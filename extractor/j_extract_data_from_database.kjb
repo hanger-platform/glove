@@ -1,0 +1,1051 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job>
+  <name>j_extract_data_from_database</name>
+  <description />
+  <extended_description />
+  <job_version />
+  <job_status>0</job_status>
+  <directory>/</directory>
+  <created_user>-</created_user>
+  <created_date>2017/08/17 12:57:55.350</created_date>
+  <modified_user>-</modified_user>
+  <modified_date>2017/08/17 12:57:55.350</modified_date>
+  <parameters>
+    <parameter>
+      <name>HAS_RECOVERY</name>
+      <default_value>0</default_value>
+      <description />
+    </parameter>
+    <parameter>
+      <name>WHERE_CONDITION_TO_DELTA</name>
+      <default_value>1=1</default_value>
+      <description />
+    </parameter>
+    <parameter>
+      <name>WHERE_CONDITION_TO_RECOVER</name>
+      <default_value>1=1</default_value>
+      <description />
+    </parameter>
+  </parameters>
+  <slaveservers>
+    </slaveservers>
+  <job-log-table>
+    <connection />
+    <schema />
+    <table />
+    <size_limit_lines />
+    <interval />
+    <timeout_days />
+    <field>
+      <id>ID_JOB</id>
+      <enabled>Y</enabled>
+      <name>ID_JOB</name>
+    </field>
+    <field>
+      <id>CHANNEL_ID</id>
+      <enabled>Y</enabled>
+      <name>CHANNEL_ID</name>
+    </field>
+    <field>
+      <id>JOBNAME</id>
+      <enabled>Y</enabled>
+      <name>JOBNAME</name>
+    </field>
+    <field>
+      <id>STATUS</id>
+      <enabled>Y</enabled>
+      <name>STATUS</name>
+    </field>
+    <field>
+      <id>LINES_READ</id>
+      <enabled>Y</enabled>
+      <name>LINES_READ</name>
+    </field>
+    <field>
+      <id>LINES_WRITTEN</id>
+      <enabled>Y</enabled>
+      <name>LINES_WRITTEN</name>
+    </field>
+    <field>
+      <id>LINES_UPDATED</id>
+      <enabled>Y</enabled>
+      <name>LINES_UPDATED</name>
+    </field>
+    <field>
+      <id>LINES_INPUT</id>
+      <enabled>Y</enabled>
+      <name>LINES_INPUT</name>
+    </field>
+    <field>
+      <id>LINES_OUTPUT</id>
+      <enabled>Y</enabled>
+      <name>LINES_OUTPUT</name>
+    </field>
+    <field>
+      <id>LINES_REJECTED</id>
+      <enabled>Y</enabled>
+      <name>LINES_REJECTED</name>
+    </field>
+    <field>
+      <id>ERRORS</id>
+      <enabled>Y</enabled>
+      <name>ERRORS</name>
+    </field>
+    <field>
+      <id>STARTDATE</id>
+      <enabled>Y</enabled>
+      <name>STARTDATE</name>
+    </field>
+    <field>
+      <id>ENDDATE</id>
+      <enabled>Y</enabled>
+      <name>ENDDATE</name>
+    </field>
+    <field>
+      <id>LOGDATE</id>
+      <enabled>Y</enabled>
+      <name>LOGDATE</name>
+    </field>
+    <field>
+      <id>DEPDATE</id>
+      <enabled>Y</enabled>
+      <name>DEPDATE</name>
+    </field>
+    <field>
+      <id>REPLAYDATE</id>
+      <enabled>Y</enabled>
+      <name>REPLAYDATE</name>
+    </field>
+    <field>
+      <id>LOG_FIELD</id>
+      <enabled>Y</enabled>
+      <name>LOG_FIELD</name>
+    </field>
+    <field>
+      <id>EXECUTING_SERVER</id>
+      <enabled>N</enabled>
+      <name>EXECUTING_SERVER</name>
+    </field>
+    <field>
+      <id>EXECUTING_USER</id>
+      <enabled>N</enabled>
+      <name>EXECUTING_USER</name>
+    </field>
+    <field>
+      <id>START_JOB_ENTRY</id>
+      <enabled>N</enabled>
+      <name>START_JOB_ENTRY</name>
+    </field>
+    <field>
+      <id>CLIENT</id>
+      <enabled>N</enabled>
+      <name>CLIENT</name>
+    </field>
+  </job-log-table>
+  <jobentry-log-table>
+    <connection />
+    <schema />
+    <table />
+    <timeout_days />
+    <field>
+      <id>ID_BATCH</id>
+      <enabled>Y</enabled>
+      <name>ID_BATCH</name>
+    </field>
+    <field>
+      <id>CHANNEL_ID</id>
+      <enabled>Y</enabled>
+      <name>CHANNEL_ID</name>
+    </field>
+    <field>
+      <id>LOG_DATE</id>
+      <enabled>Y</enabled>
+      <name>LOG_DATE</name>
+    </field>
+    <field>
+      <id>JOBNAME</id>
+      <enabled>Y</enabled>
+      <name>TRANSNAME</name>
+    </field>
+    <field>
+      <id>JOBENTRYNAME</id>
+      <enabled>Y</enabled>
+      <name>STEPNAME</name>
+    </field>
+    <field>
+      <id>LINES_READ</id>
+      <enabled>Y</enabled>
+      <name>LINES_READ</name>
+    </field>
+    <field>
+      <id>LINES_WRITTEN</id>
+      <enabled>Y</enabled>
+      <name>LINES_WRITTEN</name>
+    </field>
+    <field>
+      <id>LINES_UPDATED</id>
+      <enabled>Y</enabled>
+      <name>LINES_UPDATED</name>
+    </field>
+    <field>
+      <id>LINES_INPUT</id>
+      <enabled>Y</enabled>
+      <name>LINES_INPUT</name>
+    </field>
+    <field>
+      <id>LINES_OUTPUT</id>
+      <enabled>Y</enabled>
+      <name>LINES_OUTPUT</name>
+    </field>
+    <field>
+      <id>LINES_REJECTED</id>
+      <enabled>Y</enabled>
+      <name>LINES_REJECTED</name>
+    </field>
+    <field>
+      <id>ERRORS</id>
+      <enabled>Y</enabled>
+      <name>ERRORS</name>
+    </field>
+    <field>
+      <id>RESULT</id>
+      <enabled>Y</enabled>
+      <name>RESULT</name>
+    </field>
+    <field>
+      <id>NR_RESULT_ROWS</id>
+      <enabled>Y</enabled>
+      <name>NR_RESULT_ROWS</name>
+    </field>
+    <field>
+      <id>NR_RESULT_FILES</id>
+      <enabled>Y</enabled>
+      <name>NR_RESULT_FILES</name>
+    </field>
+    <field>
+      <id>LOG_FIELD</id>
+      <enabled>N</enabled>
+      <name>LOG_FIELD</name>
+    </field>
+    <field>
+      <id>COPY_NR</id>
+      <enabled>N</enabled>
+      <name>COPY_NR</name>
+    </field>
+  </jobentry-log-table>
+  <channel-log-table>
+    <connection />
+    <schema />
+    <table />
+    <timeout_days />
+    <field>
+      <id>ID_BATCH</id>
+      <enabled>Y</enabled>
+      <name>ID_BATCH</name>
+    </field>
+    <field>
+      <id>CHANNEL_ID</id>
+      <enabled>Y</enabled>
+      <name>CHANNEL_ID</name>
+    </field>
+    <field>
+      <id>LOG_DATE</id>
+      <enabled>Y</enabled>
+      <name>LOG_DATE</name>
+    </field>
+    <field>
+      <id>LOGGING_OBJECT_TYPE</id>
+      <enabled>Y</enabled>
+      <name>LOGGING_OBJECT_TYPE</name>
+    </field>
+    <field>
+      <id>OBJECT_NAME</id>
+      <enabled>Y</enabled>
+      <name>OBJECT_NAME</name>
+    </field>
+    <field>
+      <id>OBJECT_COPY</id>
+      <enabled>Y</enabled>
+      <name>OBJECT_COPY</name>
+    </field>
+    <field>
+      <id>REPOSITORY_DIRECTORY</id>
+      <enabled>Y</enabled>
+      <name>REPOSITORY_DIRECTORY</name>
+    </field>
+    <field>
+      <id>FILENAME</id>
+      <enabled>Y</enabled>
+      <name>FILENAME</name>
+    </field>
+    <field>
+      <id>OBJECT_ID</id>
+      <enabled>Y</enabled>
+      <name>OBJECT_ID</name>
+    </field>
+    <field>
+      <id>OBJECT_REVISION</id>
+      <enabled>Y</enabled>
+      <name>OBJECT_REVISION</name>
+    </field>
+    <field>
+      <id>PARENT_CHANNEL_ID</id>
+      <enabled>Y</enabled>
+      <name>PARENT_CHANNEL_ID</name>
+    </field>
+    <field>
+      <id>ROOT_CHANNEL_ID</id>
+      <enabled>Y</enabled>
+      <name>ROOT_CHANNEL_ID</name>
+    </field>
+  </channel-log-table>
+  <pass_batchid>N</pass_batchid>
+  <shared_objects_file />
+  <entries>
+    <entry>
+      <name>Extract data</name>
+      <description />
+      <type>TRANS</type>
+      <attributes />
+      <specification_method>filename</specification_method>
+      <trans_object_id />
+      <filename>${Internal.Job.Filename.Directory}/m_create_rawfile.ktr</filename>
+      <transname />
+      <arg_from_previous>N</arg_from_previous>
+      <params_from_previous>N</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>N</clear_files>
+      <set_logfile>N</set_logfile>
+      <logfile />
+      <logext />
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Basic</loglevel>
+      <cluster>N</cluster>
+      <slave_server_name />
+      <set_append_logfile>N</set_append_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <create_parent_folder>N</create_parent_folder>
+      <logging_remote_work>N</logging_remote_work>
+      <run_configuration />
+      <parameters>
+        <pass_all_parameters>Y</pass_all_parameters>
+        <parameter>
+          <name>TABLE_FIELD_LIST</name>
+          <stream_name />
+          <value>${TABLE_FIELD_LIST}</value>
+        </parameter>
+        <parameter>
+          <name>DELTA_FIELD_CASTING</name>
+          <stream_name />
+          <value>${DELTA_FIELD_CASTING}</value>
+        </parameter>
+        <parameter>
+          <name>INPUT_TABLE_SCHEMA</name>
+          <stream_name />
+          <value>${INPUT_TABLE_SCHEMA}</value>
+        </parameter>
+        <parameter>
+          <name>INPUT_TABLE_NAME</name>
+          <stream_name />
+          <value>${INPUT_TABLE_NAME}</value>
+        </parameter>
+        <parameter>
+          <name>WHERE_CONDITION_TO_DELTA</name>
+          <stream_name />
+          <value>${WHERE_CONDITION_TO_DELTA}</value>
+        </parameter>
+        <parameter>
+          <name>DELTA_FIELD</name>
+          <stream_name />
+          <value>${DELTA_FIELD}</value>
+        </parameter>
+        <parameter>
+          <name>RAWFILE_QUEUE_FILE</name>
+          <stream_name />
+          <value>${RAWFILE_QUEUE_FILE}</value>
+        </parameter>
+        <parameter>
+          <name>JDBC_URL</name>
+          <stream_name />
+          <value>${JDBC_URL}</value>
+        </parameter>
+        <parameter>
+          <name>JDBC_DRIVER_CLASS</name>
+          <stream_name />
+          <value>${JDBC_DRIVER_CLASS}</value>
+        </parameter>
+        <parameter>
+          <name>DB_HOST</name>
+          <stream_name />
+          <value>${DB_HOST}</value>
+        </parameter>
+        <parameter>
+          <name>DB_DATABASE</name>
+          <stream_name />
+          <value>${DB_DATABASE}</value>
+        </parameter>
+        <parameter>
+          <name>DB_PORT</name>
+          <stream_name />
+          <value>${DB_PORT}</value>
+        </parameter>
+        <parameter>
+          <name>DB_USER</name>
+          <stream_name />
+          <value>${DB_USER}</value>
+        </parameter>
+        <parameter>
+          <name>DB_PASSWORD</name>
+          <stream_name />
+          <value>${DB_PASSWORD}</value>
+        </parameter>
+      </parameters>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>432</xloc>
+      <yloc>304</yloc>
+      <attributes_kjc />
+    </entry>
+    <entry>
+      <name>Load data</name>
+      <description />
+      <type>SHELL</type>
+      <attributes />
+      <filename>${Internal.Job.Filename.Directory}/shell/${TARGET}.sh</filename>
+      <work_directory>/tmp_files/</work_directory>
+      <arg_from_previous>N</arg_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <set_logfile>N</set_logfile>
+      <logfile />
+      <set_append_logfile>N</set_append_logfile>
+      <logext />
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <insertScript>N</insertScript>
+      <script />
+      <loglevel>Basic</loglevel>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>544</xloc>
+      <yloc>304</yloc>
+      <attributes_kjc />
+    </entry>
+    <entry>
+      <name>Success</name>
+      <description />
+      <type>SUCCESS</type>
+      <attributes />
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>1024</xloc>
+      <yloc>304</yloc>
+      <attributes_kjc />
+    </entry>
+    <entry>
+      <name>Fail extracting data</name>
+      <description />
+      <type>ABORT</type>
+      <attributes />
+      <message />
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>544</xloc>
+      <yloc>416</yloc>
+      <attributes_kjc />
+    </entry>
+    <entry>
+      <name>Create delta</name>
+      <description />
+      <type>TRANS</type>
+      <attributes />
+      <specification_method>filename</specification_method>
+      <trans_object_id />
+      <filename>${Internal.Job.Filename.Directory}/m_set_delta.ktr</filename>
+      <transname />
+      <arg_from_previous>N</arg_from_previous>
+      <params_from_previous>N</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>N</clear_files>
+      <set_logfile>N</set_logfile>
+      <logfile />
+      <logext />
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Basic</loglevel>
+      <cluster>N</cluster>
+      <slave_server_name />
+      <set_append_logfile>N</set_append_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <create_parent_folder>N</create_parent_folder>
+      <logging_remote_work>N</logging_remote_work>
+      <run_configuration>Pentaho local</run_configuration>
+      <parameters>
+        <pass_all_parameters>Y</pass_all_parameters>
+        <parameter>
+          <name>DELTA_FIELD_IN_METADATA</name>
+          <stream_name />
+          <value>${DELTA_FIELD_IN_METADATA}</value>
+        </parameter>
+        <parameter>
+          <name>DELTA_DELAY</name>
+          <stream_name />
+          <value>${DELTA_DELAY}</value>
+        </parameter>
+      </parameters>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>784</xloc>
+      <yloc>192</yloc>
+      <attributes_kjc />
+    </entry>
+    <entry>
+      <name>START</name>
+      <description />
+      <type>SPECIAL</type>
+      <attributes />
+      <start>Y</start>
+      <dummy>N</dummy>
+      <repeat>N</repeat>
+      <schedulerType>0</schedulerType>
+      <intervalSeconds>0</intervalSeconds>
+      <intervalMinutes>60</intervalMinutes>
+      <hour>12</hour>
+      <minutes>0</minutes>
+      <weekDay>1</weekDay>
+      <DayOfMonth>1</DayOfMonth>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>64</xloc>
+      <yloc>192</yloc>
+      <attributes_kjc />
+    </entry>
+    <entry>
+      <name>Log</name>
+      <description />
+      <type>WRITE_TO_LOG</type>
+      <attributes />
+      <logmessage>#-----------------------------------------------------------
+# INPUT
+#-----------------------------------------------------------
+DATABASE_TYPE               	== ${DATABASE_TYPE}
+CONNECTION_NAME			== ${CONNECTION_NAME}
+INPUT_TABLE_SCHEMA            	== ${INPUT_TABLE_SCHEMA}
+INPUT_TABLE_NAME              	== ${INPUT_TABLE_NAME}
+
+#-----------------------------------------------------------
+# INPUT DELTA
+#-----------------------------------------------------------
+DELTA_FIELD                 	== ${DELTA_FIELD}
+DELTA_VALUE                 	== ${DELTA_VALUE}
+
+#-----------------------------------------------------------
+# INPUT DELTA RULE
+#-----------------------------------------------------------
+WHERE_CONDITION_TO_DELTA    	== ${WHERE_CONDITION_TO_DELTA}
+WHERE_CONDITION_TO_RECOVER  	== ${WHERE_CONDITION_TO_RECOVER}
+
+#-----------------------------------------------------------
+# INPUT DELTA FILE
+#-----------------------------------------------------------
+METADATA_DELTA_FILE      == ${METADATA_DELTA_FILE}
+
+#-----------------------------------------------------------
+# OUTPUT
+#-----------------------------------------------------------
+TARGET				== ${TARGET}
+OUTPUT_TABLE_SCHEMA            	== ${OUTPUT_TABLE_SCHEMA}
+OUTPUT_TABLE_NAME              	== ${OUTPUT_TABLE_NAME}
+OUTPUT_FORMAT			== ${OUTPUT_FORMAT}
+OUTPUT_COMPRESSION          	== ${OUTPUT_COMPRESSION}
+STORAGE_BUCKET              	== ${STORAGE_BUCKET}
+CUSTOM_PRIMARY_KEY          	== ${CUSTOM_PRIMARY_KEY}
+
+#-----------------------------------------------------------
+# OUTPUT PARTITION
+#-----------------------------------------------------------
+PARTITION_FIELD             	== ${PARTITION_FIELD}
+PARTITION_TYPE              	== ${PARTITION_TYPE}
+PARTITION_FORMAT            	== ${PARTITION_FORMAT}
+PARTITION_LENGTH            	== ${PARTITION_LENGTH}
+PARTITION_MODE              	== ${PARTITION_MODE}
+PARTITION_MERGE		    	== ${PARTITION_MERGE}
+PARTITION_EAGER		    	== ${PARTITION_EAGER}
+
+#-----------------------------------------------------------
+# OUTPUT FIELD
+#-----------------------------------------------------------
+FIELD_NAME_AND_TYPE_LIST    	== ${FIELD_NAME_AND_TYPE_LIST}
+
+#-----------------------------------------------------------
+# RULE
+#-----------------------------------------------------------
+ALLOW_RECREATE              	== ${ALLOW_RECREATE}
+IS_RECREATE                 	== ${IS_RECREATE}
+#-----------------------------------------------------------</logmessage>
+      <loglevel>Basic</loglevel>
+      <logsubject>LOG</logsubject>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>64</xloc>
+      <yloc>304</yloc>
+      <attributes_kjc />
+    </entry>
+    <entry>
+      <name>Delete queue</name>
+      <description />
+      <type>DELETE_FILES</type>
+      <attributes />
+      <arg_from_previous>N</arg_from_previous>
+      <include_subfolders>Y</include_subfolders>
+      <fields>
+        <field>
+          <name>${RAWFILE_QUEUE_PATH}</name>
+          <filemask />
+        </field>
+      </fields>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>176</xloc>
+      <yloc>304</yloc>
+      <attributes_kjc />
+    </entry>
+    <entry>
+      <name>Has partition field? </name>
+      <description />
+      <type>SIMPLE_EVAL</type>
+      <attributes />
+      <valuetype>variable</valuetype>
+      <fieldname />
+      <variablename>${PARTITION_FIELD}</variablename>
+      <fieldtype>string</fieldtype>
+      <mask />
+      <comparevalue />
+      <minvalue />
+      <maxvalue />
+      <successcondition>different</successcondition>
+      <successnumbercondition>equal</successnumbercondition>
+      <successbooleancondition>false</successbooleancondition>
+      <successwhenvarset>N</successwhenvarset>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>304</xloc>
+      <yloc>304</yloc>
+      <attributes_kjc />
+    </entry>
+    <entry>
+      <name>Create recovery file</name>
+      <description />
+      <type>TRANS</type>
+      <attributes />
+      <specification_method>filename</specification_method>
+      <trans_object_id />
+      <filename>${Internal.Job.Filename.Directory}/m_set_recovery.ktr</filename>
+      <transname />
+      <arg_from_previous>N</arg_from_previous>
+      <params_from_previous>N</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>N</clear_files>
+      <set_logfile>N</set_logfile>
+      <logfile />
+      <logext />
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Basic</loglevel>
+      <cluster>N</cluster>
+      <slave_server_name />
+      <set_append_logfile>N</set_append_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <create_parent_folder>N</create_parent_folder>
+      <logging_remote_work>N</logging_remote_work>
+      <run_configuration />
+      <parameters>
+        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>432</xloc>
+      <yloc>192</yloc>
+      <attributes_kjc />
+    </entry>
+    <entry>
+      <name>Has partition field?  </name>
+      <description />
+      <type>SIMPLE_EVAL</type>
+      <attributes />
+      <valuetype>variable</valuetype>
+      <fieldname />
+      <variablename>${PARTITION_FIELD}</variablename>
+      <fieldtype>string</fieldtype>
+      <mask />
+      <comparevalue />
+      <minvalue />
+      <maxvalue />
+      <successcondition>different</successcondition>
+      <successnumbercondition>equal</successnumbercondition>
+      <successbooleancondition>false</successbooleancondition>
+      <successwhenvarset>N</successwhenvarset>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>784</xloc>
+      <yloc>304</yloc>
+      <attributes_kjc />
+    </entry>
+    <entry>
+      <name>Delete recovery file</name>
+      <description />
+      <type>DELETE_FILES</type>
+      <attributes />
+      <arg_from_previous>N</arg_from_previous>
+      <include_subfolders>N</include_subfolders>
+      <fields>
+        <field>
+          <name>${METADATA_RECOVERY_FILE}</name>
+          <filemask />
+        </field>
+      </fields>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>912</xloc>
+      <yloc>416</yloc>
+      <attributes_kjc />
+    </entry>
+    <entry>
+      <name>Has recovery?</name>
+      <description />
+      <type>SIMPLE_EVAL</type>
+      <attributes />
+      <valuetype>variable</valuetype>
+      <fieldname />
+      <variablename>${HAS_RECOVERY}</variablename>
+      <fieldtype>number</fieldtype>
+      <mask />
+      <comparevalue>1</comparevalue>
+      <minvalue />
+      <maxvalue />
+      <successcondition>different</successcondition>
+      <successnumbercondition>equal</successnumbercondition>
+      <successbooleancondition>false</successbooleancondition>
+      <successwhenvarset>N</successwhenvarset>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>304</xloc>
+      <yloc>192</yloc>
+      <attributes_kjc />
+    </entry>
+    <entry>
+      <name>Has recovery? </name>
+      <description />
+      <type>SIMPLE_EVAL</type>
+      <attributes />
+      <valuetype>variable</valuetype>
+      <fieldname />
+      <variablename>${HAS_RECOVERY}</variablename>
+      <fieldtype>number</fieldtype>
+      <mask />
+      <comparevalue>1</comparevalue>
+      <minvalue />
+      <maxvalue />
+      <successcondition>different</successcondition>
+      <successnumbercondition>equal</successnumbercondition>
+      <successbooleancondition>false</successbooleancondition>
+      <successwhenvarset>N</successwhenvarset>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>656</xloc>
+      <yloc>304</yloc>
+      <attributes_kjc />
+    </entry>
+    <entry>
+      <name>Disable recreate</name>
+      <description />
+      <type>TRANS</type>
+      <attributes />
+      <specification_method>filename</specification_method>
+      <trans_object_id />
+      <filename>${Internal.Job.Filename.Directory}/m_disable_recreate.ktr</filename>
+      <transname />
+      <arg_from_previous>N</arg_from_previous>
+      <params_from_previous>N</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>N</clear_files>
+      <set_logfile>N</set_logfile>
+      <logfile />
+      <logext />
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Basic</loglevel>
+      <cluster>N</cluster>
+      <slave_server_name />
+      <set_append_logfile>N</set_append_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <create_parent_folder>N</create_parent_folder>
+      <logging_remote_work>N</logging_remote_work>
+      <run_configuration />
+      <parameters>
+        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>912</xloc>
+      <yloc>304</yloc>
+      <attributes_kjc />
+    </entry>
+    <entry>
+      <name>Has delta field? </name>
+      <description />
+      <type>SIMPLE_EVAL</type>
+      <attributes />
+      <valuetype>variable</valuetype>
+      <fieldname />
+      <variablename>${DELTA_FIELD}</variablename>
+      <fieldtype>string</fieldtype>
+      <mask />
+      <comparevalue />
+      <minvalue />
+      <maxvalue />
+      <successcondition>different</successcondition>
+      <successnumbercondition>equal</successnumbercondition>
+      <successbooleancondition>false</successbooleancondition>
+      <successwhenvarset>N</successwhenvarset>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>656</xloc>
+      <yloc>192</yloc>
+      <attributes_kjc />
+    </entry>
+  </entries>
+  <hops>
+    <hop>
+      <from>Extract data</from>
+      <to>Fail extracting data</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Extract data</from>
+      <to>Load data</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>START</from>
+      <to>Log</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>Y</unconditional>
+    </hop>
+    <hop>
+      <from>Log</from>
+      <to>Delete queue</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Load data</from>
+      <to>Fail extracting data</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Delete queue</from>
+      <to>Has partition field? </to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Create recovery file</from>
+      <to>Extract data</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Has partition field? </from>
+      <to>Extract data</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Create delta</from>
+      <to>Has partition field?  </to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Has partition field?  </from>
+      <to>Delete recovery file</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Has partition field? </from>
+      <to>Has recovery?</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Has recovery?</from>
+      <to>Create recovery file</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Has recovery?</from>
+      <to>Extract data</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Load data</from>
+      <to>Has recovery? </to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Has recovery? </from>
+      <to>Has partition field?  </to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Delete recovery file</from>
+      <to>Disable recreate</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Has partition field?  </from>
+      <to>Disable recreate</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Has recovery? </from>
+      <to>Has delta field? </to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Has delta field? </from>
+      <to>Create delta</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Has delta field? </from>
+      <to>Has partition field?  </to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Disable recreate</from>
+      <to>Success</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+  </hops>
+  <notepads>
+  </notepads>
+  <attributes>
+    <group>
+      <name>METASTORE.pentaho</name>
+      <attribute>
+        <key>Default Run Configuration</key>
+        <value>{"namespace":"pentaho","id":"Default Run Configuration","name":"Default Run Configuration","description":"Defines a default run configuration","metaStoreName":null}</value>
+      </attribute>
+    </group>
+    <group>
+      <name>{"_":"Embedded MetaStore Elements","namespace":"pentaho","type":"Default Run Configuration"}</name>
+      <attribute>
+        <key>Pentaho local</key>
+        <value>{"children":[{"children":[],"id":"server","value":null},{"children":[],"id":"clustered","value":"N"},{"children":[],"id":"name","value":"Pentaho local"},{"children":[],"id":"description","value":null},{"children":[],"id":"pentaho","value":"N"},{"children":[],"id":"readOnly","value":"Y"},{"children":[],"id":"sendResources","value":"N"},{"children":[],"id":"logRemoteExecutionLocally","value":"N"},{"children":[],"id":"remote","value":"N"},{"children":[],"id":"local","value":"Y"},{"children":[],"id":"showTransformations","value":"N"}],"id":"Pentaho local","value":null,"name":"Pentaho local","owner":null,"ownerPermissionsList":[]}</value>
+      </attribute>
+    </group>
+  </attributes>
+</job>
