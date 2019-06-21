@@ -241,7 +241,7 @@ public class Extractor implements Runnable {
                         } else {
                             //Match sttring. 
                             stringField = stringField + 1;
-                            length = value.length() > length ? value.getBytes().length : length;
+                            length = value.getBytes().length > length ? value.getBytes().length : length;
                         }
                     }
 
