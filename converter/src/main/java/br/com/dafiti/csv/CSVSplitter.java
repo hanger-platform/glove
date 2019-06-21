@@ -128,8 +128,6 @@ public class CSVSplitter implements Runnable {
             while ((record = csvParser.parseNext()) != null) {
                 //Ignore the header.
                 if (!(rowNumber == 0 && header)) {
-
-                    //csvParser.getRecordMetadata().indexOf(csvPath);
                     String partitionValue = record[partitionColumn];
 
                     //Identify if partition is in cache.

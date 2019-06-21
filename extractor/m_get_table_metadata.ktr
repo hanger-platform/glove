@@ -666,11 +666,6 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>To lower</from>
-      <to>Finds delta field</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
       <from>Get delta field</from>
       <to>Delta field name to lower</to>
       <enabled>Y</enabled>
@@ -678,16 +673,6 @@
     <hop>
       <from>Delta field name to lower</from>
       <to>Finds delta field</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>To lower</from>
-      <to>Finds partition field</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>To lower</from>
-      <to>Finds reserved words</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
@@ -753,6 +738,26 @@
     <hop>
       <from>Hub</from>
       <to>Writes table columns</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>To lower</from>
+      <to>Column name normalizer</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Column name normalizer</from>
+      <to>Finds partition field</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Column name normalizer</from>
+      <to>Finds delta field</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Column name normalizer</from>
+      <to>Finds reserved words</to>
       <enabled>Y</enabled>
     </hop>
   </order>
@@ -880,7 +885,7 @@
     </remotesteps>
     <GUI>
       <xloc>784</xloc>
-      <yloc>640</yloc>
+      <yloc>768</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -980,7 +985,7 @@
     </remotesteps>
     <GUI>
       <xloc>352</xloc>
-      <yloc>640</yloc>
+      <yloc>768</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1104,7 +1109,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     </remotesteps>
     <GUI>
       <xloc>224</xloc>
-      <yloc>528</yloc>
+      <yloc>656</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1138,7 +1143,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     </remotesteps>
     <GUI>
       <xloc>784</xloc>
-      <yloc>960</yloc>
+      <yloc>1120</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1172,7 +1177,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     </remotesteps>
     <GUI>
       <xloc>928</xloc>
-      <yloc>960</yloc>
+      <yloc>1120</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1320,7 +1325,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
       <method>none</method>
       <schema_name />
     </partitioning>
-    <from>To lower</from>
+    <from>Column name normalizer</from>
     <input_sorted>N</input_sorted>
     <preserve_memory>Y</preserve_memory>
     <sorted_list>N</sorted_list>
@@ -1347,7 +1352,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     </remotesteps>
     <GUI>
       <xloc>352</xloc>
-      <yloc>528</yloc>
+      <yloc>656</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1362,7 +1367,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
       <method>none</method>
       <schema_name />
     </partitioning>
-    <from>To lower</from>
+    <from>Column name normalizer</from>
     <input_sorted>N</input_sorted>
     <preserve_memory>Y</preserve_memory>
     <sorted_list>N</sorted_list>
@@ -1389,7 +1394,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     </remotesteps>
     <GUI>
       <xloc>624</xloc>
-      <yloc>528</yloc>
+      <yloc>656</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1431,7 +1436,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     </remotesteps>
     <GUI>
       <xloc>928</xloc>
-      <yloc>528</yloc>
+      <yloc>656</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1533,7 +1538,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     </remotesteps>
     <GUI>
       <xloc>96</xloc>
-      <yloc>528</yloc>
+      <yloc>656</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1608,7 +1613,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     </remotesteps>
     <GUI>
       <xloc>784</xloc>
-      <yloc>736</yloc>
+      <yloc>880</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1651,7 +1656,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     </remotesteps>
     <GUI>
       <xloc>928</xloc>
-      <yloc>736</yloc>
+      <yloc>880</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1699,6 +1704,31 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     </GUI>
   </step>
   <step>
+    <name>Hub</name>
+    <type>Dummy</type>
+    <description />
+    <distribute>N</distribute>
+    <custom_distribution />
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name />
+    </partitioning>
+    <attributes />
+    <cluster_schema />
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>624</xloc>
+      <yloc>288</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
     <name>Identifies last row</name>
     <type>DetectLastRow</type>
     <description />
@@ -1720,7 +1750,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     </remotesteps>
     <GUI>
       <xloc>1072</xloc>
-      <yloc>640</yloc>
+      <yloc>768</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1787,10 +1817,8 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
 		String column_name_lower = get(Fields.In, "column_name_lower").getString(r);
 		String reserved_words = get(Fields.In, "reserved_words").getString(r);
 	
-		//Replaces the reserved words. 
-		if ( reserved_words != null ){
-			json = json.replaceAll( '"' + column_name + '"', '"' + column_name_lower + '"' ); 
-		}	
+		//Normalize column names and replace reserved words. 
+		json = json.replaceAll( '"' + column_name + '"', '"' + column_name_lower + '"' ); 
 
         //Identifies the first row.
         if (first) {
@@ -1834,7 +1862,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     </remotesteps>
     <GUI>
       <xloc>1072</xloc>
-      <yloc>736</yloc>
+      <yloc>880</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1868,7 +1896,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     </remotesteps>
     <GUI>
       <xloc>624</xloc>
-      <yloc>640</yloc>
+      <yloc>768</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1911,7 +1939,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     </remotesteps>
     <GUI>
       <xloc>480</xloc>
-      <yloc>528</yloc>
+      <yloc>656</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -2166,7 +2194,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     </remotesteps>
     <GUI>
       <xloc>784</xloc>
-      <yloc>528</yloc>
+      <yloc>656</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -2287,7 +2315,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     </remotesteps>
     <GUI>
       <xloc>928</xloc>
-      <yloc>640</yloc>
+      <yloc>768</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -2321,7 +2349,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     </remotesteps>
     <GUI>
       <xloc>1232</xloc>
-      <yloc>736</yloc>
+      <yloc>768</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -2329,7 +2357,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     <name>To lower</name>
     <type>StringOperations</type>
     <description />
-    <distribute>N</distribute>
+    <distribute>Y</distribute>
     <custom_distribution />
     <copies>1</copies>
     <partitioning>
@@ -2430,7 +2458,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     </remotesteps>
     <GUI>
       <xloc>1072</xloc>
-      <yloc>864</yloc>
+      <yloc>1008</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -2649,7 +2677,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     </remotesteps>
     <GUI>
       <xloc>784</xloc>
-      <yloc>864</yloc>
+      <yloc>1008</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -2718,13 +2746,13 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     </remotesteps>
     <GUI>
       <xloc>928</xloc>
-      <yloc>864</yloc>
+      <yloc>1008</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Hub</name>
-    <type>Dummy</type>
+    <name>Column name normalizer</name>
+    <type>ReplaceString</type>
     <description />
     <distribute>N</distribute>
     <custom_distribution />
@@ -2733,6 +2761,32 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
       <method>none</method>
       <schema_name />
     </partitioning>
+    <fields>
+      <field>
+        <in_stream_name>column_name_lower</in_stream_name>
+        <out_stream_name />
+        <use_regex>no</use_regex>
+        <replace_string>-</replace_string>
+        <replace_by_string>_</replace_by_string>
+        <set_empty_string>N</set_empty_string>
+        <replace_field_by_string />
+        <whole_word>no</whole_word>
+        <case_sensitive>no</case_sensitive>
+        <is_unicode>no</is_unicode>
+      </field>
+      <field>
+        <in_stream_name>column_name_lower</in_stream_name>
+        <out_stream_name />
+        <use_regex>no</use_regex>
+        <replace_string> </replace_string>
+        <replace_by_string>_</replace_by_string>
+        <set_empty_string>N</set_empty_string>
+        <replace_field_by_string />
+        <whole_word>no</whole_word>
+        <case_sensitive>no</case_sensitive>
+        <is_unicode>no</is_unicode>
+      </field>
+    </fields>
     <attributes />
     <cluster_schema />
     <remotesteps>
@@ -2743,7 +2797,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     </remotesteps>
     <GUI>
       <xloc>624</xloc>
-      <yloc>288</yloc>
+      <yloc>528</yloc>
       <draw>Y</draw>
     </GUI>
   </step>

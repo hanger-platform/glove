@@ -122,8 +122,8 @@ SELECT * FROM (
             WHEN 'time'         THEN 'varchar(17)'
             WHEN 'timestamp'    THEN 'varchar(19)'
 			WHEN 'decimal'      THEN CONCAT('decimal','(', IF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ,',',NUMERIC_SCALE,')')
-            WHEN 'double'       THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN 'double precision' ELSE 'double' END
-            WHEN 'float'        THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN 'double precision' ELSE 'double' END
+            WHEN 'double'       THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
+            WHEN 'float'        THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
             WHEN 'set'          THEN 'varchar(255)'
             WHEN 'enum'         THEN 'varchar(255)'
             WHEN 'char'         THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + ROUND( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')

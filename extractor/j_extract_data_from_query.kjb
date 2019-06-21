@@ -880,9 +880,11 @@ if [ ${RECORD_TO_LOAD} -gt 1 ]; then
 
 	DIALECT=${TARGET}
 	
-	if [ ${TARGET} == "spectrum"  ] &amp;&amp;  [ ${IS_SPECTRUM} = 0 ]; then
+	if [ ${TARGET} == "spectrum"  ] &amp;&amp;  [ ${HAS_ATHENA} = 1 ]; then
 		DIALECT="athena"
 	fi 
+
+	echo "Dialect: " $DIALECT
 
 	echo "Extracting metadata"
 	java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \

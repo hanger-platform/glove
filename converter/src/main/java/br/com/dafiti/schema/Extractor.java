@@ -364,9 +364,12 @@ public class Extractor implements Runnable {
 
                             switch (dialect) {
                                 case "spectrum":
-                                case "athena":
                                     fieldSchema.add("{\"name\":\"" + field + "\",\"type\":[\"null\",\"double\"],\"default\":null}");
                                     fieldDataType.add(field + " " + "double precision");
+                                    break;
+                                case "athena":
+                                    fieldSchema.add("{\"name\":\"" + field + "\",\"type\":[\"null\",\"double\"],\"default\":null}");
+                                    fieldDataType.add(field + " " + "double");
                                     break;
                                 case "redshift":
                                     fieldDataType.add(field + " " + "double precision");

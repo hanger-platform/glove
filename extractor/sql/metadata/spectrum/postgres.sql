@@ -68,8 +68,8 @@ SELECT * FROM (
             WHEN 'timestamp with time zone'		 THEN 'varchar(25)'
             WHEN 'timestamp without time zone'	 THEN 'varchar(19)'
             WHEN 'time without time zone'	     THEN 'varchar(19)'
-            WHEN 'double precision'	             THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN 'double precision' ELSE 'double' END
-            WHEN 'real'	                         THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN 'double precision' ELSE 'double' END
+            WHEN 'double precision'	             THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
+            WHEN 'real'	                         THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
             WHEN 'numeric'		                 THEN 'decimal'||'('|| COALESCE(  numeric_precision, 16 ) ||','|| COALESCE(  numeric_scale, 4 ) ||')'
             WHEN 'boolean' 		                 THEN 'boolean'
         END AS field_type,

@@ -82,10 +82,10 @@ SELECT * FROM (
 				WHEN 'CLOB'			THEN 'varchar(65535)'
 				WHEN 'NCLOB'		THEN 'varchar(65535)'
 				WHEN 'TEXT'			THEN 'varchar(65535)'
-				WHEN 'REAL'			THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN 'double precision' ELSE 'double' END
-				WHEN 'DOUBLE'		THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN 'double precision' ELSE 'double' END
-                WHEN 'SMALLDECIMAL'	THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN 'double precision' ELSE 'double' END
-				WHEN 'DECIMAL'		THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN 'double precision' ELSE 'double' END
+				WHEN 'REAL'			THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
+				WHEN 'DOUBLE'		THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
+                WHEN 'SMALLDECIMAL'	THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
+				WHEN 'DECIMAL'		THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
 				WHEN 'DATE'			THEN 'varchar(10)'
 				WHEN 'TIME'			THEN 'varchar(19)'
 				WHEN 'SECONDDATE'	THEN 'varchar(19)'
