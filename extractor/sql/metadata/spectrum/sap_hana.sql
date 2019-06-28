@@ -61,12 +61,14 @@ SELECT * FROM (
                 WHEN DATA_TYPE_NAME = 'DATE' THEN 'TO_CHAR ( ' || COLUMN_NAME || ' , ' || '''' || 'YYYY-MM-DD' ||  '''' || ') AS ' || REPLACE_REGEXPR( '\/\w+\/' IN COLUMN_NAME WITH '' )
                 WHEN DATA_TYPE_NAME IN  ( 'TIME', 'SECONDDATE', 'TIMESTAMP' ) THEN 'CONCAT( TO_CHAR ( ' || COLUMN_NAME || ' , ' || '''' || 'YYYY-MM-DD HH24:MI:SS' || '''' || '),' || '''' || ' ${TIMEZONE_OFFSET}' || '''' || ') AS ' || REPLACE_REGEXPR( '\/\w+\/' IN COLUMN_NAME WITH '' )
                 WHEN DATA_TYPE_NAME in ( 'VARCHAR', 'NVARCHAR', 'ALPHANUM', 'SHORTTEXT', 'BLOB', 'CLOB', 'NCLOB', 'TEXT' ) then '"' || COLUMN_NAME || '"' || ' as ' || REPLACE_REGEXPR( '\/\w+\/' IN COLUMN_NAME WITH '' )
+                WHEN DATA_TYPE_NAME in ( 'VARBINARY','BINARY') then 'CAST("' || COLUMN_NAME || '" AS VARCHAR)' || ' as ' || REPLACE_REGEXPR( '\/\w+\/' IN COLUMN_NAME WITH '' )
                 ELSE '"' || COLUMN_NAME || '"' || ' AS ' || REPLACE_REGEXPR( '\/\w+\/' IN COLUMN_NAME WITH '' )
             END AS fields,
             CASE
                 WHEN DATA_TYPE_NAME = 'DATE' THEN 'TO_CHAR ( ' || COLUMN_NAME || ' , ' || '''' || 'YYYY-MM-DD' ||  '''' || ')'
                 WHEN DATA_TYPE_NAME IN  ( 'TIME', 'SECONDDATE', 'TIMESTAMP' ) THEN 'CONCAT( TO_CHAR ( ' || COLUMN_NAME || ' , ' || '''' || 'YYYY-MM-DD HH24:MI:SS' || '''' || '),' || '''' || ' ${TIMEZONE_OFFSET}' || '''' || ')'
                 WHEN DATA_TYPE_NAME IN ( 'VARCHAR', 'NVARCHAR', 'ALPHANUM', 'SHORTTEXT', 'BLOB', 'CLOB', 'NCLOB', 'TEXT' ) then '"' || COLUMN_NAME || '"'
+                WHEN DATA_TYPE_NAME IN ( 'VARBINARY', 'BINARY') then 'CAST("' || COLUMN_NAME || '" AS VARCHAR)'
                 ELSE '"' || COLUMN_NAME || '"'
             END AS casting,
 			CASE DATA_TYPE_NAME
@@ -76,16 +78,17 @@ SELECT * FROM (
 				WHEN 'BIGINT'		THEN 'bigint'
 				WHEN 'VARCHAR'		THEN 'varchar'||'(' || TO_BIGINT( round(CASE WHEN MOD("LENGTH",2) = 0 THEN "LENGTH" * ("LENGTH" / 2) else ("LENGTH" + 1) * (("LENGTH" + 1)/ 2) end, 0)) ||')'
 				WHEN 'VARBINARY'	THEN 'varchar'||'(' || TO_BIGINT( round(CASE WHEN MOD("LENGTH",2) = 0 THEN "LENGTH" * ("LENGTH" / 2) else ("LENGTH" + 1) * (("LENGTH" + 1)/ 2) end, 0)) ||')'
+                WHEN 'BINARY'	THEN 'varchar'||'(' || TO_BIGINT( round(CASE WHEN MOD("LENGTH",2) = 0 THEN "LENGTH" * ("LENGTH" / 2) else ("LENGTH" + 1) * (("LENGTH" + 1)/ 2) end, 0)) ||')'
 				WHEN 'NVARCHAR'		THEN 'varchar'||'(' || TO_BIGINT( round(CASE WHEN MOD("LENGTH",2) = 0 THEN "LENGTH" * ("LENGTH" / 2) else ("LENGTH" + 1) * (("LENGTH" + 1) /2) end, 0)) ||')'
 				WHEN 'CHAR'			THEN 'varchar'||'(' || TO_BIGINT( round(CASE WHEN MOD("LENGTH",2) = 0 THEN "LENGTH" * ("LENGTH" / 2) else ("LENGTH" + 1) * (("LENGTH" + 1) /2) end, 0)) ||')'
 				WHEN 'BLOB'			THEN 'varchar(65535)'
 				WHEN 'CLOB'			THEN 'varchar(65535)'
 				WHEN 'NCLOB'		THEN 'varchar(65535)'
 				WHEN 'TEXT'			THEN 'varchar(65535)'
-				WHEN 'REAL'			THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
-				WHEN 'DOUBLE'		THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
-                WHEN 'SMALLDECIMAL'	THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
-				WHEN 'DECIMAL'		THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
+				WHEN 'REAL'			THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN 'double precision' ELSE 'double' END
+				WHEN 'DOUBLE'		THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN 'double precision' ELSE 'double' END
+                WHEN 'SMALLDECIMAL'	THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN 'double precision' ELSE 'double' END
+				WHEN 'DECIMAL'		THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN 'double precision' ELSE 'double' END
 				WHEN 'DATE'			THEN 'varchar(10)'
 				WHEN 'TIME'			THEN 'varchar(19)'
 				WHEN 'SECONDDATE'	THEN 'varchar(19)'
@@ -96,7 +99,7 @@ SELECT * FROM (
                 CASE
                 	  WHEN DATA_TYPE_NAME IN ( 'TINYINT', 'SMALLINT', 'INTEGER' ) THEN '["null", "int"]'
                     WHEN DATA_TYPE_NAME IN ( 'BIGINT' ) THEN '["null", "long"]'
-                    WHEN DATA_TYPE_NAME IN ( 'VARCHAR', 'VARBINARY', 'NVARCHAR', 'CHAR', 'BLOB', 'CLOB', 'NCLOB', 'TEXT' ) THEN '["null", "string"]'
+                    WHEN DATA_TYPE_NAME IN ( 'VARCHAR', 'VARBINARY','BINARY', 'NVARCHAR', 'CHAR', 'BLOB', 'CLOB', 'NCLOB', 'TEXT' ) THEN '["null", "string"]'
                     WHEN DATA_TYPE_NAME IN ( 'REAL', 'DOUBLE', 'SMALLDECIMAL', 'DECIMAL' ) THEN '["null", "double"]'
                     WHEN DATA_TYPE_NAME IN ( 'DATE', 'TIME', 'SECONDDATE', 'TIMESTAMP' ) THEN '["null", "string"]'
                 	  WHEN DATA_TYPE_NAME = 'BOOLEAN' THEN '["null", "boolean"]'
