@@ -875,7 +875,6 @@ if [ ${RECORD_TO_LOAD} -gt 1 ]; then
 
 	echo "Getting data sample of ${SAMPLE} records"
 	head -n ${SAMPLE} ${RAWFILE_QUEUE_FILE} > ${RAWFILE_QUEUE_SAMPLE_FILE} 
-	tail -n ${SAMPLE} ${RAWFILE_QUEUE_FILE} >> ${RAWFILE_QUEUE_SAMPLE_FILE} 
 	error_check
 
 	DIALECT=${TARGET}
