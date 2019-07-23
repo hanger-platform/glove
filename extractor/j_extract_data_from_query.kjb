@@ -663,12 +663,12 @@ ORDER                       	== ${ORDER}
 SCHEMA_NAME		    	== ${SCHEMA_NAME}
 TABLE			    	== ${TABLE}
 CONNECTION_NAME             	== ${CONNECTION_NAME}
-MODE                       	 == ${MODE}
+MODE                       	== ${MODE}
 
 #-----------------------------------------------------------
 # INPUT
 #-----------------------------------------------------------
-DATABASE_TYPE               	== ${DATABASE_TYPE} 
+DATABASE_TYPE               	== |${DATABASE_TYPE}| 
 SAMPLE			    	== ${SAMPLE}
 SQL                         	== ${INPUT_DATA_STATEMENT}
 METADATA                    	== ${METADATA} 
@@ -680,6 +680,8 @@ TARGET                      	== ${TARGET}
 OUTPUT_FORMAT               	== ${OUTPUT_FORMAT}
 OUTPUT_COMPRESSION          	== ${OUTPUT_COMPRESSION}
 STORAGE_BUCKET              	== ${STORAGE_BUCKET}
+ALLOW_DUPLICATED              	== ${ALLOW_DUPLICATED}
+ALLOW_RECREATE              	== ${ALLOW_RECREATE}
 
 #-----------------------------------------------------------
 # OUTPUT EXPORT
@@ -970,7 +972,7 @@ fi
       <variablename>${DATABASE_TYPE}</variablename>
       <fieldtype>string</fieldtype>
       <mask />
-      <comparevalue>athena,redshift,bigquery</comparevalue>
+      <comparevalue>athena,redshift,bigquery,sisense</comparevalue>
       <minvalue />
       <maxvalue />
       <successcondition>notinlist</successcondition>
@@ -1085,7 +1087,7 @@ fi
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>176</xloc>
-      <yloc>608</yloc>
+      <yloc>720</yloc>
       <attributes_kjc />
     </entry>
     <entry>
@@ -1121,7 +1123,7 @@ fi
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>288</xloc>
-      <yloc>608</yloc>
+      <yloc>720</yloc>
       <attributes_kjc />
     </entry>
     <entry>
@@ -1161,7 +1163,7 @@ TARGET                      == ${TARGET}
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>176</xloc>
-      <yloc>720</yloc>
+      <yloc>832</yloc>
       <attributes_kjc />
     </entry>
     <entry>
@@ -1303,18 +1305,6 @@ Check if query returned at least one record or if happened error on the process.
       <attributes_kjc />
     </entry>
     <entry>
-      <name>Recreate is not allowed</name>
-      <description />
-      <type>SUCCESS</type>
-      <attributes />
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>1088</xloc>
-      <yloc>384</yloc>
-      <attributes_kjc />
-    </entry>
-    <entry>
       <name>Extract Big Data</name>
       <description />
       <type>JOB</type>
@@ -1440,6 +1430,121 @@ rm -rf ${RAWFILE_QUEUE_STAGING_PATH}*
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>752</xloc>
+      <yloc>608</yloc>
+      <attributes_kjc />
+    </entry>
+    <entry>
+      <name>Recreate is not allowed</name>
+      <description />
+      <type>ABORT</type>
+      <attributes />
+      <message />
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>1088</xloc>
+      <yloc>384</yloc>
+      <attributes_kjc />
+    </entry>
+    <entry>
+      <name>Is Athena</name>
+      <description />
+      <type>SIMPLE_EVAL</type>
+      <attributes />
+      <valuetype>variable</valuetype>
+      <fieldname />
+      <variablename>${DATABASE_TYPE}</variablename>
+      <fieldtype>string</fieldtype>
+      <mask />
+      <comparevalue>athena</comparevalue>
+      <minvalue />
+      <maxvalue />
+      <successcondition>equal</successcondition>
+      <successnumbercondition>equal</successnumbercondition>
+      <successbooleancondition>false</successbooleancondition>
+      <successwhenvarset>N</successwhenvarset>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>176</xloc>
+      <yloc>608</yloc>
+      <attributes_kjc />
+    </entry>
+    <entry>
+      <name>Athena script</name>
+      <description />
+      <type>SHELL</type>
+      <attributes />
+      <filename />
+      <work_directory />
+      <arg_from_previous>N</arg_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <set_logfile>N</set_logfile>
+      <logfile />
+      <set_append_logfile>N</set_append_logfile>
+      <logext />
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <insertScript>Y</insertScript>
+      <script>error_check(){
+	if [ $? -gt 0 ]; then
+       	 	echo "An error has occurred :_("
+
+        	# Remove os arquivos temporários.
+        	if [ ${DEBUG} = 0 ] ; then
+            		rm -rf ${RAWFILE_QUEUE_PATH}*
+       	 	fi
+
+		exit 1
+	fi
+}
+
+QUERY_ID=`aws athena start-query-execution --query-string "${INPUT_DATA_STATEMENT}" --output text --result-configuration OutputLocation=s3://${STORAGE_BUCKET}/staging`
+error_check
+
+echo "Running query $QUERY_ID!"
+
+while true
+do
+    QUERY_STATUS=`aws athena get-query-execution --query-execution-id $QUERY_ID | jq '.QueryExecution.Status.State' | sed 's/\"//g'`
+    error_check
+
+    if [[ "$QUERY_STATUS" == "SUCCEEDED" ]]; then
+       QUERY_RESULTSET=`aws athena get-query-execution --query-execution-id $QUERY_ID | jq '.QueryExecution.ResultConfiguration.OutputLocation' | sed 's/\"//g'`
+	error_check
+	break
+    elif [[ $QUERY_STATUS == "FAILED" || $QUERY_STATUS == "CANCELLED" ]]; then
+       echo "Query  $QUERY_ID failed!"
+	echo `aws athena get-query-execution --query-execution-id $QUERY_ID | jq '.QueryExecution.Status.StateChangeReason'`
+	break
+    else
+        sleep 10
+    fi
+done
+
+if [ -z $QUERY_RESULTSET ]; then
+	exit 1
+else
+	echo "Script sucessfully"
+fi</script>
+      <loglevel>Basic</loglevel>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>288</xloc>
+      <yloc>608</yloc>
+      <attributes_kjc />
+    </entry>
+    <entry>
+      <name>Fail running script </name>
+      <description />
+      <type>ABORT</type>
+      <attributes />
+      <message />
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>400</xloc>
       <yloc>608</yloc>
       <attributes_kjc />
     </entry>
@@ -1581,15 +1686,6 @@ rm -rf ${RAWFILE_QUEUE_STAGING_PATH}*
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>Script log</from>
-      <to>Script</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
       <from>Metadata exists?</from>
       <to>Recreate? </to>
       <from_nr>0</from_nr>
@@ -1707,15 +1803,6 @@ rm -rf ${RAWFILE_QUEUE_STAGING_PATH}*
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>Allow recreate? </from>
-      <to>Recreate is not allowed</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>N</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
       <from>Extract DBMS data</from>
       <to>Extract metadata</to>
       <from_nr>0</from_nr>
@@ -1803,6 +1890,60 @@ rm -rf ${RAWFILE_QUEUE_STAGING_PATH}*
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
       <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Allow recreate? </from>
+      <to>Recreate is not allowed</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Script log</from>
+      <to>Is Athena</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Is Athena</from>
+      <to>Script</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Is Athena</from>
+      <to>Athena script</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Athena script</from>
+      <to>Fail running script </to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Athena script</from>
+      <to>Script Success</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
       <unconditional>N</unconditional>
     </hop>
   </hops>

@@ -234,7 +234,7 @@ public class CSVToORC implements Runnable {
                 }
 
                 //Identify insert rule. 
-                if (fieldKey < 0) {
+                if (fieldKey < 0 || duplicated) {
                     add = true;
                 } else if (fieldKey >= 0 && !duplicated) {
                     add = key.add(record[fieldKey]);
@@ -242,7 +242,7 @@ public class CSVToORC implements Runnable {
 
                 //Identify duplicated key.
                 if (!add) {
-                    System.out.println("Duplicate key in file: [" + record[fieldKey] + "]");
+                    System.out.println("Duplicated key in file: [" + record[fieldKey] + "]");
                     duplicatedRecords++;
                 } else {
                     csvRecords++;

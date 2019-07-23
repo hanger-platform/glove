@@ -134,7 +134,7 @@ public class Extractor implements Runnable {
     public void run() {
         try {
             String[] row;
-
+            
             //Define a settings.
             CsvParserSettings settings = new CsvParserSettings();
             settings.setNullValue("");

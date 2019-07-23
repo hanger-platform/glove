@@ -252,6 +252,11 @@
       <description>Identifica o sample de dados que é analisado para geração de metadado. </description>
     </parameter>
     <parameter>
+      <name>SISENSE_CUBE</name>
+      <default_value />
+      <description>Identifica o cubo do sisense no qual as queries serão realizadas. </description>
+    </parameter>
+    <parameter>
       <name>SORTKEY</name>
       <default_value />
       <description>Identifica a chave de distribuição do Redshift.</description>

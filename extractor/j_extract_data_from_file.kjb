@@ -582,12 +582,14 @@ error_check(){
         	# Remove os arquivos temporários.
         	if [ ${DEBUG} = 0 ] ; then
             		rm -rf ${RAWFILE_QUEUE_PATH}*
-       	 fi
+			rm -rf ${METADATA_QUEUE_PATH}*
+       	 	fi
 
 		exit 1
 	fi
 }
 
+mv ${FILENAME} ${RAWFILE_QUEUE_FILE}
 RECORD_TO_LOAD=`awk 'END { print NR }' ${RAWFILE_QUEUE_FILE}`
 
 if [ ${RECORD_TO_LOAD} -gt 1 ]; then
@@ -613,7 +615,7 @@ if [ ${RECORD_TO_LOAD} -gt 1 ]; then
 		--sample=${SAMPLE} \
 		--header \
 		--delimiter="${DELIMITER}" \
-		--filename=${SCHEMA_NAME}_${TABLE}.csv  \
+		--filename=${FILE_OUTPUT_SCHEMA}_${FILE_OUTPUT_TABLE}.csv \
 		--target=metadata \
 		--dialect=${DIALECT} \
 		--reservedWords=${RESERVED_WORDS_FILE}
@@ -714,18 +716,6 @@ Check if query returned at least one record or if happened error on the process.
       <nr>0</nr>
       <xloc>848</xloc>
       <yloc>160</yloc>
-      <attributes_kjc />
-    </entry>
-    <entry>
-      <name>Recreate is not allowed</name>
-      <description />
-      <type>SUCCESS</type>
-      <attributes />
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>848</xloc>
-      <yloc>272</yloc>
       <attributes_kjc />
     </entry>
     <entry>
@@ -948,6 +938,19 @@ fi</script>
       <yloc>384</yloc>
       <attributes_kjc />
     </entry>
+    <entry>
+      <name>Recreate is not allowed</name>
+      <description />
+      <type>ABORT</type>
+      <attributes />
+      <message />
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>848</xloc>
+      <yloc>272</yloc>
+      <attributes_kjc />
+    </entry>
   </entries>
   <hops>
     <hop>
@@ -1068,15 +1071,6 @@ fi</script>
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>Allow recreate? </from>
-      <to>Recreate is not allowed</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>N</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
       <from>Metadata log</from>
       <to>Metadata exists? </to>
       <from_nr>0</from_nr>
@@ -1191,6 +1185,15 @@ fi</script>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
       <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Allow recreate? </from>
+      <to>Recreate is not allowed</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
       <unconditional>N</unconditional>
     </hop>
   </hops>

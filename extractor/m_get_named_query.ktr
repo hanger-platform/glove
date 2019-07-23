@@ -1278,13 +1278,13 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     <defaultPathLeafToNull>Y</defaultPathLeafToNull>
     <rownum_field />
     <file>
-      <name>${GLOVE_NAMED_QUERIES}/${NAMED_QUERY}/</name>
-      <filemask>.*\.manifest$</filemask>
+      <name>${GLOVE_NAMED_QUERIES}/${NAMED_QUERY}/${NAMED_QUERY}.manifest</name>
+      <filemask />
       <exclude_filemask />
       <file_required>N</file_required>
       <include_subfolders>N</include_subfolders>
-      <name>${NAMED_QUERY_DIRECTORY}/${NAMED_QUERY}/</name>
-      <filemask>.*\.manifest$</filemask>
+      <name>${NAMED_QUERY_DIRECTORY}/${NAMED_QUERY}/${NAMED_QUERY}.manifest</name>
+      <filemask />
       <exclude_filemask />
       <file_required>N</file_required>
       <include_subfolders>N</include_subfolders>

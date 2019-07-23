@@ -442,7 +442,7 @@
         </field>
         <field>
           <variable_name>METADATA_QUEUE_PATH</variable_name>
-          <variable_value>${GLOVE_TEMP}/${DATE}/file/${UUID}/${FILE_OUTPUT_SCHEMA}_${FILE_OUTPUT_TABLE}_${TARGET}/${TARGET}/metadata/queue/</variable_value>
+          <variable_value>${GLOVE_TEMP}/${DATE}/file/${UUID}/${FILE_OUTPUT_SCHEMA}_${FILE_OUTPUT_TABLE}_${TARGET}/metadata/queue/</variable_value>
           <variable_type>ROOT_JOB</variable_type>
         </field>
         <field>
