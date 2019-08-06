@@ -134,7 +134,7 @@ public class Extractor implements Runnable {
     public void run() {
         try {
             String[] row;
-            
+
             //Define a settings.
             CsvParserSettings settings = new CsvParserSettings();
             settings.setNullValue("");
@@ -239,7 +239,7 @@ public class Extractor implements Runnable {
                             nullField = nullField + 1;
 
                         } else {
-                            //Match sttring. 
+                            //Match string. 
                             stringField = stringField + 1;
                             length = value.getBytes().length > length ? value.getBytes().length : length;
                         }
@@ -264,13 +264,13 @@ public class Extractor implements Runnable {
                         }
 
                     } else if (stringField > 0) {
-                        fieldMetadata.add("{\"field\":\"" + field + "\",\"type\":\"string\",\"length\":" + length + "}");
+                        fieldMetadata.add("{\"field\":\"" + field + "\",\"type\":\"string\",\"length\":" + (length * 2) + "}");
 
                         switch (dialect) {
                             case "spectrum":
                             case "athena":
                                 fieldSchema.add("{\"name\":\"" + field + "\",\"type\":[\"null\",\"string\"],\"default\":null}");
-                                fieldDataType.add(field + " " + "varchar(" + length + ")");
+                                fieldDataType.add(field + " " + "varchar(" + (length * 2) + ")");
                                 break;
                             case "redshift":
                                 fieldDataType.add(field + " " + "varchar(" + length + ")");

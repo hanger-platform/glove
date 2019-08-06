@@ -1724,6 +1724,19 @@ cp -rf ${METADATA_QUEUE_PATH}* ${METADATA_PATH}</script>
       <yloc>384</yloc>
       <attributes_kjc />
     </entry>
+    <entry>
+      <name>Recovery file exists? </name>
+      <description />
+      <type>FILE_EXISTS</type>
+      <attributes />
+      <filename>${METADATA_RECOVERY_FILE}</filename>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>976</xloc>
+      <yloc>384</yloc>
+      <attributes_kjc />
+    </entry>
   </entries>
   <hops>
     <hop>
@@ -1877,24 +1890,6 @@ cp -rf ${METADATA_QUEUE_PATH}* ${METADATA_PATH}</script>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
       <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>Has delta field?</from>
-      <to>Has partition field? </to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>N</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>Delta file exists?</from>
-      <to>Has partition field? </to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>N</evaluation>
       <unconditional>N</unconditional>
     </hop>
     <hop>
@@ -2161,6 +2156,42 @@ cp -rf ${METADATA_QUEUE_PATH}* ${METADATA_PATH}</script>
     <hop>
       <from>Do not recreate</from>
       <to>Hub</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Has delta field?</from>
+      <to>Recovery file exists? </to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Recovery file exists? </from>
+      <to>Has partition field? </to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Delta file exists?</from>
+      <to>Recovery file exists? </to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Recovery file exists? </from>
+      <to>Get recovery value</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>

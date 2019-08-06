@@ -668,7 +668,7 @@ MODE                       	== ${MODE}
 #-----------------------------------------------------------
 # INPUT
 #-----------------------------------------------------------
-DATABASE_TYPE               	== |${DATABASE_TYPE}| 
+DATABASE_TYPE               	== ${DATABASE_TYPE}
 SAMPLE			    	== ${SAMPLE}
 SQL                         	== ${INPUT_DATA_STATEMENT}
 METADATA                    	== ${METADATA} 
@@ -1305,7 +1305,7 @@ Check if query returned at least one record or if happened error on the process.
       <attributes_kjc />
     </entry>
     <entry>
-      <name>Extract Big Data</name>
+      <name>Extract Others</name>
       <description />
       <type>JOB</type>
       <attributes />
@@ -1812,7 +1812,7 @@ fi</script>
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>Extract Big Data</from>
+      <from>Extract Others</from>
       <to>Extract metadata</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
@@ -1822,7 +1822,7 @@ fi</script>
     </hop>
     <hop>
       <from>Is DBMS</from>
-      <to>Extract Big Data</to>
+      <to>Extract Others</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>

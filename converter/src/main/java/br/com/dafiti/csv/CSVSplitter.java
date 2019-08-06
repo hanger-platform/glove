@@ -131,11 +131,14 @@ public class CSVSplitter implements Runnable {
                     String partitionValue = record[partitionColumn];
 
                     //Identify if partition is in cache.
-                    if (!partitionMap.containsKey(partitionValue)) {
+                    if (!partitionMap.containsKey(partitionValue)) {                        
+                        //Create the partition file.
+                        File partitionFile = new File(csvFile.getParent() + "/" + partitionValue.replaceAll("\\W", "") + ".csv");
+                        partitionFile.setWritable(true, false);
+
                         //Put the partition handler in cache.
                         partitionMap.put(partitionValue,
-                                new CsvWriter(
-                                        new File(csvFile.getParent() + "/" + partitionValue.replaceAll("\\W", "") + ".csv"), writerSettings));
+                                new CsvWriter(partitionFile, writerSettings));
                     }
 
                     //Write to file.
@@ -158,8 +161,8 @@ public class CSVSplitter implements Runnable {
                 csvFile.delete();
             }
         } catch (Exception ex) {
+            ex.printStackTrace();
             Logger.getLogger(this.getClass()).error("Error [" + ex + "] converting CSV to CSV");
-            Logger.getLogger(this.getClass()).error(ex.getStackTrace());
 
             System.exit(1);
         }
