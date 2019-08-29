@@ -496,11 +496,6 @@ export_bucket</note>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Sort manifest</from>
-      <to>Join</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
       <from>Group</from>
       <to>Sort file</to>
       <enabled>Y</enabled>
@@ -573,6 +568,16 @@ export_bucket</note>
     <hop>
       <from>Export bucket default</from>
       <to>Mode to lower</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Sort manifest</from>
+      <to>Unique order</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Unique order</from>
+      <to>Join</to>
       <enabled>Y</enabled>
     </hop>
   </order>
@@ -933,9 +938,9 @@ export_bucket</note>
       <method>none</method>
       <schema_name />
     </partitioning>
-    <join_type>FULL OUTER</join_type>
+    <join_type>LEFT OUTER</join_type>
     <step1>Sort file</step1>
-    <step2>Sort manifest</step2>
+    <step2>Unique order</step2>
     <keys_1>
       <key>order</key>
     </keys_1>
@@ -1278,13 +1283,13 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     <defaultPathLeafToNull>Y</defaultPathLeafToNull>
     <rownum_field />
     <file>
-      <name>${GLOVE_NAMED_QUERIES}/${NAMED_QUERY}/${NAMED_QUERY}.manifest</name>
-      <filemask />
+      <name>${GLOVE_NAMED_QUERIES}/${NAMED_QUERY}/</name>
+      <filemask>.*\.manifest$</filemask>
       <exclude_filemask />
       <file_required>N</file_required>
       <include_subfolders>N</include_subfolders>
-      <name>${NAMED_QUERY_DIRECTORY}/${NAMED_QUERY}/${NAMED_QUERY}.manifest</name>
-      <filemask />
+      <name>${NAMED_QUERY_DIRECTORY}/${NAMED_QUERY}/</name>
+      <filemask>.*\.manifest$</filemask>
       <exclude_filemask />
       <file_required>N</file_required>
       <include_subfolders>N</include_subfolders>
@@ -1364,8 +1369,8 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
       </output>
     </remotesteps>
     <GUI>
-      <xloc>640</xloc>
-      <yloc>144</yloc>
+      <xloc>528</xloc>
+      <yloc>128</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1603,8 +1608,8 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
       </output>
     </remotesteps>
     <GUI>
-      <xloc>752</xloc>
-      <yloc>144</yloc>
+      <xloc>640</xloc>
+      <yloc>128</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1689,6 +1694,41 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     <GUI>
       <xloc>976</xloc>
       <yloc>144</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Unique order</name>
+    <type>Unique</type>
+    <description />
+    <distribute>Y</distribute>
+    <custom_distribution />
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name />
+    </partitioning>
+    <count_rows>N</count_rows>
+    <count_field />
+    <reject_duplicate_row>N</reject_duplicate_row>
+    <error_description />
+    <fields>
+      <field>
+        <name>manifest_order</name>
+        <case_insensitive>N</case_insensitive>
+      </field>
+    </fields>
+    <attributes />
+    <cluster_schema />
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>752</xloc>
+      <yloc>128</yloc>
       <draw>Y</draw>
     </GUI>
   </step>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>run</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-classpath %classpath br.com.dafiti.googleanalytics.GoogleAnalytics --client_secret=/home/valdiney/tenda/client_secret_75341468439-spigg5t8usmkn1cn6bn3htfrlk2941b6.apps.googleusercontent.com.json --view_id=130486701 --start_date=2019-08-24 --end_date=2019-08-25 --dimensions=ga:adGroup+ga:adDistributionNetwork+ga:adwordsCustomerID+ga:adwordsCampaignID+ga:adwordsAdGroupID+ga:adwordsCreativeID+ga:adwordsCriteriaID --metrics=ga:impressions+ga:adClicks+ga:adCost --output=/tmp/tenda_ga_v4_users.csv --key=ga:adGroup+ga:adwordsCampaignID+ga:adwordsAdGroupID+ga:adwordsCreativeID+ga:adwordsCriteriaID</exec.args>
+                <exec.executable>java</exec.executable>
+            </properties>
+        </action>
+        <action>
+            <actionName>debug</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.googleanalytics.GoogleAnalytics --client_secret=/home/valdiney/tenda/client_secret_75341468439-spigg5t8usmkn1cn6bn3htfrlk2941b6.apps.googleusercontent.com.json --view_id=130486701 --start_date=2019-08-24 --end_date=2019-08-25 --dimensions=ga:adGroup+ga:adDistributionNetwork+ga:adwordsCustomerID+ga:adwordsCampaignID+ga:adwordsAdGroupID+ga:adwordsCreativeID+ga:adwordsCriteriaID --metrics=ga:impressions+ga:adClicks+ga:adCost --output=/tmp/tenda_ga_v4_users.csv --key=ga:adGroup+ga:adwordsCampaignID+ga:adwordsAdGroupID+ga:adwordsCreativeID+ga:adwordsCriteriaID</exec.args>
+                <exec.executable>java</exec.executable>
+                <jpda.listen>true</jpda.listen>
+            </properties>
+        </action>
+        <action>
+            <actionName>profile</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-classpath %classpath br.com.dafiti.googleanalytics.GoogleAnalytics --client_secret=/home/valdiney/tenda/client_secret_75341468439-spigg5t8usmkn1cn6bn3htfrlk2941b6.apps.googleusercontent.com.json --view_id=130486701 --start_date=2019-08-24 --end_date=2019-08-25 --dimensions=ga:adGroup+ga:adDistributionNetwork+ga:adwordsCustomerID+ga:adwordsCampaignID+ga:adwordsAdGroupID+ga:adwordsCreativeID+ga:adwordsCriteriaID --metrics=ga:impressions+ga:adClicks+ga:adCost --output=/tmp/tenda_ga_v4_users.csv --key=ga:adGroup+ga:adwordsCampaignID+ga:adwordsAdGroupID+ga:adwordsCreativeID+ga:adwordsCriteriaID</exec.args>
+                <exec.executable>java</exec.executable>
+            </properties>
+        </action>
+    </actions>

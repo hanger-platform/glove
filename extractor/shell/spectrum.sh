@@ -437,9 +437,11 @@ run_on_athena()
 # Realiza a limpeza dos arquivos temporários.
 clean_up()
 {
-    echo "Removing temporary folder ${QUEUE_PATH}"
-    cd ${GLOVE_TEMP}
-    rm -rf ${QUEUE_PATH}
+    if [ ${MODULE} != "file" ]; then
+        echo "Removing temporary folder ${QUEUE_PATH}"
+        cd ${GLOVE_TEMP}
+        rm -rf ${QUEUE_PATH}
+    fi
 }
 
 # Identifica a ocorrência de erros e interrompe processo.

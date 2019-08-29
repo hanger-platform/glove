@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
+    <system systemId="http://webservicescolhomologacao.correios.com.br/ScolWeb/WebServiceScol?wsdl" uri="wsdl/webservicescolhomologacao.correios.com.br/ScolWeb/WebServiceScol.wsdl"/>
+    <system systemId="https://cws.correios.com.br/logisticaReversaWS/logisticaReversaService/logisticaReversaWS?wsdl" uri="wsdl/cws.correios.com.br/logisticaReversaWS/logisticaReversaService/logisticaReversaWS.wsdl"/>
+</catalog>
