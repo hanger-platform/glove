@@ -1,4 +1,4 @@
-# Google Search Console Extractor [![GitHub license](https://img.shields.io/github/license/dafiti/causalimpact.svg)](https://bitbucket.org/dafiti/bi_dafiti_group_nick/src/master/license)
+# Google Search Console Extractor [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ### Extrator de dados do Google Search Console. 
 
 ## How it works

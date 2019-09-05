@@ -344,8 +344,9 @@ echo "Downloading ${FILE_INPUT_BUCKET} files!"
 rm -rf ${TEMP_QUEUE_PATH}*
 
 if [ "${FILE_INPUT_BUCKET}" != "" ]; then
+	# Gets files from input bucket.
     	if [[ "${FILE_INPUT_BUCKET}" == *"s3://"* ]]; then	
-      		aws s3 cp ${FILE_INPUT_BUCKET} ${TEMP_QUEUE_PATH} --recursive --exclude "*" --include "*.csv" --only-show-errors
+      		aws s3 cp ${FILE_INPUT_BUCKET} ${TEMP_QUEUE_PATH} --recursive --exclude "*" --include "*.${FILE_INPUT_EXTENSION}" --only-show-errors
       		error_check
     	else
 		FILE_COUNT=`ls  ${FILE_INPUT_BUCKET} | wc -l`
@@ -357,6 +358,18 @@ if [ "${FILE_INPUT_BUCKET}" != "" ]; then
 			echo "Nothing to load from ${FILE_INPUT_BUCKET} :/"
 		fi
     	fi
+
+	 # Changes files extension to csv
+	cd ${TEMP_QUEUE_PATH} 
+
+	if [ ${FILE_INPUT_EXTENSION} != "csv" ]; then
+		echo "Changing files extension from ${FILE_INPUT_EXTENSION} to csv!"
+
+		for file in $1*.${FILE_INPUT_EXTENSION}
+		do 
+			mv "$file" "${file%.*}.csv" 
+		done
+	fi
 else 
     	echo "Do not have an input bucket :/"
 fi</script>

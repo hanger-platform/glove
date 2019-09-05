@@ -87,6 +87,11 @@
       <description>Identifica o delimitador do arquivo de entrada. </description>
     </parameter>
     <parameter>
+      <name>FILE_INPUT_EXTENSION</name>
+      <default_value>csv</default_value>
+      <description>Identifica o tipo de arquivos de entrada.</description>
+    </parameter>
+    <parameter>
       <name>FILE_INPUT_PARTITONED</name>
       <default_value>0</default_value>
       <description>Identifica o tipo de particionamento do arquivo.</description>

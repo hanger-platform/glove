@@ -36,6 +36,8 @@ import com.facebook.ads.sdk.AdAccount.APIRequestGetCampaigns;
 import com.facebook.ads.sdk.AdSet;
 import com.facebook.ads.sdk.Campaign;
 import com.facebook.ads.sdk.Campaign.APIRequestGetAdSets;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -117,6 +119,9 @@ public class AdSets {
                 .addField("updated_time", new DateFormat("updated_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"))
                 .addField("use_new_app_click");
 
+        //Identifies original fields.
+        List<String> fields = mitt.getConfiguration().getOriginalFieldsName();
+
         //Iterates for each account.
         for (String account : this.adAccount) {
             Logger.getLogger(AdCampaign.class.getName()).log(Level.INFO, "Retrieving campaing from account {0}", account);
@@ -143,78 +148,37 @@ public class AdSets {
                 //Defines a time range filter.
                 adSetsRequest.setTimeRange("{\"since\":\"" + this.startDate + "\",\"until\":\"" + this.endDate + "\"}");
 
-                APINodeList<AdSet> adSets = adSetsRequest
-                        .requestField("id")
-                        .requestField("campaign_id")
-                        .requestField("account_id")
-                        .requestField("name")
-                        .requestField("bid_amount")
-                        .requestField("bid_strategy")
-                        .requestField("billing_event")
-                        .requestField("configured_status")
-                        .requestField("created_time")
-                        .requestField("daily_budget")
-                        .requestField("daily_min_spend_target")
-                        .requestField("daily_spend_cap")
-                        .requestField("destination_type")
-                        .requestField("effective_status")
-                        .requestField("end_time")
-                        .requestField("instagram_actor_id")
-                        .requestField("is_dynamic_creative")
-                        .requestField("lifetime_budget")
-                        .requestField("lifetime_imps")
-                        .requestField("lifetime_min_spend_target")
-                        .requestField("lifetime_spend_cap")
-                        .requestField("optimization_goal")
-                        .requestField("optimization_sub_event")
-                        .requestField("recurring_budget_semantics")
-                        .requestField("review_feedback")
-                        .requestField("rf_prediction_id")
-                        .requestField("source_adset_id")
-                        .requestField("start_time")
-                        .requestField("status")
-                        .requestField("updated_time")
-                        .requestField("use_new_app_click").execute();
+                //Define fields to be requested.
+                fields.forEach((field) -> {
+                    adSetsRequest.requestField(field);
+                });
+
+                //Request campaign fields.
+                APINodeList<AdSet> adSets = adSetsRequest.execute();
 
                 //Enables auto pagination.
                 adSets = adSets.withAutoPaginationIterator(true);
 
-                List record;
-
                 for (AdSet adSet : adSets) {
-                    record = new ArrayList();
+                    List record = new ArrayList();
 
-                    record.add(adSet.getFieldId());
-                    record.add(adSet.getFieldCampaignId());
-                    record.add(adSet.getFieldAccountId());
-                    record.add(adSet.getFieldName());
-                    record.add(adSet.getFieldBidAmount());
-                    record.add(adSet.getFieldBidStrategy());
-                    record.add(adSet.getFieldBillingEvent());
-                    record.add(adSet.getFieldConfiguredStatus());
-                    record.add(adSet.getFieldCreatedTime());
-                    record.add(adSet.getFieldDailyBudget());
-                    record.add(adSet.getFieldDailyMinSpendTarget());
-                    record.add(adSet.getFieldDailySpendCap());
-                    record.add(adSet.getFieldDestinationType());
-                    record.add(adSet.getFieldEffectiveStatus());
-                    record.add(adSet.getFieldEndTime());
-                    record.add(adSet.getFieldInstagramActorId());
-                    record.add(adSet.getFieldIsDynamicCreative());
-                    record.add(adSet.getFieldLifetimeBudget());
-                    record.add(adSet.getFieldLifetimeImps());
-                    record.add(adSet.getFieldLifetimeMinSpendTarget());
-                    record.add(adSet.getFieldLifetimeSpendCap());
-                    record.add(adSet.getFieldOptimizationGoal());
-                    record.add(adSet.getFieldOptimizationSubEvent());
-                    record.add(adSet.getFieldRecurringBudgetSemantics());
-                    record.add(adSet.getFieldReviewFeedback());
-                    record.add(adSet.getFieldRfPredictionId());
-                    record.add(adSet.getFieldSourceAdsetId());
-                    record.add(adSet.getFieldStartTime());
-                    record.add(adSet.getFieldStatus());
-                    record.add(adSet.getFieldUpdatedTime());
-                    record.add(adSet.getFieldUseNewAppClick());
+                    fields.forEach((field) -> {
+                        JsonObject jsonObject = adSet.getRawResponseAsJsonObject();
+
+                        //Identifies if the field exists. 
+                        if (jsonObject.has(field)) {
+                            JsonElement jsonElement = jsonObject.get(field);
+
+                            //Identifies if the fiels is a primitive.
+                            if (jsonElement.isJsonPrimitive()) {
+                                record.add(jsonElement.getAsString());
+                            } else {
+                                record.add(jsonElement);
+                            }
+                        } else {
+                            record.add(null);
+                        }
+                    });
 
                     mitt.write(record);
                 }

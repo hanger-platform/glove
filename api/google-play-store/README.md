@@ -1,4 +1,4 @@
-# Google Play Store Extractor [![GitHub license](https://img.shields.io/github/license/dafiti/causalimpact.svg)](https://bitbucket.org/dafiti/bi_dafiti_group_nick/src/master/license)
+# Google Play Store Extractor [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ### Extrai informações da API do Google Play Store
 
 ## How it works

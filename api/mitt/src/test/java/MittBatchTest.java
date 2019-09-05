@@ -45,7 +45,7 @@ public class MittBatchTest {
         mitt.getConfiguration().addField("Package Name", "Package");
         mitt.getConfiguration().addCustomField("etl_load_date", new Now());
 
-        mitt.write(new File("/home/valdiney/Downloads/exportDevices_521_20190723.csv"), ',', '"', '"', "UTF-16");
+        mitt.write(new File("/home/valdiney/Downloads/exportDevices_521_20190723.csv"), ',', '"', '\\', "UTF-16");
 
         mitt.close();
     }

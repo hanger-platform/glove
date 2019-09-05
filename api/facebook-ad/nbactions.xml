@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.facebook.FacebookAd --credentials="/home/valdiney/facebook.json" --output="/tmp/campaign.csv" --account="323699841846327+2184414031816560+340224329697013" --report="AdsInsights"</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.facebook.FacebookAd --credentials="/home/valdiney/facebook.json" --output="/tmp/campaign.csv" --account="323699841846327+2184414031816560+340224329697013" --report="ads"</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.facebook.FacebookAd --credentials="/home/valdiney/facebook.json" --output="/tmp/campaign.csv" --account="323699841846327+2184414031816560+340224329697013" --report="AdsInsights"</exec.args>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.facebook.FacebookAd --credentials="/home/valdiney/facebook.json" --output="/tmp/campaign.csv" --account="323699841846327+2184414031816560+340224329697013" --report="ads"</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.facebook.FacebookAd --credentials="/home/valdiney/facebook.json" --output="/tmp/campaign.csv" --account="323699841846327+2184414031816560+340224329697013" --report="AdsInsights"</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.facebook.FacebookAd --credentials="/home/valdiney/facebook.json" --output="/tmp/campaign.csv" --account="323699841846327+2184414031816560+340224329697013" --report="ads"</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>

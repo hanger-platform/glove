@@ -28,6 +28,7 @@ import br.com.dafiti.mitt.transformation.Scanner;
 import br.com.dafiti.mitt.transformation.Transformable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -47,6 +48,81 @@ public class Configuration {
      */
     public List<Field> getFields() {
         return fields;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public List<String> getFieldsName() {
+        return this.getFieldsName(false);
+    }
+
+    /**
+     *
+     * @param removeSpecialCharacteres
+     * @return
+     */
+    public List<String> getFieldsName(boolean removeSpecialCharacteres) {
+        List<String> nameList = new ArrayList();
+
+        this.fields.forEach((field) -> {
+            String name = field.getAlias() == null || field.getAlias().isEmpty()
+                    ? field.getName()
+                    : field.getAlias();
+
+            if (removeSpecialCharacteres) {
+                name = name.replaceAll("\\W", "_").toLowerCase();
+            }
+
+            nameList.add(name);
+        });
+
+        return nameList;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public List<Transformable> getFieldsTransformation() {
+        List<Transformable> transformation = new ArrayList();
+
+        this.fields.forEach((value) -> {
+            transformation.add(value.getTransformation());
+        });
+
+        return transformation;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public List<Field> getOriginalFields() {
+        List<Field> original = this.fields
+                .stream()
+                .filter(originalField -> originalField.isOriginal())
+                .collect(Collectors.toList());
+
+        return original;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public List<String> getOriginalFieldsName() {
+        List<String> fieldName = new ArrayList();
+
+        this.fields
+                .stream()
+                .filter(originalField -> originalField.isOriginal())
+                .collect(Collectors.toList()).forEach((value) -> {
+            fieldName.add(value.getName());
+        });
+
+        return fieldName;
     }
 
     /**

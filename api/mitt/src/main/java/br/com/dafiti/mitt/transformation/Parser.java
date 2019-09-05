@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 /**
  *
@@ -69,84 +68,8 @@ public class Parser {
      *
      * @return
      */
-    public List<Field> listField() {
-        return configuration.getFields();
-    }
-
-    /**
-     *
-     * @return
-     */
-    public List<String> listFieldName() {
-        return this.listFieldName(false);
-    }
-
-    /**
-     *
-     * @param table
-     * @return
-     */
-    public List<String> listFieldName(boolean table) {
-        List<String> nameList = new ArrayList();
-
-        this.listField().forEach((field) -> {
-            String name = field.getAlias() == null || field.getAlias().isEmpty()
-                    ? field.getName()
-                    : field.getAlias();
-
-            if (table) {
-                name = name.replaceAll("\\W", "_").toLowerCase();
-            }
-
-            nameList.add(name);
-        });
-
-        return nameList;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public List<Transformable> listFieldTransformation() {
-        List<Transformable> transformation = new ArrayList();
-
-        this.listField().forEach((value) -> {
-            transformation.add(value.getTransformation());
-        });
-
-        return transformation;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public List<Field> listOriginalField() {
-        List<Field> original = this
-                .listField()
-                .stream()
-                .filter(originalField -> originalField.isOriginal())
-                .collect(Collectors.toList());
-
-        return original;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public List<String> listOriginalFieldName() {
-        List<String> fieldName = new ArrayList();
-
-        this.listField()
-                .stream()
-                .filter(originalField -> originalField.isOriginal())
-                .collect(Collectors.toList()).forEach((value) -> {
-            fieldName.add(value.getName());
-        });
-
-        return fieldName;
+    public Configuration getConfiguration() {
+        return configuration;
     }
 
     /**
@@ -199,13 +122,13 @@ public class Parser {
         Object evaluated = null;
 
         if (field.getTransformation() == null) {
-            int index = this.listOriginalField().indexOf(field);
+            int index = configuration.getOriginalFields().indexOf(field);
 
             if (index == -1) {
                 Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, "Field {0} does not exists!", field.getName());
             } else {
                 if (index < record.size()) {
-                    evaluated = record.get(this.listOriginalField().indexOf(field));
+                    evaluated = record.get(configuration.getOriginalFields().indexOf(field));
                 }
             }
         } else {
@@ -223,7 +146,7 @@ public class Parser {
     public List<Object> evaluate(List<Object> record) {
         List<Object> fields = new ArrayList();
 
-        this.listField().forEach((field) -> {
+        configuration.getFields().forEach((field) -> {
             fields.add(this.evaluate(record, field));
         });
 

@@ -454,6 +454,7 @@
       <method>none</method>
       <schema_name />
     </partitioning>
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -493,11 +494,12 @@
     <limit>0</limit>
     <file>
       <name>${TEMP_QUEUE_PATH}</name>
-      <filemask>.*\.csv$</filemask>
+      <filemask>.*</filemask>
       <exclude_filemask />
       <file_required>N</file_required>
       <include_subfolders>N</include_subfolders>
     </file>
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -516,4 +518,5 @@
   <slave-step-copy-partition-distribution>
   </slave-step-copy-partition-distribution>
   <slave_transformation>N</slave_transformation>
+  <attributes />
 </transformation>

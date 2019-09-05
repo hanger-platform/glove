@@ -1,4 +1,4 @@
-# MITT Framework [![GitHub license](https://img.shields.io/github/license/dafiti/causalimpact.svg)](https://bitbucket.org/dafiti/bi_dafiti_group_nick/src/master/license)
+# MITT Framework [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ### O MITT é um framework qua facilita a geração de arquivos de texto para serem consumidos pelo glove.
 
 ## How it works

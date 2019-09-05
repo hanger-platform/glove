@@ -34,6 +34,8 @@ import com.facebook.ads.sdk.APINodeList;
 import com.facebook.ads.sdk.AdAccount;
 import com.facebook.ads.sdk.AdAccount.APIRequestGetCampaigns;
 import com.facebook.ads.sdk.Campaign;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -108,75 +110,50 @@ public class AdCampaign {
                 .addField("topline_id")
                 .addField("updated_time", new DateFormat("updated_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"));
 
+        //Identifies original fields.
+        List<String> fields = mitt.getConfiguration().getOriginalFieldsName();
+
         //Iterates for each account.
         for (String account : this.adAccount) {
             Logger.getLogger(AdCampaign.class.getName()).log(Level.INFO, "Retrieving campaing from account {0}", account);
 
-            AdAccount adAcount = new AdAccount(account, this.apiContext);
-            APIRequestGetCampaigns campaignRequest = adAcount.getCampaigns();
+            AdAccount adAccount = new AdAccount(account, this.apiContext);
+            APIRequestGetCampaigns campaignRequest = adAccount.getCampaigns();
 
             //Define a time range filter.
             campaignRequest.setTimeRange("{\"since\":\"" + this.startDate + "\",\"until\":\"" + this.endDate + "\"}");
 
+            //Define fields to be requested.
+            fields.forEach((field) -> {
+                campaignRequest.requestField(field, true);
+            });
+
             //Request campaign fields.
-            APINodeList<Campaign> campaigns = campaignRequest
-                    .requestField("id")
-                    .requestField("account_id")
-                    .requestField("bid_strategy")
-                    .requestField("boosted_object_id")
-                    .requestField("budget_rebalance_flag")
-                    .requestField("budget_remaining")
-                    .requestField("buying_type")
-                    .requestField("can_create_brand_lift_study")
-                    .requestField("can_use_spend_cap")
-                    .requestField("configured_status")
-                    .requestField("created_time")
-                    .requestField("daily_budget")
-                    .requestField("effective_status")
-                    .requestField("last_budget_toggling_time")
-                    .requestField("lifetime_budget")
-                    .requestField("name")
-                    .requestField("objective")
-                    .requestField("source_campaign_id")
-                    .requestField("spend_cap")
-                    .requestField("start_time")
-                    .requestField("status")
-                    .requestField("stop_time")
-                    .requestField("topline_id")
-                    .requestField("updated_time").execute();
+            APINodeList<Campaign> campaigns = campaignRequest.execute();
 
             //Enables auto pagination.
             campaigns = campaigns.withAutoPaginationIterator(true);
 
-            List record;
-
             for (Campaign campaign : campaigns) {
-                record = new ArrayList();
+                List record = new ArrayList();
 
-                record.add(campaign.getFieldId());
-                record.add(campaign.getFieldAccountId());
-                record.add(campaign.getFieldBidStrategy());
-                record.add(campaign.getFieldBoostedObjectId());
-                record.add(campaign.getFieldBudgetRebalanceFlag());
-                record.add(campaign.getFieldBudgetRemaining());
-                record.add(campaign.getFieldBuyingType());
-                record.add(campaign.getFieldCanCreateBrandLiftStudy());
-                record.add(campaign.getFieldCanUseSpendCap());
-                record.add(campaign.getFieldConfiguredStatus());
-                record.add(campaign.getFieldCreatedTime());
-                record.add(campaign.getFieldDailyBudget());
-                record.add(campaign.getFieldEffectiveStatus());
-                record.add(campaign.getFieldLastBudgetTogglingTime());
-                record.add(campaign.getFieldLifetimeBudget());
-                record.add(campaign.getFieldName());
-                record.add(campaign.getFieldObjective());
-                record.add(campaign.getFieldSourceCampaignId());
-                record.add(campaign.getFieldSpendCap());
-                record.add(campaign.getFieldStartTime());
-                record.add(campaign.getFieldStatus());
-                record.add(campaign.getFieldStopTime());
-                record.add(campaign.getFieldToplineId());
-                record.add(campaign.getFieldUpdatedTime());
+                fields.forEach((field) -> {
+                    JsonObject jsonObject = campaign.getRawResponseAsJsonObject();
+
+                    //Identifies if the field exists. 
+                    if (jsonObject.has(field)) {
+                        JsonElement jsonElement = jsonObject.get(field);
+
+                        //Identifies if the fiels is a primitive.
+                        if (jsonElement.isJsonPrimitive()) {
+                            record.add(jsonElement.getAsString());
+                        } else {
+                            record.add(jsonElement);
+                        }
+                    } else {
+                        record.add(null);
+                    }
+                });
 
                 mitt.write(record);
             }

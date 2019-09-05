@@ -1,4 +1,4 @@
-# Facebook Ad Extractor [![GitHub license](https://img.shields.io/github/license/dafiti/causalimpact.svg)](https://bitbucket.org/dafiti/bi_dafiti_group_nick/src/master/license)
+# Facebook Ad Extractor [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ### Extrator de dados de Ad do Facebook (https://developers.facebook.com/docs/marketing-api/reference/ad-campaign-group)
 
 ## How it works

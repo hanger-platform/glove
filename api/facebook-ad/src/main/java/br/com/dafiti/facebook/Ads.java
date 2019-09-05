@@ -37,6 +37,8 @@ import com.facebook.ads.sdk.AdAccount.APIRequestGetCampaigns;
 import com.facebook.ads.sdk.AdSet;
 import com.facebook.ads.sdk.AdSet.APIRequestGetAds;
 import com.facebook.ads.sdk.Campaign;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -107,6 +109,9 @@ public class Ads {
                 .addField("status")
                 .addField("updated_time", new DateFormat("updated_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"));
 
+        //Identifies original fields.
+        List<String> fields = mitt.getConfiguration().getOriginalFieldsName();
+
         //Iterates for each account.
         for (String account : this.adAccount) {
             Logger.getLogger(AdCampaign.class.getName()).log(Level.INFO, "Retrieving campaing from account {0}", account);
@@ -143,56 +148,37 @@ public class Ads {
                     //Defines a time range filter
                     adsRequest.setTimeRange("{\"since\":\"" + this.startDate + "\",\"until\":\"" + this.endDate + "\"}");
 
-                    APINodeList<Ad> ads = adsRequest
-                            .requestField("id")
-                            .requestField("adset_id")
-                            .requestField("campaign_id")
-                            .requestField("account_id")
-                            .requestField("bid_amount")
-                            .requestField("bid_type")
-                            .requestField("configured_status")
-                            .requestField("created_time")
-                            .requestField("demolink_hash")
-                            .requestField("display_sequence")
-                            .requestField("effective_status")
-                            .requestField("engagement_audience")
-                            .requestField("is_autobid")
-                            .requestField("last_updated_by_app_id")
-                            .requestField("name")
-                            .requestField("preview_shareable_link")
-                            .requestField("priority")
-                            .requestField("source_ad_id")
-                            .requestField("status")
-                            .requestField("updated_time").execute();
+                    //Define fields to be requested.
+                    fields.forEach((field) -> {
+                        adsRequest.requestField(field);
+                    });
+
+                    //Request campaign fields.
+                    APINodeList<Ad> ads = adsRequest.execute();
 
                     //Enables auto pagination.
                     ads = ads.withAutoPaginationIterator(true);
 
-                    List record;
-
                     for (Ad ad : ads) {
-                        record = new ArrayList();
+                        List record = new ArrayList();
 
-                        record.add(ad.getFieldId());
-                        record.add(ad.getFieldAdsetId());
-                        record.add(ad.getFieldCampaignId());
-                        record.add(ad.getFieldAccountId());
-                        record.add(ad.getFieldBidAmount());
-                        record.add(ad.getFieldBidType());
-                        record.add(ad.getFieldConfiguredStatus());
-                        record.add(ad.getFieldCreatedTime());
-                        record.add(ad.getFieldDemolinkHash());
-                        record.add(ad.getFieldDisplaySequence());
-                        record.add(ad.getFieldEffectiveStatus());
-                        record.add(ad.getFieldEngagementAudience());
-                        record.add(ad.getFieldIsAutobid());
-                        record.add(ad.getFieldLastUpdatedByAppId());
-                        record.add(ad.getFieldName());
-                        record.add(ad.getFieldPreviewShareableLink());
-                        record.add(ad.getFieldPriority());
-                        record.add(ad.getFieldSourceAdId());
-                        record.add(ad.getFieldStatus());
-                        record.add(ad.getFieldUpdatedTime());
+                        fields.forEach((field) -> {
+                            JsonObject jsonObject = ad.getRawResponseAsJsonObject();
+
+                            //Identifies if the field exists. 
+                            if (jsonObject.has(field)) {
+                                JsonElement jsonElement = jsonObject.get(field);
+
+                                //Identifies if the fiels is a primitive.
+                                if (jsonElement.isJsonPrimitive()) {
+                                    record.add(jsonElement.getAsString());
+                                } else {
+                                    record.add(jsonElement);
+                                }
+                            } else {
+                                record.add(null);
+                            }
+                        });
 
                         mitt.write(record);
                     }

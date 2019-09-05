@@ -56,9 +56,9 @@ public class Field {
      * @param alias
      */
     public Field(
-            String name, 
+            String name,
             String alias) {
-        
+
         this.name = name;
         this.transformation = null;
         this.alias = alias;
@@ -71,9 +71,9 @@ public class Field {
      * @param transformation
      */
     public Field(
-            String name, 
+            String name,
             Transformable transformation) {
-        
+
         this.name = name;
         this.transformation = transformation;
         this.alias = null;
@@ -87,10 +87,10 @@ public class Field {
      * @param transformation
      */
     public Field(
-            String name, 
-            String alias, 
+            String name,
+            String alias,
             Transformable transformation) {
-        
+
         this.name = name;
         this.transformation = transformation;
         this.alias = alias;
@@ -156,9 +156,9 @@ public class Field {
      * @return
      */
     public Transformable getTransformation(
-            Parser parser, 
+            Parser parser,
             List<Object> record) {
-        
+
         transformation.init(parser, record);
         return transformation;
     }

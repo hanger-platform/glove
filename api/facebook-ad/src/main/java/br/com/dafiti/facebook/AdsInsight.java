@@ -35,6 +35,8 @@ import com.facebook.ads.sdk.AdAccount.APIRequestGetCampaigns;
 import com.facebook.ads.sdk.AdsInsights;
 import com.facebook.ads.sdk.Campaign;
 import com.facebook.ads.sdk.Campaign.APIRequestGetInsights;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -156,6 +158,9 @@ public class AdsInsight {
                 .addField("action_values")
                 .addField("video_avg_time_watched_actions");
 
+        //Identifies original fields.
+        List<String> fields = mitt.getConfiguration().getOriginalFieldsName();
+
         //Iterates for each account.
         for (String account : this.adAccount) {
             Logger.getLogger(AdsInsight.class.getName()).log(Level.INFO, "Retrieving Campaing from account {0}", account);
@@ -174,168 +179,49 @@ public class AdsInsight {
             for (Campaign campaign : campaigns) {
                 Logger.getLogger(AdsInsight.class.getName()).log(Level.INFO, "Retrieving AdsInsights from campaign {0}", campaign.getFieldName());
 
-                APIRequestGetInsights insightsRequest = campaign.getInsights();
+                APIRequestGetInsights adInsightsRequest = campaign.getInsights();
 
                 //Defines some filters.
-                insightsRequest.setLevel(AdsInsights.EnumLevel.VALUE_AD);
-                insightsRequest.setTimeIncrement("1");
-                insightsRequest.setTimeRange("{\"since\":\"" + this.startDate + "\",\"until\":\"" + this.endDate + "\"}");
-                insightsRequest.setActionAttributionWindows(
+                adInsightsRequest.setLevel(AdsInsights.EnumLevel.VALUE_AD);
+                adInsightsRequest.setTimeIncrement("1");
+                adInsightsRequest.setTimeRange("{\"since\":\"" + this.startDate + "\",\"until\":\"" + this.endDate + "\"}");
+                adInsightsRequest.setActionAttributionWindows(
                         Arrays.asList(
                                 AdsInsights.EnumActionAttributionWindows.VALUE_DEFAULT
                         )
                 );
 
-                APINodeList<AdsInsights> adsInsights = insightsRequest
-                        .requestField("account_id")
-                        .requestField("campaign_id")
-                        .requestField("adset_id")
-                        .requestField("ad_id")
-                        .requestField("ad_bid_type")
-                        .requestField("ad_bid_value")
-                        .requestField("ad_delivery")
-                        .requestField("ad_name")
-                        .requestField("adset_bid_type")
-                        .requestField("adset_bid_value")
-                        .requestField("adset_budget_type")
-                        .requestField("adset_budget_value")
-                        .requestField("adset_delivery")
-                        .requestField("adset_end")
-                        .requestField("adset_name")
-                        .requestField("adset_start")
-                        .requestField("auction_bid")
-                        .requestField("auction_competitiveness")
-                        .requestField("auction_max_competitor_bid")
-                        .requestField("buying_type")
-                        .requestField("campaign_name")
-                        .requestField("canvas_avg_view_percent")
-                        .requestField("canvas_avg_view_time")
-                        .requestField("clicks")
-                        .requestField("cost_per_estimated_ad_recallers")
-                        .requestField("cost_per_inline_post_engagement")
-                        .requestField("cost_per_unique_click")
-                        .requestField("cost_per_unique_inline_link_click")
-                        .requestField("cpc")
-                        .requestField("cpm")
-                        .requestField("cpp")
-                        .requestField("created_time")
-                        .requestField("ctr")
-                        .requestField("date_start")
-                        .requestField("date_stop")
-                        .requestField("estimated_ad_recall_rate")
-                        .requestField("estimated_ad_recall_rate_lower_bound")
-                        .requestField("estimated_ad_recall_rate_upper_bound")
-                        .requestField("estimated_ad_recallers")
-                        .requestField("estimated_ad_recallers_lower_bound")
-                        .requestField("estimated_ad_recallers_upper_bound")
-                        .requestField("frequency")
-                        .requestField("gender_targeting")
-                        .requestField("impressions")
-                        .requestField("inline_link_click_ctr")
-                        .requestField("inline_link_clicks")
-                        .requestField("inline_post_engagement")
-                        .requestField("instant_experience_clicks_to_open")
-                        .requestField("instant_experience_clicks_to_start")
-                        .requestField("instant_experience_outbound_clicks")
-                        .requestField("labels")
-                        .requestField("location")
-                        .requestField("objective")
-                        .requestField("place_page_name")
-                        .requestField("quality_score_ectr")
-                        .requestField("quality_score_ecvr")
-                        .requestField("quality_score_enfbr")
-                        .requestField("quality_score_organic")
-                        .requestField("reach")
-                        .requestField("social_spend")
-                        .requestField("spend")
-                        .requestField("unique_clicks")
-                        .requestField("unique_ctr")
-                        .requestField("unique_inline_link_click_ctr")
-                        .requestField("unique_inline_link_clicks")
-                        .requestField("unique_link_clicks_ctr")
-                        .requestField("updated_time")
-                        .requestField("actions")
-                        .requestField("action_values")
-                        .requestField("video_avg_time_watched_actions").execute();
+                //Define fields to be requested.
+                fields.forEach((field) -> {
+                    adInsightsRequest.requestField(field);
+                });
+
+                //Request campaign fields.
+                APINodeList<AdsInsights> adsInsights = adInsightsRequest.execute();
 
                 //Enables auto pagination.
                 adsInsights = adsInsights.withAutoPaginationIterator(true);
 
-                List record;
-
                 for (AdsInsights adsInsight : adsInsights) {
-                    record = new ArrayList();
+                    List record = new ArrayList();
 
-                    record.add(adsInsight.getFieldAccountId());
-                    record.add(adsInsight.getFieldCampaignId());
-                    record.add(adsInsight.getFieldAdsetId());
-                    record.add(adsInsight.getFieldAdId());
-                    record.add(adsInsight.getFieldAdBidType());
-                    record.add(adsInsight.getFieldAdBidValue());
-                    record.add(adsInsight.getFieldAdDelivery());
-                    record.add(adsInsight.getFieldAdName());
-                    record.add(adsInsight.getFieldAdsetBidType());
-                    record.add(adsInsight.getFieldAdsetBidValue());
-                    record.add(adsInsight.getFieldAdsetBudgetType());
-                    record.add(adsInsight.getFieldAdsetBudgetValue());
-                    record.add(adsInsight.getFieldAdsetDelivery());
-                    record.add(adsInsight.getFieldAdsetEnd());
-                    record.add(adsInsight.getFieldAdsetName());
-                    record.add(adsInsight.getFieldAdsetStart());
-                    record.add(adsInsight.getFieldAuctionBid());
-                    record.add(adsInsight.getFieldAuctionCompetitiveness());
-                    record.add(adsInsight.getFieldAuctionMaxCompetitorBid());
-                    record.add(adsInsight.getFieldBuyingType());
-                    record.add(adsInsight.getFieldCampaignName());
-                    record.add(adsInsight.getFieldCanvasAvgViewPercent());
-                    record.add(adsInsight.getFieldCanvasAvgViewTime());
-                    record.add(adsInsight.getFieldClicks());
-                    record.add(adsInsight.getFieldCostPerEstimatedAdRecallers());
-                    record.add(adsInsight.getFieldCostPerInlinePostEngagement());
-                    record.add(adsInsight.getFieldCostPerUniqueClick());
-                    record.add(adsInsight.getFieldCostPerUniqueInlineLinkClick());
-                    record.add(adsInsight.getFieldCpc());
-                    record.add(adsInsight.getFieldCpm());
-                    record.add(adsInsight.getFieldCpp());
-                    record.add(adsInsight.getFieldCreatedTime());
-                    record.add(adsInsight.getFieldCtr());
-                    record.add(adsInsight.getFieldDateStart());
-                    record.add(adsInsight.getFieldDateStop());
-                    record.add(adsInsight.getFieldEstimatedAdRecallRate());
-                    record.add(adsInsight.getFieldEstimatedAdRecallRateLowerBound());
-                    record.add(adsInsight.getFieldEstimatedAdRecallRateUpperBound());
-                    record.add(adsInsight.getFieldEstimatedAdRecallers());
-                    record.add(adsInsight.getFieldEstimatedAdRecallersLowerBound());
-                    record.add(adsInsight.getFieldEstimatedAdRecallersUpperBound());
-                    record.add(adsInsight.getFieldFrequency());
-                    record.add(adsInsight.getFieldGenderTargeting());
-                    record.add(adsInsight.getFieldImpressions());                    
-                    record.add(adsInsight.getFieldInlineLinkClickCtr());
-                    record.add(adsInsight.getFieldInlineLinkClicks());
-                    record.add(adsInsight.getFieldInlinePostEngagement());
-                    record.add(adsInsight.getFieldInstantExperienceClicksToOpen());
-                    record.add(adsInsight.getFieldInstantExperienceClicksToStart());
-                    record.add(adsInsight.getFieldInstantExperienceOutboundClicks());
-                    record.add(adsInsight.getFieldLabels());
-                    record.add(adsInsight.getFieldLocation());
-                    record.add(adsInsight.getFieldObjective());
-                    record.add(adsInsight.getFieldPlacePageName());
-                    record.add(adsInsight.getFieldQualityScoreEctr());
-                    record.add(adsInsight.getFieldQualityScoreEcvr());
-                    record.add(adsInsight.getFieldQualityScoreEnfbr());
-                    record.add(adsInsight.getFieldQualityScoreOrganic());
-                    record.add(adsInsight.getFieldReach());
-                    record.add(adsInsight.getFieldSocialSpend());
-                    record.add(adsInsight.getFieldSpend());
-                    record.add(adsInsight.getFieldUniqueClicks());
-                    record.add(adsInsight.getFieldUniqueCtr());
-                    record.add(adsInsight.getFieldUniqueInlineLinkClickCtr());
-                    record.add(adsInsight.getFieldUniqueInlineLinkClicks());
-                    record.add(adsInsight.getFieldUniqueLinkClicksCtr());
-                    record.add(adsInsight.getFieldUpdatedTime());
-                    record.add(adsInsight.getFieldActions());
-                    record.add(adsInsight.getFieldActionValues());
-                    record.add(adsInsight.getFieldVideoTimeWatchedActions());
+                    fields.forEach((field) -> {
+                        JsonObject jsonObject = adsInsight.getRawResponseAsJsonObject();
+
+                        //Identifies if the field exists. 
+                        if (jsonObject.has(field)) {
+                            JsonElement jsonElement = jsonObject.get(field);
+
+                            //Identifies if the fiels is a primitive.
+                            if (jsonElement.isJsonPrimitive()) {
+                                record.add(jsonElement.getAsString());
+                            } else {
+                                record.add(jsonElement);
+                            }
+                        } else {
+                            record.add(null);
+                        }
+                    });
 
                     mitt.write(record);
                 }

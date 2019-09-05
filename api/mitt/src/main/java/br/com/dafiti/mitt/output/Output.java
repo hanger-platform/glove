@@ -69,11 +69,12 @@ public class Output {
         setting.getFormat().setQuoteEscape(quoteEscape);
         setting.setNullValue("");
         setting.setMaxCharsPerColumn(-1);
-        
-        setting.setHeaders(parser
-                .listFieldName(true)
-                .toArray(new String[0])
-        );
+
+        setting.setHeaders(
+                parser
+                        .getConfiguration()
+                        .getFieldsName(true)
+                        .toArray(new String[0]));
 
         this.writer = new CsvWriter(output, setting);
         this.writer.writeHeaders();
@@ -185,7 +186,11 @@ public class Output {
             setting.setHeaders(header.toArray(new String[0]));
         }
 
-        setting.selectFields(parser.listOriginalFieldName().toArray(new String[0]));
+        setting.selectFields(
+                parser
+                        .getConfiguration()
+                        .getOriginalFieldsName()
+                        .toArray(new String[0]));
 
         if ("auto".equalsIgnoreCase(encode)) {
             try {
