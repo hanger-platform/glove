@@ -479,7 +479,7 @@
   <connection>
     <name>GENERIC_CONNECTION</name>
     <server>${DB_HOST}</server>
-    <type>POSTGRESQL</type>
+    <type>GENERIC</type>
     <access>Native</access>
     <database>${DB_DATABASE}</database>
     <port>${DB_PORT}</port>
@@ -490,8 +490,16 @@
     <index_tablespace />
     <attributes>
       <attribute>
-        <code>EXTRA_OPTION_POSTGRESQL.defaultRowFetchSize</code>
-        <attribute>1000</attribute>
+        <code>CUSTOM_DRIVER_CLASS</code>
+        <attribute>${JDBC_DRIVER_CLASS}</attribute>
+      </attribute>
+      <attribute>
+        <code>CUSTOM_URL</code>
+        <attribute>${JDBC_URL}</attribute>
+      </attribute>
+      <attribute>
+        <code>DATABASE_DIALECT_ID</code>
+        <attribute>Generic database</attribute>
       </attribute>
       <attribute>
         <code>FORCE_IDENTIFIERS_TO_LOWERCASE</code>
