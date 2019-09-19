@@ -63,7 +63,7 @@
     </parameter>
     <parameter>
       <name>DISTSTYLE</name>
-      <default_value>key</default_value>
+      <default_value />
       <description>Identifica o estilo de distribuição do redshift.</description>
     </parameter>
     <parameter>
