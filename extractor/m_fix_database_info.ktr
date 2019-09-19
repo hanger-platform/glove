@@ -495,7 +495,7 @@
         <is_unicode>no</is_unicode>
       </field>
       <field>
-        <in_stream_name>INPUT_TABLE_SCHEMA_tmp</in_stream_name>
+        <in_stream_name>INPUT_TABLE_SCHEMA</in_stream_name>
         <out_stream_name>INPUT_TABLE_SCHEMA_formated</out_stream_name>
         <use_regex>yes</use_regex>
         <replace_string>\/\w{3}\/</replace_string>
@@ -507,7 +507,7 @@
         <is_unicode>no</is_unicode>
       </field>
       <field>
-        <in_stream_name>INPUT_TABLE_NAME_tmp</in_stream_name>
+        <in_stream_name>INPUT_TABLE_NAME</in_stream_name>
         <out_stream_name>INPUT_TABLE_NAME_formated</out_stream_name>
         <use_regex>yes</use_regex>
         <replace_string>\/\w{3}\/</replace_string>
