@@ -58,7 +58,7 @@
     </parameter>
     <parameter>
       <name>DISTKEY</name>
-      <default_value />
+      <default_value>none</default_value>
       <description>Identifica a chave de distribuição da tabela. </description>
     </parameter>
     <parameter>
