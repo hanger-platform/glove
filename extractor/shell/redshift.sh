@@ -273,7 +273,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
     table_check
 
 	# Identifica se é uma named query.
-    if [ ${MODULE} == "query" ]; then
+    if [ ${MODULE} == "query" ] || [ ${MODULE} == "file" ]; then
 		# Remove o header do csv intermediário.
 		echo "Removing header from ${RAWFILE_QUEUE_FILE}!"
 		tail -n +2 ${RAWFILE_QUEUE_FILE} > ${RAWFILE_QUEUE_FILE}.tmp
