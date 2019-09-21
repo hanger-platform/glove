@@ -416,6 +416,31 @@ public class Mitt {
      *
      * @param file
      * @param wildcard
+     * @param delimiter
+     * @param header
+     */
+    public void write(
+            File file,
+            String wildcard,
+            char delimiter,
+            List<String> header) {
+
+        this.write(file,
+                wildcard,
+                delimiter,
+                QUOTE,
+                QUOTE_ESCAPE,
+                ENCODE,
+                header,
+                true,
+                0
+        );
+    }
+
+    /**
+     *
+     * @param file
+     * @param wildcard
      * @param header
      */
     public void write(
@@ -505,7 +530,7 @@ public class Mitt {
                     quote,
                     quoteEscape,
                     encode,
-                    new ArrayList(),
+                    header,
                     remove,
                     skipLines
             );
