@@ -62,6 +62,7 @@ import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.util.BackOff;
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.common.collect.Maps;
+import com.google.common.io.Files;
 import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
@@ -119,7 +120,7 @@ public class GoogleAdwords {
             //Generates a refreshable OAuth2 credential.
             Credential credential = new OfflineCredentials.Builder()
                     .forApi(Api.ADWORDS)
-                    .fromFile("/home/valdiney/ads.properties")
+                    .fromFile(cli.getParameter("credentials"))
                     .build()
                     .generateCredential();
 
@@ -130,34 +131,6 @@ public class GoogleAdwords {
                     .buildImmutable();
 
             AdWordsServicesInterface adWordsServicesInterface = AdWordsServices.getInstance();
-
-            // Adjust these values as needed.
-            int offset = 0;
-            int maxElapsedSecondsPerCustomer = 60 * 5;
-            ManagedCustomerPage managedCustomerPage;
-            Map<Long, ManagedCustomer> managedCustomers = Maps.newHashMap();
-
-            //Retrieve all accounts under the manager account.
-            ManagedCustomerServiceInterface managedCustomerService = adWordsServicesInterface.get(session, ManagedCustomerServiceInterface.class);
-
-            SelectorBuilder selectorBuilder = new SelectorBuilder()
-                    .fields(ManagedCustomerField.CustomerId)
-                    .equals(ManagedCustomerField.CanManageClients, "false")
-                    .limit(cli.getParameterAsInteger("page_size"))
-                    .offset(0);
-
-            do {
-                selectorBuilder.offset(offset);
-                managedCustomerPage = managedCustomerService.get(selectorBuilder.build());
-
-                if (managedCustomerPage.getEntries() != null) {
-                    for (ManagedCustomer managedCustomer : managedCustomerPage.getEntries()) {
-                        managedCustomers.put(managedCustomer.getCustomerId(), managedCustomer);
-                    }
-                }
-
-                offset += cli.getParameterAsInteger("page_size");
-            } while (offset < managedCustomerPage.getTotalNumEntries());
 
             //Defines report date range.
             DateRange dateRange = new DateRange();
@@ -186,13 +159,39 @@ public class GoogleAdwords {
                     .build();
 
             //Create a thread pool for submitting report requests.
+            int maxElapsedSecondsPerCustomer = 60 * 5;
             ExecutorService threadPool = Executors.newFixedThreadPool(cli.getParameterAsInteger("threads"));
             ExponentialBackOff.Builder backOffBuilder = new ExponentialBackOff.Builder().setMaxElapsedTimeMillis(maxElapsedSecondsPerCustomer * 1000);
             List<ReportDownloader> reportDownloadFutureTasks = new ArrayList<>();
 
             //Defines the output path. 
-            File outputPath = new File(System.getProperty("java.io.tmpdir") + "/" + cli.getParameter("type"));
+            File outputPath = Files.createTempDir();
             outputPath.mkdirs();
+
+            //Retrieve all accounts under the manager account.
+            int offset = 0;
+            ManagedCustomerPage managedCustomerPage;
+            Map<Long, ManagedCustomer> managedCustomers = Maps.newHashMap();
+            ManagedCustomerServiceInterface managedCustomerService = adWordsServicesInterface.get(session, ManagedCustomerServiceInterface.class);
+
+            SelectorBuilder selectorBuilder = new SelectorBuilder()
+                    .fields(ManagedCustomerField.CustomerId)
+                    .equals(ManagedCustomerField.CanManageClients, "false")
+                    .limit(cli.getParameterAsInteger("page_size"))
+                    .offset(0);
+
+            do {
+                selectorBuilder.offset(offset);
+                managedCustomerPage = managedCustomerService.get(selectorBuilder.build());
+
+                if (managedCustomerPage.getEntries() != null) {
+                    for (ManagedCustomer managedCustomer : managedCustomerPage.getEntries()) {
+                        managedCustomers.put(managedCustomer.getCustomerId(), managedCustomer);
+                    }
+                }
+
+                offset += cli.getParameterAsInteger("page_size");
+            } while (offset < managedCustomerPage.getTotalNumEntries());
 
             //Dowload report for each customer. 
             for (ManagedCustomer managedCustomer : managedCustomers.values()) {
