@@ -324,10 +324,15 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 	echo ] >> ${RAWFILE_QUEUE_MANIFEST_PATH}${DATA_FILE}.manifest
 	echo } >> ${RAWFILE_QUEUE_MANIFEST_PATH}${DATA_FILE}.manifest
 
-	# Identifica o tipo de carga que será realizado.
-	if [ "${#DELTA_FIELD_IN_METADATA}" -gt "0" ]; then
+    # Identifica se o APPEND está habilitado no módulo de arquivo.
+	if [ ${MODULE} == "file" ] && [ ${FILE_OUTPUT_MODE} == "append" ]; then
 		delta_load
 	else
-		full_load
-	fi
+        # Identifica o tipo de carga que será realizado.
+        if [ "${#DELTA_FIELD_IN_METADATA}" -gt "0" ]; then
+            delta_load
+        else
+            full_load
+        fi
+    fi
 fi
