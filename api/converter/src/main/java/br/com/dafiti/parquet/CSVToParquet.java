@@ -325,7 +325,7 @@ public class CSVToParquet implements Runnable {
             parserSettings.getFormat().setQuoteEscape(quoteEscape);
 
             //Define the input buffer.
-            parserSettings.setInputBufferSize(3 * (1024 * 1024));
+            parserSettings.setInputBufferSize(5 * (1024 * 1024));
 
             //Define a csv parser.
             CsvParser csvParser = new CsvParser(parserSettings);
@@ -375,12 +375,7 @@ public class CSVToParquet implements Runnable {
 
                         //Identify if the field is empty.
                         if (value == null || value.isEmpty()) {
-                            //Identify if the field has default value and assign the default value to empty field.
-                            if (!field.defaultValue().isNull()) {
-                                value = field.defaultValue().toString();
-                            } else {
-                                value = null;
-                            }
+                            value = null;
                         }
 
                         //Reset the field.
@@ -396,7 +391,6 @@ public class CSVToParquet implements Runnable {
                                 case INT:
                                     if (logicalType == null) {
                                         builder.set(field, NumberUtils.toInt(value, 0));
-
                                     } else if (logicalType.equals("date")) {
                                         //A date logical type annotates an Avro int, where the int stores the number of days from the unix epoch.
                                         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");

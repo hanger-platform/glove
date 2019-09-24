@@ -215,7 +215,7 @@ public class Extractor implements Runnable {
                 }
 
                 //Concat postfix _rw to field name that is a reserved word. 
-                if (reservedWords.contains(field)) {
+                if (reservedWords.contains(field.toLowerCase())) {
                     System.out.println("Reserved word found at " + field + " and replaced by " + field + "_rw");
                     field = field.concat("_rw");
                 }
