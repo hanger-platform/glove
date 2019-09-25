@@ -96,6 +96,7 @@ public class GoogleAdwords {
                     .addParameter("s", "start_date", "Start date", "", true, false)
                     .addParameter("e", "end_date", "End date", "", true, false)
                     .addParameter("o", "output", "Output file", "", true, false)
+                    .addParameter("u", "customer", "(Optional) Customer IDs", "")
                     .addParameter("w", "zero_impression", "(Optional) Include Zero Impressions. false as default", "false")
                     .addParameter("t", "threads", "(Optional)  Number customer reports being generated in parallel. 5 as default", "5")
                     .addParameter("z", "page_size", "(Optional)  Page size. 500 as default", "500")
@@ -169,37 +170,40 @@ public class GoogleAdwords {
             outputPath.mkdirs();
 
             //Retrieve all accounts under the manager account.
-            int offset = 0;
-            ManagedCustomerPage managedCustomerPage;
-            Map<Long, ManagedCustomer> managedCustomers = Maps.newHashMap();
-            ManagedCustomerServiceInterface managedCustomerService = adWordsServicesInterface.get(session, ManagedCustomerServiceInterface.class);
+            List<String> customers = cli.getParameterAsList("customer", "\\+");
 
-            SelectorBuilder selectorBuilder = new SelectorBuilder()
-                    .fields(ManagedCustomerField.CustomerId)
-                    .equals(ManagedCustomerField.CanManageClients, "false")
-                    .limit(cli.getParameterAsInteger("page_size"))
-                    .offset(0);
+            if (customers.isEmpty()) {
+                int offset = 0;
+                ManagedCustomerPage managedCustomerPage;
+                ManagedCustomerServiceInterface managedCustomerService = adWordsServicesInterface.get(session, ManagedCustomerServiceInterface.class);
 
-            do {
-                selectorBuilder.offset(offset);
-                managedCustomerPage = managedCustomerService.get(selectorBuilder.build());
+                SelectorBuilder selectorBuilder = new SelectorBuilder()
+                        .fields(ManagedCustomerField.CustomerId)
+                        .equals(ManagedCustomerField.CanManageClients, "false")
+                        .limit(cli.getParameterAsInteger("page_size"))
+                        .offset(0);
 
-                if (managedCustomerPage.getEntries() != null) {
-                    for (ManagedCustomer managedCustomer : managedCustomerPage.getEntries()) {
-                        managedCustomers.put(managedCustomer.getCustomerId(), managedCustomer);
+                do {
+                    selectorBuilder.offset(offset);
+                    managedCustomerPage = managedCustomerService.get(selectorBuilder.build());
+
+                    if (managedCustomerPage.getEntries() != null) {
+                        for (ManagedCustomer managedCustomer : managedCustomerPage.getEntries()) {
+                            customers.add(managedCustomer.getCustomerId().toString());
+                        }
                     }
-                }
 
-                offset += cli.getParameterAsInteger("page_size");
-            } while (offset < managedCustomerPage.getTotalNumEntries());
+                    offset += cli.getParameterAsInteger("page_size");
+                } while (offset < managedCustomerPage.getTotalNumEntries());
+            }
 
             //Dowload report for each customer. 
-            for (ManagedCustomer managedCustomer : managedCustomers.values()) {
-                File outputFile = new File(outputPath, managedCustomer.getCustomerId() + ".csv");
+            for (String customer : customers) {
+                File outputFile = new File(outputPath, customer + ".csv");
 
                 ImmutableAdWordsSession sessionForCustomer = session
                         .newBuilder()
-                        .withClientCustomerId(Long.toString(managedCustomer.getCustomerId()))
+                        .withClientCustomerId(customer)
                         .withReportingConfiguration(reportingConfiguration)
                         .buildImmutable();
 
