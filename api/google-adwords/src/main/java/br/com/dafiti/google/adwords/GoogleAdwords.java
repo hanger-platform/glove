@@ -126,7 +126,7 @@ public class GoogleAdwords {
 
             //Construct an ImmutableAdWordsSession to use as a prototype when creating a session for each managed customer.
             ImmutableAdWordsSession session = new AdWordsSession.Builder()
-                    .fromFile()
+                    .fromFile(cli.getParameter("credentials"))
                     .withOAuth2Credential(credential)
                     .buildImmutable();
 
