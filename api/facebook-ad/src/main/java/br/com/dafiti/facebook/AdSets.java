@@ -56,6 +56,7 @@ public class AdSets {
     private final String endDate;
     private final List key;
     private final List partition;
+    private final List fields;
 
     public AdSets(
             APIContext apiContext,
@@ -64,7 +65,8 @@ public class AdSets {
             String startDate,
             String endDate,
             List key,
-            List partition) {
+            List partition,
+            List fields) {
 
         this.apiContext = apiContext;
         this.adAccount = adAccount;
@@ -73,6 +75,7 @@ public class AdSets {
         this.endDate = endDate;
         this.key = key;
         this.partition = partition;
+        this.fields = fields;
     }
 
     /**
@@ -86,38 +89,45 @@ public class AdSets {
         mitt.getConfiguration()
                 .addCustomField("partition_field", new Concat(this.partition))
                 .addCustomField("custom_primary_key", new Concat(this.key))
-                .addCustomField("etl_load_date", new Now())
-                .addField("id")
-                .addField("campaign_id")
-                .addField("account_id")
-                .addField("name")
-                .addField("bid_amount")
-                .addField("bid_strategy")
-                .addField("billing_event")
-                .addField("configured_status")
-                .addField("created_time", new DateFormat("created_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"))
-                .addField("daily_budget")
-                .addField("daily_min_spend_target")
-                .addField("daily_spend_cap")
-                .addField("destination_type")
-                .addField("effective_status")
-                .addField("end_time")
-                .addField("instagram_actor_id")
-                .addField("is_dynamic_creative")
-                .addField("lifetime_budget")
-                .addField("lifetime_imps")
-                .addField("lifetime_min_spend_target")
-                .addField("lifetime_spend_cap")
-                .addField("optimization_goal")
-                .addField("optimization_sub_event")
-                .addField("recurring_budget_semantics")
-                .addField("review_feedback")
-                .addField("rf_prediction_id")
-                .addField("source_adset_id")
-                .addField("start_time", new DateFormat("start_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"))
-                .addField("status")
-                .addField("updated_time", new DateFormat("updated_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"))
-                .addField("use_new_app_click");
+                .addCustomField("etl_load_date", new Now());
+
+        //Identifies if fields parameter was filled.
+        if (this.fields.isEmpty()) {
+            mitt.getConfiguration()
+                    .addField("id")
+                    .addField("campaign_id")
+                    .addField("account_id")
+                    .addField("name")
+                    .addField("bid_amount")
+                    .addField("bid_strategy")
+                    .addField("billing_event")
+                    .addField("configured_status")
+                    .addField("created_time", new DateFormat("created_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"))
+                    .addField("daily_budget")
+                    .addField("daily_min_spend_target")
+                    .addField("daily_spend_cap")
+                    .addField("destination_type")
+                    .addField("effective_status")
+                    .addField("end_time")
+                    .addField("instagram_actor_id")
+                    .addField("is_dynamic_creative")
+                    .addField("lifetime_budget")
+                    .addField("lifetime_imps")
+                    .addField("lifetime_min_spend_target")
+                    .addField("lifetime_spend_cap")
+                    .addField("optimization_goal")
+                    .addField("optimization_sub_event")
+                    .addField("recurring_budget_semantics")
+                    .addField("review_feedback")
+                    .addField("rf_prediction_id")
+                    .addField("source_adset_id")
+                    .addField("start_time", new DateFormat("start_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"))
+                    .addField("status")
+                    .addField("updated_time", new DateFormat("updated_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"))
+                    .addField("use_new_app_click");
+        } else {
+            mitt.getConfiguration().addField(this.fields);
+        }
 
         //Identifies original fields.
         List<String> fields = mitt.getConfiguration().getOriginalFieldsName();

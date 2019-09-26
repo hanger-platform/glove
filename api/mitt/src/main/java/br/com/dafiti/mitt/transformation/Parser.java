@@ -121,18 +121,40 @@ public class Parser {
 
         Object evaluated = null;
 
-        if (field.getTransformation() == null) {
-            int index = configuration.getOriginalFields().indexOf(field);
+        //Identifies if field has transformation. 
+        if (field.getTransformation() != null) {
+            evaluated = field.getTransformation(this, record).getValue();
+        } else {
+            //Get only original fields. 
+            List<Field> fields = configuration.getOriginalFields();
 
-            if (index == -1) {
-                Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, "Field {0} does not exists!", field.getName());
-            } else {
+            //Identifies if field exists.          
+            int index = fields.indexOf(field);
+
+            if (index != -1) {
                 if (index < record.size()) {
-                    evaluated = record.get(configuration.getOriginalFields().indexOf(field));
+                    evaluated = record.get(fields.indexOf(field));
+                }
+            } else {
+                //Get all fields. 
+                fields = configuration.getFields();
+
+                //Identifies if field exists.
+                index = fields.indexOf(field);
+
+                if (index != -1) {
+                    Field other = fields.get(index);
+
+                    //Identifies if the field has transformation.
+                    if (other.getTransformation() != null) {
+                        evaluated = other.getTransformation(this, record).getValue();
+                    } else {
+                        Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, "Field {0} does not have related value or transformation!", field.getName());
+                    }
+                } else {
+                    Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, "Field {0} does not exists!", field.getName());
                 }
             }
-        } else {
-            evaluated = field.getTransformation(this, record).getValue();
         }
 
         return evaluated;

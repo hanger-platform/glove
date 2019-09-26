@@ -57,6 +57,7 @@ public class Ads {
     private final String endDate;
     private final List key;
     private final List partition;
+    private final List fields;
 
     public Ads(
             APIContext apiContext,
@@ -65,7 +66,8 @@ public class Ads {
             String startDate,
             String endDate,
             List key,
-            List partition) {
+            List partition,
+            List fields) {
 
         this.apiContext = apiContext;
         this.adAccount = adAccount;
@@ -74,6 +76,7 @@ public class Ads {
         this.endDate = endDate;
         this.key = key;
         this.partition = partition;
+        this.fields = fields;
     }
 
     /**
@@ -87,27 +90,34 @@ public class Ads {
         mitt.getConfiguration()
                 .addCustomField("partition_field", new Concat(this.partition))
                 .addCustomField("custom_primary_key", new Concat(this.key))
-                .addCustomField("etl_load_date", new Now())
-                .addField("id")
-                .addField("adset_id")
-                .addField("campaign_id")
-                .addField("account_id")
-                .addField("bid_amount")
-                .addField("bid_type")
-                .addField("configured_status")
-                .addField("created_time", new DateFormat("created_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"))
-                .addField("demolink_hash")
-                .addField("display_sequence")
-                .addField("effective_status")
-                .addField("engagement_audience")
-                .addField("is_autobid")
-                .addField("last_updated_by_app_id")
-                .addField("name")
-                .addField("preview_shareable_link")
-                .addField("priority")
-                .addField("source_ad_id")
-                .addField("status")
-                .addField("updated_time", new DateFormat("updated_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"));
+                .addCustomField("etl_load_date", new Now());
+
+        //Identifies if fields parameter was filled.
+        if (this.fields.isEmpty()) {
+            mitt.getConfiguration()
+                    .addField("id")
+                    .addField("adset_id")
+                    .addField("campaign_id")
+                    .addField("account_id")
+                    .addField("bid_amount")
+                    .addField("bid_type")
+                    .addField("configured_status")
+                    .addField("created_time", new DateFormat("created_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"))
+                    .addField("demolink_hash")
+                    .addField("display_sequence")
+                    .addField("effective_status")
+                    .addField("engagement_audience")
+                    .addField("is_autobid")
+                    .addField("last_updated_by_app_id")
+                    .addField("name")
+                    .addField("preview_shareable_link")
+                    .addField("priority")
+                    .addField("source_ad_id")
+                    .addField("status")
+                    .addField("updated_time", new DateFormat("updated_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"));
+        } else {
+            mitt.getConfiguration().addField(this.fields);
+        }
 
         //Identifies original fields.
         List<String> fields = mitt.getConfiguration().getOriginalFieldsName();

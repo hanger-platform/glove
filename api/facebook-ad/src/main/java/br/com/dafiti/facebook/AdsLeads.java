@@ -31,9 +31,13 @@ import br.com.dafiti.mitt.transformation.embedded.Now;
 import com.facebook.ads.sdk.APIContext;
 import com.facebook.ads.sdk.APIException;
 import com.facebook.ads.sdk.APINodeList;
+import com.facebook.ads.sdk.Ad;
 import com.facebook.ads.sdk.AdAccount;
 import com.facebook.ads.sdk.AdAccount.APIRequestGetCampaigns;
+import com.facebook.ads.sdk.AdSet;
+import com.facebook.ads.sdk.AdSet.APIRequestGetAds;
 import com.facebook.ads.sdk.Campaign;
+import com.facebook.ads.sdk.Lead;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import java.util.ArrayList;
@@ -43,9 +47,9 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Valdiney V GOMES
+ * @author Helio Leal
  */
-public class AdCampaign {
+public class AdsLeads {
 
     private final APIContext apiContext;
     private final String output;
@@ -56,7 +60,7 @@ public class AdCampaign {
     private final List partition;
     private final List fields;
 
-    public AdCampaign(
+    public AdsLeads(
             APIContext apiContext,
             String output,
             List<String> adAccount,
@@ -93,29 +97,10 @@ public class AdCampaign {
         if (this.fields.isEmpty()) {
             mitt.getConfiguration()
                     .addField("id")
-                    .addField("account_id")
-                    .addField("bid_strategy")
-                    .addField("boosted_object_id")
-                    .addField("budget_rebalance_flag")
-                    .addField("budget_remaining")
-                    .addField("buying_type")
-                    .addField("can_create_brand_lift_study")
-                    .addField("can_use_spend_cap")
-                    .addField("configured_status")
                     .addField("created_time", new DateFormat("created_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"))
-                    .addField("daily_budget")
-                    .addField("effective_status")
-                    .addField("last_budget_toggling_time", new DateFormat("last_budget_toggling_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"))
-                    .addField("lifetime_budget")
-                    .addField("name")
-                    .addField("objective")
-                    .addField("source_campaign_id")
-                    .addField("spend_cap")
-                    .addField("start_time", new DateFormat("start_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"))
-                    .addField("status")
-                    .addField("stop_time", new DateFormat("stop_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"))
-                    .addField("topline_id")
-                    .addField("updated_time", new DateFormat("updated_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"));
+                    .addField("ad_id")
+                    .addField("form_id")
+                    .addField("field_data");
         } else {
             mitt.getConfiguration().addField(this.fields);
         }
@@ -128,44 +113,88 @@ public class AdCampaign {
             Logger.getLogger(AdCampaign.class.getName()).log(Level.INFO, "Retrieving campaing from account {0}", account);
 
             AdAccount adAccount = new AdAccount(account, this.apiContext);
-            APIRequestGetCampaigns campaignRequest = adAccount.getCampaigns();
-
-            //Define a time range filter.
-            campaignRequest.setTimeRange("{\"since\":\"" + this.startDate + "\",\"until\":\"" + this.endDate + "\"}");
-
-            //Define fields to be requested.
-            fields.forEach((field) -> {
-                campaignRequest.requestField(field, true);
-            });
+            APIRequestGetCampaigns request = adAccount.getCampaigns();
 
             //Request campaign fields.
-            APINodeList<Campaign> campaigns = campaignRequest.execute();
+            APINodeList<Campaign> campaigns = request
+                    .requestField("name")
+                    .requestField("adset").execute();
 
             //Enables auto pagination.
             campaigns = campaigns.withAutoPaginationIterator(true);
 
+            //Reads each campaign.
             for (Campaign campaign : campaigns) {
-                List record = new ArrayList();
+                Logger.getLogger(AdCampaign.class.getName()).log(Level.INFO, "Retrieving adSets from campaign {0}", campaign.getFieldName());
 
-                fields.forEach((field) -> {
-                    JsonObject jsonObject = campaign.getRawResponseAsJsonObject();
+                APINodeList<AdSet> adSets = campaign.getAdSets()
+                        .requestField("name")
+                        .requestField("ad").execute();
 
-                    //Identifies if the field exists. 
-                    if (jsonObject.has(field)) {
-                        JsonElement jsonElement = jsonObject.get(field);
+                //Enables auto pagination.
+                adSets = adSets.withAutoPaginationIterator(true);
 
-                        //Identifies if the fiels is a primitive.
-                        if (jsonElement.isJsonPrimitive()) {
-                            record.add(jsonElement.getAsString());
-                        } else {
-                            record.add(jsonElement);
+                //Reads each adSets.
+                for (AdSet adSet : adSets) {
+                    Logger.getLogger(AdCampaign.class.getName()).log(Level.INFO, "Retrieving ads from adSets {0}", adSet.getFieldName());
+
+                    //Defines the campaign ads edge request.
+                    APIRequestGetAds adsRequest = adSet.getAds();
+
+                    //Defines a time range filter
+                    adsRequest.setTimeRange("{\"since\":\"" + this.startDate + "\",\"until\":\"" + this.endDate + "\"}");
+
+                    //Request campaign fields.
+                    APINodeList<Ad> ads = adsRequest
+                            .requestField("id")
+                            .requestField("name").execute();
+
+                    //Enables auto pagination.
+                    ads = ads.withAutoPaginationIterator(true);
+
+                    //Reads each ads.
+                    for (Ad ad : ads) {
+                        Logger.getLogger(AdCampaign.class.getName()).log(Level.INFO, "Retrieving adsLeads from ad {0}", ad.getFieldName());
+
+                        Ad.APIRequestGetLeads leadsRequest = ad.getLeads();
+
+                        //Define fields to be requested.
+                        fields.forEach((field) -> {
+                            leadsRequest.requestField(field);
+                        });
+
+                        APINodeList<Lead> leads = leadsRequest.execute();
+
+                        //Enables auto pagination.
+                        leads = leads.withAutoPaginationIterator(true);
+
+                        //Reads each leads ad.
+                        for (Lead lead : leads) {
+                            List record = new ArrayList();
+
+                            JsonObject jsonObject = lead.getRawResponseAsJsonObject();
+
+                            fields.forEach((field) -> {
+
+                                //Identifies if the field exists. 
+                                if (jsonObject.has(field)) {
+                                    JsonElement jsonElement = jsonObject.get(field);
+
+                                    //Identifies if the fiels is a primitive.
+                                    if (jsonElement.isJsonPrimitive()) {
+                                        record.add(jsonElement.getAsString());
+                                    } else {
+                                        record.add(jsonElement);
+                                    }
+                                } else {
+                                    record.add(null);
+                                }
+                            });
+
+                            mitt.write(record);
                         }
-                    } else {
-                        record.add(null);
                     }
-                });
-
-                mitt.write(record);
+                }
             }
         }
 
