@@ -61,14 +61,12 @@ import com.google.api.ads.common.lib.exception.ValidationException;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.util.BackOff;
 import com.google.api.client.util.ExponentialBackOff;
-import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -96,7 +94,7 @@ public class GoogleAdwords {
                     .addParameter("s", "start_date", "Start date", "", true, false)
                     .addParameter("e", "end_date", "End date", "", true, false)
                     .addParameter("o", "output", "Output file", "", true, false)
-                    .addParameter("u", "customer", "(Optional) Customer IDs", "")
+                    .addParameter("u", "customer", "(Optional) Customer IDs, divided by + if has more than one", "")
                     .addParameter("w", "zero_impression", "(Optional) Include Zero Impressions. false as default", "false")
                     .addParameter("t", "threads", "(Optional)  Number customer reports being generated in parallel. 5 as default", "5")
                     .addParameter("z", "page_size", "(Optional)  Page size. 500 as default", "500")
