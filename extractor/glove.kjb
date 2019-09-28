@@ -274,7 +274,12 @@
     <parameter>
       <name>STORAGE_BUCKET</name>
       <default_value />
-      <description>Identifica o bucket do storage que será utilizado para transferência de arquivos para a AWS.</description>
+      <description>Identifica o bucket do storage que será utilizado para transferência de arquivos.</description>
+    </parameter>
+    <parameter>
+      <name>STORAGE_BUCKET_BACKUP</name>
+      <default_value />
+      <description>Identifica o bucket do storage que será utilizado para backup de arquivos.</description>
     </parameter>
     <parameter>
       <name>TARGET</name>

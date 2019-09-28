@@ -444,6 +444,30 @@ clean_up()
     fi
 }
 
+# Realiza o backup dos arquivos brutos.
+backup()
+{
+    #Identifica a data e hora do backup.
+    DAY=`date '+%Y-%m-%d'`
+    HOUR=`date '+%H:%M:%S'`
+
+    #Identifica o bucket que receberá os dados do backup. 
+    STORAGE_BACKUP_METADATA_PATH="s3://${STORAGE_BUCKET_BACKUP}/${SCHEMA}/${TABLE}/metadata/day=${DAY}/hour=${HOUR}/"
+    STORAGE_BACKUP_QUEUE_PATH="s3://${STORAGE_BUCKET_BACKUP}/${SCHEMA}/${TABLE}/rawfile/queue/day=${DAY}/hour=${HOUR}/"
+
+    # Envia o arquivo do metadado para o storage.
+    echo "Backing up metadata files to ${STORAGE_BACKUP_METADATA_PATH}"
+    aws s3 cp ${METADATA_QUEUE_PATH} ${STORAGE_BACKUP_METADATA_PATH} --recursive --only-show-errors
+    error_check
+    
+    # Envia o arquivo de dados para o storage.
+    echo "Backing up data files to ${STORAGE_BACKUP_QUEUE_PATH}"
+    pigz -c ${RAWFILE_QUEUE_FILE} > ${RAWFILE_QUEUE_FILE}.gz 
+    aws s3 cp ${RAWFILE_QUEUE_FILE} ${STORAGE_BACKUP_QUEUE_PATH} --recursive --exclude "*" --include "*.gz" --only-show-errors
+    rm -f ${RAWFILE_QUEUE_FILE}.gz 
+    error_check 
+}
+
 # Identifica a ocorrência de erros e interrompe processo.
 error_check()
 {
@@ -525,6 +549,11 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
         echo "Dataset ${REDSHIFT_DATASET}"
         echo "Port ${REDSHIFT_PORT}"
         echo "Password provided by kettle.properties parameter"
+    fi
+
+    # Identifica se será feito bachup dos arquivos de dados. 
+    if [ "${#STORAGE_BUCKET_BACKUP}" -gt "0" ]; then
+        backup
     fi
 
 	schema_check
