@@ -452,8 +452,8 @@ backup()
     HOUR=`date '+%H:%M:%S'`
 
     #Identifica o bucket que receberá os dados do backup. 
-    STORAGE_BACKUP_METADATA_PATH="s3://${STORAGE_BUCKET_BACKUP}/${SCHEMA}/${TABLE}/metadata/day=${DAY}/hour=${HOUR}/"
-    STORAGE_BACKUP_QUEUE_PATH="s3://${STORAGE_BUCKET_BACKUP}/${SCHEMA}/${TABLE}/rawfile/queue/day=${DAY}/hour=${HOUR}/"
+    STORAGE_BACKUP_METADATA_PATH="s3://${STORAGE_BUCKET_BACKUP}/backup/${SCHEMA}/${TABLE}/metadata/day=${DAY}/hour=${HOUR}/"
+    STORAGE_BACKUP_QUEUE_PATH="s3://${STORAGE_BUCKET_BACKUP}/backup/${SCHEMA}/${TABLE}/rawfile/queue/day=${DAY}/hour=${HOUR}/"
 
     # Envia o arquivo do metadado para o storage.
     echo "Backing up metadata files to ${STORAGE_BACKUP_METADATA_PATH}"
