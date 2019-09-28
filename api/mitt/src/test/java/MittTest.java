@@ -53,6 +53,7 @@ public class MittTest {
         mitt.getConfiguration().addField("data");
         mitt.getConfiguration().addCustomField("scanner::concat([id,nome,::now(),::Dateformat(data,YYYYMM)])");
         mitt.getConfiguration().addCustomField("fixed::concat([id,nome])");
+        mitt.getConfiguration().addCustomField("bola::eval((id*5))");
 
         //Parameters. 
         mitt.getConfiguration().addParameter("a", "primeiro", "Primeiro parâmetro", "xxx");
