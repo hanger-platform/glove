@@ -449,7 +449,7 @@ backup()
 {
     #Identifica a data e hora do backup.
     DAY=`date '+%Y-%m-%d'`
-    HOUR=`date '+%H:%M:%S'`
+    HOUR=`date '+%H%M'`
 
     #Identifica o bucket que receberá os dados do backup. 
     STORAGE_BACKUP_METADATA_PATH="s3://${STORAGE_BUCKET_BACKUP}/backup/${SCHEMA}/${TABLE}/metadata/day=${DAY}/hour=${HOUR}/"
