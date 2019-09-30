@@ -462,8 +462,9 @@ backup()
     
     # Envia o arquivo de dados para o storage.
     echo "Backing up data files to ${STORAGE_BACKUP_QUEUE_PATH}"
+    cd ${RAWFILE_QUEUE_PATH}
     pigz -c ${RAWFILE_QUEUE_FILE} > ${RAWFILE_QUEUE_FILE}.gz 
-    aws s3 cp ${RAWFILE_QUEUE_FILE} ${STORAGE_BACKUP_QUEUE_PATH} --recursive --exclude "*" --include "*.gz" --only-show-errors
+    aws s3 cp ${RAWFILE_QUEUE_PATH} ${STORAGE_BACKUP_QUEUE_PATH} --recursive --exclude "*" --include "*.gz" --only-show-errors
     rm -f ${RAWFILE_QUEUE_FILE}.gz 
     error_check 
 }
