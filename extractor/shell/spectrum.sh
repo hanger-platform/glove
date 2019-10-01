@@ -457,7 +457,7 @@ backup()
 
     # Envia o arquivo do metadado para o storage.
     echo "Backing up metadata files to ${STORAGE_BACKUP_METADATA_PATH}"
-    aws s3 cp ${METADATA_QUEUE_PATH} ${STORAGE_BACKUP_METADATA_PATH} --recursive --only-show-errors
+    aws s3 cp ${METADATA_PATH} ${STORAGE_BACKUP_METADATA_PATH} --recursive --only-show-errors
     error_check
     
     # Envia o arquivo de dados para o storage.
