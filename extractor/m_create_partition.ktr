@@ -896,16 +896,16 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
 	
 		partitions.add("1900");
 
-		for (Object partition : partitions) {
+		//for (Object partition : partitions) {
   			//Creates the output row. 
         	Object[] output = createOutputRow(r, data.outputRowMeta.size());   
 
        		//Set the partition condition.
-        	get(Fields.Out, "partition").setValue(output, partition);       
+        	get(Fields.Out, "partition").setValue(output, "1900");       
         
         	//Send the row to the output port. 
         	putRow(data.outputRowMeta, output);
-		}
+		//}
     } else {
         setOutputDone();
     }
