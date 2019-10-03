@@ -881,8 +881,8 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
       <definition>
         <class_type>TRANSFORM_CLASS</class_type>
         <class_name>Processor</class_name>
-        <class_source>import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+        <class_source>//import java.time.LocalDate;
+//import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -928,56 +928,19 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
 			//Define the minimun date to start a date range.
 			partition = partition.replace("1900", partitionMinimun);
 
-            if (partitionFormat.equalsIgnoreCase("YYYY")) {
-                LocalDate date = LocalDate.parse(from + "0101", DateTimeFormatter.ofPattern("yyyyMMdd"));
+            if (partitionFormat.equalsIgnoreCase("YYYYMM")) {
+                //LocalDate date = LocalDate.parse(from + "0101", DateTimeFormatter.ofPattern("yyyyMMdd"));
 
 				partitions.add("1900");
 
-                while (Integer.valueOf(partition) &lt; Integer.valueOf(to)) {
-                    partitions.add(partition);
+                //while (Integer.valueOf(partition) &lt; Integer.valueOf(to)) {
+                //    partitions.add(partition);
 
-                    date = date.plusYears(1);
-                    partition = DateTimeFormatter.ofPattern("yyyy").format(date);
-                }
+                //    date = date.plusYears(1);
+                //    partition = DateTimeFormatter.ofPattern("yyyy").format(date);
+                //}
 
-            } else if (partitionFormat.equalsIgnoreCase("YYYYMM")) {
-                LocalDate date = LocalDate.parse(from + "01", DateTimeFormatter.ofPattern("yyyyMMdd"));
-
-				partitions.add("190001");
-
-                while (Integer.valueOf(partition) &lt; Integer.valueOf(to)) {
-                    partitions.add(partition);
-
-                    date = date.plusMonths(1);
-                    partition = DateTimeFormatter.ofPattern("yyyyMM").format(date);
-                }
-
-            } else if (partitionFormat.equalsIgnoreCase("YYYYMMDD")) {
-                LocalDate date = LocalDate.parse(from, DateTimeFormatter.ofPattern("yyyyMMdd"));
-
-				partitions.add("19000101");
-
-                while (Integer.valueOf(partition) &lt; Integer.valueOf(to)) {
-                    partitions.add(partition);
-
-                    date = date.plusMonths(1);
-                    partition = DateTimeFormatter.ofPattern("yyyyMMdd").format(date);
-                }
-
-            } else if (partitionFormat.equalsIgnoreCase("YYYYWW")) {
-                LocalDate date = LocalDate.parse(from.substring(0, 4) + "0101", DateTimeFormatter.ofPattern("yyyyMMdd"));
-                date = date.plusWeeks(Long.valueOf(from.substring(4, 6)));
-				partition = DateTimeFormatter.ofPattern("yyyyww").format(date);
-
-				partitions.add("190001");
-
-                while (Integer.valueOf(partition) &lt; Integer.valueOf(to)) {
-                    partitions.add(partition);
-
-                    date = date.plusWeeks(1);
-                    partition = DateTimeFormatter.ofPattern("yyyyww").format(date);
-                }
-            }
+            } 
         }
 
 		for (Object partition : partitions) {
