@@ -881,8 +881,8 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
       <definition>
         <class_type>TRANSFORM_CLASS</class_type>
         <class_name>Processor</class_name>
-        <class_source>//import java.time.LocalDate;
-//import java.time.format.DateTimeFormatter;
+        <class_source>import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -892,20 +892,100 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     boolean process = (r != null);
 
     if (process) {
-        List partitions = new ArrayList();
-	
-		partitions.add("1900");
+        Calendar calendar = Calendar.getInstance();
+        calendar.clear();
 
-		//for (Object partition : partitions) {
+        //Get partition range;
+        String partitionFrom = get(Fields.In, "partition_from").getString(r);
+        String partitionTo = get(Fields.In, "partition_to").getString(r);
+
+        //Get partition configuration;
+        String partitionFormat = getVariable("PARTITION_FORMAT", "");
+        String partitionType = getVariable("PARTITION_TYPE", "");
+        String partitionLength = getVariable("PARTITION_LENGTH", "");
+
+        List partitions = new ArrayList();
+
+        //Identifies if the partition is from ID.
+        if (partitionType.equalsIgnoreCase("ID")) {
+            long from = Integer.valueOf(partitionFrom);
+            long to = Integer.valueOf(partitionTo);
+			long length = Integer.valueOf(partitionLength);
+
+            long partition = from;
+
+            while (partition &lt; to) {
+                partitions.add(partition);
+                partition = partition + length;
+            }
+        } else {
+            String from = partitionFrom;
+            String to = partitionTo;
+
+            String partition = from;
+
+            if (partitionFormat.equalsIgnoreCase("YYYY")) {
+                LocalDate date = LocalDate.parse(from + "0101", DateTimeFormatter.ofPattern("yyyyMMdd"));
+
+				partitions.add("1900");
+
+                while (Integer.valueOf(partition) &lt; Integer.valueOf(to)) {
+                    partitions.add(partition);
+
+                    date = date.plusYears(1);
+                    partition = DateTimeFormatter.ofPattern("yyyy").format(date);
+                }
+
+            } else if (partitionFormat.equalsIgnoreCase("YYYYMM")) {
+                LocalDate date = LocalDate.parse(from + "01", DateTimeFormatter.ofPattern("yyyyMMdd"));
+
+				partitions.add("190001");
+
+                while (Integer.valueOf(partition) &lt; Integer.valueOf(to)) {
+                    partitions.add(partition);
+
+                    date = date.plusMonths(1);
+                    partition = DateTimeFormatter.ofPattern("yyyyMM").format(date);
+                }
+
+            } else if (partitionFormat.equalsIgnoreCase("YYYYMMDD")) {
+                LocalDate date = LocalDate.parse(from, DateTimeFormatter.ofPattern("yyyyMMdd"));
+
+				partitions.add("19000101");
+
+                while (Integer.valueOf(partition) &lt; Integer.valueOf(to)) {
+                    partitions.add(partition);
+
+                    date = date.plusMonths(1);
+                    partition = DateTimeFormatter.ofPattern("yyyyMMdd").format(date);
+                }
+
+            } else if (partitionFormat.equalsIgnoreCase("YYYYWW")) {
+                LocalDate date = LocalDate.parse(from.substring(0, 4) + "0101", DateTimeFormatter.ofPattern("yyyyMMdd"));
+                date = date.plusWeeks(Integer.valueOf(from.substring(4, 6)));
+				partition = DateTimeFormatter.ofPattern("yyyyww").format(date);
+
+				partitions.add("190001");
+
+                while (Integer.valueOf(partition) &lt; Integer.valueOf(to)) {
+                    partitions.add(partition);
+
+                    date = date.plusWeeks(1);
+                    partition = DateTimeFormatter.ofPattern("yyyyww").format(date);
+                }
+            }
+        }
+
+		for (int i = 0; i &lt; partitions.size(); i++) {
   			//Creates the output row. 
         	Object[] output = createOutputRow(r, data.outputRowMeta.size());   
 
        		//Set the partition condition.
-        	get(Fields.Out, "partition").setValue(output, "1900");       
+        	get(Fields.Out, "partition").setValue(output, partitions.get(i));       
         
         	//Send the row to the output port. 
         	putRow(data.outputRowMeta, output);
-		//}
+		}
     } else {
         setOutputDone();
     }
