@@ -567,11 +567,6 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Generate partition range</from>
-      <to>Sort partition</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
       <from>Get partition</from>
       <to>Generate partition range</to>
       <enabled>N</enabled>
@@ -579,6 +574,16 @@
     <hop>
       <from>Data grid</from>
       <to>Generate partition range</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Generate partition range</from>
+      <to>Write to log</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Write to log</from>
+      <to>Sort partition</to>
       <enabled>Y</enabled>
     </hop>
   </order>
@@ -776,7 +781,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
       </output>
     </remotesteps>
     <GUI>
-      <xloc>576</xloc>
+      <xloc>736</xloc>
       <yloc>48</yloc>
       <draw>Y</draw>
     </GUI>
@@ -801,14 +806,14 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
       </output>
     </remotesteps>
     <GUI>
-      <xloc>752</xloc>
+      <xloc>912</xloc>
       <yloc>48</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Sort partition</name>
-    <type>SortRows</type>
+    <name>Data grid</name>
+    <type>DataGrid</type>
     <description />
     <distribute>Y</distribute>
     <custom_distribution />
@@ -817,23 +822,36 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
       <method>none</method>
       <schema_name />
     </partitioning>
-    <directory>${GLOVE_TEMP}</directory>
-    <prefix>out</prefix>
-    <sort_size>1000000</sort_size>
-    <free_memory />
-    <compress>Y</compress>
-    <compress_variable />
-    <unique_rows>Y</unique_rows>
     <fields>
       <field>
-        <name>partition</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <collator_enabled>N</collator_enabled>
-        <collator_strength>0</collator_strength>
-        <presorted>N</presorted>
+        <name>partition_from</name>
+        <type>String</type>
+        <format />
+        <currency />
+        <decimal />
+        <group />
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>partition_to</name>
+        <type>String</type>
+        <format />
+        <currency />
+        <decimal />
+        <group />
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
       </field>
     </fields>
+    <data>
+      <line>
+        <item>201501</item>
+        <item>201802</item>
+      </line>
+    </data>
     <attributes />
     <cluster_schema />
     <remotesteps>
@@ -843,8 +861,8 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
       </output>
     </remotesteps>
     <GUI>
-      <xloc>416</xloc>
-      <yloc>48</yloc>
+      <xloc>96</xloc>
+      <yloc>160</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1039,8 +1057,8 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     </GUI>
   </step>
   <step>
-    <name>Data grid</name>
-    <type>DataGrid</type>
+    <name>Sort partition</name>
+    <type>SortRows</type>
     <description />
     <distribute>Y</distribute>
     <custom_distribution />
@@ -1049,36 +1067,23 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
       <method>none</method>
       <schema_name />
     </partitioning>
+    <directory>${GLOVE_TEMP}</directory>
+    <prefix>out</prefix>
+    <sort_size>1000000</sort_size>
+    <free_memory />
+    <compress>Y</compress>
+    <compress_variable />
+    <unique_rows>Y</unique_rows>
     <fields>
       <field>
-        <name>partition_from</name>
-        <type>String</type>
-        <format />
-        <currency />
-        <decimal />
-        <group />
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-      <field>
-        <name>partition_to</name>
-        <type>String</type>
-        <format />
-        <currency />
-        <decimal />
-        <group />
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
+        <name>partition</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <presorted>N</presorted>
       </field>
     </fields>
-    <data>
-      <line>
-        <item>201501</item>
-        <item>201802</item>
-      </line>
-    </data>
     <attributes />
     <cluster_schema />
     <remotesteps>
@@ -1088,8 +1093,40 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
       </output>
     </remotesteps>
     <GUI>
-      <xloc>96</xloc>
-      <yloc>160</yloc>
+      <xloc>576</xloc>
+      <yloc>48</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Write to log</name>
+    <type>WriteToLog</type>
+    <description />
+    <distribute>Y</distribute>
+    <custom_distribution />
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name />
+    </partitioning>
+    <loglevel>log_level_basic</loglevel>
+    <displayHeader>Y</displayHeader>
+    <limitRows>N</limitRows>
+    <limitRowsNumber>0</limitRowsNumber>
+    <logmessage />
+    <fields>
+      </fields>
+    <attributes />
+    <cluster_schema />
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>416</xloc>
+      <yloc>48</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
