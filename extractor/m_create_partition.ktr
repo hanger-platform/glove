@@ -929,7 +929,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
 
 				partitions.add("1900");
 
-                while (Integer.valueOf(partition) &lt; Integer.valueOf(to)) {
+                while (Integer.valueOf(partition) &lt;= Integer.valueOf(to)) {
                     partitions.add(partition);
 
                     date = date.plusYears(1);
@@ -941,7 +941,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
 
 				partitions.add("190001");
 
-                while (Integer.valueOf(partition) &lt; Integer.valueOf(to)) {
+                while (Integer.valueOf(partition) &lt;= Integer.valueOf(to)) {
                     partitions.add(partition);
 
                     date = date.plusMonths(1);
@@ -953,7 +953,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
 
 				partitions.add("19000101");
 
-                while (Integer.valueOf(partition) &lt; Integer.valueOf(to)) {
+                while (Integer.valueOf(partition) &lt;= Integer.valueOf(to)) {
                     partitions.add(partition);
 
                     date = date.plusMonths(1);
@@ -967,7 +967,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
 
 				partitions.add("190001");
 
-                while (Integer.valueOf(partition) &lt; Integer.valueOf(to)) {
+                while (Integer.valueOf(partition) &lt;= Integer.valueOf(to)) {
                     partitions.add(partition);
 
                     date = date.plusWeeks(1);
