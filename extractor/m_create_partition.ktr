@@ -574,6 +574,11 @@
     <hop>
       <from>Get partition</from>
       <to>Generate partition range</to>
+      <enabled>N</enabled>
+    </hop>
+    <hop>
+      <from>Data grid</from>
+      <to>Generate partition range</to>
       <enabled>Y</enabled>
     </hop>
   </order>
@@ -1030,6 +1035,61 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     <GUI>
       <xloc>96</xloc>
       <yloc>48</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Data grid</name>
+    <type>DataGrid</type>
+    <description />
+    <distribute>Y</distribute>
+    <custom_distribution />
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name />
+    </partitioning>
+    <fields>
+      <field>
+        <name>partition_from</name>
+        <type>String</type>
+        <format />
+        <currency />
+        <decimal />
+        <group />
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>partition_to</name>
+        <type>String</type>
+        <format />
+        <currency />
+        <decimal />
+        <group />
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+    </fields>
+    <data>
+      <line>
+        <item>201501</item>
+        <item>201802</item>
+      </line>
+    </data>
+    <attributes />
+    <cluster_schema />
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>96</xloc>
+      <yloc>160</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
