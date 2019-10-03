@@ -892,19 +892,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     boolean process = (r != null);
 
     if (process) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.clear();
-
-        //Get partition range;
-        String partitionFrom = get(Fields.In, "partition_from").getString(r);
-        String partitionTo = get(Fields.In, "partition_to").getString(r);
-
-        //Get partition configuration;
-        String partitionFormat = getVariable("PARTITION_FORMAT", "");
-        String partitionType = getVariable("PARTITION_TYPE", "");
-        String partitionLength = getVariable("PARTITION_LENGTH", "");
-		//String partitionMinimun = getVariable("PARTITION_MINIMUN", "");
-
         List partitions = new ArrayList();
 	
 		partitions.add("1900");
