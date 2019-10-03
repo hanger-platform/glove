@@ -238,7 +238,7 @@
     </parameter>
     <parameter>
       <name>PARTITION_MINIMUN</name>
-      <default_value>2010</default_value>
+      <default_value>2015</default_value>
       <description>Identifica o valor mínimo para definição de range de partição de dada.</description>
     </parameter>
     <parameter>
