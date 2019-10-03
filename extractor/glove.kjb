@@ -237,6 +237,11 @@
       <description>Identifica se deve ser realizado merge dos dados da partição. </description>
     </parameter>
     <parameter>
+      <name>PARTITION_MINIMUN</name>
+      <default_value>2010</default_value>
+      <description>Identifica o valor mínimo para definição de range de partição de dada.</description>
+    </parameter>
+    <parameter>
       <name>PARTITION_MODE</name>
       <default_value>virtual</default_value>
       <description>Identifica o tipo de partiticionamento que será utilizado. </description>
