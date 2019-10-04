@@ -627,8 +627,8 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
 
         //Identifies if the partition is from ID.
         if (partitionType.equalsIgnoreCase("ID")) {
-            Integer value = Integer.valueOf(partition);
-            Integer length = Integer.valueOf(partitionLength);
+            long value = Long.valueOf(partition);
+            long length = Long.valueOf(partitionLength);
 
             partitionCondition = partitionField + " BETWEEN " + (value - (length - 1)) + " AND " + value;
             partitionRecoveryCondition = partitionField + " >= " + (value - (length - 1));
@@ -905,7 +905,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
         if (partitionType.equalsIgnoreCase("ID")) {
             long from = (long) Double.parseDouble(partitionFrom);
             long to = (long) Double.parseDouble(partitionTo);
-			long length = Integer.valueOf(partitionLength);
+			long length = Long.valueOf(partitionLength);
 
             long partition = from;
 
