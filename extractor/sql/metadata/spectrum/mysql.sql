@@ -117,6 +117,7 @@ SELECT * FROM (
            	WHEN 'longtext'     THEN 'varchar(65535)'
             WHEN 'blob'         THEN 'varchar(65535)'
             WHEN 'mediumblob'   THEN 'varchar(65535)'
+	WHEN 'longblob'   THEN 'varchar(65535)'	
             WHEN 'date'         THEN 'varchar(10)'
             WHEN 'datetime'     THEN 'varchar(19)'
             WHEN 'time'         THEN 'varchar(17)'
