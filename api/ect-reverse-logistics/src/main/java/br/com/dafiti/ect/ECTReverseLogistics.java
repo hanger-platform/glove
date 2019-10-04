@@ -157,6 +157,10 @@ public class ECTReverseLogistics {
             }
 
             executor.shutdown();
+
+            if (executor.isTerminated()) {
+                Logger.getLogger(ECTReverseLogistics.class.getName()).info("GLOVE - ECT Reverse Logistics Extractor finalized");
+            }
         } catch (IOException
                 | ParseException
                 | DuplicateEntityException ex) {
@@ -166,7 +170,5 @@ public class ECTReverseLogistics {
         } finally {
             mitt.close();
         }
-
-        Logger.getLogger(ECTReverseLogistics.class.getName()).info("GLOVE - ECT Reverse Logistics Extractor finalized");
     }
 }

@@ -266,7 +266,8 @@ public class ECTReverseLogisticsRunner implements Runnable {
                 if (retry < API_DEFAULT_RETRY) {
                     Logger.getLogger(ECTReverseLogisticsRunner.class.getName()).log(Level.INFO, "Reverse logistics retry {0} for authorizations: {1}, caused by {2}", new Object[]{retry, String.join(",", authorizations), ex});
                     TimeUnit.MINUTES.sleep(1);
-                    this.loteProcessor(mitt, authorizations, retry++);
+                    retry = retry + 1;
+                    this.loteProcessor(mitt, authorizations, retry);
                 } else {
                     Logger.getLogger(ECTReverseLogisticsRunner.class.getName()).log(Level.SEVERE, "Reverse logistics retrying limit exceeded!");
                     System.exit(1);
