@@ -197,6 +197,10 @@ public class Output {
                 encoding = UniversalDetector.detectCharset(file);
             } catch (IOException ex) {
                 Logger.getLogger(Output.class.getName()).log(Level.SEVERE, "Encode do not detected!", ex);
+            } finally {
+                if (encoding == null) {
+                    encoding = "UTF-8";
+                }
             }
         } else {
             encoding = encode;
