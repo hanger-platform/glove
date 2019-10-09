@@ -28,7 +28,8 @@ Utilizando o [Maven](https://maven.apache.org/):
 ```
 {
 	"user":"<username>",
-	"password":"<password>"
+	"password":"<password>",
+	"private_key":"[private_key]"
 }
 ```
 
@@ -41,7 +42,6 @@ java -jar sftp.jar  \
 	--output=<Output path> \
 	--directory=<SFTP directory> \
 	--output=<Output file> \
-	--path=<Temporary path to file transfer> \
 	--start_date=<Start date>
 	--end_date=<End date>  \
 	--delimiter=<(Optional) File delimiter; ';' as default> \

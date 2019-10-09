@@ -31,7 +31,7 @@ import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -69,7 +69,8 @@ public class Output {
         setting.getFormat().setQuoteEscape(quoteEscape);
         setting.setNullValue("");
         setting.setMaxCharsPerColumn(-1);
-
+        setting.setHeaderWritingEnabled(true);
+        
         setting.setHeaders(
                 parser
                         .getConfiguration()
@@ -77,7 +78,6 @@ public class Output {
                         .toArray(new String[0]));
 
         this.writer = new CsvWriter(output, setting);
-        this.writer.writeHeaders();
     }
 
     /**
@@ -92,8 +92,11 @@ public class Output {
      *
      * @param record
      */
-    public void write(List<Object> record) {
-        this.writer.writeRow(parser.evaluate(record));
+    public void write(List record) {
+        this.writer
+                .writeRow(
+                        parser.evaluate(record)
+                );
     }
 
     /**
@@ -101,13 +104,9 @@ public class Output {
      * @param record
      */
     public void write(String[] record) {
-        List<Object> data = new ArrayList();
-
-        for (String value : record) {
-            data.add(value);
-        }
-
-        this.writer.writeRow(parser.evaluate(data));
+        this.write(
+                Arrays.asList(record)
+        );
     }
 
     /**

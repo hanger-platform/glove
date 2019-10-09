@@ -35,14 +35,25 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.ArchiveException;
+import org.apache.commons.compress.archivers.ArchiveInputStream;
+import org.apache.commons.compress.archivers.ArchiveStreamFactory;
+import org.apache.commons.compress.utils.IOUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.joda.time.LocalDate;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -60,6 +71,8 @@ public class SFTP {
      * @param args cli parameteres provided by command line.
      */
     public static void main(String[] args) {
+        Path outputPath = null;
+
         Session session = null;
         Channel channel = null;
 
@@ -73,7 +86,6 @@ public class SFTP {
                     .addParameter("j", "credentials", "Credentials file", "", true, false)
                     .addParameter("D", "directory", "SFTP directory", "", true, false)
                     .addParameter("O", "output", "Output file", "", true, false)
-                    .addParameter("ph", "path", "Temporary path to file transfer", "", true, false)
                     .addParameter("sd", "start_date", "Start date", "", true, false)
                     .addParameter("ed", "end_date", "End date", "", true, false)
                     .addParameter("f", "field", "Fields to be extracted from the file", "", true, false)
@@ -102,6 +114,11 @@ public class SFTP {
 
             //Opens an SSH session with username and password authentication or private key. 
             JSch jsch = new JSch();
+
+            if (credentials.get("private_key") != null) {
+                jsch.addIdentity((String) credentials.get("private_key"));
+            }
+
             session = jsch.getSession(
                     (String) credentials.get("user"),
                     cli.getParameter("host"),
@@ -127,8 +144,7 @@ public class SFTP {
             Vector<ChannelSftp.LsEntry> list = channelSftp.ls(cli.getParameter("pattern"));
 
             //Defines the output path. 
-            File outputPath = new File(System.getProperty("java.io.tmpdir") + cli.getParameter("path"));
-            outputPath.mkdirs();
+            outputPath = Files.createTempDirectory("sftp_");
 
             //Transfers a file.
             for (ChannelSftp.LsEntry entry : list) {
@@ -140,7 +156,8 @@ public class SFTP {
                 if (updatedDate.compareTo(LocalDate.parse(cli.getParameter("start_date"))) >= 0
                         && updatedDate.compareTo(LocalDate.parse(cli.getParameter("end_date"))) <= 0) {
 
-                    File outputFile = new File(outputPath.getAbsolutePath() + "/" + entry.getFilename());
+                    ArchiveEntry archiveEntry;
+                    File outputFile = new File(outputPath.toString() + "/" + entry.getFilename());
 
                     //Transfer a file to local filesystem. 
                     channelSftp.get(
@@ -148,16 +165,36 @@ public class SFTP {
                             outputFile.getAbsolutePath(),
                             new Monitor()
                     );
+
+                    //Identifies if file is compressed.
+                    if ("|zip|gz|tar|".contains(FilenameUtils.getExtension(outputFile.getName()))) {
+                        try (ArchiveInputStream archiveInputStream = new ArchiveStreamFactory().createArchiveInputStream(new BufferedInputStream(new FileInputStream(outputFile)))) {
+                            while ((archiveEntry = archiveInputStream.getNextEntry()) != null) {
+                                File decompressedOutputFile = new File(outputPath.toString() + "/" + archiveEntry.getName());
+
+                                try (OutputStream outputStream = Files.newOutputStream(decompressedOutputFile.toPath())) {
+                                    IOUtils.copy(archiveInputStream, outputStream);
+                                }
+                            }
+                        }
+
+                        //Remove compressed file. 
+                        Files.delete(outputFile.toPath());
+                    }
                 }
             }
 
             //Writes the final file.
-            mitt.write(outputPath, "*.csv", cli.getParameter("delimiter").charAt(0));
+            mitt.write(outputPath.toFile(), "*", cli.getParameter("delimiter").charAt(0));
+
+            //Remove temporary path. 
+            Files.delete(outputPath);
         } catch (JSchException
                 | SftpException
                 | IOException
                 | ParseException
-                | DuplicateEntityException ex) {
+                | DuplicateEntityException
+                | ArchiveException ex) {
 
             Logger.getLogger(SFTP.class.getName()).log(Level.SEVERE, "SFTP Failure: ", ex);
             System.exit(1);
