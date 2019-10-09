@@ -54,8 +54,7 @@ Crie um arquivo json, contendo uma lista de objetos cujos valores serão utiliza
 
 ```json
 [
-    	{"name":"GLOVE_raw_campaign_factory_dafiti_ar_app_and_miac","connection_name":"RAW_CAMPAIGN_FACTORY","input_table_name":"dafiti_ar_app_and_miac","input_table_schema":"campaign_factory","target":"spectrum","dataset_name":"dftdwh","storage_bucket":"bi-bucket","output_table_schema":"spc_raw_campaign_factory","delta_field":"","partition_field":""},
-...
+    	{"name":"GLOVE_raw_campaign_factory_dafiti_ar_app_and_miac","connection_name":"RAW_CAMPAIGN_FACTORY","input_table_name":"dafiti_ar_app_and_miac","input_table_schema":"campaign_factory","target":"spectrum","dataset_name":"dftdwh","storage_bucket":"bi-bucket","output_table_schema":"spc_raw_campaign_factory","delta_field":"","partition_field":""}
 ]
 ```
 
@@ -63,7 +62,7 @@ Execute o Jenkins job creator:
 
 ```bash
 java -jar jenkins-job-creator.jar \
-	--url=http://172.18.10.204:8080/jenkins \
+	--url=http://127.0.0.1:8080/jenkins \
 	--user=vgomes \
 	--password=xxx \
 	--template=GLOVE_template \
