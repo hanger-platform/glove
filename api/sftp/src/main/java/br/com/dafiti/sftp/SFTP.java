@@ -168,18 +168,22 @@ public class SFTP {
 
                     //Identifies if file is compressed.
                     if ("|zip|gz|tar|".contains(FilenameUtils.getExtension(outputFile.getName()))) {
-                        try (ArchiveInputStream archiveInputStream = new ArchiveStreamFactory().createArchiveInputStream(new BufferedInputStream(new FileInputStream(outputFile)))) {
-                            while ((archiveEntry = archiveInputStream.getNextEntry()) != null) {
-                                File decompressedOutputFile = new File(outputPath.toString() + "/" + archiveEntry.getName());
+                        try (ArchiveInputStream archiveInputStream
+                                = new ArchiveStreamFactory()
+                                        .createArchiveInputStream(
+                                                new BufferedInputStream(
+                                                        new FileInputStream(outputFile)))) {
+                                    while ((archiveEntry = archiveInputStream.getNextEntry()) != null) {
+                                        File decompressedOutputFile = new File(outputPath.toString() + "/" + archiveEntry.getName());
 
-                                try (OutputStream outputStream = Files.newOutputStream(decompressedOutputFile.toPath())) {
-                                    IOUtils.copy(archiveInputStream, outputStream);
+                                        try (OutputStream outputStream = Files.newOutputStream(decompressedOutputFile.toPath())) {
+                                            IOUtils.copy(archiveInputStream, outputStream);
+                                        }
+                                    }
                                 }
-                            }
-                        }
 
-                        //Remove compressed file. 
-                        Files.delete(outputFile.toPath());
+                                //Remove compressed file. 
+                                Files.delete(outputFile.toPath());
                     }
                 }
             }
