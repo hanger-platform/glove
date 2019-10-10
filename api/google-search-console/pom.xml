@@ -62,7 +62,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>br.com.dafiti.gsc.extractor.Application</mainClass>
+                            <mainClass>br.com.dafiti.googlesearchconsole.GoogleSearchConsole</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
