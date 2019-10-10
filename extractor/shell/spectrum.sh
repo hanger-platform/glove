@@ -210,6 +210,9 @@ partition_load(){
         done
     fi
 
+    # Remove os arquivos utilizados no merge.	
+    rm -f *.original.${OUTPUT_FORMAT}
+
 	# Envia os arquivo para o storage.
 	echo "Uploading ${OUTPUT_FORMAT} files!"
 	aws s3 cp ${RAWFILE_QUEUE_PATH} ${STORAGE_QUEUE_PATH} --recursive --exclude "*" --include "*.${OUTPUT_FORMAT}" --only-show-errors
@@ -281,8 +284,12 @@ delta_load(){
 		--replace
     error_check
 
-	# Remove os arquivos antigos.
-	aws s3 rm ${STORAGE_QUEUE_PATH} --recursive --exclude "*" --include "${DATA_FILE}.*" --only-show-errors
+
+    # Remove os arquivos antigos.
+    aws s3 rm ${STORAGE_QUEUE_PATH} --recursive --exclude "*" --include "${DATA_FILE}.*" --only-show-errors
+
+    # Remove os arquivos utilizados no merge.	
+    rm -f *.original.${OUTPUT_FORMAT}	
 
     # Envia o arquivo para o storage.
     echo "Uploading ${OUTPUT_FORMAT} files to S3 "
