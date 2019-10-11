@@ -79,11 +79,10 @@ public class GoogleSheets {
         //Define parameters. 
         mitt.getConfiguration()
                 .addParameter("c", "credentials", "Credentials file", "", true, false)
-                .addParameter("a", "application_name", "Any application name of your choosing.", "", true, false)
                 .addParameter("s", "spreadsheet", "Identify the id of the spreadsheet", "", true, false)
                 .addParameter("o", "output", "Identify the output path and file name", "", true, false)
-                .addParameter("k", "key", "Unique key, divided by + if has more than one field", "", true, false)
-                .addParameter("p", "partition", "Define the partition field or fields, divided by +", "", true, false)
+                .addParameter("k", "key", "Unique key, divided by + if has more than one field", "")
+                .addParameter("p", "partition", "Define the partition field or fields, divided by +", "")
                 .addParameter("f", "field", "(Optional)fields to be extracted", "")
                 .addParameter("sh", "sheets", "(Optional)(Default consider all sheets) Identify the sheets to extract, divided by +")
                 .addParameter("d", "delimiter", "(Optional)(Default is ;) Identify the delimiter character", ";")
@@ -124,7 +123,7 @@ public class GoogleSheets {
 
         //Instance of sheets service.
         Sheets sheets = new Sheets.Builder(netHttpTransport, jsonFactory, new AuthorizationCodeInstalledApp(googleAuthorizationCodeFlow, new LocalServerReceiver()).authorize("user"))
-                .setApplicationName(cli.getParameter("application_name"))
+                .setApplicationName("Google Sheets API extractor")
                 .build();
 
         //Get the spreadsheet object to get the google spreadsheet name
