@@ -725,7 +725,7 @@ export_bucket</note>
     </remotesteps>
     <GUI>
       <xloc>864</xloc>
-      <yloc>144</yloc>
+      <yloc>128</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1145,11 +1145,16 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     boolean process = (r != null);
 
     if( process ){
+		//Get parameter.
+		String generic_parameter = getVariable("GENERIC_PARAMETER", "");
+	
 		//Get variables. 
 		String order = get(Fields.In, "order").getString(r);
 		String step_parameter = get(Fields.In, "parameter").getString(r);
-		String generic_parameter = getVariable("GENERIC_PARAMETER", "");
-		String sql_in_one_line = get(Fields.Out, "sql_in_one_line").getString(r);
+		String schema = get(Fields.In, "schema").getString(r);
+		String table = get(Fields.In, "table").getString(r);
+		String sql_in_one_line = get(Fields.In, "sql_in_one_line").getString(r);
+		
 		String[] global_parameters = new String[0];
 
 		//Identify parameter scope. 
@@ -1216,15 +1221,21 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
 						logBasic( "Result of data macro ( " + macro + " ) evaluation of parameter " + values[0] + ": " + values[1] );				
 					}
 
-					//Replace query parameters.
+					//Replace element parameters.
+					schema = schema.replaceAll( "\\$\\{" + values[0].toUpperCase() + "\\}", values[1] );	
+					table = table.replaceAll( "\\$\\{" + values[0].toUpperCase() + "\\}", values[1] );	
 					sql_in_one_line = sql_in_one_line.replaceAll( "\\$\\{" + values[0].toUpperCase() + "\\}", values[1] );	
 				}else if ( values.length == 1 ){
+					schema = schema.replaceAll( "\\$\\{" + values[0].toUpperCase() + "\\}", "" );	    
+					table = table.replaceAll( "\\$\\{" + values[0].toUpperCase() + "\\}", "" );	    
                     sql_in_one_line = sql_in_one_line.replaceAll( "\\$\\{" + values[0].toUpperCase() + "\\}", "" );	    
                 } 		       		
         	}				
 		} 
 
-		//Update field value. 
+		//Update output field value. 
+		get(Fields.Out, "schema").setValue(r, schema);
+		get(Fields.Out, "table").setValue(r, table);
 		get(Fields.Out, "sql_in_one_line").setValue(r, sql_in_one_line);
 
         //Create output row. 
@@ -1693,7 +1704,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     </remotesteps>
     <GUI>
       <xloc>976</xloc>
-      <yloc>144</yloc>
+      <yloc>128</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
