@@ -323,7 +323,7 @@ error_check(){
 echo "Running query on Big Query!"
 bq mk --project_id=${BIG_QUERY_PROJECT_ID}  ${STAGING_SCHEMA}
 bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${STAGING_SCHEMA}.${SCHEMA_NAME}_${TABLE}
-bq query --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --allow_large_results --destination_table=${STAGING_SCHEMA}.${SCHEMA_NAME}_${TABLE} "${INPUT_DATA_STATEMENT}"
+bq query --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --allow_large_results --destination_table=${STAGING_SCHEMA}.${SCHEMA_NAME}_${TABLE} "${INPUT_DATA_STATEMENT_ESCAPED}"
 error_check
 
 echo "Extracting data to  gs://${GOOGLE_CLOUD_BUCKET}/${SCHEMA_NAME}/${TABLE}/!"
