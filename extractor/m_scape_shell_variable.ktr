@@ -611,6 +611,7 @@
         <jsScript_script>var INPUT_DATA_STATEMENT_SCAPED = INPUT_DATA_STATEMENT;
 
 INPUT_DATA_STATEMENT_SCAPED = INPUT_DATA_STATEMENT_SCAPED.replace(/"/g,'\\"');
+INPUT_DATA_STATEMENT_SCAPED = INPUT_DATA_STATEMENT_SCAPED.replace(/`/g,'\\`');
 </jsScript_script>
       </jsScript>
     </jsScripts>
