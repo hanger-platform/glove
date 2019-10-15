@@ -28,6 +28,8 @@ import com.univocity.parsers.csv.CsvParserSettings;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.Writer;
 import java.util.HashMap;
 import org.apache.log4j.Logger;
 
@@ -133,8 +135,7 @@ public class CSVSplitter implements Runnable {
                     //Identify if partition is in cache.
                     if (!partitionMap.containsKey(partitionValue)) {                        
                         //Create the partition file.
-                        File partitionFile = new File(csvFile.getParent() + "/" + partitionValue.replaceAll("\\W", "") + ".csv");
-                        partitionFile.setWritable(true, false);
+                        Writer partitionFile = new FileWriter(csvFile.getParent() + "/" + partitionValue.replaceAll("\\W", "") + ".csv", true);
 
                         //Put the partition handler in cache.
                         partitionMap.put(partitionValue,
