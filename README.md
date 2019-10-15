@@ -1,5 +1,5 @@
 # Glove [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-### uma plataforma modular para automatização de processos de integração de dados
+### Plataforma modular para automatização de processos de integração de dados
 
 ## Instalação
 
