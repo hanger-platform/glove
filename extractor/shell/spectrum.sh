@@ -130,7 +130,6 @@ partition_load(){
 			--delimiter=${DELIMITER} \
 			--target=csv \
 			--partition=0 \
-            --thread=${THREAD} \
 			--header \
 			--replace
 		error_check
@@ -151,7 +150,6 @@ partition_load(){
 			--delimiter=${DELIMITER} \
 			--target=csv \
 			--partition=0 \
-            --thread=${THREAD} \
 			--replace
 		error_check
     fi
