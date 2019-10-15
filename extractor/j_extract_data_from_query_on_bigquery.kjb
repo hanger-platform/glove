@@ -335,7 +335,7 @@ gsutil -m cp gs://${GOOGLE_CLOUD_BUCKET}/${SCHEMA_NAME}/${TABLE}/${SCHEMA_NAME}_
 error_check
 
 echo "Unzipping data!"
-gunzip ${RAWFILE_QUEUE_STAGING_PATH}*.gz
+unpigz ${RAWFILE_QUEUE_STAGING_PATH}*.gz
 error_check
 
 echo "Merging data file!"
