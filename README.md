@@ -227,7 +227,7 @@ São suportados os seguintes tipos de carga:
 | STATICPARTITIONED | O comportamento será o mesmo do parâmetro PARTITIONED, porém os arquivos de cada partição serão substituídos ao invés de serem atualizados.                                                                                                                                                 |
 | SCRIPT            | Será executada uma instrução sql no database de destino sem que seja retornado nenhum valor.                                                                                                                                                                                                |
 
-####### EXEMPLO (Materialização)
+###### EXEMPLO (Materialização)
 
 **1.integration_layer.product_costs.redshift.full.sql**
 
@@ -243,7 +243,7 @@ Neste exemplo:
 **redshift** é a conexão na qual a consulta será executada. 
 **full** é o tipo da carga, cuja descrição está na tabela anterior. 
 
-####### EXEMPLO (Script)
+###### EXEMPLO (Script)
 
 **1.business_layer.product_costs.redshift.script.sql**
 
@@ -282,7 +282,7 @@ O metadado possui os seguintes atributos obrigatórios:
 | LENGTH   | Tamanho                                          |
 | DECIMAL  | Decimal                                          |
 
-####### EXEMPLO (Metadado)
+###### EXEMPLO (Metadado)
 
 ´´´
 [ 
@@ -301,7 +301,7 @@ O metadado possui os seguintes atributos obrigatórios:
 ]
 ´´´
 
-###### PARÂMETROS ADICIONAIS
+##### PARÂMETROS ADICIONAIS
 
 | Tecnologia         | Parâmetro                | Descrição                                                                                                                                                                                                                                                                                                                                         |
 |--------------------|--------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
