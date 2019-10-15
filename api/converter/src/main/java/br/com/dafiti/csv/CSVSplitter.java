@@ -30,6 +30,11 @@ import com.univocity.parsers.csv.CsvWriterSettings;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import org.apache.log4j.Logger;
 
@@ -135,8 +140,9 @@ public class CSVSplitter implements Runnable {
                     //Identify if partition is in cache.
                     if (!partitionMap.containsKey(partitionValue)) {                        
                         //Create the partition file.
-                        Writer partitionFile = new FileWriter(csvFile.getParent() + "/" + partitionValue.replaceAll("\\W", "") + ".csv", true);
-
+                        Path path = Paths.get(csvFile.getParent() + "/" + partitionValue.replaceAll("\\W", "") + ".csv");
+                        Writer partitionFile = Files.newBufferedWriter(path, Charset.forName("UTF-8"), StandardOpenOption.APPEND);
+                        
                         //Put the partition handler in cache.
                         partitionMap.put(partitionValue,
                                 new CsvWriter(partitionFile, writerSettings));
