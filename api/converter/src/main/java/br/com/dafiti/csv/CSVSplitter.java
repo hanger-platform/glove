@@ -31,11 +31,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import org.apache.log4j.Logger;
 
@@ -141,14 +136,9 @@ public class CSVSplitter implements Runnable {
                     //Identify if partition is in cache.
                     if (!partitionMap.containsKey(partitionValue)) {
                         //Create the partition file.
-                        Path path = Paths.get(csvFile.getParent() + "/" + partitionValue.replaceAll("\\W", "") + ".csv");
-                        BufferedWriter partitionFile = Files.newBufferedWriter(
-                                path,
-                                Charset.forName("UTF-8"),
-                                StandardOpenOption.APPEND);
-
-                        //Create the physical file. 
-                        Files.createFile(path);
+                        Writer partitionFile = new BufferedWriter(
+                                new FileWriter(csvFile.getParent() + "/" + partitionValue.replaceAll("\\W", "") + ".csv", true)
+                        );
 
                         //Put the partition handler in cache.
                         partitionMap.put(partitionValue,
