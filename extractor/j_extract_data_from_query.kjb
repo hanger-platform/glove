@@ -870,7 +870,7 @@ error_check(){
 	fi
 }
 
-RECORD_TO_LOAD=`awk 'END { print NR }' ${RAWFILE_QUEUE_FILE}`
+RECORD_TO_LOAD=`awk 'END { print NR }' ${RAWFILE_QUEUE_PATH}${SCHEMA_NAME}_${TABLE}*.csv`
 
 if [ ${RECORD_TO_LOAD} -gt 1 ]; then
 	echo "Records: $(( $RECORD_TO_LOAD - 1 ))"

@@ -343,8 +343,6 @@ FILE_INDEX=0
 
 for i in `ls ${RAWFILE_QUEUE_STAGING_PATH}*`
 do
-	echo ${i}
-
 	if [ ${FILE_INDEX} = 0 ]; then	
 		cat ${i}	>> 	${RAWFILE_QUEUE_FILE}
 		error_check
