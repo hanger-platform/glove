@@ -157,8 +157,7 @@ public class CSVSplitter implements Runnable {
             partitionMap.forEach((k, v) -> {
                 v.flush();
                 v.close();
-            }
-            );
+            });
 
             //Identify if should remove csv file. 
             if (replace) {

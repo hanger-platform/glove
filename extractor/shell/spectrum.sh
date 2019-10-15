@@ -130,6 +130,7 @@ partition_load(){
 			--delimiter=${DELIMITER} \
 			--target=csv \
 			--partition=0 \
+            --thread=${THREAD} \
 			--header \
 			--replace
 		error_check
@@ -150,6 +151,7 @@ partition_load(){
 			--delimiter=${DELIMITER} \
 			--target=csv \
 			--partition=0 \
+            --thread=${THREAD} \
 			--replace
 		error_check
     fi
@@ -492,21 +494,21 @@ error_check()
 }
 
 # Identifica o tamanho do diretório de trabalho.
-QUEUE_FOLDER_SIZE=`du -s ${RAWFILE_QUEUE_PATH} | cut -f1`
+# QUEUE_FOLDER_SIZE=`du -s ${RAWFILE_QUEUE_PATH} | cut -f1`
 
 # Limita o volume de dados.
-if [ ${QUEUE_FOLDER_SIZE} -gt ${QUEUE_FILES_SIZE_LIMIT} ]; then
-	echo "You are trying processing ${QUEUE_FOLDER_SIZE} KB :0. Please, reduce the amount of data!"
+# if [ ${QUEUE_FOLDER_SIZE} -gt ${QUEUE_FILES_SIZE_LIMIT} ]; then
+# 	echo "You are trying processing ${QUEUE_FOLDER_SIZE} KB :0. Please, reduce the amount of data!"
 
 	# Remove os arquivos temporários.
-	if [ ${DEBUG} = 0 ] ; then
-		clean_up
-	fi
+# 	if [ ${DEBUG} = 0 ] ; then
+# 		clean_up
+# 	fi
 
-	exit 1
-else
-	echo "${QUEUE_FOLDER_SIZE} KB of data will be processed ( ${QUEUE_FILES_SIZE_LIMIT} KB is the limit )!"
-fi
+# 	exit 1
+# else
+# 	echo "${QUEUE_FOLDER_SIZE} KB of data will be processed ( ${QUEUE_FILES_SIZE_LIMIT} KB is the limit )!"
+# fi
 
 # Identifica se deve recriar a tabela.
 if [ ${IS_RECREATE} = 1 -o ${IS_RELOAD} = 1 ]; then

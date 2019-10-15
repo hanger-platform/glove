@@ -870,11 +870,9 @@ error_check(){
 	fi
 }
 
-RECORD_TO_LOAD=`awk 'END { print NR }' ${RAWFILE_QUEUE_PATH}${SCHEMA_NAME}_${TABLE}*.csv`
+HAS_RECORD=`head -5 ${RAWFILE_QUEUE_PATH}${SCHEMA_NAME}_${TABLE}*.csv | wc -l`
 
-if [ ${RECORD_TO_LOAD} -gt 1 ]; then
-	echo "Records including headers: $(( $RECORD_TO_LOAD - 1 ))"
-
+if [ ${HAS_RECORD} -gt 1 ]; then
 	echo "Getting data sample of ${SAMPLE} records"
 	head -n ${SAMPLE} ${RAWFILE_QUEUE_FILE} > ${RAWFILE_QUEUE_SAMPLE_FILE} 
 	error_check
