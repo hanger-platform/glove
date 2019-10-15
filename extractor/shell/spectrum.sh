@@ -159,7 +159,8 @@ partition_load(){
     # Une os arquivos parciais. 
     for i in `ls ${RAWFILE_QUEUE_PATH}*.split`
     do
-        PARTITION_FILE=`${i} | cut -d'#' -f1`
+        echo ${i}
+        PARTITION_FILE=`echo ${i} | cut -d'#' -f1`
         cat ${i} >> ${PARTITION_FILE}.csv
         rm -f ${i}
     done   
