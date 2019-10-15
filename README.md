@@ -231,9 +231,9 @@ São suportados os seguintes tipos de carga:
 
 **1.integration_layer.product_costs.redshift.full.sql**
 
-´´´
+```
 SELECT <fields> FROM <schema>.<table>
-´´´
+```
 
 Neste exemplo: 
 
@@ -247,13 +247,13 @@ Neste exemplo:
 
 **1.business_layer.product_costs.redshift.script.sql**
 
-´´´
+```
 BEGIN;
     CREATE TABLE #TMP AS SELECT <fields> FROM <schema>.<table>;
     INSERT INTO business_layer.dim_product_config(<fields>)
         SELECT <fields> FROM #TMP;
 END;
-´´´
+```
 
 Neste exemplo: 
 
@@ -284,7 +284,7 @@ O metadado possui os seguintes atributos obrigatórios:
 
 ###### EXEMPLO (Metadado)
 
-´´´
+```
 [ 
    { 
       "order":1,
@@ -299,7 +299,7 @@ O metadado possui os seguintes atributos obrigatórios:
       ]
    }
 ]
-´´´
+```
 
 ##### PARÂMETROS ADICIONAIS
 
