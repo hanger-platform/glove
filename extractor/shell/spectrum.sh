@@ -156,17 +156,6 @@ partition_load(){
 		error_check
     fi
 
-    # Une os arquivos parciais. 
-    for i in `ls ${RAWFILE_QUEUE_PATH}*.split`
-    do
-        PARTITION_FILE=`echo ${i} | cut -d'#' -f1`
-        
-        echo ${PARTITION_FILE}
-        
-        cat ${i} >> ${PARTITION_FILE}.csv
-        rm -f ${i}
-    done   
-
 	# Identifica se será realizado merge.
 	if [ ${PARTITION_MERGE} -gt 0 ]; then
 		echo "Partition merge ACTIVED!"
@@ -504,21 +493,21 @@ error_check()
 }
 
 # Identifica o tamanho do diretório de trabalho.
-# QUEUE_FOLDER_SIZE=`du -s ${RAWFILE_QUEUE_PATH} | cut -f1`
+QUEUE_FOLDER_SIZE=`du -s ${RAWFILE_QUEUE_PATH} | cut -f1`
 
 # Limita o volume de dados.
-# if [ ${QUEUE_FOLDER_SIZE} -gt ${QUEUE_FILES_SIZE_LIMIT} ]; then
-# 	echo "You are trying processing ${QUEUE_FOLDER_SIZE} KB :0. Please, reduce the amount of data!"
+if [ ${QUEUE_FOLDER_SIZE} -gt ${QUEUE_FILES_SIZE_LIMIT} ]; then
+	echo "You are trying processing ${QUEUE_FOLDER_SIZE} KB :0. Please, reduce the amount of data!"
 
 	# Remove os arquivos temporários.
-# 	if [ ${DEBUG} = 0 ] ; then
-# 		clean_up
-# 	fi
+	if [ ${DEBUG} = 0 ] ; then
+		clean_up
+	fi
 
-# 	exit 1
-# else
-# 	echo "${QUEUE_FOLDER_SIZE} KB of data will be processed ( ${QUEUE_FILES_SIZE_LIMIT} KB is the limit )!"
-# fi
+	exit 1
+else
+    echo "${QUEUE_FOLDER_SIZE} KB of data will be processed ( ${QUEUE_FILES_SIZE_LIMIT} KB is the limit )!"
+fi
 
 # Identifica se deve recriar a tabela.
 if [ ${IS_RECREATE} = 1 -o ${IS_RELOAD} = 1 ]; then
@@ -555,7 +544,7 @@ EOF
 fi
 
 # Identifica a quantidade de arquivos a serem processados.
-QUEUE_FILE_COUNT=`cat ${RAWFILE_QUEUE_PATH}*${DATA_FILE}* |wc -l`
+QUEUE_FILE_COUNT=`ls ${RAWFILE_QUEUE_PATH}*${DATA_FILE}* |wc -l`
 
 # Executa o processo de carga e criação de entidades.
 if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then

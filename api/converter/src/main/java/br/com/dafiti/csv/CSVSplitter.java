@@ -32,7 +32,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
 import java.util.HashMap;
-import java.util.UUID;
 import org.apache.log4j.Logger;
 
 /**
@@ -138,7 +137,7 @@ public class CSVSplitter implements Runnable {
                     if (!partitionMap.containsKey(partitionValue)) {
                         //Create the partition file.
                         Writer partitionFile = new BufferedWriter(
-                                new FileWriter(csvFile.getParent() + "/" + partitionValue.replaceAll("\\W", "") + "#" + UUID.randomUUID() + ".split", true)
+                                new FileWriter(csvFile.getParent() + "/" + partitionValue.replaceAll("\\W", "") + ".csv", true)
                         );
 
                         //Put the partition handler in cache.
