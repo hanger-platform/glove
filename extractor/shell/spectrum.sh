@@ -124,6 +124,8 @@ partition_load(){
 				--replace"
 		fi
 
+        ls ${RAWFILE_QUEUE_PATH}
+    
         java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
 			--folder=${RAWFILE_QUEUE_PATH} \
 			--filename=*.csv \

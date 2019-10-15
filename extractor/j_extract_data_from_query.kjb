@@ -873,7 +873,7 @@ error_check(){
 RECORD_TO_LOAD=`awk 'END { print NR }' ${RAWFILE_QUEUE_PATH}${SCHEMA_NAME}_${TABLE}*.csv`
 
 if [ ${RECORD_TO_LOAD} -gt 1 ]; then
-	echo "Records: $(( $RECORD_TO_LOAD - 1 ))"
+	echo "Records including headers: $(( $RECORD_TO_LOAD - 1 ))"
 
 	echo "Getting data sample of ${SAMPLE} records"
 	head -n ${SAMPLE} ${RAWFILE_QUEUE_FILE} > ${RAWFILE_QUEUE_SAMPLE_FILE} 
