@@ -254,7 +254,7 @@ EOF
 fi
 
 # Identifica a quantidade de arquivos a serem processados.
-QUEUE_FILE_COUNT=`cat ${RAWFILE_QUEUE_PATH}*${DATA_FILE}* |wc -l`
+QUEUE_FILE_COUNT=`ls ${RAWFILE_QUEUE_PATH}*${DATA_FILE}* |wc -l`
 
 # Executa o processo de carga e criação de entidades.
 if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
