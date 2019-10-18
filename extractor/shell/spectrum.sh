@@ -458,12 +458,15 @@ clean_up()
 backup()
 {
     #Identifica a data e hora do backup.
-    DAY=`date '+%Y-%m-%d'`
-    HOUR=`date '+%H%M'`
+    YEAR=`date '+%Y'`
+    MONTH=`date '+%m'`
+    DAY=`date '+%d'`
+    HOUR=`date '+%H'`
+    MINUTE=`date '+%M'`
 
     #Identifica o bucket que receberá os dados do backup. 
-    STORAGE_BACKUP_METADATA_PATH="s3://${STORAGE_BUCKET_BACKUP}/backup/${SCHEMA}/${TABLE}/metadata/day=${DAY}/hour=${HOUR}/"
-    STORAGE_BACKUP_QUEUE_PATH="s3://${STORAGE_BUCKET_BACKUP}/backup/${SCHEMA}/${TABLE}/rawfile/queue/day=${DAY}/hour=${HOUR}/"
+    STORAGE_BACKUP_METADATA_PATH="s3://${STORAGE_BUCKET_BACKUP}/backup/${SCHEMA}/${TABLE}/metadata/year=${YEAR}/month=${MONTH}/day=${DAY}/hour=${HOUR}/minute=${MINUTE}/"
+    STORAGE_BACKUP_QUEUE_PATH="s3://${STORAGE_BUCKET_BACKUP}/backup/${SCHEMA}/${TABLE}/rawfile/year=${YEAR}/month=${MONTH}/day=${DAY}/hour=${HOUR}/minute=${MINUTE}/"
 
     # Envia o arquivo do metadado para o storage.
     echo "Backing up metadata files to ${STORAGE_BACKUP_METADATA_PATH}"
