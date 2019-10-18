@@ -120,6 +120,7 @@ partition_load(){
 				--delimiter=${DELIMITER} \
 				--target=csv \
 				--partition=0 \
+				--thread=${THREAD} \
 				--header \
 				--replace"
 		fi
@@ -130,6 +131,7 @@ partition_load(){
 			--delimiter=${DELIMITER} \
 			--target=csv \
 			--partition=0 \
+			--thread=${THREAD} \
 			--header \
 			--replace
 		error_check
@@ -141,6 +143,7 @@ partition_load(){
 				--delimiter=${DELIMITER} \
 				--target=csv \
 				--partition=0 \
+				--thread=${THREAD} \
 				--replace"
 		fi
 
@@ -150,6 +153,7 @@ partition_load(){
 			--delimiter=${DELIMITER} \
 			--target=csv \
 			--partition=0 \
+			--thread=${THREAD} \
 			--replace
 		error_check
     fi
@@ -166,7 +170,7 @@ partition_load(){
 	if [ ${DEBUG} = 1 ] ; then
 	 	echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
 			--folder=${RAWFILE_QUEUE_PATH} \
-			--filename=*.csv \
+			--filename=* \
 			--delimiter=${DELIMITER} \
 			--schema=${METADATA_JSON_FILE} \
 			--target=${OUTPUT_FORMAT} \
@@ -182,7 +186,7 @@ partition_load(){
 
     java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
 		--folder=${RAWFILE_QUEUE_PATH} \
-		--filename=*.csv \
+		--filename=* \
 		--delimiter=${DELIMITER} \
 		--schema=${METADATA_JSON_FILE} \
 		--target=${OUTPUT_FORMAT} \
