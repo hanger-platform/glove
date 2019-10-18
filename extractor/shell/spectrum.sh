@@ -112,6 +112,8 @@ partition_load(){
 	#Particiona o arquivo contendo os dados.
 	echo "Partitioning data file delimited by ${DELIMITER}!"
 
+	exit 1
+
     if [ ${MODULE} == "query" ] || [ ${MODULE} == "file" ]; then
 		if [ ${DEBUG} = 1 ] ; then
 			echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
