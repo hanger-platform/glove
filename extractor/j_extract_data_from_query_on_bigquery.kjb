@@ -362,8 +362,7 @@ done
 
 echo "Removing staging data!"
 rm -rf ${RAWFILE_QUEUE_STAGING_PATH}
-bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${STAGING_SCHEMA}.${SCHEMA_NAME}_${TABLE}
-# gsutil  -m rm gs://${GOOGLE_CLOUD_BUCKET}/${SCHEMA_NAME}/${TABLE}/${UUID}/*</script>
+bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${STAGING_SCHEMA}.${SCHEMA_NAME}_${TABLE}</script>
       <loglevel>Basic</loglevel>
       <parallel>N</parallel>
       <draw>Y</draw>
