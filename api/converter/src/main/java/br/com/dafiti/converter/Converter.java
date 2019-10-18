@@ -26,10 +26,8 @@ package br.com.dafiti.converter;
 import br.com.dafiti.csv.CSVSplitter;
 import br.com.dafiti.schema.Extractor;
 import br.com.dafiti.orc.CSVToORC;
-import br.com.dafiti.orc.ORCToCSV;
 import br.com.dafiti.parquet.CSVToParquet;
 import br.com.dafiti.schema.Parser;
-import br.com.dafiti.parquet.ParquetToCSV;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -91,7 +89,6 @@ public class Converter {
         options.addOption("p", "partition", true, "Partition column");
         options.addOption("k", "fieldkey", true, "Unique key field");
         options.addOption("d", "merge", true, "Identify if should merge existing files");
-        options.addOption("K", "delta", true, "Delta filename, with wildcard if necessary, to be merged");
         options.addOption("z", "duplicated", true, "Identify if duplicated is allowed");
         options.addOption("b", "bucket", true, "Identify the storage bucket");
         options.addOption("m", "mode", true, "Identify the partition mode");
@@ -116,7 +113,6 @@ public class Converter {
         Converter converter;
         FileFilter fileFilter = null;
         File[] files = null;
-        File deltaFile = null;
         File reserverWordsFile = null;
         String target = TARGET;
         String dialect = DIALECT;
@@ -163,11 +159,6 @@ public class Converter {
             if (line.hasOption("filename")) {
                 fileName = line.getOptionValue("filename").replace("file:", "");
                 fileFilter = new WildcardFileFilter(fileName);
-            }
-
-            //Get the delta file.
-            if (line.hasOption("delta")) {
-                deltaFile = new File(line.getOptionValue("delta").replace("file:", ""));
             }
 
             //Get the reserved words file.
@@ -294,44 +285,48 @@ public class Converter {
                     Schema schema = new Parser(new File(schemaFile)).getAvroSchema();
 
                     for (File file : files) {
-                        executor.execute(
-                                new CSVToParquet(
-                                        file,
-                                        compression,
-                                        delimiter,
-                                        quote,
-                                        quoteEscape,
-                                        schema,
-                                        header,
-                                        replace,
-                                        fieldKeyPos,
-                                        duplicated,
-                                        merge,
-                                        bucketPath,
-                                        mode)
-                        );
+                        if (file.isDirectory() || "csv".equals(FilenameUtils.getExtension(file.getName()))) {
+                            executor.execute(
+                                    new CSVToParquet(
+                                            file,
+                                            compression,
+                                            delimiter,
+                                            quote,
+                                            quoteEscape,
+                                            schema,
+                                            header,
+                                            replace,
+                                            fieldKeyPos,
+                                            duplicated,
+                                            merge,
+                                            bucketPath,
+                                            mode)
+                            );
+                        }
                     }
 
                 } else if (target.equalsIgnoreCase("orc")) {
                     TypeDescription schema = new Parser(new File(schemaFile)).getOrcSchema();
 
                     for (File file : files) {
-                        executor.execute(
-                                new CSVToORC(
-                                        file,
-                                        compression,
-                                        delimiter,
-                                        quote,
-                                        quoteEscape,
-                                        schema,
-                                        header,
-                                        replace,
-                                        fieldKeyPos,
-                                        duplicated,
-                                        merge,
-                                        bucketPath,
-                                        mode)
-                        );
+                        if (file.isDirectory() || "csv".equals(FilenameUtils.getExtension(file.getName()))) {
+                            executor.execute(
+                                    new CSVToORC(
+                                            file,
+                                            compression,
+                                            delimiter,
+                                            quote,
+                                            quoteEscape,
+                                            schema,
+                                            header,
+                                            replace,
+                                            fieldKeyPos,
+                                            duplicated,
+                                            merge,
+                                            bucketPath,
+                                            mode)
+                            );
+                        }
                     }
 
                 } else if (target.equalsIgnoreCase("csv")) {
@@ -339,30 +334,6 @@ public class Converter {
                         String extension = FilenameUtils.getExtension(file.getName());
 
                         switch (extension) {
-                            case "parquet":
-                                executor.execute(
-                                        new ParquetToCSV(
-                                                file,
-                                                deltaFile,
-                                                delimiter,
-                                                quote,
-                                                quoteEscape,
-                                                replace,
-                                                fieldKeyPos,
-                                                duplicated));
-                                break;
-                            case "orc":
-                                executor.execute(
-                                        new ORCToCSV(
-                                                file,
-                                                deltaFile,
-                                                delimiter,
-                                                quote,
-                                                quoteEscape,
-                                                replace,
-                                                fieldKeyPos,
-                                                duplicated));
-                                break;
                             case "csv":
                                 executor.execute(
                                         new CSVSplitter(

@@ -23,15 +23,16 @@
  */
 package br.com.dafiti.csv;
 
-import com.univocity.parsers.csv.CsvParser;
-import com.univocity.parsers.csv.CsvParserSettings;
-import com.univocity.parsers.csv.CsvWriter;
-import com.univocity.parsers.csv.CsvWriterSettings;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.Writer;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.UUID;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.LineIterator;
 import org.apache.log4j.Logger;
 
 /**
@@ -83,90 +84,69 @@ public class CSVSplitter implements Runnable {
      */
     @Override
     public void run() {
-        //Line being processed.
-        int rowNumber = 0;
-
-        //Get the csv file path.
-        String csvPath = csvFile.getAbsolutePath();
-
-        //Log the process init.
-        Logger.getLogger(this.getClass()).info("Converting CSV to CSV: " + csvPath);
+        Logger.getLogger(this.getClass()).info("Converting CSV to CSV");
 
         try {
-            String[] record;
+            String part = "";
+            int lineNumber = 0;
+            HashMap<String, BufferedWriter> partitions = new HashMap<>();
+            LineIterator lineIterator = FileUtils.lineIterator(csvFile, "UTF-8");
 
-            //Define the writer cache.
-            HashMap<String, CsvWriter> partitionMap = new HashMap<>();
+            try {
+                while (lineIterator.hasNext()) {
+                    String line = lineIterator.nextLine();
 
-            //Define a writer settings.
-            CsvWriterSettings writerSettings = new CsvWriterSettings();
-            writerSettings.setNullValue("");
-            writerSettings.setMaxCharsPerColumn(-1);
+                    if (!(lineNumber == 0 && header)) {
+                        String[] split = line.split(delimiter.toString());
 
-            //Define format settings
-            writerSettings.getFormat().setDelimiter(delimiter);
-            writerSettings.getFormat().setQuote(quote);
-            writerSettings.getFormat().setQuoteEscape(quoteEscape);
+                        if (split[split.length - 1].startsWith("\"") && !split[split.length - 1].endsWith("\"")) {
+                            part = line;
+                        } else {
+                            if (!part.isEmpty()) {
+                                line = part + line;
+                                part = "";
+                                split = line.split(delimiter.toString());
+                            }
+                        }
 
-            //Define a parser settings.
-            CsvParserSettings parserSettings = new CsvParserSettings();
-            parserSettings.setNullValue("");
-            parserSettings.setMaxCharsPerColumn(-1);
+                        if (part.isEmpty()) {
+                            String partition = split[partitionColumn].replaceAll("\\W", "");
 
-            //Define format settings
-            parserSettings.getFormat().setDelimiter(delimiter);
-            parserSettings.getFormat().setQuote(quote);
-            parserSettings.getFormat().setQuoteEscape(quoteEscape);
+                            if (!partitions.containsKey(partition)) {
+                                String partitionPath = csvFile.getParent() + "/" + partition;
+                                Files.createDirectories(Paths.get(partitionPath));
+                                BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(partitionPath + "/" + UUID.randomUUID() + ".csv"));
 
-            //Define the input buffer.
-            parserSettings.setInputBufferSize(5 * (1024 * 1024));
+                                partitions.put(partition, bufferedWriter);
+                            }
 
-            //Define a csv parser.
-            CsvParser csvParser = new CsvParser(parserSettings);
-
-            //Init a parser.
-            csvParser.beginParsing(csvFile);
-
-            //Process each csv line.
-            while ((record = csvParser.parseNext()) != null) {
-                //Ignore the header.
-                if (!(rowNumber == 0 && header)) {
-                    String partitionValue = record[partitionColumn];
-
-                    //Identify if partition is in cache.
-                    if (!partitionMap.containsKey(partitionValue)) {
-                        //Create the partition file.
-                        Writer partitionFile = new BufferedWriter(
-                                new FileWriter(csvFile.getParent() + "/" + partitionValue.replaceAll("\\W", "") + ".csv", true)
-                        );
-
-                        //Put the partition handler in cache.
-                        partitionMap.put(partitionValue,
-                                new CsvWriter(partitionFile, writerSettings));
+                            partitions.get(partition).append(line + "\r\n");
+                        }
                     }
 
-                    //Write to file.
-                    partitionMap.get(partitionValue).writeRow(record);
+                    lineNumber++;
                 }
-
-                //Identify the record being processed.
-                rowNumber++;
+            } finally {
+                LineIterator.closeQuietly(lineIterator);
             }
 
             //Flush and close the output stream.
-            partitionMap.forEach((k, v) -> {
-                v.flush();
-                v.close();
+            partitions.forEach((k, v) -> {
+                try {
+                    v.flush();
+                    v.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(this.getClass()).error("Error [" + ex + "] closing writer");
+                    System.exit(1);
+                }
             });
 
             //Identify if should remove csv file. 
             if (replace) {
                 csvFile.delete();
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (IOException ex) {
             Logger.getLogger(this.getClass()).error("Error [" + ex + "] converting CSV to CSV");
-
             System.exit(1);
         }
     }

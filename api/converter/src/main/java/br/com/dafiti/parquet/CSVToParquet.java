@@ -24,10 +24,12 @@
 package br.com.dafiti.parquet;
 
 import br.com.dafiti.datalake.S3;
+import br.com.dafiti.util.Statistics;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import java.io.File;
 import java.math.BigDecimal;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -42,6 +44,8 @@ import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.generic.GenericRecordBuilder;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.hadoop.fs.Path;
@@ -62,7 +66,7 @@ public class CSVToParquet implements Runnable {
     private final HashMap<String, Type> typeMap;
     private final HashMap<String, String> logicalTypeMap;
     private final HashMap<String, Integer> decimalScaleMap;
-    private final File csvFile;
+    private final File inputFile;
     private final Schema schema;
     private final CompressionCodecName compression;
     private final Character delimiter;
@@ -79,7 +83,7 @@ public class CSVToParquet implements Runnable {
     /**
      * Constructor.
      *
-     * @param csvFile CSV file.
+     * @param inputFile CSV file.
      * @param compression Parquet file compression.
      * @param delimiter File delimiter.
      * @param quote File quote.
@@ -94,7 +98,7 @@ public class CSVToParquet implements Runnable {
      * @param mode Identify partition mode.
      */
     public CSVToParquet(
-            File csvFile,
+            File inputFile,
             String compression,
             Character delimiter,
             Character quote,
@@ -111,7 +115,7 @@ public class CSVToParquet implements Runnable {
         this.typeMap = new HashMap();
         this.logicalTypeMap = new HashMap();
         this.decimalScaleMap = new HashMap();
-        this.csvFile = csvFile;
+        this.inputFile = inputFile;
         this.schema = schema;
         this.delimiter = delimiter;
         this.quote = quote;
@@ -249,221 +253,58 @@ public class CSVToParquet implements Runnable {
      */
     @Override
     public void run() {
-        //Number of fields in the schema.
-        int fieldCount;
-
-        //Line being processed.
-        int rowNumber = 0;
-
-        //Value being processed.
-        String[] record;
-        String value;
-
-        //Unique key list.
-        HashSet<String> key = new HashSet();
-
-        //Statistics.
-        int csvRecords = 0;
-        int parquetRecords = 0;
-        int updatedRecords = 0;
-        int duplicatedRecords = 0;
-
         //Log the process init.
-        Logger.getLogger(this.getClass()).info("Converting CSV to Parquet: " + csvFile.getAbsolutePath());
+        Logger.getLogger(this.getClass()).info("Converting CSV to Parquet: " + inputFile.getAbsolutePath());
 
         try {
+            String path = FilenameUtils.getFullPath(inputFile.getAbsolutePath());
+            String name = FilenameUtils.getBaseName(inputFile.getName());
+
             //Get the parquet and crc file.
-            File parquetFile = new File(csvFile.getAbsolutePath().replace(".csv", "." + this.compression.toString().toLowerCase() + ".parquet"));
-            File parquetCRCFile = new File(csvFile.getParent().concat("/.").concat(csvFile.getName()).concat(".parquet.crc"));
-            File originalFile = new File(parquetFile.getAbsolutePath().replace(".parquet", ".original.parquet"));
+            File parquetFile = new File(path + name + "." + this.compression.toString().toLowerCase() + ".parquet");
+            File parquetCRCFile = new File(path + name + ".parquet.crc");
+            File originalFile = new File(path + name + ".original.parquet");
+
+            //Unique key list.
+            HashSet<String> key = new HashSet();
+
+            //Defines a statistics object;
+            Statistics statistics = new Statistics();
 
             //Remove old files. 
-            if (parquetFile.exists()) {
-                parquetFile.delete();
-            }
+            Files.deleteIfExists(parquetFile.toPath());
 
             if (merge) {
-                if (originalFile.exists()) {
-                    originalFile.delete();
-                }
+                Files.deleteIfExists(originalFile.toPath());
             }
 
             //Remove old crc files.
-            if (parquetCRCFile.exists()) {
-                parquetCRCFile.delete();
-            }
-
-            //Define a record builder.
-            GenericRecordBuilder builder = new GenericRecordBuilder(schema);
+            Files.deleteIfExists(parquetCRCFile.toPath());
 
             //Enable decimal conversion support.
-            GenericData decimalSupport = new GenericData();
-            decimalSupport.addLogicalTypeConversion(new Conversions.DecimalConversion());
+            GenericData genericData = new GenericData();
+            genericData.addLogicalTypeConversion(new Conversions.DecimalConversion());
 
             //Define the writer.
             ParquetWriter<GenericRecord> parquetWriter = AvroParquetWriter.<GenericRecord>builder(new Path(parquetFile.getAbsolutePath()))
                     .withSchema(schema)
-                    .withDataModel(decimalSupport)
+                    .withDataModel(genericData)
                     .withCompressionCodec(this.compression)
                     .withDictionaryEncoding(true)
                     .build();
 
-            //List the schema fields.
-            List<Field> fields = schema.getFields();
+            //Convert to parquet.
+            if (inputFile.isDirectory()) {
+                File[] files = inputFile.listFiles();
 
-            //Get the number of column in schema.
-            fieldCount = fields.size();
-
-            //Define a settings.
-            CsvParserSettings parserSettings = new CsvParserSettings();
-            parserSettings.setNullValue("");
-            parserSettings.setMaxCharsPerColumn(-1);
-
-            //Define format settings
-            parserSettings.getFormat().setDelimiter(delimiter);
-            parserSettings.getFormat().setQuote(quote);
-            parserSettings.getFormat().setQuoteEscape(quoteEscape);
-
-            //Define the input buffer.
-            parserSettings.setInputBufferSize(5 * (1024 * 1024));
-
-            //Define a csv parser.
-            CsvParser csvParser = new CsvParser(parserSettings);
-
-            //Init a parser.
-            csvParser.beginParsing(csvFile);
-
-            //Process each csv record.
-            while ((record = csvParser.parseNext()) != null) {
-                boolean add = false;
-
-                //Identify if the csv the field count specified in the schema.                
-                if (record.length < fieldCount) {
-                    throw new Exception(csvFile.getName() + " expected " + fieldCount + " fields, but received only " + record.length + " : " + String.join("|", record));
+                for (File file : files) {
+                    this.toParquet(file, parquetWriter, key, statistics);
                 }
-
-                //Identify insert rule. 
-                if (fieldKey < 0 || duplicated) {
-                    add = true;
-                } else if (fieldKey >= 0 && !duplicated) {
-                    add = key.add(record[fieldKey]);
-                }
-
-                //Identify duplicated key.
-                if (!add) {
-                    System.out.println("Duplicated key in file: [" + record[fieldKey] + "]");
-                    duplicatedRecords++;
-                } else {
-                    csvRecords++;
-                }
-
-                //Ignore the header.
-                if (!(rowNumber == 0 && header) && add) {
-                    for (Field field : fields) {
-                        value = "";
-
-                        //Get field type.
-                        Type type = this.getType(field);
-
-                        //Get logical type.
-                        String logicalType = this.getLogicalType(field);
-
-                        //Get field value.
-                        if ((record.length - 1) >= field.pos()) {
-                            value = record[field.pos()];
-                        }
-
-                        //Identify if the field is empty.
-                        if (value == null || value.isEmpty()) {
-                            value = null;
-                        }
-
-                        //Reset the field.
-                        builder.clear(field);
-
-                        //Identify if the value is null.
-                        if (value != null) {
-                            //Convert values to fit avro type.
-                            switch (type) {
-                                case BOOLEAN:
-                                    builder.set(field, BooleanUtils.toBoolean(value));
-                                    break;
-                                case INT:
-                                    if (logicalType == null) {
-                                        builder.set(field, NumberUtils.toInt(value, 0));
-                                    } else if (logicalType.equals("date")) {
-                                        //A date logical type annotates an Avro int, where the int stores the number of days from the unix epoch.
-                                        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-
-                                        Date date = format.parse(value);
-                                        Calendar calendar = Calendar.getInstance();
-                                        calendar.setTime(date);
-
-                                        Long timeInMillis = calendar.getTimeInMillis();
-                                        Long timeZoneOffset = (long) calendar.getTimeZone().getOffset(calendar.getTimeInMillis());
-
-                                        builder.set(field, timeInMillis + timeZoneOffset / (1000 * 60 * 60 * 24));
-                                    }
-
-                                    break;
-                                case LONG:
-                                    if (logicalType == null) {
-                                        builder.set(field, NumberUtils.toLong(value, 0));
-                                    } else if (logicalType.equals("timestamp-millis")) {
-                                        //A timestamp-millis logical type annotates an Avro long, where the long stores the number of milliseconds from the unix epoch.
-                                        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-
-                                        Date date = format.parse(value);
-                                        Calendar calendar = Calendar.getInstance();
-                                        calendar.setTime(date);
-
-                                        Long timeInMillis = calendar.getTimeInMillis();
-                                        Long timeZoneOffset = (long) calendar.getTimeZone().getOffset(calendar.getTimeInMillis());
-
-                                        builder.set(field, timeInMillis + timeZoneOffset);
-                                    }
-
-                                    break;
-                                case FLOAT:
-                                    builder.set(field, NumberUtils.toFloat(value, 0));
-                                    break;
-                                case DOUBLE:
-                                    builder.set(field, NumberUtils.toDouble(value, 0));
-                                    break;
-                                case BYTES:
-                                case FIXED:
-                                    if (logicalType == null) {
-                                        builder.set(field, value.getBytes());
-                                    } else if (logicalType.equals("decimal")) {
-                                        //A decimal logical type annotates Avro bytes or fixed types.
-                                        //The byte array must contain the two's-complement representation of the unscaled integer value in big-endian byte order.
-                                        //The scale is fixed, and is specified using an attribute.
-                                        int scale = this.getDecimalScale(field);
-
-                                        builder.set(field, new BigDecimal(value).setScale(scale, BigDecimal.ROUND_UP));
-                                    }
-
-                                    break;
-                                case STRING:
-                                    builder.set(field, value);
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-                    }
-
-                    //Write date into parquet file.
-                    parquetWriter.write(builder.build());
-                }
-
-                //Identify the record being processed.
-                rowNumber++;
+            } else {
+                this.toParquet(inputFile, parquetWriter, key, statistics);
             }
 
-            //Stop the parser.
-            csvParser.stopParsing();
-
+            //Identifies if merge is necessary.
             if (merge) {
                 String object = parquetFile.getName();
 
@@ -474,7 +315,7 @@ public class CSVToParquet implements Runnable {
                 if (originalFile.exists()) {
                     //Define the reader.
                     ParquetReader<GenericRecord> parquetReader = AvroParquetReader.<GenericRecord>builder(new Path(originalFile.getAbsolutePath()))
-                            .withDataModel(decimalSupport)
+                            .withDataModel(genericData)
                             .disableCompatibility()
                             .build();
 
@@ -486,7 +327,7 @@ public class CSVToParquet implements Runnable {
                         boolean add = true;
 
                         //Identify merge file records.
-                        parquetRecords++;
+                        statistics.incrementOutputRows();
 
                         //Identify if can add a record.
                         if (fieldKey >= 0 && !duplicated) {
@@ -497,11 +338,11 @@ public class CSVToParquet implements Runnable {
                             //Write date into parquet file.
                             parquetWriter.write(row);
                         } else {
-                            updatedRecords++;
+                            statistics.incrementDuplicatedRows();
                         }
 
                         //Identify the record being processed.
-                        rowNumber++;
+                        statistics.incrementRowNumber();
                     }
                 }
             }
@@ -510,42 +351,223 @@ public class CSVToParquet implements Runnable {
             parquetWriter.close();
 
             //Identifies if the csv file is empty.
-            if (rowNumber == 0) {
+            if (statistics.getRowNumber() == 0) {
                 throw new Exception("Empty csv file!");
             } else {
                 //Print on console.
                 System.out.println("[" + parquetFile.getName() + "] records: "
-                        + parquetRecords
+                        + statistics.getOutputRows()
                         + ", Delta: "
-                        + csvRecords
-                        + ", ( Updated: " + updatedRecords + ", Inserted: " + (csvRecords - updatedRecords) + ", Duplicated:" + duplicatedRecords + " )"
+                        + statistics.getInputRows()
+                        + ", ( Updated: " + statistics.getOutputUpdatedRows() + ", Inserted: " + (statistics.getInputRows() - statistics.getOutputUpdatedRows()) + ", Duplicated:" + statistics.getDuplicatedRows() + " )"
                         + " Final: "
-                        + (parquetRecords + (csvRecords - updatedRecords)));
+                        + (statistics.getOutputRows() + (statistics.getInputRows() - statistics.getOutputUpdatedRows())));
             }
 
             //Remove the parquet crc file.
-            if (parquetCRCFile.exists()) {
-                parquetCRCFile.delete();
-            }
+            Files.deleteIfExists(parquetCRCFile.toPath());
 
             //Remove the original file.
             if (merge) {
-                if (originalFile.exists()) {
-                    originalFile.delete();
-                }
+                Files.deleteIfExists(originalFile.toPath());
             }
 
             //Identify if should remove csv file. 
             if (replace) {
-                if (csvFile.exists()) {
-                    csvFile.delete();
+                if (inputFile.isDirectory()) {
+                    FileUtils.deleteDirectory(inputFile);
+                } else {
+
+                    Files.deleteIfExists(inputFile.toPath());
                 }
             }
         } catch (Exception ex) {
-            Logger.getLogger(this.getClass()).error("Error [" + ex + "] converting CSV to Parquet at line [" + rowNumber + "]");
+            Logger.getLogger(this.getClass()).error("Error [" + ex + "] converting CSV to Parquet");
             Logger.getLogger(this.getClass()).error(Arrays.toString(ex.getStackTrace()));
 
             System.exit(1);
         }
+    }
+
+    /**
+     * Convert a file to parquet.
+     *
+     * @param file CSV File.
+     * @param parquetWriter Parquet Writer.
+     * @param key Unique keys mapper.
+     * @param statistics Statistics collector.
+     * @throws Exception
+     */
+    private void toParquet(
+            File file,
+            ParquetWriter<GenericRecord> parquetWriter,
+            HashSet<String> key,
+            Statistics statistics) throws Exception {
+
+        //Number of fields in the schema.
+        int fieldCount;
+
+        //Value being processed.
+        String[] record;
+        String value;
+
+        //Define a settings.
+        CsvParserSettings parserSettings = new CsvParserSettings();
+        parserSettings.setNullValue("");
+        parserSettings.setMaxCharsPerColumn(-1);
+
+        //Define format settings
+        parserSettings.getFormat().setDelimiter(delimiter);
+        parserSettings.getFormat().setQuote(quote);
+        parserSettings.getFormat().setQuoteEscape(quoteEscape);
+
+        //Define the input buffer.
+        parserSettings.setInputBufferSize(20 * (1024 * 1024));
+
+        //Define a csv parser.
+        CsvParser csvParser = new CsvParser(parserSettings);
+
+        //Init a parser.
+        csvParser.beginParsing(file);
+
+        //Identifies parquet fields.
+        List<Field> fields = schema.getFields();
+
+        //Get parquet field count.
+        fieldCount = schema.getFields().size();
+
+        //Define a record builder.
+        GenericRecordBuilder builder = new GenericRecordBuilder(schema);
+
+        //Process each csv record.
+        while ((record = csvParser.parseNext()) != null) {
+            boolean add = false;
+
+            //Identify if the csv the field count specified in the schema.                
+            if (record.length < fieldCount) {
+                throw new Exception(inputFile.getName() + " expected " + fieldCount + " fields, but received only " + record.length + " : " + String.join("|", record));
+            }
+
+            //Identify insert rule. 
+            if (fieldKey < 0 || duplicated) {
+                add = true;
+            } else if (fieldKey >= 0 && !duplicated) {
+                add = key.add(record[fieldKey]);
+            }
+
+            //Identify duplicated key.
+            if (!add) {
+                System.out.println("Duplicated key in file: [" + record[fieldKey] + "]");
+                statistics.incrementDuplicatedRows();
+            } else {
+                statistics.incrementInputRows();
+            }
+
+            //Ignore the header.
+            if (!(statistics.getRowNumber() == 0 && header) && add) {
+                for (Field field : fields) {
+                    value = "";
+
+                    //Get field type.
+                    Type type = this.getType(field);
+
+                    //Get logical type.
+                    String logicalType = this.getLogicalType(field);
+
+                    //Get field value.
+                    if ((record.length - 1) >= field.pos()) {
+                        value = record[field.pos()];
+                    }
+
+                    //Identify if the field is empty.
+                    if (value == null || value.isEmpty()) {
+                        value = null;
+                    }
+
+                    //Reset the field.
+                    builder.clear(field);
+
+                    //Identify if the value is null.
+                    if (value != null) {
+                        //Convert values to fit avro type.
+                        switch (type) {
+                            case BOOLEAN:
+                                builder.set(field, BooleanUtils.toBoolean(value));
+                                break;
+                            case INT:
+                                if (logicalType == null) {
+                                    builder.set(field, NumberUtils.toInt(value, 0));
+                                } else if (logicalType.equals("date")) {
+                                    //A date logical type annotates an Avro int, where the int stores the number of days from the unix epoch.
+                                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+
+                                    Date date = format.parse(value);
+                                    Calendar calendar = Calendar.getInstance();
+                                    calendar.setTime(date);
+
+                                    Long timeInMillis = calendar.getTimeInMillis();
+                                    Long timeZoneOffset = (long) calendar.getTimeZone().getOffset(calendar.getTimeInMillis());
+
+                                    builder.set(field, timeInMillis + timeZoneOffset / (1000 * 60 * 60 * 24));
+                                }
+
+                                break;
+                            case LONG:
+                                if (logicalType == null) {
+                                    builder.set(field, NumberUtils.toLong(value, 0));
+                                } else if (logicalType.equals("timestamp-millis")) {
+                                    //A timestamp-millis logical type annotates an Avro long, where the long stores the number of milliseconds from the unix epoch.
+                                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
+                                    Date date = format.parse(value);
+                                    Calendar calendar = Calendar.getInstance();
+                                    calendar.setTime(date);
+
+                                    Long timeInMillis = calendar.getTimeInMillis();
+                                    Long timeZoneOffset = (long) calendar.getTimeZone().getOffset(calendar.getTimeInMillis());
+
+                                    builder.set(field, timeInMillis + timeZoneOffset);
+                                }
+
+                                break;
+                            case FLOAT:
+                                builder.set(field, NumberUtils.toFloat(value, 0));
+                                break;
+                            case DOUBLE:
+                                builder.set(field, NumberUtils.toDouble(value, 0));
+                                break;
+                            case BYTES:
+                            case FIXED:
+                                if (logicalType == null) {
+                                    builder.set(field, value.getBytes());
+                                } else if (logicalType.equals("decimal")) {
+                                    //A decimal logical type annotates Avro bytes or fixed types.
+                                    //The byte array must contain the two's-complement representation of the unscaled integer value in big-endian byte order.
+                                    //The scale is fixed, and is specified using an attribute.
+                                    int scale = this.getDecimalScale(field);
+
+                                    builder.set(field, new BigDecimal(value).setScale(scale, BigDecimal.ROUND_UP));
+                                }
+
+                                break;
+                            case STRING:
+                                builder.set(field, value);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+
+                //Write date into parquet file.
+                parquetWriter.write(builder.build());
+            }
+
+            //Identify the record being processed.
+            statistics.incrementRowNumber();
+        }
+
+        //Stop the parser.
+        csvParser.stopParsing();
     }
 }

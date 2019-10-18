@@ -24,15 +24,20 @@
 package br.com.dafiti.orc;
 
 import br.com.dafiti.datalake.S3;
+import br.com.dafiti.util.Statistics;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -64,7 +69,7 @@ import org.apache.orc.mapred.OrcTimestamp;
  */
 public class CSVToORC implements Runnable {
 
-    private final File csvFile;
+    private final File inputFile;
     private final TypeDescription schema;
     private final CompressionKind compression;
     private final Character delimiter;
@@ -81,7 +86,7 @@ public class CSVToORC implements Runnable {
     /**
      * Constructor.
      *
-     * @param csvFile CSV file.
+     * @param inputFile CSV file.
      * @param compression Orc file compression.
      * @param delimiter File delimiter.
      * @param quote File quote.
@@ -96,7 +101,7 @@ public class CSVToORC implements Runnable {
      * @param mode Identify partition mode.
      */
     public CSVToORC(
-            File csvFile,
+            File inputFile,
             String compression,
             Character delimiter,
             Character quote,
@@ -110,7 +115,7 @@ public class CSVToORC implements Runnable {
             String bucket,
             String mode) {
 
-        this.csvFile = csvFile;
+        this.inputFile = inputFile;
         this.schema = schema;
         this.delimiter = delimiter;
         this.quote = quote;
@@ -150,43 +155,28 @@ public class CSVToORC implements Runnable {
      */
     @Override
     public void run() {
-        //Line being processed.
-        int rowNumber = 0;
-
-        //Row being processed.
-        String name;
-
-        //Value being processed.
-        String[] record;
-        String value;
-        int row = 0;
-
-        //Unique key list.
-        HashSet<String> key = new HashSet();
-
-        //Statistics.
-        int csvRecords = 0;
-        int orcRecords = 0;
-        int updatedRecords = 0;
-        int duplicatedRecords = 0;
-
         //Log the process init.
-        Logger.getLogger(this.getClass()).info("Converting CSV to ORC: " + csvFile.getAbsolutePath());
+        Logger.getLogger(this.getClass()).info("Converting CSV to Parquet: " + inputFile.getAbsolutePath());
 
         try {
-            //Get the orc file.
-            File orcFile = new File(csvFile.getAbsolutePath().replace(".csv", "." + this.compression.toString().toLowerCase() + ".orc"));
-            File originalFile = new File(orcFile.getAbsolutePath().replace(".orc", ".original.orc"));
+            String path = FilenameUtils.getFullPath(inputFile.getAbsolutePath());
+            String name = FilenameUtils.getBaseName(inputFile.getName());
+
+            //Get the parquet and crc file.
+            File orcFile = new File(path + name + "." + this.compression.toString().toLowerCase() + ".orc");
+            File originalFile = new File(path + name + ".original.orc");
+
+            //Unique key list.
+            HashSet<String> key = new HashSet();
+
+            //Defines a statistics object;
+            Statistics statistics = new Statistics();
 
             //Remove old files. 
-            if (orcFile.exists()) {
-                orcFile.delete();
-            }
+            Files.deleteIfExists(orcFile.toPath());
 
             if (merge) {
-                if (originalFile.exists()) {
-                    originalFile.delete();
-                }
+                Files.deleteIfExists(originalFile.toPath());
             }
 
             //Define the writer.
@@ -199,96 +189,16 @@ public class CSVToORC implements Runnable {
             //Define the vectorized row batch.
             VectorizedRowBatch rowBatchWriter = schema.createRowBatch();
 
-            //List the type description.
-            List<TypeDescription> typeDescription = schema.getChildren();
+            //Convert to parquet.
+            if (inputFile.isDirectory()) {
+                File[] files = inputFile.listFiles();
 
-            //List the field name.
-            List<String> fieldNames = schema.getFieldNames();
-
-            //Define a settings.
-            CsvParserSettings parserSettings = new CsvParserSettings();
-            parserSettings.setNullValue("");
-            parserSettings.setMaxCharsPerColumn(-1);
-
-            //Define format settings
-            parserSettings.getFormat().setDelimiter(delimiter);
-            parserSettings.getFormat().setQuote(quote);
-            parserSettings.getFormat().setQuoteEscape(quoteEscape);
-
-            //Define the input buffer.
-            parserSettings.setInputBufferSize(5 * (1024 * 1024));
-
-            //Define a csv parser.
-            CsvParser csvParser = new CsvParser(parserSettings);
-
-            //Init a parser.
-            csvParser.beginParsing(csvFile);
-
-            //Process each csv line.
-            while ((record = csvParser.parseNext()) != null) {
-                boolean add = false;
-
-                //Identifies if the csv the field count specified in the schema.                
-                if (record.length < rowBatchWriter.numCols) {
-                    throw new Exception(csvFile.getName() + " expected " + rowBatchWriter.numCols + " fields, but received only " + record.length + " : " + String.join("|", record));
+                for (File file : files) {
+                    this.toOrc(file, orcWriter, rowBatchWriter, key, statistics);
                 }
-
-                //Identify insert rule. 
-                if (fieldKey < 0 || duplicated) {
-                    add = true;
-                } else if (fieldKey >= 0 && !duplicated) {
-                    add = key.add(record[fieldKey]);
-                }
-
-                //Identify duplicated key.
-                if (!add) {
-                    System.out.println("Duplicated key in file: [" + record[fieldKey] + "]");
-                    duplicatedRecords++;
-                } else {
-                    csvRecords++;
-                }
-
-                //Ignore the header.
-                if (!(rowNumber == 0 && header) && add) {
-                    //Identify the batch size. 
-                    row = rowBatchWriter.size++;
-
-                    for (int column = 0; column < fieldNames.size(); column++) {
-                        value = "";
-
-                        //Get field name.
-                        name = fieldNames.get(column);
-
-                        //Get field category.
-                        Category category = typeDescription.get(column).getCategory();
-
-                        //Get field value.
-                        if ((record.length - 1) >= column) {
-                            value = record[column];
-                        }
-
-                        //Identify if the field is empty.
-                        if (value == null || value.isEmpty()) {
-                            value = null;
-                        }
-
-                        //Write data into a row batch. 
-                        this.rowBatchAppend(value, category, row, column, rowBatchWriter);
-                    }
-
-                    //Write data into orc file.
-                    if (rowBatchWriter.size == rowBatchWriter.getMaxSize()) {
-                        orcWriter.addRowBatch(rowBatchWriter);
-                        rowBatchWriter.reset();
-                    }
-                }
-
-                //Identify the record being processed.
-                rowNumber++;
+            } else {
+                this.toOrc(inputFile, orcWriter, rowBatchWriter, key, statistics);
             }
-
-            //Stop the parser.
-            csvParser.stopParsing();
 
             if (merge) {
                 String object = orcFile.getName();
@@ -298,9 +208,12 @@ public class CSVToORC implements Runnable {
 
                 //Identify if the original file was downloaded. 
                 if (originalFile.exists()) {
+                    //Value being processed.
+                    String value;
+                    int row = 0;
+
                     //Define the reader.
-                    Reader reader = OrcFile.createReader(new Path(originalFile.getAbsolutePath()),
-                            OrcFile.readerOptions(new Configuration()));
+                    Reader reader = OrcFile.createReader(new Path(originalFile.getAbsolutePath()), OrcFile.readerOptions(new Configuration()));
 
                     //Define the row.
                     RecordReader rows = reader.rows();
@@ -308,13 +221,16 @@ public class CSVToORC implements Runnable {
                     //Define the batch.
                     VectorizedRowBatch rowBatchReader = reader.getSchema().createRowBatch();
 
+                    //List the field name.
+                    List<String> fieldNames = schema.getFieldNames();
+
                     //Read a orc file.
                     while (rows.nextBatch(rowBatchReader)) {
                         for (int originalFileRow = 0; originalFileRow < rowBatchReader.size; ++originalFileRow) {
                             boolean add = true;
 
                             //Identify merge file records.
-                            orcRecords++;
+                            statistics.incrementOutputRows();
 
                             //Define the buffer to stringify values. 
                             StringBuilder readerValue;
@@ -344,7 +260,7 @@ public class CSVToORC implements Runnable {
                                     value = readerValue.toString();
 
                                     //Get field category.
-                                    Category category = typeDescription.get(column).getCategory();
+                                    Category category = schema.getChildren().get(column).getCategory();
 
                                     //Identify if the field is empty.
                                     if (value == null || value.isEmpty()) {
@@ -361,11 +277,11 @@ public class CSVToORC implements Runnable {
                                     rowBatchWriter.reset();
                                 }
                             } else {
-                                updatedRecords++;
+                                statistics.incrementOutputUpdatedRows();
                             }
 
                             //Identify the record being processed.
-                            rowNumber++;
+                            statistics.incrementRowNumber();
                         }
                     }
                 }
@@ -381,34 +297,35 @@ public class CSVToORC implements Runnable {
             orcWriter.close();
 
             //Identifies if the csv file is empty.
-            if (rowNumber == 0) {
+            if (statistics.getRowNumber() == 0) {
                 throw new Exception("Empty csv file!");
             } else {
                 //Print on console.
                 System.out.println("[" + orcFile.getName() + "] records: "
-                        + orcRecords
+                        + statistics.getOutputRows()
                         + ", Delta: "
-                        + csvRecords
-                        + ", ( Updated: " + updatedRecords + ", Inserted: " + (csvRecords - updatedRecords) + ", Duplicated:" + duplicatedRecords + " )"
+                        + statistics.getInputRows()
+                        + ", ( Updated: " + statistics.getOutputUpdatedRows() + ", Inserted: " + (statistics.getInputRows() - statistics.getOutputUpdatedRows()) + ", Duplicated:" + statistics.getDuplicatedRows() + " )"
                         + " Final: "
-                        + (orcRecords + (csvRecords - updatedRecords)));
+                        + (statistics.getOutputRows() + (statistics.getInputRows() - statistics.getOutputUpdatedRows())));
             }
 
             //Remove the original file.
             if (merge) {
-                if (originalFile.exists()) {
-                    originalFile.delete();
-                }
+                Files.deleteIfExists(originalFile.toPath());
             }
 
             //Identify if should remove csv file. 
             if (replace) {
-                if (csvFile.exists()) {
-                    csvFile.delete();
+                if (inputFile.isDirectory()) {
+                    FileUtils.deleteDirectory(inputFile);
+                } else {
+
+                    Files.deleteIfExists(inputFile.toPath());
                 }
             }
         } catch (Exception ex) {
-            Logger.getLogger(this.getClass()).error("Error [" + ex + "] converting CSV to ORC at line [" + rowNumber + "]");
+            Logger.getLogger(this.getClass()).error("Error [" + ex + "] converting CSV to ORC");
             Logger.getLogger(this.getClass()).error(Arrays.toString(ex.getStackTrace()));
 
             System.exit(1);
@@ -471,5 +388,107 @@ public class CSVToORC implements Runnable {
                     break;
             }
         }
+    }
+
+    /**
+     * Convert a file to orc.
+     *
+     * @param file CSV File.
+     * @param orcWriter Orc Writer.
+     * @param rowBatchWriter Row Batch Writer.
+     * @param key Unique keys mapper.
+     * @param statistics Statistics collector.
+     * @throws Exception
+     */
+    private void toOrc(
+            File file,
+            Writer orcWriter,
+            VectorizedRowBatch rowBatchWriter,
+            HashSet<String> key,
+            Statistics statistics) throws IOException, Exception {
+
+        //Define a settings.
+        CsvParserSettings parserSettings = new CsvParserSettings();
+        parserSettings.setNullValue("");
+        parserSettings.setMaxCharsPerColumn(-1);
+
+        //Define format settings
+        parserSettings.getFormat().setDelimiter(delimiter);
+        parserSettings.getFormat().setQuote(quote);
+        parserSettings.getFormat().setQuoteEscape(quoteEscape);
+
+        //Define the input buffer.        
+        parserSettings.setInputBufferSize(20 * (1024 * 1024));
+
+        //Define a csv parser.
+        CsvParser csvParser = new CsvParser(parserSettings);
+
+        //Init a parser.
+        csvParser.beginParsing(file);
+
+        //Process each csv line.
+        String[] record;
+
+        while ((record = csvParser.parseNext()) != null) {
+            boolean add = false;
+
+            //Identifies if the csv the field count specified in the schema.                
+            if (record.length < rowBatchWriter.numCols) {
+                throw new Exception(file.getName() + " expected " + rowBatchWriter.numCols + " fields, but received only " + record.length + " : " + String.join("|", record));
+            }
+
+            //Identify insert rule. 
+            if (fieldKey < 0 || duplicated) {
+                add = true;
+            } else if (fieldKey >= 0 && !duplicated) {
+                add = key.add(record[fieldKey]);
+            }
+
+            //Identify duplicated key.
+            if (!add) {
+                System.out.println("Duplicated key in file: [" + record[fieldKey] + "]");
+                statistics.incrementDuplicatedRows();
+            } else {
+                statistics.incrementInputRows();
+            }
+
+            //Ignore the header.
+            if (!(statistics.getRowNumber() == 0 && header) && add) {
+                //Identify the batch size. 
+                int row = rowBatchWriter.size++;
+
+                for (int column = 0; column < schema.getFieldNames().size(); column++) {
+                    String value = "";
+
+                    //Get field category.
+                    Category category = schema.getChildren().get(column).getCategory();
+
+                    //Get field value.
+                    if ((record.length - 1) >= column) {
+                        value = record[column];
+                    }
+
+                    //Identify if the field is empty.
+                    if (value == null || value.isEmpty()) {
+                        value = null;
+                    }
+
+                    //Write data into a row batch. 
+                    this.rowBatchAppend(value, category, row, column, rowBatchWriter);
+                }
+
+                //Write data into orc file.
+                if (rowBatchWriter.size == rowBatchWriter.getMaxSize()) {
+                    orcWriter.addRowBatch(rowBatchWriter);
+                    rowBatchWriter.reset();
+                }
+            }
+
+            //Identify the record being processed.
+            statistics.incrementRowNumber();
+        }
+
+        //Stop the parser.
+        csvParser.stopParsing();
     }
 }
