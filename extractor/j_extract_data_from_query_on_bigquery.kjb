@@ -326,12 +326,12 @@ bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${STAGING_SCHEMA}.${SCHEMA_NAME
 bq query --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --allow_large_results --destination_table=${STAGING_SCHEMA}.${SCHEMA_NAME}_${TABLE} "${INPUT_DATA_STATEMENT_ESCAPED}"
 error_check
 
-echo "Extracting data to  gs://${GOOGLE_CLOUD_BUCKET}/${SCHEMA_NAME}/${TABLE}/!"
-bq extract --compression=GZIP --project_id=${BIG_QUERY_PROJECT_ID} -F ';' ${STAGING_SCHEMA}.${SCHEMA_NAME}_${TABLE} gs://${GOOGLE_CLOUD_BUCKET}/${UUID}/${SCHEMA_NAME}/${TABLE}/${SCHEMA_NAME}_${TABLE}*.gz
+echo "Extracting data to gs://${GOOGLE_CLOUD_BUCKET}/${SCHEMA_NAME}/${TABLE}/${UUID}!"
+bq extract --compression=GZIP --project_id=${BIG_QUERY_PROJECT_ID} -F ';' ${STAGING_SCHEMA}.${SCHEMA_NAME}_${TABLE} gs://${GOOGLE_CLOUD_BUCKET}/${SCHEMA_NAME}/${TABLE}/${UUID}/${SCHEMA_NAME}_${TABLE}*.gz
 error_check
 
 echo "Copying data to ${RAWFILE_QUEUE_STAGING_PATH}!"
-gsutil -m mv gs://${GOOGLE_CLOUD_BUCKET}/${UUID}/${SCHEMA_NAME}/${TABLE}/${SCHEMA_NAME}_${TABLE}*.gz ${RAWFILE_QUEUE_STAGING_PATH}
+gsutil -m mv gs://${GOOGLE_CLOUD_BUCKET}/${SCHEMA_NAME}/${TABLE}/${UUID}/${SCHEMA_NAME}_${TABLE}*.gz ${RAWFILE_QUEUE_STAGING_PATH}
 error_check
 
 echo "Unzipping data!"
@@ -363,7 +363,7 @@ done
 echo "Removing staging data!"
 rm -rf ${RAWFILE_QUEUE_STAGING_PATH}
 bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${STAGING_SCHEMA}.${SCHEMA_NAME}_${TABLE}
-gsutil  -m rm gs://${GOOGLE_CLOUD_BUCKET}/${UUID}/${SCHEMA_NAME}/${TABLE}/*</script>
+gsutil  -m rm gs://${GOOGLE_CLOUD_BUCKET}/${SCHEMA_NAME}/${TABLE}/${UUID}/*</script>
       <loglevel>Basic</loglevel>
       <parallel>N</parallel>
       <draw>Y</draw>
