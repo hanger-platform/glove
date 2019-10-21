@@ -256,6 +256,11 @@ fi
 # Identifica a quantidade de arquivos a serem processados.
 QUEUE_FILE_COUNT=`ls ${RAWFILE_QUEUE_PATH}*${DATA_FILE}* |wc -l`
 
+# Identifica se o arquivo contém ao menos uma linha.
+if [ ${QUEUE_FOLDER_SIZE} -lt 1000 ]; then
+    QUEUE_FILE_COUNT=`cat ${RAWFILE_QUEUE_PATH}*${DATA_FILE}* |wc -l`
+fi
+
 # Executa o processo de carga e criação de entidades.
 if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 	cd ${RAWFILE_QUEUE_PATH}
