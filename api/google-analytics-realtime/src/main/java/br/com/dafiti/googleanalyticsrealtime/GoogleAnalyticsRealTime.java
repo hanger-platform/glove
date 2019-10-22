@@ -97,11 +97,11 @@ public class GoogleAnalyticsRealTime {
 
         //Define fields.
         mitt.getConfiguration()
-                .addCustomField("partition_field", new Concat((List) cli.getParameterAsList("partition", "\\+")))
-                .addCustomField("custom_primary_key", new Concat((List) cli.getParameterAsList("key", "\\+")))
+                .addCustomField("partition_field", new Concat((List) cli.getParameterAsList("partition", "\\+"), "|"))
+                .addCustomField("custom_primary_key", new Concat((List) cli.getParameterAsList("key", "\\+"), "|"))
                 .addCustomField("etl_load_date", new Now())
-                .addField(cli.getParameterAsList("metrics", ","))
-                .addField(cli.getParameterAsList("dimensions", ","));
+                .addField(cli.getParameterAsList("dimensions", ","))
+                .addField(cli.getParameterAsList("metrics", ","));
 
         HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
         JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
