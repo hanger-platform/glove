@@ -72,6 +72,11 @@
       <description>Identifica o bucket default para exportação de dados. </description>
     </parameter>
     <parameter>
+      <name>FIELD_HAS_PREFIX</name>
+      <default_value>0</default_value>
+      <description>Identifica se o prefixo dos campos das tabelas do HANA devem ser mantidos. </description>
+    </parameter>
+    <parameter>
       <name>FILE_DONE_BUCKET</name>
       <default_value />
       <description>Identifica o diretório para armazenamento de arquivos processados.</description>

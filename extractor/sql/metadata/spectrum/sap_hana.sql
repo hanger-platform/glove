@@ -54,15 +54,15 @@ SELECT * FROM (
         GROUP BY dd03l.tabname
 
         UNION ALL
-
+        
         SELECT DISTINCT
             POSITION,
             CASE
-                WHEN DATA_TYPE_NAME = 'DATE' THEN 'TO_CHAR ( ' || COLUMN_NAME || ' , ' || '''' || 'YYYY-MM-DD' ||  '''' || ') AS ' || REPLACE_REGEXPR( '\/\w+\/' IN COLUMN_NAME WITH '' )
-                WHEN DATA_TYPE_NAME IN  ( 'TIME', 'SECONDDATE', 'TIMESTAMP' ) THEN 'CONCAT( TO_CHAR ( ' || COLUMN_NAME || ' , ' || '''' || 'YYYY-MM-DD HH24:MI:SS' || '''' || '),' || '''' || ' ${TIMEZONE_OFFSET}' || '''' || ') AS ' || REPLACE_REGEXPR( '\/\w+\/' IN COLUMN_NAME WITH '' )
-                WHEN DATA_TYPE_NAME in ( 'VARCHAR', 'NVARCHAR', 'ALPHANUM', 'SHORTTEXT', 'BLOB', 'CLOB', 'NCLOB', 'TEXT' ) then '"' || COLUMN_NAME || '"' || ' as ' || REPLACE_REGEXPR( '\/\w+\/' IN COLUMN_NAME WITH '' )
-                WHEN DATA_TYPE_NAME in ( 'VARBINARY' ) then 'TO_NVARCHAR (' || COLUMN_NAME || ')' || ' as ' || REPLACE_REGEXPR( '\/\w+\/' IN COLUMN_NAME WITH '' )
-                ELSE '"' || COLUMN_NAME || '"' || ' AS ' || REPLACE_REGEXPR( '\/\w+\/' IN COLUMN_NAME WITH '' )
+                WHEN DATA_TYPE_NAME = 'DATE' THEN 'TO_CHAR ( ' || COLUMN_NAME || ' , ' || '''' || 'YYYY-MM-DD' ||  '''' || ') AS ' || CASE '${FIELD_HAS_PREFIX}' WHEN '1' THEN REPLACE_REGEXPR( '\/' IN REPLACE_REGEXPR( '^\/' IN COLUMN_NAME WITH '' ) WITH '_' ) ELSE REPLACE_REGEXPR( '\/\w+\/' IN COLUMN_NAME WITH '' ) END
+                WHEN DATA_TYPE_NAME IN  ( 'TIME', 'SECONDDATE', 'TIMESTAMP' ) THEN 'CONCAT( TO_CHAR ( ' || COLUMN_NAME || ' , ' || '''' || 'YYYY-MM-DD HH24:MI:SS' || '''' || '),' || '''' || ' ${TIMEZONE_OFFSET}' || '''' || ') AS ' || CASE '${FIELD_HAS_PREFIX}' WHEN '1' THEN REPLACE_REGEXPR( '\/' IN REPLACE_REGEXPR( '^\/' IN COLUMN_NAME WITH '' ) WITH '_' ) ELSE REPLACE_REGEXPR( '\/\w+\/' IN COLUMN_NAME WITH '' ) END
+                WHEN DATA_TYPE_NAME in ( 'VARCHAR', 'NVARCHAR', 'ALPHANUM', 'SHORTTEXT', 'BLOB', 'CLOB', 'NCLOB', 'TEXT' ) then '"' || COLUMN_NAME || '"' || ' as ' || CASE '${FIELD_HAS_PREFIX}' WHEN '1' THEN REPLACE_REGEXPR( '\/' IN REPLACE_REGEXPR( '^\/' IN COLUMN_NAME WITH '' ) WITH '_' ) ELSE REPLACE_REGEXPR( '\/\w+\/' IN COLUMN_NAME WITH '' ) END
+                WHEN DATA_TYPE_NAME in ( 'VARBINARY' ) then 'TO_NVARCHAR (' || COLUMN_NAME || ')' || ' as ' || CASE '${FIELD_HAS_PREFIX}' WHEN '1' THEN REPLACE_REGEXPR( '\/' IN REPLACE_REGEXPR( '^\/' IN COLUMN_NAME WITH '' ) WITH '_' ) ELSE REPLACE_REGEXPR( '\/\w+\/' IN COLUMN_NAME WITH '' ) END
+                ELSE '"' || COLUMN_NAME || '"' || ' AS ' || CASE '${FIELD_HAS_PREFIX}' WHEN '1' THEN REPLACE_REGEXPR( '\/' IN REPLACE_REGEXPR( '^\/' IN COLUMN_NAME WITH '' ) WITH '_' ) ELSE REPLACE_REGEXPR( '\/\w+\/' IN COLUMN_NAME WITH '' ) END
             END AS fields,
             CASE
                 WHEN DATA_TYPE_NAME = 'DATE' THEN 'TO_CHAR ( ' || COLUMN_NAME || ' , ' || '''' || 'YYYY-MM-DD' ||  '''' || ')'
@@ -94,7 +94,7 @@ SELECT * FROM (
 				WHEN 'TIMESTAMP'	THEN 'varchar(19)'
 				WHEN 'BOOLEAN' 		THEN 'boolean'
 			END	AS field_type,
-            ( '{"name": "' || LOWER( REPLACE_REGEXPR( '\/\w+\/' IN COLUMN_NAME WITH '' ) ) ||  '","type":' ||
+            ( '{"name": "' || LOWER( CASE '${FIELD_HAS_PREFIX}' WHEN '1' THEN REPLACE_REGEXPR( '\/' IN REPLACE_REGEXPR( '^\/' IN COLUMN_NAME WITH '' ) WITH '_' ) ELSE REPLACE_REGEXPR( '\/\w+\/' IN COLUMN_NAME WITH '' ) END ) ||  '","type":' ||
                 CASE
                 	  WHEN DATA_TYPE_NAME IN ( 'TINYINT', 'SMALLINT', 'INTEGER' ) THEN '["null", "int"]'
                     WHEN DATA_TYPE_NAME IN ( 'BIGINT' ) THEN '["null", "long"]'
@@ -103,7 +103,7 @@ SELECT * FROM (
                     WHEN DATA_TYPE_NAME IN ( 'DATE', 'TIME', 'SECONDDATE', 'TIMESTAMP' ) THEN '["null", "string"]'
                 	  WHEN DATA_TYPE_NAME = 'BOOLEAN' THEN '["null", "boolean"]'
                 end ||', "default": null}' ) AS json,
-            LOWER( REPLACE_REGEXPR( '\/\w+\/' IN COLUMN_NAME WITH '' ) ) AS column_name,
+            LOWER( CASE '${FIELD_HAS_PREFIX}' WHEN '1' THEN REPLACE_REGEXPR( '\/' IN REPLACE_REGEXPR( '^\/' IN COLUMN_NAME WITH '' ) WITH '_' ) ELSE REPLACE_REGEXPR( '\/\w+\/' IN COLUMN_NAME WITH '' ) END ) AS column_name,
             0 AS column_key
         FROM
             TABLE_COLUMNS
