@@ -843,8 +843,8 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     </fields>
     <data>
       <line>
-        <item />
-        <item />
+        <item>50000000</item>
+        <item>50000000</item>
       </line>
     </data>
     <attributes />
@@ -913,7 +913,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
 
             long partition = from;
 
-            while (partition &lt; to) {
+            while (partition &lt;= to) {
                 partitions.add(partition);
                 partition = partition + length;
             }
