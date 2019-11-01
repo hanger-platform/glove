@@ -199,6 +199,7 @@ public class Extractor implements Runnable {
                         .get(column)
                         .replaceAll("\\s", "")
                         .replaceAll("\\W", "_")
+                        .replaceAll("^_", "")
                         .toLowerCase();
 
                 //Get field properties from metadata. 
