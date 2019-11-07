@@ -131,11 +131,11 @@ SELECT * FROM (
             WHEN 'varchar'      THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + ROUND( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
 			WHEN 'boolean' 		THEN 'boolean'
         END AS field_type,
-		CONCAT('{"name": "', LOWER( column_name ), '","type":', 
+		CONCAT('{"name": "', LOWER( REPLACE(column_name,' ','_') ), '","type":', 
 			IF( data_type IN ("tinyint","smallint","mediumint", "int", "bit"), '["null", "int"]', 
 			IF( data_type IN ("bigint"), '["null", "long"]', 
 			IF( data_type IN ("float","double"), '["null", "double"]', 
-			IF( data_type IN ("decimal"), CONCAT( '["null", {"type":"fixed", "name": "', LOWER( column_name ) , '", "size":' , CAST( ROUND( IF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ) / 2 AS SIGNED ) , ', "logicalType": "decimal", "precision":' , ROUND( IF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ) , ', "scale":' , NUMERIC_SCALE , '}]' ), 
+			IF( data_type IN ("decimal"), CONCAT( '["null", {"type":"fixed", "name": "', LOWER( REPLACE(column_name,' ','_') ) , '", "size":' , CAST( ROUND( IF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ) / 2 AS SIGNED ) , ', "logicalType": "decimal", "precision":' , ROUND( IF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ) , ', "scale":' , NUMERIC_SCALE , '}]' ), 
 			IF( data_type = "timestamp",'["null", "string"]', IF( data_type="datetime",'["null", "string"]', 
 			IF( data_type = "boolean",'["null", "boolean"]', 
 			IF( data_type = "date",'["null", "string"]', 
