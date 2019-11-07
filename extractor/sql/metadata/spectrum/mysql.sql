@@ -141,7 +141,7 @@ SELECT * FROM (
 			IF( data_type = "date",'["null", "string"]', 
 			IF( data_type = "time",'["null", "string"]','["null", "string"]' ))))))))), ' , "default": null}'
 		) AS json,
-		LOWER( column_name ) AS REPLACE(column_name,' ','_'),
+		LOWER( REPLACE(column_name,' ','_') ) AS column_name,
         0 AS column_key
     FROM
         information_schema.columns c
