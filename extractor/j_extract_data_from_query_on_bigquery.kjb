@@ -302,7 +302,9 @@
       <add_date>N</add_date>
       <add_time>N</add_time>
       <insertScript>Y</insertScript>
-      <script>mkdir -p ${RAWFILE_QUEUE_STAGING_PATH}
+      <script>export PATH=$PATH:${GOOGLE_TOOLS_HOME}:${GOOGLE_TOOLS_HOME}/bin
+
+mkdir -p ${RAWFILE_QUEUE_STAGING_PATH}
 mkdir -p ${RAWFILE_QUEUE_PATH}
 
 error_check(){

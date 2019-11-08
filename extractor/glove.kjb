@@ -725,6 +725,7 @@ GLOVE_HOME		== ${GLOVE_HOME}
 GLOVE_TEMP		== ${GLOVE_TEMP}
 GLOVE_METADATA		== ${GLOVE_METADATA}
 GLOVE_NAMED_QUERIES	== ${GLOVE_NAMED_QUERIES}
+GOOGLE_TOOLS_HOME	== ${GOOGLE_TOOLS_HOME}
 #-----------------------------------------------------------</logmessage>
       <loglevel>Basic</loglevel>
       <logsubject>LOG</logsubject>
