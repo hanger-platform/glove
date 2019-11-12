@@ -97,10 +97,8 @@ public class CSVSplitter implements Runnable {
 
         try {
             if (splitStrategy.equalsIgnoreCase("FAST")) {
-                System.out.println("FAST splitting enabled");
                 this.fastSplit();
             } else {
-                System.out.println("SECURE splitting enabled");
                 this.secureSplit();
             }
 
