@@ -56,6 +56,7 @@ public class Converter {
     public static final String DIALECT = "spectrum";
     public static final String TARGET = "parquet";
     public static final String COMPRESSION = "gzip";
+    public static final String SPLIT_STRATEGY = "secure";
     public static final Character DELIMITER = ';';
     public static final Character QUOTE = '"';
     public static final Character QUOTE_ESCAPE = '"';
@@ -93,6 +94,7 @@ public class Converter {
         options.addOption("b", "bucket", true, "Identify the storage bucket");
         options.addOption("m", "mode", true, "Identify the partition mode");
         options.addOption("w", "reservedWords", true, "Identify the reserved words file list");
+        options.addOption("ps", "splitStrategy", true, "Identify the split strategy");
     }
 
     /**
@@ -120,6 +122,7 @@ public class Converter {
         Character delimiter = DELIMITER;
         Character quote = QUOTE;
         Character quoteEscape = QUOTE_ESCAPE;
+        String splitStrategy = SPLIT_STRATEGY;
         String fileName = "";
         String field = "";
         String metadata = "";
@@ -264,6 +267,11 @@ public class Converter {
                 mode = line.getOptionValue("mode").toLowerCase();
             }
 
+            //Get the split strategy. 
+            if (line.hasOption("splitStrategy")) {
+                mode = line.getOptionValue("splitStrategy").toUpperCase();
+            }
+
             //Identify if should remove the csv file. 
             replace = line.hasOption("replace");
 
@@ -343,7 +351,8 @@ public class Converter {
                                                 quote,
                                                 quoteEscape,
                                                 header,
-                                                replace));
+                                                replace,
+                                                splitStrategy));
                                 break;
                             default:
                                 Logger.getLogger(Converter.class).error("Unsupported file ".concat(extension));

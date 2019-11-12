@@ -277,6 +277,11 @@
       <description>Identifica a chave de distribuição do Redshift.</description>
     </parameter>
     <parameter>
+      <name>SPLIT_STRATEGY</name>
+      <default_value>SECURE</default_value>
+      <description>Identifica a estratégia de particionamento entre SECURE e FAST.</description>
+    </parameter>
+    <parameter>
       <name>STAGING_SCHEMA</name>
       <default_value>transient</default_value>
       <description>Identifica o schema utilizado como staging.</description>

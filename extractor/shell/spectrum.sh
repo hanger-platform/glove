@@ -119,8 +119,9 @@ partition_load(){
 				--filename=*.csv \
 				--delimiter=${DELIMITER} \
 				--target=csv \
+				--splitStrategy=${SPLIT_STRATEGY} \
 				--partition=0 \
-				--thread=${THREAD} \
+				--thread=${THREAD} \				
 				--header \
 				--replace"
 		fi
@@ -130,6 +131,7 @@ partition_load(){
 			--filename=*.csv \
 			--delimiter=${DELIMITER} \
 			--target=csv \
+			--splitStrategy=${SPLIT_STRATEGY} \
 			--partition=0 \
 			--thread=${THREAD} \
 			--header \
@@ -142,6 +144,7 @@ partition_load(){
 				--filename=*.csv \
 				--delimiter=${DELIMITER} \
 				--target=csv \
+				--splitStrategy=${SPLIT_STRATEGY} \
 				--partition=0 \
 				--thread=${THREAD} \
 				--replace"
@@ -152,6 +155,7 @@ partition_load(){
 			--filename=*.csv \
 			--delimiter=${DELIMITER} \
 			--target=csv \
+			--splitStrategy=${SPLIT_STRATEGY} \
 			--partition=0 \
 			--thread=${THREAD} \
 			--replace
