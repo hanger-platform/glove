@@ -23,7 +23,10 @@
  */
 package br.com.dafiti.csv;
 
-import java.io.BufferedWriter;
+import com.univocity.parsers.csv.CsvParser;
+import com.univocity.parsers.csv.CsvParserSettings;
+import com.univocity.parsers.csv.CsvWriter;
+import com.univocity.parsers.csv.CsvWriterSettings;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -31,8 +34,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.UUID;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.LineIterator;
 import org.apache.log4j.Logger;
 
 /**
@@ -87,58 +88,51 @@ public class CSVSplitter implements Runnable {
         Logger.getLogger(this.getClass()).info("Converting CSV to CSV");
 
         try {
-            String part = "";
-            int lineNumber = 0;
-            HashMap<String, BufferedWriter> partitions = new HashMap<>();
-            LineIterator lineIterator = FileUtils.lineIterator(csvFile, "UTF-8");
+            int line = 0;
+            HashMap<String, CsvWriter> partitions = new HashMap<>();
 
-            try {
-                while (lineIterator.hasNext()) {
-                    String line = lineIterator.nextLine();
+            //Writer. 
+            CsvWriterSettings writerSettings = new CsvWriterSettings();
+            writerSettings.getFormat().setDelimiter(delimiter);
+            writerSettings.getFormat().setQuote(quote);
+            writerSettings.getFormat().setQuoteEscape(quoteEscape);
+            writerSettings.setNullValue("");
+            writerSettings.setMaxCharsPerColumn(-1);
 
-                    if (!(lineNumber == 0 && header)) {
-                        String[] split = line.split(delimiter.toString());
+            //Reader. 
+            CsvParserSettings readerSettings = new CsvParserSettings();
+            readerSettings.getFormat().setDelimiter(delimiter);
+            readerSettings.getFormat().setQuote(quote);
+            readerSettings.getFormat().setQuoteEscape(quoteEscape);
+            readerSettings.setNullValue("");
+            readerSettings.setMaxCharsPerColumn(-1);
+            readerSettings.setInputBufferSize(20 * (1024 * 1024));
 
-                        if (split[split.length - 1].startsWith("\"") && !split[split.length - 1].endsWith("\"")) {
-                            part = line;
-                        } else {
-                            if (!part.isEmpty()) {
-                                line = part + line;
-                                part = "";
-                                split = line.split(delimiter.toString());
-                            }
-                        }
+            CsvParser csvParser = new CsvParser(readerSettings);
+            csvParser.beginParsing(csvFile);
 
-                        if (part.isEmpty()) {
-                            String partition = split[partitionColumn].replaceAll("\\W", "");
+            String[] record;
 
-                            if (!partitions.containsKey(partition)) {
-                                String partitionPath = csvFile.getParent() + "/" + partition;
-                                Files.createDirectories(Paths.get(partitionPath));
-                                BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(partitionPath + "/" + UUID.randomUUID() + ".csv"));
+            while ((record = csvParser.parseNext()) != null) {
+                if (!(line == 0 && header)) {
+                    String partition = record[partitionColumn].replaceAll("\\W", "");
 
-                                partitions.put(partition, bufferedWriter);
-                            }
-
-                            partitions.get(partition).append(line + "\r\n");
-                        }
+                    if (!partitions.containsKey(partition)) {
+                        String partitionPath = csvFile.getParent() + "/" + partition;
+                        Files.createDirectories(Paths.get(partitionPath));
+                        partitions.put(partition, new CsvWriter(new FileWriter(partitionPath + "/" + UUID.randomUUID() + ".csv"), writerSettings));
                     }
 
-                    lineNumber++;
+                    partitions.get(partition).writeRow(record);
                 }
-            } finally {
-                LineIterator.closeQuietly(lineIterator);
+
+                line++;
             }
 
             //Flush and close the output stream.
             partitions.forEach((k, v) -> {
-                try {
-                    v.flush();
-                    v.close();
-                } catch (IOException ex) {
-                    Logger.getLogger(this.getClass()).error("Error [" + ex + "] closing writer");
-                    System.exit(1);
-                }
+                v.flush();
+                v.close();
             });
 
             //Identify if should remove csv file. 
