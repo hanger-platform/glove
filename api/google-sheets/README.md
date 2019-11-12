@@ -21,10 +21,13 @@ O **Google Sheets Extractor** é uma ferramenta que possibilita extrair as infor
     - Se _API_ não estiver ativada, ative-a.
 
 - Criar credenciais de acesso para _API_
-    - Acessar [https://developers.google.com/sheets/api/quickstart](https://developers.google.com/sheets/api/quickstart)
-    - Clique no botão Enable the Google Sheets API
-    - Cliquei em DOWNLOAD CLIENT CONFIGURATION
-    - Guardar arquivo _JSON_ gerado
+    - Acesse o Google Developer Console API [https://console.developers.google.com/apis](https://console.developers.google.com/apis)
+    - Clique no menu Credenciais.
+    - Clique em Criar credenciais. 
+    - Clique em Criar ID do cliente do OAuth.
+    - Selecione a opção Outros
+    - Defina um nome e clique em clicar.
+    - Faça downloado do arquivo JSON gerado.     
 
 ##### CONSTRUÇÃO
 
