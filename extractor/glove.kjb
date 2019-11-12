@@ -262,6 +262,11 @@
       <description>Identifica o tamanho máximo em MB dos arquivos temporários. </description>
     </parameter>
     <parameter>
+      <name>QUOTE_ESCAPE</name>
+      <default_value>"</default_value>
+      <description>Identifica o caracter utilizado para escape de aspas duplas.</description>
+    </parameter>
+    <parameter>
       <name>SAMPLE</name>
       <default_value>100000</default_value>
       <description>Identifica o sample de dados que é analisado para geração de metadado. </description>

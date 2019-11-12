@@ -372,7 +372,7 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>512</xloc>
+      <xloc>528</xloc>
       <yloc>64</yloc>
       <attributes_kjc />
     </entry>
@@ -385,12 +385,12 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>288</xloc>
+      <xloc>304</xloc>
       <yloc>176</yloc>
       <attributes_kjc />
     </entry>
     <entry>
-      <name>Set delimiter to ;</name>
+      <name>Set defaults</name>
       <description />
       <type>SET_VARIABLES</type>
       <attributes />
@@ -401,6 +401,11 @@
         <field>
           <variable_name>DELIMITER</variable_name>
           <variable_value>;</variable_value>
+          <variable_type>ROOT_JOB</variable_type>
+        </field>
+        <field>
+          <variable_name>QUOTE_ESCAPE</variable_name>
+          <variable_value>\</variable_value>
           <variable_type>ROOT_JOB</variable_type>
         </field>
       </fields>
@@ -423,6 +428,7 @@
 		HEADER
 		DELIMITER ';'
 		NULL AS ''
+		ESCAPE
 		ADDQUOTES
 		GZIP
 		ALLOWOVERWRITE
@@ -436,7 +442,7 @@ END; </sql>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>288</xloc>
+      <xloc>304</xloc>
       <yloc>64</yloc>
       <attributes_kjc />
     </entry>
@@ -515,7 +521,7 @@ aws s3 rm s3://${STORAGE_BUCKET}/unload/${SCHEMA_NAME}/${TABLE_NAME}/ --recursiv
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>400</xloc>
+      <xloc>416</xloc>
       <yloc>64</yloc>
       <attributes_kjc />
     </entry>
@@ -523,7 +529,7 @@ aws s3 rm s3://${STORAGE_BUCKET}/unload/${SCHEMA_NAME}/${TABLE_NAME}/ --recursiv
   <hops>
     <hop>
       <from>START</from>
-      <to>Set delimiter to ;</to>
+      <to>Set defaults</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -531,7 +537,7 @@ aws s3 rm s3://${STORAGE_BUCKET}/unload/${SCHEMA_NAME}/${TABLE_NAME}/ --recursiv
       <unconditional>Y</unconditional>
     </hop>
     <hop>
-      <from>Set delimiter to ;</from>
+      <from>Set defaults</from>
       <to>Unload from Redshift</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
