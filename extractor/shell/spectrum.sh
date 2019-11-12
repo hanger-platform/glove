@@ -135,7 +135,7 @@ partition_load(){
 			--splitStrategy=${SPLIT_STRATEGY} \
 			--partition=0 \
 			--thread=${THREAD} \
-			--escape='${QUOTE_ESCAPE}' \
+			--escape=${QUOTE_ESCAPE} \
 			--header \
 			--replace
 		error_check
@@ -161,7 +161,7 @@ partition_load(){
 			--splitStrategy=${SPLIT_STRATEGY} \
 			--partition=0 \
 			--thread=${THREAD} \
-			--escape='${QUOTE_ESCAPE}' \
+			--escape=${QUOTE_ESCAPE} \
 			--replace
 		error_check
     fi
@@ -206,7 +206,7 @@ partition_load(){
 		--merge=${PARTITION_MERGE} \
 		--bucket=${STORAGE_QUEUE_PATH} \
 		--mode=${PARTITION_MODE} \
-		--escape='${QUOTE_ESCAPE}' \
+		--escape=${QUOTE_ESCAPE} \
 		--replace
     error_check
 
@@ -295,7 +295,7 @@ delta_load(){
 		--fieldkey=0 \
 		--merge=${PARTITION_MERGE} \
 		--bucket=${STORAGE_QUEUE_PATH} \
-		--escape='${QUOTE_ESCAPE}' \
+		--escape=${QUOTE_ESCAPE} \
 		--replace
     error_check
 
@@ -370,7 +370,7 @@ full_load(){
 			--compression=${OUTPUT_COMPRESSION} \
 			--thread=${THREAD} \
 			--duplicated=${ALLOW_DUPLICATED} \
-			--escape='${QUOTE_ESCAPE}' \
+			--escape=${QUOTE_ESCAPE} \
 			--replace
     	error_check
 
@@ -406,7 +406,7 @@ full_load(){
 			--compression=${OUTPUT_COMPRESSION} \
 			--thread=${THREAD} \
 			--duplicated=${ALLOW_DUPLICATED} \
-			--escape='${QUOTE_ESCAPE}' \
+			--escape=${QUOTE_ESCAPE} \
 			--replace
 		error_check
 
