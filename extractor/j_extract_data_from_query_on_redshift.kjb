@@ -372,7 +372,7 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>528</xloc>
+      <xloc>560</xloc>
       <yloc>64</yloc>
       <attributes_kjc />
     </entry>
@@ -385,7 +385,7 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>304</xloc>
+      <xloc>320</xloc>
       <yloc>176</yloc>
       <attributes_kjc />
     </entry>
@@ -442,12 +442,12 @@ END; </sql>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>304</xloc>
+      <xloc>320</xloc>
       <yloc>64</yloc>
       <attributes_kjc />
     </entry>
     <entry>
-      <name>Process data</name>
+      <name>Extract data</name>
       <description />
       <type>SHELL</type>
       <attributes />
@@ -485,7 +485,7 @@ aws s3 cp s3://${STORAGE_BUCKET}/unload/${SCHEMA_NAME}/${TABLE_NAME}/ ${RAWFILE_
 error_check
 
 echo "Unzipping data!"
-gunzip ${RAWFILE_QUEUE_STAGING_PATH}*.gz
+unpigz ${RAWFILE_QUEUE_STAGING_PATH}*.gz
 error_check
 
 echo "Merging data file!"
@@ -493,19 +493,18 @@ FILE_INDEX=0
 
 for i in `ls ${RAWFILE_QUEUE_STAGING_PATH}*`
 do
-	echo ${i}
-
-	if [ ${FILE_INDEX} = 0 ]; then
+	if [ ${FILE_INDEX} = 0 ]; then	
 		cat ${i}	>> 	${RAWFILE_QUEUE_FILE}
-		rm -rf  ${i}
 		error_check
 	else
-		tail -n +2 ${i} > ${i}.tmp
-		mv -f ${i}.tmp ${i};
-
-		cat ${i}	>> 	${RAWFILE_QUEUE_FILE}
-		rm -rf  ${i}
-		error_check
+		if [ "${#PARTITION_FIELD}" -gt "0" ]; then
+			mv ${i}	${RAWFILE_QUEUE_PATH}${SCHEMA_NAME}_${TABLE}_${FILE_INDEX}.csv
+			error_check
+		else
+			echo "Removing data file header!"
+			sed '1d' ${i} >> ${RAWFILE_QUEUE_FILE}	
+			error_check	
+		fi
 	fi
 
 	FILE_INDEX=$(( $FILE_INDEX + 1 ))
@@ -513,15 +512,12 @@ done
 
 echo "Removing temporary files!"
 rm -rf ${RAWFILE_QUEUE_STAGING_PATH}
-error_check
-
-echo "Removing files from s3://${STORAGE_BUCKET}/unload/${SCHEMA_NAME}/${TABLE_NAME}/"
 aws s3 rm s3://${STORAGE_BUCKET}/unload/${SCHEMA_NAME}/${TABLE_NAME}/ --recursive --only-show-errors</script>
       <loglevel>Basic</loglevel>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>416</xloc>
+      <xloc>448</xloc>
       <yloc>64</yloc>
       <attributes_kjc />
     </entry>
@@ -555,7 +551,7 @@ aws s3 rm s3://${STORAGE_BUCKET}/unload/${SCHEMA_NAME}/${TABLE_NAME}/ --recursiv
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>Process data</from>
+      <from>Extract data</from>
       <to>Success</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
@@ -565,7 +561,7 @@ aws s3 rm s3://${STORAGE_BUCKET}/unload/${SCHEMA_NAME}/${TABLE_NAME}/ --recursiv
     </hop>
     <hop>
       <from>Unload from Redshift</from>
-      <to>Process data</to>
+      <to>Extract data</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
