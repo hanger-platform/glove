@@ -896,7 +896,6 @@ if [ ${HAS_RECORD} -gt 1 ]; then
 		--filename=${SCHEMA_NAME}_${TABLE}.csv  \
 		--target=metadata \
 		--dialect=${DIALECT} \
-		--escape=${QUOTE_ESCAPE} \
 		--reservedWords=${RESERVED_WORDS_FILE}
 	error_check
 
