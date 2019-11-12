@@ -269,7 +269,7 @@ public class Converter {
 
             //Get the split strategy. 
             if (line.hasOption("splitStrategy")) {
-                mode = line.getOptionValue("splitStrategy").toUpperCase();
+                splitStrategy = line.getOptionValue("splitStrategy").toUpperCase();
             }
 
             //Identify if should remove the csv file. 
