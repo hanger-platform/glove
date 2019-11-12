@@ -22,12 +22,12 @@ O **Google Sheets Extractor** é uma ferramenta que possibilita extrair as infor
 
 - Criar credenciais de acesso para _API_
     - Acesse o Google Developer Console API [https://console.developers.google.com/apis](https://console.developers.google.com/apis)
-    - Clique no menu Credenciais.
-    - Clique em Criar credenciais. 
-    - Clique em Criar ID do cliente do OAuth.
-    - Selecione a opção Outros
-    - Defina um nome e clique em clicar.
-    - Faça downloado do arquivo JSON gerado.     
+    - Clique no menu **Credenciais**.
+    - Clique em **Criar credenciais**. 
+    - Clique em criar **ID do cliente do OAuth**.
+    - Selecione a opção **Outros**
+    - Defina um **nome** e clique em **criar**.
+    - Faça downloado do arquivo JSON relacionado com a credencial.     
 
 ##### CONSTRUÇÃO
 
