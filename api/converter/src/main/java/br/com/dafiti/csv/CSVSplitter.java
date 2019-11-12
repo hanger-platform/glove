@@ -97,9 +97,11 @@ public class CSVSplitter implements Runnable {
 
         try {
             if (splitStrategy.equalsIgnoreCase("FAST")) {
+                System.out.println("FAST splitting enabled");
                 this.fastSplit();
             } else {
                 this.secureSplit();
+                System.out.println("SECURE splitting enabled");
             }
 
             //Identify if should remove csv file. 
