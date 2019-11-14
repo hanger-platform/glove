@@ -517,6 +517,11 @@
       <to>INPUT_DATA_STATEMENT_ESCAPED</to>
       <enabled>Y</enabled>
     </hop>
+    <hop>
+      <from>Debug</from>
+      <to>Scape</to>
+      <enabled>N</enabled>
+    </hop>
   </order>
   <step>
     <name>INPUT_DATA_STATEMENT</name>
@@ -612,6 +617,7 @@
 
 INPUT_DATA_STATEMENT_SCAPED = INPUT_DATA_STATEMENT_SCAPED.replace(/"/g,'\\"');
 INPUT_DATA_STATEMENT_SCAPED = INPUT_DATA_STATEMENT_SCAPED.replace(/`/g,'\\`');
+INPUT_DATA_STATEMENT_SCAPED = INPUT_DATA_STATEMENT_SCAPED.replace(/"\$/g,'"\\$');
 </jsScript_script>
       </jsScript>
     </jsScripts>
@@ -636,6 +642,49 @@ INPUT_DATA_STATEMENT_SCAPED = INPUT_DATA_STATEMENT_SCAPED.replace(/`/g,'\\`');
     <GUI>
       <xloc>256</xloc>
       <yloc>32</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Debug</name>
+    <type>DataGrid</type>
+    <description />
+    <distribute>Y</distribute>
+    <custom_distribution />
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name />
+    </partitioning>
+    <fields>
+      <field>
+        <name>INPUT_DATA_STATEMENT</name>
+        <type>String</type>
+        <format />
+        <currency />
+        <decimal />
+        <group />
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+    </fields>
+    <data>
+      <line>
+        <item>select coalesce(split_part(regexp_extract("$path", '[^/]+$'),'-',1),'19000101')</item>
+      </line>
+    </data>
+    <attributes />
+    <cluster_schema />
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>256</xloc>
+      <yloc>160</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
