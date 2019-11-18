@@ -27,7 +27,6 @@ import br.com.dafiti.mitt.Mitt;
 import br.com.dafiti.mitt.cli.CommandLineInterface;
 import br.com.dafiti.mitt.exception.DuplicateEntityException;
 import br.com.dafiti.mitt.transformation.embedded.Concat;
-import br.com.dafiti.mitt.transformation.embedded.MD5;
 import br.com.dafiti.mitt.transformation.embedded.Now;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -71,7 +70,8 @@ public class GoogleSheets {
             GeneralSecurityException,
             IOException {
 
-        Logger.getLogger(GoogleSheets.class.getName()).info("Google Sheets API extration started.");
+        Logger.getLogger(GoogleSheets.class.getName())
+                .info("Google Sheets API extration started.");
 
         //Define the mitt.
         Mitt mitt = new Mitt();
@@ -86,7 +86,8 @@ public class GoogleSheets {
                 .addParameter("f", "field", "(Optional)fields to be extracted", "")
                 .addParameter("sh", "sheets", "(Optional)(Default consider all sheets) Identify the sheets to extract, divided by +")
                 .addParameter("d", "delimiter", "(Optional)(Default is ;) Identify the delimiter character", ";")
-                .addParameter("q", "quote", "(Optional)(Default is \") Identify the quote character", "\"");
+                .addParameter("q", "quote", "(Optional)(Default is \") Identify the quote character", "\"")
+                .addParameter("st", "sheet_title", "(Optional)(Default is false) Identify if sheet title will be a column", "false");
 
         //Read the command line interface. 
         CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -96,46 +97,80 @@ public class GoogleSheets {
 
         //Defines fields.
         mitt.getConfiguration()
-                .addCustomField("partition_field", new Concat((List) cli.getParameterAsList("partition", "\\+")))
-                .addCustomField("custom_primary_key", new MD5((List) cli.getParameterAsList("key", "\\+")))
-                .addCustomField("etl_load_date", new Now());
+                .addCustomField("partition_field",
+                        new Concat(
+                                (List) cli.getParameterAsList("partition", "\\+")))
+                .addCustomField("custom_primary_key",
+                        new Concat(
+                                (List) cli.getParameterAsList("key", "\\+")))
+                .addCustomField("etl_load_date", 
+                        new Now());
 
         //Identify if it is to consider just some fields.
         if (!cli.getParameterAsList("field", "\\+").isEmpty()) {
             mitt.getConfiguration()
                     .addField(cli.getParameterAsList("field", "\\+"));
+
+            //Identify if it is to consider sheet title as a column.
+            if (cli.getParameterAsBoolean("sheet_title")) {
+                mitt.getConfiguration()
+                        .addField("sheet_title");
+            }
         }
 
         //Build a new authorized API client service.
-        NetHttpTransport netHttpTransport = GoogleNetHttpTransport.newTrustedTransport();
+        NetHttpTransport netHttpTransport
+                = GoogleNetHttpTransport.newTrustedTransport();
 
         //Json instance.
         JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
 
         //Load client secrets.
-        GoogleClientSecrets googleClientSecrets = GoogleClientSecrets.load(jsonFactory, new InputStreamReader(new FileInputStream(cli.getParameter("credentials"))));
+        GoogleClientSecrets googleClientSecrets
+                = GoogleClientSecrets.load(
+                        jsonFactory,
+                        new InputStreamReader(
+                                new FileInputStream(
+                                        cli.getParameter("credentials"))));
 
         //Build flow and trigger user authorization request.
-        GoogleAuthorizationCodeFlow googleAuthorizationCodeFlow = new GoogleAuthorizationCodeFlow.Builder(netHttpTransport, jsonFactory, googleClientSecrets, Collections.singletonList(SheetsScopes.SPREADSHEETS))
-                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File("tokens")))
-                .setAccessType("offline")
-                .build();
+        GoogleAuthorizationCodeFlow googleAuthorizationCodeFlow
+                = new GoogleAuthorizationCodeFlow.Builder(
+                        netHttpTransport,
+                        jsonFactory,
+                        googleClientSecrets,
+                        Collections.singletonList(SheetsScopes.SPREADSHEETS))
+                        .setDataStoreFactory(
+                                new FileDataStoreFactory(
+                                        new java.io.File("tokens")))
+                        .setAccessType("offline")
+                        .build();
 
         //Instance of sheets service.
-        Sheets sheets = new Sheets.Builder(netHttpTransport, jsonFactory, new AuthorizationCodeInstalledApp(googleAuthorizationCodeFlow, new LocalServerReceiver()).authorize("user"))
+        Sheets sheets = new Sheets.Builder(
+                netHttpTransport,
+                jsonFactory,
+                new AuthorizationCodeInstalledApp(
+                        googleAuthorizationCodeFlow,
+                        new LocalServerReceiver()).authorize("user"))
                 .setApplicationName("Google Sheets API extractor")
                 .build();
 
-        //Get the spreadsheet object to get the google spreadsheet name
+        //Get the spreadsheet by its code.
         Spreadsheet spreadsheet = sheets
                 .spreadsheets()
                 .get(cli.getParameter("spreadsheet"))
                 .execute();
 
-        Logger.getLogger(GoogleSheets.class.getName()).log(Level.INFO, "Retrieving data from spreadsheet {0}", spreadsheet.getProperties().getTitle());
+        Logger.getLogger(GoogleSheets.class.getName())
+                .log(Level.INFO,
+                        "Retrieving data from spreadsheet {0}",
+                        spreadsheet.getProperties().getTitle());
 
         //Only one sheet header is considered.
-        boolean considerHeaderOnce = cli.getParameterAsList("field", "\\+").isEmpty();
+        boolean headerOnce = cli
+                .getParameterAsList("field", "\\+")
+                .isEmpty();
 
         //Identify if user want a specific sheet(s).
         List<String> parameterSheets = cli.getParameterAsList("sheets", "\\+");
@@ -144,10 +179,14 @@ public class GoogleSheets {
         for (Sheet sheet : spreadsheet.getSheets()) {
             final String sheetName = sheet.getProperties().getTitle();
 
-            //Identify if it considers all sheets or just some (passed by parameter).
-            if (parameterSheets.isEmpty() || parameterSheets.contains(sheetName)) {
+            //Identify if it considers all sheets or just some.
+            if (parameterSheets.isEmpty() || 
+                    parameterSheets.contains(sheetName)) {
 
-                Logger.getLogger(GoogleSheets.class.getName()).log(Level.INFO, "Retrieving data from sheet {0}", sheetName);
+                Logger.getLogger(GoogleSheets.class.getName())
+                        .log(Level.INFO,
+                                "Retrieving data from sheet {0}",
+                                sheetName);
 
                 ValueRange valueRange = sheets
                         .spreadsheets()
@@ -158,14 +197,25 @@ public class GoogleSheets {
                 //Get the data of each sheet in spreadsheet
                 List<List<Object>> values = valueRange.getValues();
 
-                if (considerHeaderOnce) {
+                if (headerOnce) {
                     mitt.getConfiguration().addField(values.get(0));
-                    considerHeaderOnce = false;
+
+                    //Identify it it is to consider sheet title as a column.
+                    if (cli.getParameterAsBoolean("sheet_title")) {
+                        mitt.getConfiguration()
+                                .addField("sheet_title");
+                    }
+
+                    headerOnce = false;
                 }
 
                 boolean skipFirst = true;
                 for (List<Object> value : values) {
                     if (!skipFirst) {
+                        //Identify it it is to consider sheet title as a column.
+                        if (cli.getParameterAsBoolean("sheet_title")) {
+                            value.add(sheetName);
+                        }
                         mitt.write(value);
                     }
                     skipFirst = false;
@@ -175,6 +225,7 @@ public class GoogleSheets {
 
         mitt.close();
 
-        Logger.getLogger(GoogleSheets.class.getName()).info("Google Sheets API extration finalized.");
+        Logger.getLogger(GoogleSheets.class.getName())
+                .info("Google Sheets API extration finalized.");
     }
 }
