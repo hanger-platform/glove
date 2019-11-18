@@ -87,7 +87,8 @@ public class GoogleSheets {
                 .addParameter("sh", "sheets", "(Optional)(Default consider all sheets) Identify the sheets to extract, divided by +")
                 .addParameter("d", "delimiter", "(Optional)(Default is ;) Identify the delimiter character", ";")
                 .addParameter("q", "quote", "(Optional)(Default is \") Identify the quote character", "\"")
-                .addParameter("st", "sheet_title", "(Optional)(Default is false) Identify if sheet title will be a column", "false");
+                .addParameter("st", "sheet_title", "(Optional)(Default is false) Identify if sheet title will be a column", "false")
+                .addParameter("sr", "skip_row", "(Optional)(Default is 0) Identify where the sheet header begins", "0");
 
         //Read the command line interface. 
         CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -103,7 +104,7 @@ public class GoogleSheets {
                 .addCustomField("custom_primary_key",
                         new Concat(
                                 (List) cli.getParameterAsList("key", "\\+")))
-                .addCustomField("etl_load_date", 
+                .addCustomField("etl_load_date",
                         new Now());
 
         //Identify if it is to consider just some fields.
@@ -180,8 +181,8 @@ public class GoogleSheets {
             final String sheetName = sheet.getProperties().getTitle();
 
             //Identify if it considers all sheets or just some.
-            if (parameterSheets.isEmpty() || 
-                    parameterSheets.contains(sheetName)) {
+            if (parameterSheets.isEmpty()
+                    || parameterSheets.contains(sheetName)) {
 
                 Logger.getLogger(GoogleSheets.class.getName())
                         .log(Level.INFO,
@@ -197,10 +198,13 @@ public class GoogleSheets {
                 //Get the data of each sheet in spreadsheet
                 List<List<Object>> values = valueRange.getValues();
 
-                if (headerOnce) {
-                    mitt.getConfiguration().addField(values.get(0));
+                //Identify where the header begins.
+                int skip = cli.getParameterAsInteger("skip_row");
 
-                    //Identify it it is to consider sheet title as a column.
+                if (headerOnce) {
+                    mitt.getConfiguration().addField(values.get(skip));
+
+                    //Identify it is to consider sheet title as column.
                     if (cli.getParameterAsBoolean("sheet_title")) {
                         mitt.getConfiguration()
                                 .addField("sheet_title");
@@ -210,15 +214,19 @@ public class GoogleSheets {
                 }
 
                 boolean skipFirst = true;
-                for (List<Object> value : values) {
-                    if (!skipFirst) {
-                        //Identify it it is to consider sheet title as a column.
-                        if (cli.getParameterAsBoolean("sheet_title")) {
-                            value.add(sheetName);
+                for (int index = 0; index < values.size(); index++) {
+
+                    //Identify how many rows will be skipped.
+                    if (index >= skip) {
+                        if (!skipFirst) {
+                            //Identify if is to consider sheet title as column.
+                            if (cli.getParameterAsBoolean("sheet_title")) {
+                                values.get(index).add(sheetName);
+                            }
+                            mitt.write(values.get(index));
                         }
-                        mitt.write(value);
+                        skipFirst = false;
                     }
-                    skipFirst = false;
                 }
             }
         }
