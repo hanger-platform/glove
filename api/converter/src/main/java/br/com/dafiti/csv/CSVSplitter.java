@@ -199,7 +199,7 @@ public class CSVSplitter implements Runnable {
         readerSettings.getFormat().setQuoteEscape(quoteEscape);
         readerSettings.setNullValue("");
         readerSettings.setMaxCharsPerColumn(-1);
-        readerSettings.setInputBufferSize(20 * (1024 * 1024));
+        readerSettings.setInputBufferSize(5 * (1024 * 1024));
 
         CsvParser csvParser = new CsvParser(readerSettings);
         csvParser.beginParsing(csvFile);

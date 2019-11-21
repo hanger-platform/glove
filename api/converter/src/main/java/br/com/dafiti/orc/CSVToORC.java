@@ -418,7 +418,7 @@ public class CSVToORC implements Runnable {
         parserSettings.getFormat().setQuoteEscape(quoteEscape);
 
         //Define the input buffer.        
-        parserSettings.setInputBufferSize(20 * (1024 * 1024));
+        parserSettings.setInputBufferSize(5 * (1024 * 1024));
 
         //Define a csv parser.
         CsvParser csvParser = new CsvParser(parserSettings);
