@@ -50,6 +50,8 @@ java -jar google-sheets.jar \
 	--field=<(Opcional) Identifica os campos das planilhas que serão extraídos, senão for informado extrairá todos os campos> \
 	--quote =<(Opcional) Identifica o separador, padrão é aspas> \
 	--delimiter =<(Opcional) Identifica o delimitador, padrão é vírgula>
+	--sheet_title=<(Opcional)(Padrão é não considerar) Identifica se nome da planilha vai ser uma coluna no arquivo de saída>
+	--skip_row=<(Opcional)(Padrão é 0) Identifica em qual linha o processo se iniciará>
 ```
 
 ## Contributing, Bugs, Questions
