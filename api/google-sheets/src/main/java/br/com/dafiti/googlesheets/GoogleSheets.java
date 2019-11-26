@@ -41,13 +41,15 @@ import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
-import com.google.api.services.sheets.v4.model.ValueRange;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -87,7 +89,6 @@ public class GoogleSheets {
                 .addParameter("sh", "sheets", "(Optional)(Default consider all sheets) Identify the sheets to extract, divided by +")
                 .addParameter("d", "delimiter", "(Optional)(Default is ;) Identify the delimiter character", ";")
                 .addParameter("q", "quote", "(Optional)(Default is \") Identify the quote character", "\"")
-                .addParameter("st", "sheet_title", "(Optional)(Default is false) Identify if sheet title will be a column", "false")
                 .addParameter("sr", "skip_row", "(Optional)(Default is 0) Identify where the sheet header begins", "0");
 
         //Read the command line interface. 
@@ -99,24 +100,19 @@ public class GoogleSheets {
         //Defines fields.
         mitt.getConfiguration()
                 .addCustomField("partition_field",
-                        new Concat(
-                                (List) cli.getParameterAsList("partition", "\\+")))
+                        new Concat((List) cli.getParameterAsList("partition", "\\+")))
                 .addCustomField("custom_primary_key",
-                        new Concat(
-                                (List) cli.getParameterAsList("key", "\\+")))
+                        new Concat((List) cli.getParameterAsList("key", "\\+")))
                 .addCustomField("etl_load_date",
                         new Now());
 
-        //Identify if it is to consider just some fields.
-        if (!cli.getParameterAsList("field", "\\+").isEmpty()) {
-            mitt.getConfiguration()
-                    .addField(cli.getParameterAsList("field", "\\+"));
+        //Identify the fields to extract data. 
+        List<String> fields = cli.getParameterAsList("field", "\\+");
 
-            //Identify if it is to consider sheet title as a column.
-            if (cli.getParameterAsBoolean("sheet_title")) {
-                mitt.getConfiguration()
-                        .addField("sheet_title");
-            }
+        //Identify if it is to consider just some fields.
+        if (!fields.isEmpty()) {
+            mitt.getConfiguration().addField(fields);
+            mitt.getConfiguration().addCustomField("sheet_title");
         }
 
         //Build a new authorized API client service.
@@ -169,61 +165,69 @@ public class GoogleSheets {
                         spreadsheet.getProperties().getTitle());
 
         //Only one sheet header is considered.
-        boolean headerOnce = cli
-                .getParameterAsList("field", "\\+")
-                .isEmpty();
+        boolean headerOnce = fields.isEmpty();
 
         //Identify if user want a specific sheet(s).
         List<String> parameterSheets = cli.getParameterAsList("sheets", "\\+");
 
         //Loop through each sheet.
         for (Sheet sheet : spreadsheet.getSheets()) {
+            Map<String, Integer> header = new HashMap();
             final String sheetName = sheet.getProperties().getTitle();
 
             //Identify if it considers all sheets or just some.
-            if (parameterSheets.isEmpty()
-                    || parameterSheets.contains(sheetName)) {
+            if (parameterSheets.isEmpty() || parameterSheets.contains(sheetName)) {
 
                 Logger.getLogger(GoogleSheets.class.getName())
                         .log(Level.INFO,
                                 "Retrieving data from sheet {0}",
                                 sheetName);
 
-                ValueRange valueRange = sheets
+                //Get the data of each sheet in spreadsheet
+                List<List<Object>> values = sheets
                         .spreadsheets()
                         .values()
                         .get(cli.getParameter("spreadsheet"), sheetName)
-                        .execute();
-
-                //Get the data of each sheet in spreadsheet
-                List<List<Object>> values = valueRange.getValues();
+                        .execute()
+                        .getValues();
 
                 //Identify where the header begins.
                 int skip = cli.getParameterAsInteger("skip_row");
 
                 if (headerOnce) {
                     mitt.getConfiguration().addField(values.get(skip));
-
-                    //Identify it is to consider sheet title as column.
-                    if (cli.getParameterAsBoolean("sheet_title")) {
-                        mitt.getConfiguration()
-                                .addField("sheet_title");
-                    }
-
+                    mitt.getConfiguration().addCustomField("sheet_title");
                     headerOnce = false;
                 }
 
                 boolean skipFirst = true;
                 for (int index = 0; index < values.size(); index++) {
-
-                    //Identify how many rows will be skipped.
+                    //Identify if shold skip lines.
                     if (index >= skip) {
                         if (!skipFirst) {
-                            //Identify if is to consider sheet title as column.
-                            if (cli.getParameterAsBoolean("sheet_title")) {
+                            //Identify if the field list was provided. 
+                            if (!fields.isEmpty()) {
+                                ArrayList<String> record = new ArrayList();
+
+                                for (String field : fields) {
+                                    if (header.containsKey(field)) {
+                                        record.add((String) values
+                                                .get(index)
+                                                .get(header.get(field)));
+                                    } else {
+                                        record.add("Unknown field " + field);
+                                    }
+                                }
+                                record.add(sheetName);
+                                mitt.write(record);
+                            } else {
                                 values.get(index).add(sheetName);
+                                mitt.write(values.get(index));
                             }
-                            mitt.write(values.get(index));
+                        } else {
+                            for (int i = 0; i < values.get(index).size(); i++) {
+                                header.put(String.valueOf(values.get(index).get(i)), i);
+                            }
                         }
                         skipFirst = false;
                     }
