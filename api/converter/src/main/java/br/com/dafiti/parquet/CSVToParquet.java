@@ -338,7 +338,7 @@ public class CSVToParquet implements Runnable {
                             //Write date into parquet file.
                             parquetWriter.write(row);
                         } else {
-                            statistics.incrementDuplicatedRows();
+                            statistics.incrementOutputUpdatedRows();
                         }
 
                         //Identify the record being processed.
