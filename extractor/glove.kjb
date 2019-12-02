@@ -263,7 +263,7 @@
     </parameter>
     <parameter>
       <name>QUOTE</name>
-      <default_value>ADDQUOTES</default_value>
+      <default_value>1</default_value>
       <description>Identifica se o unload de dados do Redshift devem conter aspas duplas</description>
     </parameter>
     <parameter>

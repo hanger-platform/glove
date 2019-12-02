@@ -361,7 +361,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>64</xloc>
-      <yloc>64</yloc>
+      <yloc>192</yloc>
       <attributes_kjc />
     </entry>
     <entry>
@@ -372,8 +372,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>560</xloc>
-      <yloc>64</yloc>
+      <xloc>720</xloc>
+      <yloc>304</yloc>
       <attributes_kjc />
     </entry>
     <entry>
@@ -385,8 +385,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>320</xloc>
-      <yloc>176</yloc>
+      <xloc>480</xloc>
+      <yloc>416</yloc>
       <attributes_kjc />
     </entry>
     <entry>
@@ -412,8 +412,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>176</xloc>
-      <yloc>64</yloc>
+      <xloc>192</xloc>
+      <yloc>192</yloc>
       <attributes_kjc />
     </entry>
     <entry>
@@ -429,7 +429,7 @@
 		DELIMITER ';'
 		NULL AS ''
 		ESCAPE
-		${QUOTE}
+		${ADDQUOTES}
 		GZIP
 		ALLOWOVERWRITE
 		PARALLEL ON;
@@ -442,8 +442,8 @@ END; </sql>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>320</xloc>
-      <yloc>64</yloc>
+      <xloc>480</xloc>
+      <yloc>304</yloc>
       <attributes_kjc />
     </entry>
     <entry>
@@ -517,8 +517,76 @@ aws s3 rm s3://${STORAGE_BUCKET}/unload/${SCHEMA_NAME}/${TABLE_NAME}/ --recursiv
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>448</xloc>
-      <yloc>64</yloc>
+      <xloc>608</xloc>
+      <yloc>304</yloc>
+      <attributes_kjc />
+    </entry>
+    <entry>
+      <name>Unload with quotes</name>
+      <description />
+      <type>SIMPLE_EVAL</type>
+      <attributes />
+      <valuetype>variable</valuetype>
+      <fieldname />
+      <variablename>${QUOTE}</variablename>
+      <fieldtype>number</fieldtype>
+      <mask />
+      <comparevalue>1</comparevalue>
+      <minvalue />
+      <maxvalue />
+      <successcondition>equal</successcondition>
+      <successnumbercondition>equal</successnumbercondition>
+      <successbooleancondition>false</successbooleancondition>
+      <successwhenvarset>N</successwhenvarset>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>320</xloc>
+      <yloc>192</yloc>
+      <attributes_kjc />
+    </entry>
+    <entry>
+      <name>No ADDQUOTES</name>
+      <description />
+      <type>SET_VARIABLES</type>
+      <attributes />
+      <replacevars>Y</replacevars>
+      <filename />
+      <file_variable_type>JVM</file_variable_type>
+      <fields>
+        <field>
+          <variable_name>ADDQUOTES</variable_name>
+          <variable_value />
+          <variable_type>ROOT_JOB</variable_type>
+        </field>
+      </fields>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>320</xloc>
+      <yloc>304</yloc>
+      <attributes_kjc />
+    </entry>
+    <entry>
+      <name>ADDQUOTES</name>
+      <description />
+      <type>SET_VARIABLES</type>
+      <attributes />
+      <replacevars>Y</replacevars>
+      <filename />
+      <file_variable_type>JVM</file_variable_type>
+      <fields>
+        <field>
+          <variable_name>ADDQUOTES</variable_name>
+          <variable_value>ADDQUOTES</variable_value>
+          <variable_type>ROOT_JOB</variable_type>
+        </field>
+      </fields>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>480</xloc>
+      <yloc>192</yloc>
       <attributes_kjc />
     </entry>
   </entries>
@@ -531,15 +599,6 @@ aws s3 rm s3://${STORAGE_BUCKET}/unload/${SCHEMA_NAME}/${TABLE_NAME}/ --recursiv
       <enabled>Y</enabled>
       <evaluation>Y</evaluation>
       <unconditional>Y</unconditional>
-    </hop>
-    <hop>
-      <from>Set defaults</from>
-      <to>Unload from Redshift</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
     </hop>
     <hop>
       <from>Unload from Redshift</from>
@@ -562,6 +621,51 @@ aws s3 rm s3://${STORAGE_BUCKET}/unload/${SCHEMA_NAME}/${TABLE_NAME}/ --recursiv
     <hop>
       <from>Unload from Redshift</from>
       <to>Extract data</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Set defaults</from>
+      <to>Unload with quotes</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Unload with quotes</from>
+      <to>ADDQUOTES</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Unload with quotes</from>
+      <to>No ADDQUOTES</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>No ADDQUOTES</from>
+      <to>Unload from Redshift</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>ADDQUOTES</from>
+      <to>Unload from Redshift</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
