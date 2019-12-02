@@ -522,7 +522,7 @@ aws s3 rm s3://${STORAGE_BUCKET}/unload/${SCHEMA_NAME}/${TABLE_NAME}/ --recursiv
       <attributes_kjc />
     </entry>
     <entry>
-      <name>Unload with quotes</name>
+      <name>Unload with quotes?</name>
       <description />
       <type>SIMPLE_EVAL</type>
       <attributes />
@@ -546,7 +546,7 @@ aws s3 rm s3://${STORAGE_BUCKET}/unload/${SCHEMA_NAME}/${TABLE_NAME}/ --recursiv
       <attributes_kjc />
     </entry>
     <entry>
-      <name>No ADDQUOTES</name>
+      <name>Without quotes</name>
       <description />
       <type>SET_VARIABLES</type>
       <attributes />
@@ -568,7 +568,7 @@ aws s3 rm s3://${STORAGE_BUCKET}/unload/${SCHEMA_NAME}/${TABLE_NAME}/ --recursiv
       <attributes_kjc />
     </entry>
     <entry>
-      <name>ADDQUOTES</name>
+      <name>With quotes</name>
       <description />
       <type>SET_VARIABLES</type>
       <attributes />
@@ -629,7 +629,7 @@ aws s3 rm s3://${STORAGE_BUCKET}/unload/${SCHEMA_NAME}/${TABLE_NAME}/ --recursiv
     </hop>
     <hop>
       <from>Set defaults</from>
-      <to>Unload with quotes</to>
+      <to>Unload with quotes?</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -637,8 +637,8 @@ aws s3 rm s3://${STORAGE_BUCKET}/unload/${SCHEMA_NAME}/${TABLE_NAME}/ --recursiv
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>Unload with quotes</from>
-      <to>ADDQUOTES</to>
+      <from>Unload with quotes?</from>
+      <to>With quotes</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -646,8 +646,8 @@ aws s3 rm s3://${STORAGE_BUCKET}/unload/${SCHEMA_NAME}/${TABLE_NAME}/ --recursiv
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>Unload with quotes</from>
-      <to>No ADDQUOTES</to>
+      <from>Unload with quotes?</from>
+      <to>Without quotes</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -655,7 +655,7 @@ aws s3 rm s3://${STORAGE_BUCKET}/unload/${SCHEMA_NAME}/${TABLE_NAME}/ --recursiv
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>No ADDQUOTES</from>
+      <from>Without quotes</from>
       <to>Unload from Redshift</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
@@ -664,7 +664,7 @@ aws s3 rm s3://${STORAGE_BUCKET}/unload/${SCHEMA_NAME}/${TABLE_NAME}/ --recursiv
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>ADDQUOTES</from>
+      <from>With quotes</from>
       <to>Unload from Redshift</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
