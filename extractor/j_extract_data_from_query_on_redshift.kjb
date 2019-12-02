@@ -557,7 +557,7 @@ aws s3 rm s3://${STORAGE_BUCKET}/unload/${SCHEMA_NAME}/${TABLE_NAME}/ --recursiv
         <field>
           <variable_name>ADDQUOTES</variable_name>
           <variable_value>XX</variable_value>
-          <variable_type>ROOT_JOB</variable_type>
+          <variable_type>CURRENT_JOB</variable_type>
         </field>
       </fields>
       <parallel>N</parallel>
@@ -579,7 +579,7 @@ aws s3 rm s3://${STORAGE_BUCKET}/unload/${SCHEMA_NAME}/${TABLE_NAME}/ --recursiv
         <field>
           <variable_name>ADDQUOTES</variable_name>
           <variable_value>ADDQUOTES</variable_value>
-          <variable_type>ROOT_JOB</variable_type>
+          <variable_type>CURRENT_JOB</variable_type>
         </field>
       </fields>
       <parallel>N</parallel>
