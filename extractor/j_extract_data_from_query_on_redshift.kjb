@@ -501,7 +501,6 @@ do
 			mv ${i}	${RAWFILE_QUEUE_PATH}${SCHEMA_NAME}_${TABLE}_${FILE_INDEX}.csv
 			error_check
 		else
-			echo "Removing data file header!"
 			sed '1d' ${i} >> ${RAWFILE_QUEUE_FILE}	
 			error_check	
 		fi
