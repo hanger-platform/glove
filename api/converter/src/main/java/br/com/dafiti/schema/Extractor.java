@@ -251,7 +251,7 @@ public class Extractor implements Runnable {
                     }
 
                     //Identify the field type and size based on the number of ocurrences of each data type.
-                    if ((nullField > 1 && stringField == 0 && integerField == 0 && doubleField == 0)) {
+                    if ((nullField > 0 && stringField == 0 && integerField == 0 && doubleField == 0)) {
                         fieldMetadata.add("{\"field\":\"" + field + "\",\"type\":\"string\",\"length\":255}");
 
                         switch (dialect) {
