@@ -159,6 +159,7 @@ bash kitchen.sh -file=<GLOVE_HOME>/extractor/glove.kjb \
 |            | FILE_INPUT_DELIMITER | Identifica o delimitador do arquivo de origem.                                    |
 |            | FILE_OUTPUT_SCHEMA   | Identifica o schema de destino.                                                   |
 |            | FILE_OUTPUT_TABLE    | Identifica a tabela de destino.                                                   |
+|            | FILE_INPUT_PARTITONED| Identifica se o arquivo é particionado.                                                 |
 |            | TARGET               | Identifica a tecnologia de destino.                                               |
 |            | DATASET_NAME         | Identifica o dataset de destino.                                                  |
 |            | STORAGE_BUCKET       | Identifica o bucket do storage que será utilizado para transferência de arquivos. |
