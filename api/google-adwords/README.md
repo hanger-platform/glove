@@ -1,5 +1,5 @@
-# Google Analytics Extractor [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-### Extrator de dados armazenados em servidores SFTP 
+# Google Adwords Extractor [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+### Extrator de dados da api do Google Adwords 
 
 ## How it works
 
@@ -39,7 +39,7 @@ api.adwords.isPartialFailure=false
 ## Utilização
 
 ```bash
-java -jar google-analytics.jar  \
+java -jar google-adwords.jar  \
 	--credentials=<Credentials file>  \
 	--type=<Adwords report type> 
 	--field=<Report fields>
