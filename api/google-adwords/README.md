@@ -23,7 +23,7 @@ Utilizando o [Maven](https://maven.apache.org/):
 
 ##### CONFIGURAÇÂO
 
-* Se você não possui um client ID e secret para o Adwords, crie um projeto no console do desenvolvedor. Consulte o link a seguir para obter mais informações:: https://github.com/googleads/googleads-java-lib/wiki/Using-OAuth2.0
+* Se você não possui um client ID e secret para o Adwords, crie um projeto no console do desenvolvedor. Consulte o link a seguir para obter mais informações:: https://github.com/googleads/googleads-java-lib/wiki/API-access-using-own-credentials-(installed-application-flow)
 
 * Crie um arquivo com as seguintes informações sobre seu acesso ao serviço, este será o seu **credentials file**:
 
