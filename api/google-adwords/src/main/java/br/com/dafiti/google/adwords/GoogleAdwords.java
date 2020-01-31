@@ -31,7 +31,6 @@ import br.com.dafiti.mitt.Mitt;
 import br.com.dafiti.mitt.cli.CommandLineInterface;
 import br.com.dafiti.mitt.exception.DuplicateEntityException;
 import br.com.dafiti.mitt.transformation.embedded.Concat;
-import br.com.dafiti.mitt.transformation.embedded.Fixed;
 import br.com.dafiti.mitt.transformation.embedded.Now;
 import com.google.api.ads.adwords.axis.factory.AdWordsServices;
 import com.google.api.ads.adwords.axis.utils.v201809.SelectorBuilder;
@@ -65,6 +64,9 @@ import com.google.common.io.Files;
 import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -84,7 +86,7 @@ public class GoogleAdwords {
         Mitt mitt = new Mitt();
 
         try {
-            Logger.getLogger(GoogleAdwords.class.getName()).log(Level.INFO, "GLOVE - Google Adwords Extractor started");
+            Logger.getLogger(GoogleAdwords.class.getName()).log(Level.INFO, "GLOVE - Google Adwords (v201809) Extractor started");
 
             //Defines parameters.
             mitt.getConfiguration()
@@ -112,8 +114,6 @@ public class GoogleAdwords {
                     .addCustomField("partition_field", new Concat((List) cli.getParameterAsList("partition", "\\+")))
                     .addCustomField("custom_primary_key", new Concat((List) cli.getParameterAsList("key", "\\+")))
                     .addCustomField("etl_load_date", new Now())
-                    .addCustomField("start_date", new Fixed(cli.getParameter("start_date")))
-                    .addCustomField("end_date", new Fixed(cli.getParameter("end_date")))
                     .addField(cli.getParameterAsList("field", "\\+"));
 
             //Generates a refreshable OAuth2 credential.
@@ -131,109 +131,120 @@ public class GoogleAdwords {
 
             AdWordsServicesInterface adWordsServicesInterface = AdWordsServices.getInstance();
 
-            //Defines report date range.
-            DateRange dateRange = new DateRange();
-            dateRange.setMin(cli.getParameter("start_date"));
-            dateRange.setMax(cli.getParameter("end_date"));
-
-            //Defines report selector.
-            Selector selector = new Selector();
-            selector.getFields().addAll(cli.getParameterAsList("field", "\\+"));
-            selector.setDateRange(dateRange);
-
-            //Defines report definition.
-            ReportDefinition reportDefinition = new ReportDefinition();
-            reportDefinition.setReportName(cli.getParameter("type"));
-            reportDefinition.setDateRangeType(ReportDefinitionDateRangeType.CUSTOM_DATE);
-            reportDefinition.setReportType(ReportDefinitionReportType.valueOf(cli.getParameter("type").toUpperCase()));
-            reportDefinition.setDownloadFormat(DownloadFormat.CSV);
-            reportDefinition.setSelector(selector);
-
-            //Defines report configuration.
-            ReportingConfiguration reportingConfiguration = new ReportingConfiguration.Builder()
-                    .skipReportHeader(true)
-                    .skipColumnHeader(true)
-                    .skipReportSummary(true)
-                    .includeZeroImpressions(cli.getParameterAsBoolean("zero_impression"))
-                    .build();
-
-            //Create a thread pool for submitting report requests.
-            int maxElapsedSecondsPerCustomer = 60 * 5;
-            ExecutorService threadPool = Executors.newFixedThreadPool(cli.getParameterAsInteger("threads"));
-            ExponentialBackOff.Builder backOffBuilder = new ExponentialBackOff.Builder().setMaxElapsedTimeMillis(maxElapsedSecondsPerCustomer * 1000);
-            List<ReportDownloader> reportDownloadFutureTasks = new ArrayList<>();
-
             //Defines the output path. 
             File outputPath = Files.createTempDir();
             outputPath.mkdirs();
 
-            //Retrieve all accounts under the manager account.
-            List<String> customers = cli.getParameterAsList("customer", "\\+");
+            LocalDate startDate = LocalDate.parse(cli.getParameter("start_date"), DateTimeFormatter.ofPattern("yyyyMMdd"));
+            LocalDate endDate = LocalDate.parse(cli.getParameter("end_date"), DateTimeFormatter.ofPattern("yyyyMMdd"));
+            long daysBetween = ChronoUnit.DAYS.between(startDate, endDate);
 
-            if (customers.isEmpty()) {
-                int offset = 0;
-                ManagedCustomerPage managedCustomerPage;
-                ManagedCustomerServiceInterface managedCustomerService = adWordsServicesInterface.get(session, ManagedCustomerServiceInterface.class);
+            //Extract the report for each date.
+            for (int i = 0; i <= daysBetween; i++) {
+                String date = startDate.plusDays(i).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
-                SelectorBuilder selectorBuilder = new SelectorBuilder()
-                        .fields(ManagedCustomerField.CustomerId)
-                        .equals(ManagedCustomerField.CanManageClients, "false")
-                        .limit(cli.getParameterAsInteger("page_size"))
-                        .offset(0);
+                Logger.getLogger(GoogleAdwords.class.getName()).log(Level.INFO, "GLOVE - Downloading reports of {0}", date);
 
-                do {
-                    selectorBuilder.offset(offset);
-                    managedCustomerPage = managedCustomerService.get(selectorBuilder.build());
+                //Defines report date range.
+                DateRange dateRange = new DateRange();
+                dateRange.setMin(date);
+                dateRange.setMax(date);
 
-                    if (managedCustomerPage.getEntries() != null) {
-                        for (ManagedCustomer managedCustomer : managedCustomerPage.getEntries()) {
-                            customers.add(managedCustomer.getCustomerId().toString());
+                //Defines report selector.
+                Selector selector = new Selector();
+                selector.getFields().addAll(mitt.getConfiguration().getOriginalFieldsName());
+                selector.setDateRange(dateRange);
+
+                //Defines report definition.
+                ReportDefinition reportDefinition = new ReportDefinition();
+                reportDefinition.setReportName(cli.getParameter("type"));
+                reportDefinition.setDateRangeType(ReportDefinitionDateRangeType.CUSTOM_DATE);
+                reportDefinition.setReportType(ReportDefinitionReportType.valueOf(cli.getParameter("type").toUpperCase()));
+                reportDefinition.setDownloadFormat(DownloadFormat.CSV);
+                reportDefinition.setSelector(selector);
+
+                //Defines report configuration.
+                ReportingConfiguration reportingConfiguration = new ReportingConfiguration.Builder()
+                        .skipReportHeader(true)
+                        .skipColumnHeader(true)
+                        .skipReportSummary(true)
+                        .includeZeroImpressions(cli.getParameterAsBoolean("zero_impression"))
+                        .build();
+
+                //Create a thread pool for submitting report requests.
+                int maxElapsedSecondsPerCustomer = 60 * 5;
+                ExecutorService threadPool = Executors.newFixedThreadPool(cli.getParameterAsInteger("threads"));
+                ExponentialBackOff.Builder backOffBuilder = new ExponentialBackOff.Builder().setMaxElapsedTimeMillis(maxElapsedSecondsPerCustomer * 1000);
+                List<ReportDownloader> reportDownloadFutureTasks = new ArrayList<>();
+
+                //Retrieve all accounts under the manager account.
+                List<String> customers = cli.getParameterAsList("customer", "\\+");
+
+                if (customers.isEmpty()) {
+                    int offset = 0;
+                    ManagedCustomerPage managedCustomerPage;
+                    ManagedCustomerServiceInterface managedCustomerService = adWordsServicesInterface.get(session, ManagedCustomerServiceInterface.class);
+
+                    SelectorBuilder selectorBuilder = new SelectorBuilder()
+                            .fields(ManagedCustomerField.CustomerId)
+                            .equals(ManagedCustomerField.CanManageClients, "false")
+                            .limit(cli.getParameterAsInteger("page_size"))
+                            .offset(0);
+
+                    do {
+                        selectorBuilder.offset(offset);
+                        managedCustomerPage = managedCustomerService.get(selectorBuilder.build());
+
+                        if (managedCustomerPage.getEntries() != null) {
+                            for (ManagedCustomer managedCustomer : managedCustomerPage.getEntries()) {
+                                customers.add(managedCustomer.getCustomerId().toString());
+                            }
                         }
-                    }
 
-                    offset += cli.getParameterAsInteger("page_size");
-                } while (offset < managedCustomerPage.getTotalNumEntries());
-            }
-
-            //Dowload report for each customer. 
-            for (String customer : customers) {
-                File outputFile = new File(outputPath, customer + ".csv");
-
-                ImmutableAdWordsSession sessionForCustomer = session
-                        .newBuilder()
-                        .withClientCustomerId(customer)
-                        .withReportingConfiguration(reportingConfiguration)
-                        .buildImmutable();
-
-                ReportDownloader reportDownloadFutureTask = new ReportDownloader(
-                        new ReportDownloaderCallable(
-                                sessionForCustomer,
-                                adWordsServicesInterface,
-                                reportDefinition,
-                                outputFile,
-                                backOffBuilder.build()));
-
-                threadPool.execute(reportDownloadFutureTask);
-                reportDownloadFutureTasks.add(reportDownloadFutureTask);
-            }
-
-            threadPool.shutdown();
-            threadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-
-            //Identifies if all reports was downloaded successfully. 
-            reportDownloadFutureTasks.forEach((reportDownloadFutureTask) -> {
-                String clientCustomerId = reportDownloadFutureTask.getClientCustomerId();
-
-                try {
-                    reportDownloadFutureTask.get();
-                } catch (CancellationException
-                        | InterruptedException
-                        | ExecutionException ex) {
-
-                    Logger.getLogger(GoogleAdwords.class.getName()).log(Level.SEVERE, "Google Adwords Reporting failed for customer " + clientCustomerId, ex);
-                    System.exit(1);
+                        offset += cli.getParameterAsInteger("page_size");
+                    } while (offset < managedCustomerPage.getTotalNumEntries());
                 }
-            });
+
+                //Dowload report for each customer. 
+                for (String customer : customers) {
+                    File outputFile = new File(outputPath, customer + "_" + date + ".csv");
+
+                    ImmutableAdWordsSession sessionForCustomer = session
+                            .newBuilder()
+                            .withClientCustomerId(customer)
+                            .withReportingConfiguration(reportingConfiguration)
+                            .buildImmutable();
+
+                    ReportDownloader reportDownloadFutureTask = new ReportDownloader(
+                            new ReportDownloaderCallable(
+                                    sessionForCustomer,
+                                    adWordsServicesInterface,
+                                    reportDefinition,
+                                    outputFile,
+                                    backOffBuilder.build()));
+
+                    threadPool.execute(reportDownloadFutureTask);
+                    reportDownloadFutureTasks.add(reportDownloadFutureTask);
+                }
+
+                threadPool.shutdown();
+                threadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+
+                //Identifies if all reports was downloaded successfully. 
+                reportDownloadFutureTasks.forEach((reportDownloadFutureTask) -> {
+                    String clientCustomerId = reportDownloadFutureTask.getClientCustomerId();
+
+                    try {
+                        reportDownloadFutureTask.get();
+                    } catch (CancellationException
+                            | InterruptedException
+                            | ExecutionException ex) {
+
+                        Logger.getLogger(GoogleAdwords.class.getName()).log(Level.SEVERE, "Google Adwords Reporting failed for customer " + clientCustomerId, ex);
+                        System.exit(1);
+                    }
+                });
+            }
 
             //Writes all source files to a single target file.
             mitt.write(outputPath, "*.csv", ',', mitt.getConfiguration().getOriginalFieldsName());
