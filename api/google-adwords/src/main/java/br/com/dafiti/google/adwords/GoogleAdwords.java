@@ -97,6 +97,7 @@ public class GoogleAdwords {
                     .addParameter("e", "end_date", "End date", "", true, false)
                     .addParameter("o", "output", "Output file", "", true, false)
                     .addParameter("u", "customer", "(Optional) Customer IDs, divided by + if has more than one", "")
+                    .addParameter("m", "manager", "(Optional) Manager account ID", "")
                     .addParameter("w", "zero_impression", "(Optional) Include Zero Impressions. false as default", "false")
                     .addParameter("t", "threads", "(Optional)  Number customer reports being generated in parallel. 5 as default", "5")
                     .addParameter("z", "page_size", "(Optional)  Page size. 500 as default", "500")
@@ -122,12 +123,6 @@ public class GoogleAdwords {
                     .fromFile(cli.getParameter("credentials"))
                     .build()
                     .generateCredential();
-
-            //Construct an ImmutableAdWordsSession to use as a prototype when creating a session for each managed customer.
-            ImmutableAdWordsSession session = new AdWordsSession.Builder()
-                    .fromFile(cli.getParameter("credentials"))
-                    .withOAuth2Credential(credential)
-                    .buildImmutable();
 
             AdWordsServicesInterface adWordsServicesInterface = AdWordsServices.getInstance();
 
@@ -177,13 +172,25 @@ public class GoogleAdwords {
                 ExponentialBackOff.Builder backOffBuilder = new ExponentialBackOff.Builder().setMaxElapsedTimeMillis(maxElapsedSecondsPerCustomer * 1000);
                 List<ReportDownloader> reportDownloadFutureTasks = new ArrayList<>();
 
-                //Retrieve all accounts under the manager account.
+                //Retrieves all accounts under the manager account.
                 List<String> customers = cli.getParameterAsList("customer", "\\+");
 
+                //Defines a session. 
+                ImmutableAdWordsSession session = null;
+
+                //Identifies if a manager account was provided. 
                 if (customers.isEmpty()) {
                     int offset = 0;
                     ManagedCustomerPage managedCustomerPage;
-                    ManagedCustomerServiceInterface managedCustomerService = adWordsServicesInterface.get(session, ManagedCustomerServiceInterface.class);
+
+                    session = new AdWordsSession.Builder()
+                            .fromFile(cli.getParameter("credentials"))
+                            .withOAuth2Credential(credential)
+                            .withClientCustomerId(cli.getParameter("manager"))
+                            .buildImmutable();
+
+                    ManagedCustomerServiceInterface managedCustomerService = adWordsServicesInterface
+                            .get(session, ManagedCustomerServiceInterface.class);
 
                     SelectorBuilder selectorBuilder = new SelectorBuilder()
                             .fields(ManagedCustomerField.CustomerId)
