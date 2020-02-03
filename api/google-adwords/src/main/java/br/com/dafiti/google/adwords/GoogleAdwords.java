@@ -96,8 +96,8 @@ public class GoogleAdwords {
                     .addParameter("s", "start_date", "Start date", "", true, false)
                     .addParameter("e", "end_date", "End date", "", true, false)
                     .addParameter("o", "output", "Output file", "", true, false)
+                    .addParameter("m", "manager", "Manager account ID", "")
                     .addParameter("u", "customer", "(Optional) Customer IDs, divided by + if has more than one", "")
-                    .addParameter("m", "manager", "(Optional) Manager account ID", "")
                     .addParameter("w", "zero_impression", "(Optional) Include Zero Impressions. false as default", "false")
                     .addParameter("t", "threads", "(Optional)  Number customer reports being generated in parallel. 5 as default", "5")
                     .addParameter("z", "page_size", "(Optional)  Page size. 500 as default", "500")
@@ -123,6 +123,25 @@ public class GoogleAdwords {
                     .fromFile(cli.getParameter("credentials"))
                     .build()
                     .generateCredential();
+
+            //Identifies if a manager account was provided. 
+            String manager = cli.getParameter("manager");
+
+            //Construct an ImmutableAdWordsSession to use as a prototype when creating a session for each managed customer.
+            ImmutableAdWordsSession session;
+
+            if (manager == null) {
+                session = new AdWordsSession.Builder()
+                        .fromFile(cli.getParameter("credentials"))
+                        .withOAuth2Credential(credential)
+                        .buildImmutable();
+            } else {
+                session = new AdWordsSession.Builder()
+                        .fromFile(cli.getParameter("credentials"))
+                        .withOAuth2Credential(credential)
+                        .withClientCustomerId(cli.getParameter("manager"))
+                        .buildImmutable();
+            }
 
             AdWordsServicesInterface adWordsServicesInterface = AdWordsServices.getInstance();
 
@@ -167,30 +186,16 @@ public class GoogleAdwords {
                         .build();
 
                 //Create a thread pool for submitting report requests.
-                int maxElapsedSecondsPerCustomer = 60 * 5;
                 ExecutorService threadPool = Executors.newFixedThreadPool(cli.getParameterAsInteger("threads"));
-                ExponentialBackOff.Builder backOffBuilder = new ExponentialBackOff.Builder().setMaxElapsedTimeMillis(maxElapsedSecondsPerCustomer * 1000);
+                ExponentialBackOff.Builder backOffBuilder = new ExponentialBackOff.Builder().setMaxElapsedTimeMillis(60 * 5 * 1000);
                 List<ReportDownloader> reportDownloadFutureTasks = new ArrayList<>();
+                List<String> customers = new ArrayList();
 
-                //Retrieves all accounts under the manager account.
-                List<String> customers = cli.getParameterAsList("customer", "\\+");
-
-                //Defines a session. 
-                ImmutableAdWordsSession session = null;
-
-                //Identifies if a manager account was provided. 
-                if (customers.isEmpty()) {
+                //Retrieve all accounts under the manager account.
+                if (manager != null) {
                     int offset = 0;
                     ManagedCustomerPage managedCustomerPage;
-
-                    session = new AdWordsSession.Builder()
-                            .fromFile(cli.getParameter("credentials"))
-                            .withOAuth2Credential(credential)
-                            .withClientCustomerId(cli.getParameter("manager"))
-                            .buildImmutable();
-
-                    ManagedCustomerServiceInterface managedCustomerService = adWordsServicesInterface
-                            .get(session, ManagedCustomerServiceInterface.class);
+                    ManagedCustomerServiceInterface managedCustomerService = adWordsServicesInterface.get(session, ManagedCustomerServiceInterface.class);
 
                     SelectorBuilder selectorBuilder = new SelectorBuilder()
                             .fields(ManagedCustomerField.CustomerId)
@@ -210,6 +215,8 @@ public class GoogleAdwords {
 
                         offset += cli.getParameterAsInteger("page_size");
                     } while (offset < managedCustomerPage.getTotalNumEntries());
+                } else {
+                    customers = cli.getParameterAsList("customer", "\\+");
                 }
 
                 //Dowload report for each customer. 
