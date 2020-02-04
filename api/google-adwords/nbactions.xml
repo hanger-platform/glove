@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.google.adwords.GoogleAdwords --credentials="/home/valdiney/ads.properties" --type="CAMPAIGN_PERFORMANCE_REPORT" --field="Date+CampaignId+CampaignName+Impressions+Clicks+Cost::Eval(Cost/1000000)+ConversionValue+Conversions+ConversionRate+CampaignStatus" --start_date="20190901" --end_date="20190901" --output="/tmp/adwords.csv" --customer=6753656993</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.google.adwords.GoogleAdwords --credentials="/home/valdiney/ads.properties" --type="SHOPPING_PERFORMANCE_REPORT" --field="AccountDescriptiveName+AdGroupId+AdGroupName+AllConversions+AllConversionValue+Brand+CampaignId+CampaignName+CategoryL1+CategoryL2+CategoryL3+CategoryL4+CategoryL5+Clicks+Conversions+ConversionValue+Cost+CustomAttribute0+CustomAttribute1+CustomAttribute2+CustomAttribute3+CustomAttribute4+Date+Device+ExternalCustomerId+Impressions+OfferId+ProductTypeL1+ProductTypeL2+ProductTypeL3+ProductTypeL4+ProductTypeL5+SearchClickShare+SearchImpressionShare::Eval(SearchImpressionShare.replace('--', ''))" --start_date="20200201" --end_date="20200201" --output="/tmp/adwords.csv" --manager=7626550557</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.google.adwords.GoogleAdwords --credentials="/home/valdiney/ads.properties" --type="CAMPAIGN_PERFORMANCE_REPORT" --field="Date+CampaignId+CampaignName+Impressions+Clicks+Cost::Eval(Cost/1000000)+ConversionValue+Conversions+ConversionRate+CampaignStatus" --start_date="20190901" --end_date="20190901" --output="/tmp/adwords.csv" --customer=6753656993</exec.args>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.google.adwords.GoogleAdwords --credentials="/home/valdiney/ads.properties" --type="SHOPPING_PERFORMANCE_REPORT" --field="AccountDescriptiveName+AdGroupId+AdGroupName+AllConversions+AllConversionValue+Brand+CampaignId+CampaignName+CategoryL1+CategoryL2+CategoryL3+CategoryL4+CategoryL5+Clicks+Conversions+ConversionValue+Cost+CustomAttribute0+CustomAttribute1+CustomAttribute2+CustomAttribute3+CustomAttribute4+Date+Device+ExternalCustomerId+Impressions+OfferId+ProductTypeL1+ProductTypeL2+ProductTypeL3+ProductTypeL4+ProductTypeL5+SearchClickShare+SearchImpressionShare::Eval(SearchImpressionShare.replace('--', ''))" --start_date="20200201" --end_date="20200201" --output="/tmp/adwords.csv" --manager=7626550557</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.google.adwords.GoogleAdwords --credentials="/home/valdiney/ads.properties" --type="CAMPAIGN_PERFORMANCE_REPORT" --field="Date+CampaignId+CampaignName+Impressions+Clicks+Cost::Eval(Cost/1000000)+ConversionValue+Conversions+ConversionRate+CampaignStatus" --start_date="20190901" --end_date="20190901" --output="/tmp/adwords.csv" --customer=6753656993</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.google.adwords.GoogleAdwords --credentials="/home/valdiney/ads.properties" --type="SHOPPING_PERFORMANCE_REPORT" --field="AccountDescriptiveName+AdGroupId+AdGroupName+AllConversions+AllConversionValue+Brand+CampaignId+CampaignName+CategoryL1+CategoryL2+CategoryL3+CategoryL4+CategoryL5+Clicks+Conversions+ConversionValue+Cost+CustomAttribute0+CustomAttribute1+CustomAttribute2+CustomAttribute3+CustomAttribute4+Date+Device+ExternalCustomerId+Impressions+OfferId+ProductTypeL1+ProductTypeL2+ProductTypeL3+ProductTypeL4+ProductTypeL5+SearchClickShare+SearchImpressionShare::Eval(SearchImpressionShare.replace('--', ''))" --start_date="20200201" --end_date="20200201" --output="/tmp/adwords.csv" --manager=7626550557</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>

@@ -219,6 +219,8 @@ public class GoogleAdwords {
                     customers = cli.getParameterAsList("customer", "\\+");
                 }
 
+                Logger.getLogger(GoogleAdwords.class.getName()).log(Level.INFO, "GLOVE - Downloading reports for {0} accounts", customers.size());
+
                 //Dowload report for each customer. 
                 for (String customer : customers) {
                     File outputFile = new File(outputPath, customer + "_" + date + ".csv");
@@ -334,7 +336,7 @@ public class GoogleAdwords {
                 try {
                     ReportDownloadResponse response = reportDownloaderInterface.downloadReport(reportDefinition);
                     response.saveToFile(reportOutputFile.getPath());
-                    Logger.getLogger(GoogleAdwords.class.getName()).log(Level.INFO, "Report generated successfully for customer {0}", session.getClientCustomerId());
+                    Logger.getLogger(GoogleAdwords.class.getName()).log(Level.INFO, "Report generated successfully for customer {0} ({1} byte)", new Object[]{session.getClientCustomerId(), reportOutputFile.length()});
 
                     return reportOutputFile;
                 } catch (ReportException ex) {
