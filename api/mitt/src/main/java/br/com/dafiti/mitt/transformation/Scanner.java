@@ -131,13 +131,6 @@ public class Scanner {
                 }
             }
 
-            functionParameter = functionParameter.replace(
-                    functionListParameter,
-                    Base64.encodeBase64String(
-                            String.join("+", functionListParameterItem).getBytes()
-                    )
-            );
-
             if (functionParameter.startsWith("{") && functionParameter.endsWith("}")) {
                 parameters.add(
                         functionParameter
@@ -145,6 +138,13 @@ public class Scanner {
                                 .replace("}", "")
                 );
             } else {
+                functionParameter = functionParameter.replace(
+                        functionListParameter,
+                        Base64.encodeBase64String(
+                                String.join("+", functionListParameterItem).getBytes()
+                        )
+                );
+
                 parameters = Arrays.asList(
                         StringUtils
                                 .split(functionParameter, ',')
