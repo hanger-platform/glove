@@ -7,7 +7,8 @@ SELECT * FROM (
 		'varchar(255)' AS field_type,
 		'' AS json,
         'custom_primary_key' AS column_name,
-        1 AS column_key
+        1 AS column_key,
+	'encode ${ENCODE}' AS encoding
     FROM
         information_schema.columns c
     WHERE
@@ -62,7 +63,8 @@ SELECT * FROM (
         END AS field_type,
 		'' AS json,
 		LOWER( column_name ) AS column_name,
-        0 AS column_key
+        0 AS column_key,
+	'encode ${ENCODE}' AS encoding
     FROM
         information_schema.columns c
     WHERE
@@ -79,6 +81,7 @@ SELECT * FROM (
         'timestamp' AS field_type,
   		'' AS json,
         'etl_load_date' 							AS column_name,
-        0 											AS column_key
+        0 											AS column_key,
+	'encode ${ENCODE}' AS encoding
 ) x
 ORDER BY x.ordinal_position
