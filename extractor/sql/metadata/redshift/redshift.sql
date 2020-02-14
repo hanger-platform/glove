@@ -7,8 +7,8 @@ SELECT * FROM (
 		'varchar(255)'::varchar(50) AS field_type,
 		'' AS json,
         'custom_primary_key'::varchar(50) AS column_name,
-        1 AS column_key
-
+        1 AS column_key,
+		'encode ${ENCODE}' AS encoding
 	UNION ALL
 
     SELECT DISTINCT
@@ -42,7 +42,8 @@ SELECT * FROM (
             WHEN 'boolean' 		                 THEN 'boolean'
         END::varchar(50) AS field_type,
 		'' AS json,
-        0 AS column_key
+        0 AS column_key,
+		'encode ${ENCODE}' AS encoding
     FROM
 		information_schema.columns c
    	WHERE
@@ -59,6 +60,7 @@ SELECT * FROM (
         'timestamp'::varchar(50) AS field_type,
   		'' AS json,
         'etl_load_date'::varchar(50) 				AS column_name,
-        0 											AS column_key
+        0 											AS column_key,
+		'encode ${ENCODE}' AS encoding
 ) x
 ORDER BY x.ordinal_position

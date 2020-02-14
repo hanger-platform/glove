@@ -907,7 +907,7 @@
         <precision>-1</precision>
       </field>
       <field>
-        <name>encoding</name>
+        <name>encode</name>
         <type>String</type>
         <format />
         <currency />
