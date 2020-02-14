@@ -67,6 +67,11 @@
       <description>Identifica o estilo de distribuição do redshift.</description>
     </parameter>
     <parameter>
+      <name>ENCODE</name>
+      <default_value>zstd</default_value>
+      <description>Identifica o tipo de compressão aplicado nas colunas de tabelas do redshift</description>
+    </parameter>
+    <parameter>
       <name>EXPORT_BUCKET_DEFAULT</name>
       <default_value />
       <description>Identifica o bucket default para exportação de dados. </description>
@@ -611,7 +616,6 @@
       <name>START</name>
       <description />
       <type>SPECIAL</type>
-      <attributes />
       <start>Y</start>
       <dummy>N</dummy>
       <repeat>N</repeat>
@@ -627,43 +631,36 @@
       <nr>0</nr>
       <xloc>80</xloc>
       <yloc>48</yloc>
-      <attributes_kjc />
     </entry>
     <entry>
       <name>Fail extracting data</name>
       <description />
       <type>ABORT</type>
-      <attributes />
       <message />
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>208</xloc>
       <yloc>608</yloc>
-      <attributes_kjc />
     </entry>
     <entry>
       <name>Success</name>
       <description />
       <type>SUCCESS</type>
-      <attributes />
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>336</xloc>
       <yloc>496</yloc>
-      <attributes_kjc />
     </entry>
     <entry>
       <name>Module selector</name>
       <description />
       <type>JOB</type>
-      <attributes />
       <specification_method>filename</specification_method>
       <job_object_id />
       <filename>${Internal.Job.Filename.Directory}/j_${MODULE}_module.kjb</filename>
       <jobname />
-      <directory />
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
       <exec_per_row>N</exec_per_row>
@@ -689,13 +686,11 @@
       <nr>0</nr>
       <xloc>208</xloc>
       <yloc>496</yloc>
-      <attributes_kjc />
     </entry>
     <entry>
       <name>Metadata folder exists?</name>
       <description />
       <type>SHELL</type>
-      <attributes />
       <filename />
       <work_directory />
       <arg_from_previous>N</arg_from_previous>
@@ -719,13 +714,11 @@ fi</script>
       <nr>0</nr>
       <xloc>80</xloc>
       <yloc>272</yloc>
-      <attributes_kjc />
     </entry>
     <entry>
       <name>Setup</name>
       <description />
       <type>WRITE_TO_LOG</type>
-      <attributes />
       <logmessage>   _____   _                        
   / ____| | |                       
  | |  __  | |   ___   __   __   ___ 
@@ -749,13 +742,11 @@ GOOGLE_TOOLS_HOME	== ${GOOGLE_TOOLS_HOME}
       <nr>0</nr>
       <xloc>80</xloc>
       <yloc>160</yloc>
-      <attributes_kjc />
     </entry>
     <entry>
       <name>Get process information</name>
       <description />
       <type>TRANS</type>
-      <attributes />
       <specification_method>filename</specification_method>
       <trans_object_id />
       <filename>${Internal.Entry.Current.Directory}/m_get_uuid.ktr</filename>
@@ -787,13 +778,11 @@ GOOGLE_TOOLS_HOME	== ${GOOGLE_TOOLS_HOME}
       <nr>0</nr>
       <xloc>80</xloc>
       <yloc>384</yloc>
-      <attributes_kjc />
     </entry>
     <entry>
       <name>Process ID</name>
       <description />
       <type>WRITE_TO_LOG</type>
-      <attributes />
       <logmessage>#-----------------------------------------------------------
 # UUID
 #-----------------------------------------------------------
@@ -806,7 +795,6 @@ UUID == ${UUID}
       <nr>0</nr>
       <xloc>80</xloc>
       <yloc>496</yloc>
-      <attributes_kjc />
     </entry>
   </entries>
   <hops>
