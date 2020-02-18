@@ -28,6 +28,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -98,6 +99,7 @@ public class Scanner {
         if (content.contains("::")) {
             String chunck = "";
             boolean partial = false;
+            List<String> parameters = new ArrayList();
             List<String> functionListParameterItem = new ArrayList();
 
             name = StringUtils.substringBefore(content, "::");
@@ -129,14 +131,25 @@ public class Scanner {
                 }
             }
 
-            functionParameter = functionParameter.replace(
-                    functionListParameter,
-                    Base64.encodeBase64String(
-                            String.join("+", functionListParameterItem).getBytes()
-                    )
-            );
+            if (functionParameter.startsWith("{") && functionParameter.endsWith("}")) {
+                parameters.add(
+                        functionParameter
+                                .replace("{", "")
+                                .replace("}", "")
+                );
+            } else {
+                functionParameter = functionParameter.replace(
+                        functionListParameter,
+                        Base64.encodeBase64String(
+                                String.join("+", functionListParameterItem).getBytes()
+                        )
+                );
 
-            String[] parameters = StringUtils.split(functionParameter, ',');
+                parameters = Arrays.asList(
+                        StringUtils
+                                .split(functionParameter, ',')
+                );
+            }
 
             if (this.transformations.containsKey(functionName)) {
                 try {
@@ -147,7 +160,7 @@ public class Scanner {
                         instance = clazz.newInstance();
                     } else {
                         for (Constructor constructor : constructors) {
-                            int functionParameterCount = parameters.length;
+                            int functionParameterCount = parameters.size();
 
                             if (functionParameterCount == 0) {
                                 instance = clazz.newInstance();
@@ -177,16 +190,16 @@ public class Scanner {
                                                 constructorParameters.add(fieldList);
                                                 break;
                                             case "Field":
-                                                constructorParameters.add(this.scan(parameters[i]));
+                                                constructorParameters.add(this.scan(parameters.get(i)));
                                             case "String":
-                                                constructorParameters.add(parameters[i]);
+                                                constructorParameters.add(parameters.get(i));
                                                 break;
                                             default:
                                                 if (constructor.getParameterTypes()[i].isPrimitive()) {
                                                     Method method = constructor
                                                             .getParameterTypes()[i]
                                                             .getDeclaredMethod("valueOf", String.class);
-                                                    constructorParameters.add(method.invoke(parameters[i]));
+                                                    constructorParameters.add(method.invoke(parameters.get(i)));
                                                 }
 
                                                 break;
