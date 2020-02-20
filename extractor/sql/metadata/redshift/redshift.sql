@@ -42,6 +42,7 @@ SELECT * FROM (
             WHEN 'boolean' 		                 THEN 'boolean'
         END::varchar(50) AS field_type,
 		'' AS json,
+		LOWER( column_name::varchar(50) ) AS column_name,
         0 AS column_key,
 		'encode ${ENCODE}' AS encoding
     FROM
