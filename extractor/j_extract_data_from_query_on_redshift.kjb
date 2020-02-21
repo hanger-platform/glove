@@ -478,7 +478,7 @@ error_check(){
 }
 
 echo "Synchronizing Amazon S3 Buckets"
-sleep 15
+sleep 45
 
 echo "Copying files from s3://${STORAGE_BUCKET}/unload/${SCHEMA_NAME}/${TABLE_NAME}/!"
 aws s3 cp s3://${STORAGE_BUCKET}/unload/${SCHEMA_NAME}/${TABLE_NAME}/ ${RAWFILE_QUEUE_STAGING_PATH} --recursive --only-show-errors
