@@ -35,6 +35,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.io.FilenameUtils;
@@ -167,51 +168,53 @@ public class Output {
         ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL);
 
         //Remove all old files from the output folder. 
-        if (parallel) {
-            if (output.isDirectory()) {
-                File[] garbage = output.listFiles(new PatternFilenameFilter(".+\\.csv"));
+        if (output.isDirectory()) {
+            File[] garbage = output.listFiles(new PatternFilenameFilter(".+\\.csv"));
 
-                for (File file : garbage) {
-                    try {
-                        Files.deleteIfExists(file.toPath());
-                    } catch (IOException ex) {
-                        Logger.getLogger(Output.class.getName()).log(Level.SEVERE, "Fail deleting file " + file.getName(), ex);
-                    }
+            for (File file : garbage) {
+                try {
+                    Files.deleteIfExists(file.toPath());
+                } catch (IOException ex) {
+                    Logger.getLogger(Output.class.getName()).log(Level.SEVERE, "Fail deleting file " + file.getName(), ex);
                 }
             }
         }
 
         for (File file : files) {
-            if (file.length() != 0) {
-                if (parallel) {
-                    executor.execute(new OutputProcessor(
-                            file,
-                            parser,
-                            this.getWriter(new File(output.getAbsolutePath() + "/" + file.getName())),
-                            delimiter,
-                            quote,
-                            quoteEscape,
-                            encode,
-                            header,
-                            remove,
-                            skipLines));
-                } else {
-                    new OutputProcessor(
-                            file,
-                            parser,
-                            writer,
-                            delimiter,
-                            quote,
-                            quoteEscape,
-                            encode,
-                            header,
-                            remove,
-                            skipLines).write();
-                }
+            if (parallel) {
+                executor.execute(new OutputProcessor(
+                        file,
+                        parser,
+                        this.getWriter(new File(output.getAbsolutePath() + "/" + file.getName())),
+                        delimiter,
+                        quote,
+                        quoteEscape,
+                        encode,
+                        header,
+                        remove,
+                        skipLines));
+            } else {
+                new OutputProcessor(
+                        file,
+                        parser,
+                        writer,
+                        delimiter,
+                        quote,
+                        quoteEscape,
+                        encode,
+                        header,
+                        remove,
+                        skipLines).write();
             }
         }
 
         executor.shutdown();
+
+        try {
+            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Output.class.getName()).log(Level.SEVERE, "Fail waiting executor termination", ex);
+        }
     }
 
     /**
