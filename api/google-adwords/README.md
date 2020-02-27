@@ -47,7 +47,7 @@ java -jar google-analytics.jar  \
 	--field=<Report fields> \
 	--start_date=<Start date formated as YYYYMMDD> \
 	--end_date=<End date formated as YYYYMMDD> \
-	--output=<Output file> \
+	--output=<Output file or path> \
 	--zero_impression=<(Optional) Include Zero Impressions. false as default> \
 	--threads=<Optional)  Number customer reports being generated in parallel. 5 as default> \
 	--page_size=<Page size. 500 as default> \
