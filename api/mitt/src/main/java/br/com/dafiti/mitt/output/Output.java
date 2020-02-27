@@ -25,13 +25,18 @@ package br.com.dafiti.mitt.output;
 
 import br.com.dafiti.mitt.transformation.Parser;
 import br.com.dafiti.mitt.model.Configuration;
+import com.google.common.io.PatternFilenameFilter;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.io.FilenameUtils;
 
 /**
@@ -46,6 +51,7 @@ public class Output {
     private final char delimiter;
     private final char quote;
     private final char quoteEscape;
+    private final boolean parallel;
 
     private final int THREAD_POOL = 5;
 
@@ -70,6 +76,7 @@ public class Output {
         this.quoteEscape = quoteEscape;
         this.parser = new Parser(configuration);
         this.writer = this.getWriter(output);
+        this.parallel = FilenameUtils.getExtension(output.getName()).isEmpty();
     }
 
     /**
@@ -159,12 +166,24 @@ public class Output {
 
         ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL);
 
+        //Remove all old files from the output folder. 
+        if (parallel) {
+            if (output.isDirectory()) {
+                File[] garbage = output.listFiles(new PatternFilenameFilter(".+\\.csv"));
+
+                for (File file : garbage) {
+                    try {
+                        Files.deleteIfExists(file.toPath());
+                    } catch (IOException ex) {
+                        Logger.getLogger(Output.class.getName()).log(Level.SEVERE, "Fail deleting file " + file.getName(), ex);
+                    }
+                }
+            }
+        }
+
         for (File file : files) {
             if (file.length() != 0) {
-                if (FilenameUtils
-                        .getExtension(output.getName())
-                        .isEmpty()) {
-
+                if (parallel) {
                     executor.execute(new OutputProcessor(
                             file,
                             parser,
