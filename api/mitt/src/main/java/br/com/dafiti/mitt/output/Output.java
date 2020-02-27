@@ -49,6 +49,7 @@ public class Output {
     private final File output;
     private final CsvWriter writer;
     private final Parser parser;
+    private final Configuration configuration;
     private final char delimiter;
     private final char quote;
     private final char quoteEscape;
@@ -75,6 +76,7 @@ public class Output {
         this.delimiter = delimiter;
         this.quote = quote;
         this.quoteEscape = quoteEscape;
+        this.configuration = configuration;
         this.parser = new Parser(configuration);
         this.writer = this.getWriter(output);
         this.parallel = FilenameUtils.getExtension(output.getName()).isEmpty();
@@ -184,7 +186,7 @@ public class Output {
             if (parallel) {
                 executor.execute(new OutputProcessor(
                         file,
-                        parser,
+                        new Parser(configuration),
                         this.getWriter(new File(output.getAbsolutePath() + "/" + file.getName())),
                         delimiter,
                         quote,
