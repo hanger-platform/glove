@@ -262,7 +262,7 @@ public class GoogleAdwords {
                 });
             }
 
-            //Writes all source files to a single target file.
+            //Writes all source files to a single target.
             mitt.write(outputPath, "*.csv", ',', mitt.getConfiguration().getOriginalFieldsName());
         } catch (RemoteException
                 | InterruptedException
