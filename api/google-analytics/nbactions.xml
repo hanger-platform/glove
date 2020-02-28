@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.googleanalytics.GoogleAnalytics --client_secret=/home/valdiney/tenda/client_secret_75341468439-spigg5t8usmkn1cn6bn3htfrlk2941b6.apps.googleusercontent.com.json --view_id=130486701 --start_date=2019-08-24 --end_date=2019-08-25 --dimensions=ga:adGroup+ga:adDistributionNetwork+ga:adwordsCustomerID+ga:adwordsCampaignID+ga:adwordsAdGroupID+ga:adwordsCreativeID+ga:adwordsCriteriaID --metrics=ga:impressions+ga:adClicks+ga:adCost --output=/tmp/tenda_ga_v4_users.csv --key=ga:adGroup+ga:adwordsCampaignID+ga:adwordsAdGroupID+ga:adwordsCreativeID+ga:adwordsCriteriaID</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.googleanalytics.GoogleAnalytics --client_secret=/home/helio.leal/.google/ga.json --output=/tmp/funnil_minute_two_views.csv --view_id=40663416+78143321 --start_date=2020-02-28 --end_date=2020-02-28 --dimensions=ga:deviceCategory+ga:shoppingStage+ga:dateHourMinute::dateformat(ga:dateHourMinute,yyyyMMddHHmm,yyyy-MM-dd:HH:mm:00) --metrics=ga:sessions+ga:transactions+ga:transactionRevenue+ga:revenuePerTransaction+ga:users --filter="ga:shoppingStage==ADD_TO_CART,ga:shoppingStage==CHECKOUT,ga:shoppingStage==TRANSACTION,ga:shoppingStage==PRODUCT_VIEW,ga:shoppingStage==ALL_VISITS" --key=::md5([view_id,ga:shoppingStage,ga:dateHourMinute,ga:deviceCategory]) --partition=ga:dateHourMinute::dateformat(ga:dateHourMinute,yyyyMMddHH,yyyyMM)</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.googleanalytics.GoogleAnalytics --client_secret=/home/valdiney/tenda/client_secret_75341468439-spigg5t8usmkn1cn6bn3htfrlk2941b6.apps.googleusercontent.com.json --view_id=130486701 --start_date=2019-08-24 --end_date=2019-08-25 --dimensions=ga:adGroup+ga:adDistributionNetwork+ga:adwordsCustomerID+ga:adwordsCampaignID+ga:adwordsAdGroupID+ga:adwordsCreativeID+ga:adwordsCriteriaID --metrics=ga:impressions+ga:adClicks+ga:adCost --output=/tmp/tenda_ga_v4_users.csv --key=ga:adGroup+ga:adwordsCampaignID+ga:adwordsAdGroupID+ga:adwordsCreativeID+ga:adwordsCriteriaID</exec.args>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.googleanalytics.GoogleAnalytics --client_secret=/home/helio.leal/.google/ga.json --output=/tmp/funnil_minute_two_views.csv --view_id=40663416+78143321 --start_date=2020-02-28 --end_date=2020-02-28 --dimensions=ga:deviceCategory+ga:shoppingStage+ga:dateHourMinute::dateformat(ga:dateHourMinute,yyyyMMddHHmm,yyyy-MM-dd:HH:mm:00) --metrics=ga:sessions+ga:transactions+ga:transactionRevenue+ga:revenuePerTransaction+ga:users --filter="ga:shoppingStage==ADD_TO_CART,ga:shoppingStage==CHECKOUT,ga:shoppingStage==TRANSACTION,ga:shoppingStage==PRODUCT_VIEW,ga:shoppingStage==ALL_VISITS" --key=::md5([view_id,ga:shoppingStage,ga:dateHourMinute,ga:deviceCategory]) --partition=ga:dateHourMinute::dateformat(ga:dateHourMinute,yyyyMMddHH,yyyyMM)</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.googleanalytics.GoogleAnalytics --client_secret=/home/valdiney/tenda/client_secret_75341468439-spigg5t8usmkn1cn6bn3htfrlk2941b6.apps.googleusercontent.com.json --view_id=130486701 --start_date=2019-08-24 --end_date=2019-08-25 --dimensions=ga:adGroup+ga:adDistributionNetwork+ga:adwordsCustomerID+ga:adwordsCampaignID+ga:adwordsAdGroupID+ga:adwordsCreativeID+ga:adwordsCriteriaID --metrics=ga:impressions+ga:adClicks+ga:adCost --output=/tmp/tenda_ga_v4_users.csv --key=ga:adGroup+ga:adwordsCampaignID+ga:adwordsAdGroupID+ga:adwordsCreativeID+ga:adwordsCriteriaID</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.googleanalytics.GoogleAnalytics --client_secret=/home/helio.leal/.google/ga.json --output=/tmp/funnil_minute_two_views.csv --view_id=40663416+78143321 --start_date=2020-02-28 --end_date=2020-02-28 --dimensions=ga:deviceCategory+ga:shoppingStage+ga:dateHourMinute::dateformat(ga:dateHourMinute,yyyyMMddHHmm,yyyy-MM-dd:HH:mm:00) --metrics=ga:sessions+ga:transactions+ga:transactionRevenue+ga:revenuePerTransaction+ga:users --filter="ga:shoppingStage==ADD_TO_CART,ga:shoppingStage==CHECKOUT,ga:shoppingStage==TRANSACTION,ga:shoppingStage==PRODUCT_VIEW,ga:shoppingStage==ALL_VISITS" --key=::md5([view_id,ga:shoppingStage,ga:dateHourMinute,ga:deviceCategory]) --partition=ga:dateHourMinute::dateformat(ga:dateHourMinute,yyyyMMddHH,yyyyMM)</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>

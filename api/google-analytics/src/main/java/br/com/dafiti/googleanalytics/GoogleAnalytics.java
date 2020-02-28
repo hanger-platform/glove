@@ -84,7 +84,7 @@ public class GoogleAnalytics {
             //Defines parameters.
             mitt.getConfiguration()
                     .addParameter("c", "client_secret", "Client secrets json file path", "", true, false)
-                    .addParameter("v", "view_id", "Google analytics project view ID", "", true, false)
+                    .addParameter("v", "view_id", "Google analytics project view ID, divided by + if has more than one", "", true, false)
                     .addParameter("s", "start_date", "Start date", "", true, false)
                     .addParameter("e", "end_date", "End date", "", true, false)
                     .addParameter("d", "dimensions", "Dimensions, divided by + if has more than one", "", true, false)
@@ -151,66 +151,71 @@ public class GoogleAnalytics {
                 }
             });
 
-            String token = null;
+            //Get list of view ids.
+            List<String> viewIdList = cli.getParameterAsList("view_id", "\\+");
 
-            do {
-                //Create the ReportRequest object.
-                ReportRequest request = new ReportRequest()
-                        .setViewId((String) cli.getParameter("view_id"))
-                        .setDateRanges(Arrays.asList(dateRange))
-                        .setDimensions(dimensions)
-                        .setMetrics(metrics)
-                        .setFiltersExpression(cli.getParameter("filter"))
-                        .setPageToken(token);
+            for (String viewId : viewIdList) {
+                String token = null;
 
-                ArrayList<ReportRequest> requests = new ArrayList();
-                requests.add(request);
+                do {
+                    //Create the ReportRequest object.
+                    ReportRequest request = new ReportRequest()
+                            .setViewId(viewId)
+                            .setDateRanges(Arrays.asList(dateRange))
+                            .setDimensions(dimensions)
+                            .setMetrics(metrics)
+                            .setFiltersExpression(cli.getParameter("filter"))
+                            .setPageToken(token);
 
-                //Create the GetReportsRequest object.
-                GetReportsRequest getReport = new GetReportsRequest().setReportRequests(requests);
+                    ArrayList<ReportRequest> requests = new ArrayList();
+                    requests.add(request);
 
-                //Call the batchGet method.
-                GetReportsResponse response = service.reports().batchGet(getReport).execute();
+                    //Create the GetReportsRequest object.
+                    GetReportsRequest getReport = new GetReportsRequest().setReportRequests(requests);
 
-                //Reads the response.
-                for (Report report : response.getReports()) {
-                    ColumnHeader header = report.getColumnHeader();
-                    List<MetricHeaderEntry> metricHeaders = header.getMetricHeader().getMetricHeaderEntries();
-                    List<ReportRow> rows = report.getData().getRows();
+                    //Call the batchGet method.
+                    GetReportsResponse response = service.reports().batchGet(getReport).execute();
 
-                    if (rows == null) {
-                        Logger.getLogger(GoogleAnalytics.class.getName()).log(Level.INFO, "No data found for {0} in interval {1} and {2}", new Object[]{(String) cli.getParameter("view_id"), dateRange.getStartDate(), dateRange.getEndDate()});
-                        return;
-                    }
+                    //Reads the response.
+                    for (Report report : response.getReports()) {
+                        ColumnHeader header = report.getColumnHeader();
+                        List<MetricHeaderEntry> metricHeaders = header.getMetricHeader().getMetricHeaderEntries();
+                        List<ReportRow> rows = report.getData().getRows();
 
-                    //Reads each report row.
-                    rows.forEach((row) -> {
-                        ArrayList<Object> record = new ArrayList();
-
-                        //Writes parameters.                    
-                        record.add((String) cli.getParameter("view_id"));
-
-                        //Writes dimensions.
-                        row.getDimensions().forEach((dimension) -> {
-                            record.add(dimension);
-                        });
-
-                        //Writes metrics.
-                        List<DateRangeValues> reportMetrics = row.getMetrics();
-
-                        for (int i = 0; i < reportMetrics.size(); i++) {
-                            DateRangeValues values = reportMetrics.get(i);
-                            for (int j = 0; j < values.getValues().size() && j < metricHeaders.size(); j++) {
-                                record.add(values.getValues().get(j));
-                            }
+                        if (rows == null) {
+                            Logger.getLogger(GoogleAnalytics.class.getName()).log(Level.INFO, "No data found for {0} in interval {1} and {2}", new Object[]{viewId, dateRange.getStartDate(), dateRange.getEndDate()});
+                            return;
                         }
 
-                        mitt.write(record);
-                    });
+                        //Reads each report row.
+                        rows.forEach((row) -> {
+                            ArrayList<Object> record = new ArrayList();
 
-                    token = report.getNextPageToken();
-                }
-            } while (token != null);
+                            //Writes parameters.                    
+                            record.add(viewId);
+
+                            //Writes dimensions.
+                            row.getDimensions().forEach((dimension) -> {
+                                record.add(dimension);
+                            });
+
+                            //Writes metrics.
+                            List<DateRangeValues> reportMetrics = row.getMetrics();
+
+                            for (int i = 0; i < reportMetrics.size(); i++) {
+                                DateRangeValues values = reportMetrics.get(i);
+                                for (int j = 0; j < values.getValues().size() && j < metricHeaders.size(); j++) {
+                                    record.add(values.getValues().get(j));
+                                }
+                            }
+
+                            mitt.write(record);
+                        });
+
+                        token = report.getNextPageToken();
+                    }
+                } while (token != null);
+            }
         } catch (DuplicateEntityException
                 | IOException
                 | GeneralSecurityException ex) {
@@ -224,6 +229,7 @@ public class GoogleAnalytics {
     }
 
     /**
+     * Set the Google Analytics API timeout.
      *
      * @param requestInitializer
      * @return
