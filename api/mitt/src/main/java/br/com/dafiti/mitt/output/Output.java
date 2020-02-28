@@ -25,17 +25,20 @@ package br.com.dafiti.mitt.output;
 
 import br.com.dafiti.mitt.transformation.Parser;
 import br.com.dafiti.mitt.model.Configuration;
-import com.univocity.parsers.csv.CsvParser;
-import com.univocity.parsers.csv.CsvParserSettings;
+import com.google.common.io.PatternFilenameFilter;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.mozilla.universalchardet.UniversalDetector;
+import org.apache.commons.io.FilenameUtils;
 
 /**
  *
@@ -43,8 +46,16 @@ import org.mozilla.universalchardet.UniversalDetector;
  */
 public class Output {
 
+    private final File output;
     private final CsvWriter writer;
     private final Parser parser;
+    private final Configuration configuration;
+    private final char delimiter;
+    private final char quote;
+    private final char quoteEscape;
+    private final boolean parallel;
+
+    private final int THREAD_POOL = 5;
 
     /**
      *
@@ -61,38 +72,50 @@ public class Output {
             char quote,
             char quoteEscape) {
 
-        parser = new Parser(configuration);
-
-        CsvWriterSettings setting = new CsvWriterSettings();
-        setting.getFormat().setDelimiter(delimiter);
-        setting.getFormat().setQuote(quote);
-        setting.getFormat().setQuoteEscape(quoteEscape);
-        setting.setNullValue("");
-        setting.setMaxCharsPerColumn(-1);
-        setting.setHeaderWritingEnabled(true);
-        
-        setting.setHeaders(
-                parser
-                        .getConfiguration()
-                        .getFieldsName(true)
-                        .toArray(new String[0]));
-
-        this.writer = new CsvWriter(output, setting);
+        this.output = output;
+        this.delimiter = delimiter;
+        this.quote = quote;
+        this.quoteEscape = quoteEscape;
+        this.configuration = configuration;
+        this.parser = new Parser(configuration);
+        this.writer = this.getWriter(output);
+        this.parallel = FilenameUtils.getExtension(output.getName()).isEmpty();
     }
 
     /**
      *
+     * @param output
      * @return
      */
-    public Parser getParser() {
-        return parser;
+    public CsvWriter getWriter(File output) {
+        CsvWriter currentWriter = null;
+
+        if (!FilenameUtils
+                .getExtension(output.getName())
+                .isEmpty()) {
+
+            CsvWriterSettings setting = new CsvWriterSettings();
+            setting.getFormat().setDelimiter(delimiter);
+            setting.getFormat().setQuote(quote);
+            setting.getFormat().setQuoteEscape(quoteEscape);
+            setting.setNullValue("");
+            setting.setMaxCharsPerColumn(-1);
+            setting.setHeaderWritingEnabled(true);
+            setting.setHeaders(
+                    parser.getConfiguration().getFieldsName(true).toArray(new String[0])
+            );
+
+            currentWriter = new CsvWriter(output, setting);
+        }
+
+        return currentWriter;
     }
 
     /**
      *
      * @param record
      */
-    public void write(List record) {
+    public void write(List<Object> record) {
         this.writer
                 .writeRow(
                         parser.evaluate(record)
@@ -103,10 +126,24 @@ public class Output {
      *
      * @param record
      */
-    public void write(String[] record) {
+    public void write(Object[] record) {
         this.write(
                 Arrays.asList(record)
         );
+    }
+
+    /**
+     *
+     * @param writer
+     * @param record
+     */
+    public void write(CsvWriter writer, Object[] record) {
+        writer
+                .writeRow(
+                        parser.evaluate(
+                                Arrays.asList(record)
+                        )
+                );
     }
 
     /**
@@ -130,17 +167,55 @@ public class Output {
             boolean remove,
             int skipLines) {
 
+        ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL);
+
+        //Remove all old files from the output folder. 
+        if (output.isDirectory()) {
+            File[] garbage = output.listFiles(new PatternFilenameFilter(".+\\.csv"));
+
+            for (File file : garbage) {
+                try {
+                    Files.deleteIfExists(file.toPath());
+                } catch (IOException ex) {
+                    Logger.getLogger(Output.class.getName()).log(Level.SEVERE, "Fail deleting file " + file.getName(), ex);
+                }
+            }
+        }
+
         for (File file : files) {
-            this.write(
-                    file,
-                    delimiter,
-                    quote,
-                    escape,
-                    encode,
-                    header,
-                    remove,
-                    skipLines
-            );
+            if (parallel) {
+                executor.execute(new OutputProcessor(
+                        file,
+                        new Parser(configuration),
+                        this.getWriter(new File(output.getAbsolutePath() + "/" + file.getName())),
+                        delimiter,
+                        quote,
+                        quoteEscape,
+                        encode,
+                        header,
+                        remove,
+                        skipLines));
+            } else {
+                new OutputProcessor(
+                        file,
+                        parser,
+                        writer,
+                        delimiter,
+                        quote,
+                        quoteEscape,
+                        encode,
+                        header,
+                        remove,
+                        skipLines).write();
+            }
+        }
+
+        executor.shutdown();
+
+        try {
+            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Output.class.getName()).log(Level.SEVERE, "Fail waiting executor termination", ex);
         }
     }
 
@@ -149,7 +224,7 @@ public class Output {
      * @param file
      * @param delimiter
      * @param quote
-     * @param escape
+     * @param quoteEscape
      * @param encode
      * @param header
      * @param remove
@@ -159,69 +234,32 @@ public class Output {
             File file,
             char delimiter,
             char quote,
-            char escape,
+            char quoteEscape,
             String encode,
             List<String> header,
             boolean remove,
             int skipLines) {
 
-        String[] record;
-        String encoding = null;
-
-        parser.setFile(file);
-
-        CsvParserSettings setting = new CsvParserSettings();
-        setting.getFormat().setDelimiter(delimiter);
-        setting.getFormat().setQuote(quote);
-        setting.getFormat().setQuoteEscape(escape);
-        setting.setNullValue("");
-        setting.setMaxCharsPerColumn(-1);
-        setting.setInputBufferSize(5 * (1024 * 1024));
-        setting.setNumberOfRowsToSkip(skipLines);
-
-        if (header.isEmpty()) {
-            setting.setHeaderExtractionEnabled(true);
-        } else {
-            setting.setHeaders(header.toArray(new String[0]));
-        }
-
-        setting.selectFields(
-                parser
-                        .getConfiguration()
-                        .getOriginalFieldsName()
-                        .toArray(new String[0]));
-
-        if ("auto".equalsIgnoreCase(encode)) {
-            try {
-                encoding = UniversalDetector.detectCharset(file);
-            } catch (IOException ex) {
-                Logger.getLogger(Output.class.getName()).log(Level.SEVERE, "Encode do not detected!", ex);
-            } finally {
-                if (encoding == null) {
-                    encoding = "UTF-8";
-                }
-            }
-        } else {
-            encoding = encode;
-        }
-
-        CsvParser csvParser = new CsvParser(setting);
-        csvParser.beginParsing(file, encoding);
-
-        while ((record = csvParser.parseNext()) != null) {
-            this.write(record);
-        }
-
-        if (remove) {
-            file.delete();
-        }
+        new OutputProcessor(
+                file,
+                parser,
+                writer,
+                delimiter,
+                quote,
+                quoteEscape,
+                encode,
+                header,
+                remove,
+                skipLines).write();
     }
 
     /**
      *
      */
     public void close() {
-        this.writer.flush();
-        this.writer.close();
+        if (this.writer != null) {
+            this.writer.flush();
+            this.writer.close();
+        }
     }
 }

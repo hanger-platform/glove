@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.google.adwords.GoogleAdwords --credentials="/home/valdiney/xxx.properties" --type="ADGROUP_PERFORMANCE_REPORT" --field="CampaignId+AdGroupId+Impressions+Clicks+Cost" --start_date="20190921" --end_date="20190921" --output="/tmp/adwords.csv" --partition=start_date</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.google.adwords.GoogleAdwords --credentials=/home/valdiney/ads.properties --type=AUDIENCE_PERFORMANCE_REPORT --field=Date+AdGroupId+AllConversions+AllConversionValue+AveragePosition+CampaignId+CampaignName+Clicks+Conversions+ConversionValue+Cost+Criteria+Device+ExternalCustomerId+Id+Impressions --start_date=20200225 --end_date=20200225 --manager=7626550557 --output=/tmp/raw_google_adwords_dafiti_br/audiences/ '--partition=::Dateformat(Date,yyyy-MM-dd,yyyyMMdd)'</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.google.adwords.GoogleAdwords --credentials="/home/valdiney/xxx.properties" --type="ADGROUP_PERFORMANCE_REPORT" --field="CampaignId+AdGroupId+Impressions+Clicks+Cost" --start_date="20190921" --end_date="20190921" --output="/tmp/adwords.csv" --partition=start_date</exec.args>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.google.adwords.GoogleAdwords --credentials=/home/valdiney/ads.properties --type=AUDIENCE_PERFORMANCE_REPORT --field=Date+AdGroupId+AllConversions+AllConversionValue+AveragePosition+CampaignId+CampaignName+Clicks+Conversions+ConversionValue+Cost+Criteria+Device+ExternalCustomerId+Id+Impressions --start_date=20200225 --end_date=20200225 --manager=7626550557 --output=/tmp/raw_google_adwords_dafiti_br/audiences/ '--partition=::Dateformat(Date,yyyy-MM-dd,yyyyMMdd)'</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.google.adwords.GoogleAdwords --credentials="/home/valdiney/xxx.properties" --type="ADGROUP_PERFORMANCE_REPORT" --field="CampaignId+AdGroupId+Impressions+Clicks+Cost" --start_date="20190921" --end_date="20190921" --output="/tmp/adwords.csv" --partition=start_date</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.google.adwords.GoogleAdwords --credentials=/home/valdiney/ads.properties --type=AUDIENCE_PERFORMANCE_REPORT --field=Date+AdGroupId+AllConversions+AllConversionValue+AveragePosition+CampaignId+CampaignName+Clicks+Conversions+ConversionValue+Cost+Criteria+Device+ExternalCustomerId+Id+Impressions --start_date=20200225 --end_date=20200225 --manager=7626550557 --output=/tmp/raw_google_adwords_dafiti_br/audiences/ '--partition=::Dateformat(Date,yyyy-MM-dd,yyyyMMdd)'</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>

@@ -3,7 +3,7 @@
 
 ## How it works
 
-O **Google Adwords Extractor** permite a extração de relatórios do Google Adwords de todas as contas abaixo de uma **AdWords manager account**. Os relatórios suportado, bem como métricas e atributos estão disponíveis em (https://developers.google.com/adwords/api/docs/appendix/reports#available-reports).
+O **Google Adwords Extractor** permite a extração de relatórios do Google Adwords de contas indivíduais ou todas as contas abaixo de uma **AdWords manager account**. Os relatórios suportado, bem como métricas e atributos estão disponíveis em (https://developers.google.com/adwords/api/docs/appendix/reports#available-reports).
 
 ## Instalação
 
@@ -23,7 +23,7 @@ Utilizando o [Maven](https://maven.apache.org/):
 
 ##### CONFIGURAÇÂO
 
-* Se você não possui um client ID e secret para o Adwords, crie um projeto no console do desenvolvedor. Consulte o link a seguir para obter mais informações:: https://github.com/googleads/googleads-java-lib/wiki/Using-OAuth2.0
+* Se você não possui um client ID e secret para o Adwords, crie um projeto no console do desenvolvedor. Consulte o link a seguir para obter mais informações:: https://github.com/googleads/googleads-java-lib/wiki/API-access-using-own-credentials-(installed-application-flow)
 
 * Crie um arquivo com as seguintes informações sobre seu acesso ao serviço, este será o seu **credentials file**:
 
@@ -41,15 +41,17 @@ api.adwords.isPartialFailure=false
 ```bash
 java -jar google-adwords.jar  \
 	--credentials=<Credentials file>  \
-	--type=<Adwords report type> 
-	--field=<Report fields>
-	--start_date=<Start date formated as YYYYMMDD> 
-	--end_date=<End date formated as YYYYMMDD> 
-	--output=<Output file>
-	--zero_impression=<(Optional) Include Zero Impressions. false as default>
-	--threads=<Optional)  Number customer reports being generated in parallel. 5 as default>
-	--page_size=<Page size. 500 as default>
-	--partition=<(Optional)  Partition, divided by + if has more than one>
+	--manager=<(Optional) Manager account> \
+	--customer=<(Optional) Customer IDs, divided by + if has more than one>
+	--type=<Adwords report type> \
+	--field=<Report fields> \
+	--start_date=<Start date formated as YYYYMMDD> \
+	--end_date=<End date formated as YYYYMMDD> \
+	--output=<Output file or path> \
+	--zero_impression=<(Optional) Include Zero Impressions. false as default> \
+	--threads=<Optional)  Number customer reports being generated in parallel. 5 as default> \
+	--page_size=<Page size. 500 as default> \
+	--partition=<(Optional)  Partition, divided by + if has more than one> \
 	--key=<(Optional) Unique key, divided by + if has more than one>
 ```
 
@@ -57,11 +59,12 @@ java -jar google-adwords.jar  \
 
 ```bash
 java -jar google-adwords.jar  \
-	--credentials="/home/valdiney/ads.properties" 
-	--type="ADGROUP_PERFORMANCE_REPORT" 
-	--field="CampaignId+AdGroupId+Impressions+Clicks+Cost" 
-	--start_date="20190921" 
-	--end_date="20190921" 
+	--credentials="/home/valdiney/ads.properties" \
+	--manager=1234567
+	--type="ADGROUP_PERFORMANCE_REPORT" \
+	--field="CampaignId+AdGroupId+Impressions+Clicks+Cost" \
+	--start_date="20190921" \
+	--end_date="20190921" \
 	--output="/tmp/ADGROUP_PERFORMANCE_REPORT.csv"
 ```
 

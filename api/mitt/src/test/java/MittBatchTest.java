@@ -23,11 +23,8 @@
  */
 import br.com.dafiti.mitt.Mitt;
 import br.com.dafiti.mitt.exception.DuplicateEntityException;
-import br.com.dafiti.mitt.model.Field;
 import br.com.dafiti.mitt.transformation.embedded.Now;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -36,16 +33,12 @@ import java.util.List;
 public class MittBatchTest {
 
     public static void main(String[] args) throws DuplicateEntityException {
-        Mitt mitt = new Mitt("/tmp/mitt/batch.csv");
+        Mitt mitt = new Mitt("/tmp/mitt/");
 
-        List<Field> fields = new ArrayList<>();
-        fields.add(new Field("id"));
+        mitt.getConfiguration().addField("nome");
+        mitt.getConfiguration().addCustomField("xxx", new Now());
 
-        //mitt.getConfiguration().addField("custom_primary_key", new Concat(fields));
-        mitt.getConfiguration().addField("Package Name", "Package");
-        mitt.getConfiguration().addCustomField("etl_load_date", new Now());
-
-        mitt.write(new File("/home/valdiney/Downloads/exportDevices_521_20190723.csv"), ',', '"', '\\', "UTF-16");
+        mitt.write(new File("/home/valdiney/Downloads/"), "*");
 
         mitt.close();
     }

@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright (c) 2019 Dafiti Group
  * 
@@ -51,9 +49,9 @@ public class MittTest {
         mitt.getConfiguration().addField("id");
         mitt.getConfiguration().addField("nome");
         mitt.getConfiguration().addField("data");
-        mitt.getConfiguration().addCustomField("scanner::concat([id,nome,::now(),::Dateformat(data,YYYYMM)])");
+        mitt.getConfiguration().addCustomField("scanner::concat([id,nome,::now(),::Dateformat(data,YYYYMM),::eval({nome.replace('A','xxx')})])");
         mitt.getConfiguration().addCustomField("fixed::concat([id,nome])");
-        mitt.getConfiguration().addCustomField("bola::eval((id*5))");
+        mitt.getConfiguration().addCustomField("bola::eval({nome.replace(/[^0-9.]/g,'xxx')})");
 
         //Parameters. 
         mitt.getConfiguration().addParameter("a", "primeiro", "Primeiro parâmetro", "xxx");
@@ -69,7 +67,7 @@ public class MittTest {
         cli.getParameter("primeiro");
         cli.getParameterAsList("segundo", "\\+");
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 1000; i++) {
             List<Object> data = new ArrayList();
             data.add(i);
             data.add("A" + i);
