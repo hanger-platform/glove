@@ -38,6 +38,7 @@ java -jar google-analytics.jar  \
 	--output=<Output file> \
 	--partition=<(Optional)  Partition field, divided by + if has more than one> \
 	--key=<(Optional) Unique key, divided by + if has more than one> 
+	--filter=<(Optional) Filter expression> 
 ```
 
 ## Exemplo
