@@ -322,14 +322,10 @@ public class GoogleAdwords {
         }
 
         @Override
-        public File call() throws
-                ReportException,
-                ReportDownloadResponseException,
-                IOException,
-                InterruptedException {
+        public File call() throws Exception {
 
             boolean go = true;
-            ReportException reportException = null;
+            Exception reportException = null;
             ReportDownloaderInterface reportDownloaderInterface = adWordsServices.getUtility(session, ReportDownloaderInterface.class);
 
             do {
@@ -339,7 +335,10 @@ public class GoogleAdwords {
                     Logger.getLogger(GoogleAdwords.class.getName()).log(Level.INFO, "Report generated successfully for customer {0} ({1} byte)", new Object[]{session.getClientCustomerId(), reportOutputFile.length()});
 
                     return reportOutputFile;
-                } catch (ReportException ex) {
+                } catch (ReportDownloadResponseException
+                        | ReportException
+                        | IOException ex) {
+
                     reportException = ex;
                     long sleep = backOff.nextBackOffMillis();
 
