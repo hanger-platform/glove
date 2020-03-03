@@ -40,6 +40,8 @@ import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.client.util.BackOff;
+import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.analyticsreporting.v4.AnalyticsReporting;
 import com.google.api.services.analyticsreporting.v4.AnalyticsReportingScopes;
@@ -173,52 +175,77 @@ public class GoogleAnalytics {
                     //Create the GetReportsRequest object.
                     GetReportsRequest getReport = new GetReportsRequest().setReportRequests(requests);
 
+                    //Defines the exponential backoff for multiples retries.
+                    boolean retry = true;
+                    ExponentialBackOff backOff = new ExponentialBackOff.Builder()
+                            .setMaxElapsedTimeMillis(60 * 5 * 1000)
+                            .build();
+
                     //Call the batchGet method.
-                    GetReportsResponse response = service.reports().batchGet(getReport).execute();
+                    GetReportsResponse response = null;
+                    do {
+                        try {
+                            response = service.reports().batchGet(getReport).execute();
+                            retry = false;
+                        } catch (IOException ex) {
+                            long sleep = backOff.nextBackOffMillis();
 
-                    //Reads the response.
-                    for (Report report : response.getReports()) {
-                        ColumnHeader header = report.getColumnHeader();
-                        List<MetricHeaderEntry> metricHeaders = header.getMetricHeader().getMetricHeaderEntries();
-                        List<ReportRow> rows = report.getData().getRows();
-
-                        if (rows == null) {
-                            Logger.getLogger(GoogleAnalytics.class.getName()).log(Level.INFO, "No data found for {0} in interval {1} and {2}", new Object[]{viewId, dateRange.getStartDate(), dateRange.getEndDate()});
-                            return;
+                            if (sleep == BackOff.STOP) {
+                                retry = false;
+                                Logger.getLogger(GoogleAnalytics.class.getName()).log(Level.SEVERE, "Report request failed after maximum elapsed millis: " + backOff.getMaxElapsedTimeMillis(), ex);
+                            } else {
+                                Logger.getLogger(GoogleAnalytics.class.getName()).log(Level.SEVERE, "Trying to recover of: ", ex);
+                                Thread.sleep(sleep);
+                            }
                         }
+                    } while (retry);
 
-                        //Reads each report row.
-                        rows.forEach((row) -> {
-                            ArrayList<Object> record = new ArrayList();
+                    if (response != null) {
+                        //Reads the response.
+                        for (Report report : response.getReports()) {
+                            ColumnHeader header = report.getColumnHeader();
+                            List<MetricHeaderEntry> metricHeaders = header.getMetricHeader().getMetricHeaderEntries();
+                            List<ReportRow> rows = report.getData().getRows();
 
-                            //Writes parameters.                    
-                            record.add(viewId);
-
-                            //Writes dimensions.
-                            row.getDimensions().forEach((dimension) -> {
-                                record.add(dimension);
-                            });
-
-                            //Writes metrics.
-                            List<DateRangeValues> reportMetrics = row.getMetrics();
-
-                            for (int i = 0; i < reportMetrics.size(); i++) {
-                                DateRangeValues values = reportMetrics.get(i);
-                                for (int j = 0; j < values.getValues().size() && j < metricHeaders.size(); j++) {
-                                    record.add(values.getValues().get(j));
-                                }
+                            if (rows == null) {
+                                Logger.getLogger(GoogleAnalytics.class.getName()).log(Level.INFO, "No data found for {0} in interval {1} and {2}", new Object[]{viewId, dateRange.getStartDate(), dateRange.getEndDate()});
+                                return;
                             }
 
-                            mitt.write(record);
-                        });
+                            //Reads each report row.
+                            rows.forEach((row) -> {
+                                ArrayList<Object> record = new ArrayList();
 
-                        token = report.getNextPageToken();
+                                //Writes parameters.                    
+                                record.add(viewId);
+
+                                //Writes dimensions.
+                                row.getDimensions().forEach((dimension) -> {
+                                    record.add(dimension);
+                                });
+
+                                //Writes metrics.
+                                List<DateRangeValues> reportMetrics = row.getMetrics();
+
+                                for (int i = 0; i < reportMetrics.size(); i++) {
+                                    DateRangeValues values = reportMetrics.get(i);
+                                    for (int j = 0; j < values.getValues().size() && j < metricHeaders.size(); j++) {
+                                        record.add(values.getValues().get(j));
+                                    }
+                                }
+
+                                mitt.write(record);
+                            });
+
+                            token = report.getNextPageToken();
+                        }
                     }
                 } while (token != null);
             }
         } catch (DuplicateEntityException
                 | IOException
-                | GeneralSecurityException ex) {
+                | GeneralSecurityException
+                | InterruptedException ex) {
 
             Logger.getLogger(GoogleAnalytics.class.getName()).log(Level.SEVERE, "Google Analytics Reporting fail: ", ex);
             System.exit(1);
