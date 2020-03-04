@@ -61,6 +61,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -130,11 +133,6 @@ public class GoogleAnalytics {
                     .setApplicationName(APPLICATION_NAME)
                     .build();
 
-            //Create the DateRange object.
-            DateRange dateRange = new DateRange();
-            dateRange.setStartDate((String) cli.getParameter("start_date"));
-            dateRange.setEndDate((String) cli.getParameter("end_date"));
-
             //Create the Dimensions and Metrics objects.
             List<Dimension> dimensions = new ArrayList();
             List<Metric> metrics = new ArrayList();
@@ -153,94 +151,110 @@ public class GoogleAnalytics {
                 }
             });
 
-            //Get list of view ids.
-            List<String> viewIdList = cli.getParameterAsList("view_id", "\\+");
+            LocalDate startDate = LocalDate.parse(cli.getParameter("start_date"), DateTimeFormatter.ofPattern("yyyyMMdd"));
+            LocalDate endDate = LocalDate.parse(cli.getParameter("end_date"), DateTimeFormatter.ofPattern("yyyyMMdd"));
+            long daysBetween = ChronoUnit.DAYS.between(startDate, endDate);
 
-            for (String viewId : viewIdList) {
-                String token = null;
+            //Extract the report for each date.
+            for (int i = 0; i <= daysBetween; i++) {
+                String date = startDate.plusDays(i).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-                do {
-                    //Create the ReportRequest object.
-                    ReportRequest request = new ReportRequest()
-                            .setViewId(viewId)
-                            .setDateRanges(Arrays.asList(dateRange))
-                            .setDimensions(dimensions)
-                            .setMetrics(metrics)
-                            .setFiltersExpression(cli.getParameter("filter"))
-                            .setPageToken(token);
+                Logger.getLogger(GoogleAnalytics.class.getName()).log(Level.INFO, "GLOVE - Receiving data of {0}", date);
 
-                    ArrayList<ReportRequest> requests = new ArrayList();
-                    requests.add(request);
+                //Create the DateRange object.
+                DateRange dateRange = new DateRange();
+                dateRange.setStartDate(date);
+                dateRange.setEndDate(date);
 
-                    //Create the GetReportsRequest object.
-                    GetReportsRequest getReport = new GetReportsRequest().setReportRequests(requests);
+                //Get list of view ids.
+                List<String> viewIdList = cli.getParameterAsList("view_id", "\\+");
 
-                    //Defines the exponential backoff for multiples retries.
-                    boolean retry = true;
-                    ExponentialBackOff backOff = new ExponentialBackOff.Builder()
-                            .setMaxElapsedTimeMillis(60 * 5 * 1000)
-                            .build();
+                for (String viewId : viewIdList) {
+                    String token = null;
 
-                    //Call the batchGet method.
-                    GetReportsResponse response = null;
                     do {
-                        try {
-                            response = service.reports().batchGet(getReport).execute();
-                            retry = false;
-                        } catch (IOException ex) {
-                            long sleep = backOff.nextBackOffMillis();
+                        //Create the ReportRequest object.
+                        ReportRequest request = new ReportRequest()
+                                .setViewId(viewId)
+                                .setDateRanges(Arrays.asList(dateRange))
+                                .setDimensions(dimensions)
+                                .setMetrics(metrics)
+                                .setFiltersExpression(cli.getParameter("filter"))
+                                .setPageToken(token);
 
-                            if (sleep == BackOff.STOP) {
+                        ArrayList<ReportRequest> requests = new ArrayList();
+                        requests.add(request);
+
+                        //Create the GetReportsRequest object.
+                        GetReportsRequest getReport = new GetReportsRequest().setReportRequests(requests);
+
+                        //Defines the exponential backoff for multiples retries.
+                        boolean retry = true;
+                        ExponentialBackOff backOff = new ExponentialBackOff.Builder()
+                                .setMaxElapsedTimeMillis(60 * 5 * 1000)
+                                .build();
+
+                        //Call the batchGet method.
+                        GetReportsResponse response = null;
+                        do {
+                            try {
+                                response = service.reports().batchGet(getReport).execute();
                                 retry = false;
-                                Logger.getLogger(GoogleAnalytics.class.getName()).log(Level.SEVERE, "Report request failed after maximum elapsed millis: " + backOff.getMaxElapsedTimeMillis(), ex);
-                            } else {
-                                Logger.getLogger(GoogleAnalytics.class.getName()).log(Level.SEVERE, "Trying to recover of: ", ex);
-                                Thread.sleep(sleep);
+                            } catch (IOException ex) {
+                                long sleep = backOff.nextBackOffMillis();
+
+                                if (sleep == BackOff.STOP) {
+                                    retry = false;
+                                    Logger.getLogger(GoogleAnalytics.class.getName()).log(Level.SEVERE, "Report request failed after maximum elapsed millis: " + backOff.getMaxElapsedTimeMillis(), ex);
+                                } else {
+                                    Logger.getLogger(GoogleAnalytics.class.getName()).log(Level.SEVERE, "Trying to recover of: ", ex);
+                                    Thread.sleep(sleep);
+                                }
                             }
-                        }
-                    } while (retry);
+                        } while (retry);
 
-                    if (response != null) {
-                        //Reads the response.
-                        for (Report report : response.getReports()) {
-                            ColumnHeader header = report.getColumnHeader();
-                            List<MetricHeaderEntry> metricHeaders = header.getMetricHeader().getMetricHeaderEntries();
-                            List<ReportRow> rows = report.getData().getRows();
+                        if (response != null) {
+                            //Reads the response.
+                            for (Report report : response.getReports()) {
+                                ColumnHeader header = report.getColumnHeader();
+                                List<MetricHeaderEntry> metricHeaders = header.getMetricHeader().getMetricHeaderEntries();
+                                List<ReportRow> rows = report.getData().getRows();
 
-                            if (rows == null) {
-                                Logger.getLogger(GoogleAnalytics.class.getName()).log(Level.INFO, "No data found for {0} in interval {1} and {2}", new Object[]{viewId, dateRange.getStartDate(), dateRange.getEndDate()});
-                                return;
-                            }
-
-                            //Reads each report row.
-                            rows.forEach((row) -> {
-                                ArrayList<Object> record = new ArrayList();
-
-                                //Writes parameters.                    
-                                record.add(viewId);
-
-                                //Writes dimensions.
-                                row.getDimensions().forEach((dimension) -> {
-                                    record.add(dimension);
-                                });
-
-                                //Writes metrics.
-                                List<DateRangeValues> reportMetrics = row.getMetrics();
-
-                                for (int i = 0; i < reportMetrics.size(); i++) {
-                                    DateRangeValues values = reportMetrics.get(i);
-                                    for (int j = 0; j < values.getValues().size() && j < metricHeaders.size(); j++) {
-                                        record.add(values.getValues().get(j));
-                                    }
+                                if (rows == null) {
+                                    Logger.getLogger(GoogleAnalytics.class.getName()).log(Level.INFO, "No data found for {0} in interval {1} and {2}", new Object[]{viewId, dateRange.getStartDate(), dateRange.getEndDate()});
+                                    return;
                                 }
 
-                                mitt.write(record);
-                            });
+                                //Reads each report row.
+                                rows.forEach((row) -> {
+                                    ArrayList<Object> record = new ArrayList();
 
-                            token = report.getNextPageToken();
+                                    //Writes parameters.                    
+                                    record.add(viewId);
+
+                                    //Writes dimensions.
+                                    row.getDimensions().forEach((dimension) -> {
+                                        record.add(dimension);
+                                    });
+
+                                    //Writes metrics.
+                                    List<DateRangeValues> reportMetrics = row.getMetrics();
+
+                                    for (int j = 0; j < reportMetrics.size(); j++) {
+                                        DateRangeValues values = reportMetrics.get(j);
+                                        for (int k = 0; k < values.getValues().size() && k < metricHeaders.size(); k++) {
+                                            record.add(values.getValues().get(k));
+                                        }
+                                    }
+
+                                    mitt.write(record);
+                                });
+
+                                token = report.getNextPageToken();
+                            }
                         }
-                    }
-                } while (token != null);
+                    } while (token != null);
+                }
             }
         } catch (DuplicateEntityException
                 | IOException
