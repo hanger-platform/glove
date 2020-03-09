@@ -99,11 +99,19 @@ public class ElastiCubeStatus {
      * @return
      */
     public String getStatusMessage(int statusNumber) {
+        CubeStatus status = null;
         String statusMessage = "";
-        CubeStatus status = CubeStatus.valueOf("_" + statusNumber);
+
+        try {
+            status = CubeStatus.valueOf("_" + statusNumber);
+        } catch (Exception ex) {
+            Logger.getLogger(ElastiCubeStatus.class.getName()).log(Level.SEVERE, "Fail getting status descroption of ", statusNumber);
+        }
 
         if (status != null) {
             statusMessage = status.status;
+        } else {
+            statusMessage = "Undefined";
         }
 
         return statusMessage;

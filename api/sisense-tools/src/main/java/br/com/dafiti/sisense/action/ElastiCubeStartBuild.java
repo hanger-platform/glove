@@ -68,8 +68,10 @@ public class ElastiCubeStartBuild {
         //Identifies cube status.
         status = elastiCubesStatus.getStatus();
 
-        //Identifies if cube is running (2) or falted (4).
-        if (status != 2 && status != 4) {
+        //Identifies if cube is stopped (1) or running (2) or falted (4).
+        if (status != 1
+                && status != 2
+                && status != 4) {
             monitor = true;
         } else {
             try {
@@ -106,7 +108,7 @@ public class ElastiCubeStartBuild {
                     //Identifies if any status different than "running (2)" is got.
                     if (status != 2) {
                         System.exit(1);
-                    }else{
+                    } else {
                         Logger.getLogger(ElastiCubeStartBuild.class.getName()).log(Level.INFO, "{0} built successfully", this.cube);
                     }
 
