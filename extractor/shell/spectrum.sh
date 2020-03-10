@@ -18,7 +18,8 @@ SCHEMA_HASH=`echo -n ${SCHEMA} | md5sum | awk '{print substr($1,1,6)}'`
 
 # Caminho do bucket.
 STORAGE_QUEUE_PATH="s3://${STORAGE_BUCKET}/${SCHEMA_HASH}_${SCHEMA}/${ENTITY_HASH}_${TABLE}/rawfile/queue/"
-STORAGE_RECOVERY_QUEUE_PATH="s3://${STORAGE_BUCKET}/disaster_recovery/${SCHEMA_HASH}_${SCHEMA}/${ENTITY_HASH}_${TABLE}/rawfile/queue/"
+STORAGE_DISASTER_RECOVERY_QUEUE_PATH="s3://${STORARE_BUCKET_DISASTER_RECOVERY}/disaster_recovery/${SCHEMA_HASH}_${SCHEMA}/${ENTITY_HASH}_${TABLE}/rawfile/queue/"
+STORAGE_STAGING_QUEUE_PATH="s3://${STORARE_BUCKET_STAGING}/staging"
 
 # Arquivo de dados. 
 DATA_FILE="${SCHEMA}_${TABLE}"
@@ -439,7 +440,7 @@ run_on_athena()
     ATHENA_QUERY_ID=`aws athena start-query-execution \
             --query-string "${QUERY}" \
             --output text \
-            --result-configuration OutputLocation=s3://${STORAGE_BUCKET}/staging`
+            --result-configuration OutputLocation=${STORAGE_STAGING_QUEUE_PATH}`
 
     # Identifica o status de execução.
     while true
@@ -535,8 +536,8 @@ if [ ${IS_RECREATE} = 1 -o ${IS_RELOAD} = 1 ]; then
     DATE=`date '+%Y%m%d%H%M%S'`
 
     # Cria o arquivo de recuperação a partir dos arquivos do processo.
-    echo "Moving files to recovery folder ${STORAGE_RECOVERY_QUEUE_PATH}!"
-    aws s3 mv ${STORAGE_QUEUE_PATH} ${STORAGE_RECOVERY_QUEUE_PATH}${DATE}/ --recursive --only-show-errors
+    echo "Moving files to recovery folder ${STORAGE_DISASTER_RECOVERY_QUEUE_PATH}!"
+    aws s3 mv ${STORAGE_QUEUE_PATH} ${STORAGE_DISASTER_RECOVERY_QUEUE_PATH}${DATE}/ --recursive --only-show-errors
 
 	if [ ${IS_RELOAD} = 0 ]; then
 		# Dropa a tabela para que possa ser recriada.         
@@ -653,7 +654,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
     fi
 
 	# Identifica a quantidade de registros na tabela.
-    ATHENA_QUERY_ID=`aws athena start-query-execution --query-string "select count(1) from ${SCHEMA}.${TABLE};" --output text --result-configuration OutputLocation=s3://${STORAGE_BUCKET}/staging`
+    ATHENA_QUERY_ID=`aws athena start-query-execution --query-string "select count(1) from ${SCHEMA}.${TABLE};" --output text --result-configuration OutputLocation=${STORAGE_STAGING_QUEUE_PATH}`
     error_check
 
     while true

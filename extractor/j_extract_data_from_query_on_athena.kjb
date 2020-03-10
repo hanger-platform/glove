@@ -323,7 +323,7 @@ if [ ${DEBUG} = 1 ] ; then
 	echo  "${INPUT_DATA_STATEMENT_ESCAPED}"
 fi
 
-QUERY_ID=$(aws athena start-query-execution --query-string  "${INPUT_DATA_STATEMENT_ESCAPED}"  --output text --result-configuration OutputLocation=s3://${STORAGE_BUCKET}/staging)
+QUERY_ID=$(aws athena start-query-execution --query-string  "${INPUT_DATA_STATEMENT_ESCAPED}"  --output text --result-configuration OutputLocation=s3://${STORARE_BUCKET_STAGING}/staging)
 error_check
 
 echo "Running query $QUERY_ID!"
