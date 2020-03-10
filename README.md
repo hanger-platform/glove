@@ -1,3 +1,4 @@
+
 # Glove [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ### Plataforma modular para automatização de processos de integração de dados
 
@@ -7,15 +8,15 @@
 
 - Linux
 - Open JDK 8
-- Git 
+- Git 
 - Tomcat 8 +
 - Google Cloud SDK
 - AWS Cli
-- Jenkins ( [https://jenkins.io/](https://jenkins.io/) )
+- Jenkins ( [https://jenkins.io/](https://jenkins.io/) )
 - Pentaho Data Integration
-- Parallel ( [https://www.gnu.org/software/parallel/](https://www.gnu.org/software/parallel/) )
+- Parallel ( [https://www.gnu.org/software/parallel/](https://www.gnu.org/software/parallel/) )
 - jq ([https://stedolan.github.io/jq/](https://stedolan.github.io/jq/))
-- pigz ( [https://zlib.net/pigz/](https://zlib.net/pigz/) )
+- pigz ( [https://zlib.net/pigz/](https://zlib.net/pigz/) )
 
 ##### CONFIGURAÇÃO
 
@@ -47,7 +48,7 @@ GLOVE_SISENSE_URL=<Sisense URL>
 GLOVE_SISENSE_TOKEN=<Sisense API Token>    
 ```
 
-Para configuração do Spectrum Role, consulte esta documentação:  [Utilização do Amazon Redshift Spectrum para consultar dados externos](https://docs.aws.amazon.com/pt_br/redshift/latest/dg/c-using-spectrum.html)   
+Para configuração do Spectrum Role, consulte esta documentação:  [Utilização do Amazon Redshift Spectrum para consultar dados externos](https://docs.aws.amazon.com/pt_br/redshift/latest/dg/c-using-spectrum.html)   
 
 - Crie o arquivo ~/.kettle/connection.properties, inserindo o cabeçalho e uma nova linha para cada conexão:  
 
@@ -57,8 +58,8 @@ Para configuração do Spectrum Role, consulte esta documentação:  [Utiliza�
     - **DB_HOST**: Endereço do banco de dados .
     - **DB_DATABASE**: Database.
     - **DB_USER**: Usuário do banco de dados.
-    - **DB_PASSWORD**: Senha do usuário do banco de dados. 
-    - **DATABASE_TYPE**: Tipo do banco de dados, sendo suportado os seguintes valores: **REDSHIFT, ATHENA, MYSQL, POSTGRES **e** SAP_HANA**. 
+    - **DB_PASSWORD**: Senha do usuário do banco de dados. 
+    - **DATABASE_TYPE**: Tipo do banco de dados, sendo suportado os seguintes valores: **REDSHIFT, ATHENA, MYSQL, POSTGRES **e** SAP_HANA**. 
 
 ##### TECNOLOGIAS SUPORTADAS
 
@@ -79,16 +80,16 @@ O destino de dados suportados são os seguintes:
 
 ##### LIMITAÇÕES CONHECIDAS
 
-1. Os campos do tipo _Timestamp_ e _Date_ são sempre convertidos para _String_. 
-2. O particionamento dos arquivos Parquet e Orc é sempre realizado pela coluna partition_field e, quando utilizada partição real, a filtragem dos registros deve ser realizada pela coluna partition_value. 
+1. Os campos do tipo _Timestamp_ e _Date_ são sempre convertidos para _String_. 
+2. O particionamento dos arquivos Parquet e Orc é sempre realizado pela coluna partition_field e, quando utilizada partição real, a filtragem dos registros deve ser realizada pela coluna partition_value. 
 
 ## Módulos
 
 ##### DATABASE MODULE
 
-Permite a extração de dados de bancos de dados relacionais, garantindo que os dados serão integrados entre a origem e o destino e que a estrutura das tabelas sejam mantidas idênticas. 
+Permite a extração de dados de bancos de dados relacionais, garantindo que os dados serão integrados entre a origem e o destino e que a estrutura das tabelas sejam mantidas idênticas. 
 
-Campos do tipo **Date** e **Timestamp** serão sempre criadas como **String** na tabela de destino. 
+Campos do tipo **Date** e **Timestamp** serão sempre criadas como **String** na tabela de destino. 
 
 Quando utilizamos o Spectrum como destino, os dados extraídos da origem são convertidos para Parquet ou Orc e armazenados no S3. Se não for utilizado nenhum campo para particionamento dos dados, será gerado um único arquivo no S3 e a atualização das informações do arquivo se tornarão mais lentas. Quando definido o PARTITION_FIELD, o conteúdo deste campo será utilizado para definir como os arquivos serão criados e, posteriormente, atualizados. Sendo assim, deve ser definido como PARTITION_FIELD um campo cujos valores não sofram atualização. Ex.: created_at
 
@@ -129,7 +130,7 @@ bash kitchen.sh -file=<GLOVE_HOME>/extractor/glove.kjb \
 
 ##### FILE MODULE
 
-Permite a extração de dados de arquivos .csv contendo cabeçalho, a inferência de tipos e a criação de  tabela no destino para recepção dos dados. 
+Permite a extração de dados de arquivos .csv contendo cabeçalho, a inferência de tipos e a criação de  tabela no destino para recepção dos dados. 
 
 ###### UTILIZAÇÃO
 
@@ -168,7 +169,7 @@ bash kitchen.sh -file=<GLOVE_HOME>/extractor/glove.kjb \
 
 ##### NAMED QUERY MODULE
 
-Permite a construção de processos de extração de dados compostos por um ou mais _steps_ com fontes de dados distintas e executados de forma sequencial.
+Permite a construção de processos de extração de dados compostos por um ou mais _steps_ com fontes de dados distintas e executados de forma sequencial.
 
 ###### EXEMPLO
 
@@ -199,7 +200,7 @@ bash kitchen.sh -file=<GLOVE_HOME>/extractor/glove.kjb \
 
 ###### CONSTRUÇÃO
 
-Uma _named query_ é composta por um ou mais arquivos [.sql](https://dafiti.jira.com/wiki/spaces/BIDG/pages/807698514/GLOVE#GLOVE-sql) e, quando necessário, um arquivo [.manifest](https://dafiti.jira.com/wiki/spaces/BIDG/pages/807698514/GLOVE#GLOVE-manifest) que devem ser organizados dentro um diretório da seguinte forma:
+Uma _named query_ é composta por um ou mais arquivos [.sql](https://dafiti.jira.com/wiki/spaces/BIDG/pages/807698514/GLOVE#GLOVE-sql) e, quando necessário, um arquivo [.manifest](https://dafiti.jira.com/wiki/spaces/BIDG/pages/807698514/GLOVE#GLOVE-manifest) que devem ser organizados dentro um diretório da seguinte forma:
 
 - Folder
     - 1.schema.table.connection.mode.sql
@@ -209,7 +210,7 @@ Uma _named query_ é composta por um ou mais arquivos [.sql](https://dafiti.j
 
 ###### .SQL
 
-Permite definir a instrução que será realizada pelo _step_, sendo que cada atributo do nome do arquivo (separados por ponto) deve ser definido de acordo com a seguinte regra:
+Permite definir a instrução que será realizada pelo _step_, sendo que cada atributo do nome do arquivo (separados por ponto) deve ser definido de acordo com a seguinte regra:
 
 | Parâmetro | Valor                                                                                                                                              |
 |-----------|----------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -266,7 +267,7 @@ Neste exemplo:
 
 ###### .MANIFEST
 
-Permite parametrizar cada **step** individualmente, de modo que além dos atributos obrigatórios contidos no nome do arquivo é possível individualizar alguns parâmetros como o tipo de campo, por meio do atributo METADATA, e passar parâmetros diferentes para cada step, por meio do parâmetro PARAMETER.
+Permite parametrizar cada **step** individualmente, de modo que além dos atributos obrigatórios contidos no nome do arquivo é possível individualizar alguns parâmetros como o tipo de campo, por meio do atributo METADATA, e passar parâmetros diferentes para cada step, por meio do parâmetro PARAMETER.
 
 | Atributo  | Valor                                                                                                                                                                                                                                                                                                                                    |   |   | Escope      |
 |-----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---|---|-------------|
@@ -325,7 +326,8 @@ O metadado possui os seguintes atributos obrigatórios:
 |                    | IS_RELOAD                | Identifica se todos os dados devem ser recarregados sem que a tabela de destino seja recriada. Não é criado disaster recovery.                                                                                                                                                                                                                                                   |
 |                    | NAMED_QUERY              | Identifica o diretório contendo osstepsde umanamed query.                                                                                                                                                                                                                                                                                         |
 |                    | NAMED_QUERY_DIRECTORY    | Identifica o diretório de origem dasnamed queries. Por padrão, asnamed queriessão procuradas no diretório /home/etl/named_query                                                                                                                                                                                                                   |
-|                    | NAMED_QUERY_IGNORE_STEP  | Identifica os passos que devem ser ignorados na execução de umanamed query.                                                                                                                                                                                                                                                                       |
+|                    | NAMED_QUERY_IGNORE_STEP  | Identifica os passos que devem ser ignorados na execução de uma named query.                                                                                                                                                                                                                                                                       |
+|                    | NAMED_QUERY_INCLUDE_STEP  | Identifica os passos que devem ser considerados na execução de umanamed query.                                                                                                                                                                                                                                                                       |
 |                    | OUTPUT_FORMAT            | Identifica o formato de arquivo de saída.                                                                                                                                                                                                                                                                                                         |
 |                    | OUTPUT_COMPRESSION       | Identifica o tipo de compressão dos arquivos de saída, sendo suportado gzip e snappy.                                                                                                                                                                                                                                                             |
 |                    | WHERE_CONDITION_TO_DELTA | Condição para carga delta.                                                                                                                                                                                                                                                                                                                        |
@@ -356,7 +358,7 @@ O metadado possui os seguintes atributos obrigatórios:
 | SPECTRUM           | HAS_ATHENA               | Identifica se o AWS Athena está disponível                                                                                                                                                                                                                                                                                                        |
 | SPECTRUM           | FIELD_HAS_PREFIX         | Identifica se o prefixo dos campos das tabelas do HANA devem ser mantidos.                                                                                                                                                                                                                                                                        |
 | SPECTRUM           | SPLIT_STRATEGY         | Identifica a estratégia utilizada para o particionamento dos dados sendo: FAST, os dados sendo processados são confiáveis e não contém caracteres especiais ou quebra de linas. SECURE, os dados não são confiáveis. Default: SECURE.                                                                                                                                                                                                                                                                       |
-| REDSHIFT           | QUOTE                | Identifica se o unload de dados do Redshift devem conter aspas duplas, sendo 0 para não e 1 para sim.                                                                                                                          
+| REDSHIFT           | QUOTE                | Identifica se o unload de dados do Redshift devem conter aspas duplas, sendo 0 para não e 1 para sim.
 
 
 ## Contributing, Bugs, Questions
