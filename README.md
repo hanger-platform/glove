@@ -48,8 +48,8 @@ GLOVE_SISENSE_URL=<Sisense URL>
 GLOVE_SISENSE_TOKEN=<Sisense API Token>    
 
 # Support buckets
-STORARE_BUCKET_STAGING=<S3 bucket para dados temporários>
-STORARE_BUCKET_DISASTER_RECOVERY=<S3 bucket para disaster recovery>
+GLOVE_STORARE_BUCKET_STAGING=<S3 bucket para dados temporários>
+GLOVE_STORARE_BUCKET_DISASTER_RECOVERY=<S3 bucket para disaster recovery>
 ```
 
 
