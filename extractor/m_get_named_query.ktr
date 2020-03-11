@@ -1462,8 +1462,10 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
 						} else {
 							values[1] = new SimpleDateFormat(mask).format( new Date() );
 						}	
-
-						logBasic( "Result of data macro ( " + macro + " ) evaluation of parameter " + values[0] + ": " + values[1] );				
+						
+						if (first) {
+							logBasic( "Result of data macro ( " + macro + " ) evaluation of parameter " + values[0] + ": " + values[1] );				
+						}
 					}
 
 					//Replace element parameters.
