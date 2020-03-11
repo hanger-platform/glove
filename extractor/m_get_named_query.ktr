@@ -687,50 +687,6 @@ export_bucket</note>
     </GUI>
   </step>
   <step>
-    <name>Ignored step filter</name>
-    <type>FilterRows</type>
-    <description />
-    <distribute>Y</distribute>
-    <custom_distribution />
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name />
-    </partitioning>
-    <send_true_to>Export bucket default</send_true_to>
-    <send_false_to>Ignored step log</send_false_to>
-    <compare>
-      <condition>
-        <negated>N</negated>
-        <leftvalue>step_to_ignore</leftvalue>
-        <function>=</function>
-        <rightvalue />
-        <value>
-          <name>constant</name>
-          <type>String</type>
-          <text />
-          <length>-1</length>
-          <precision>-1</precision>
-          <isnull>Y</isnull>
-          <mask />
-        </value>
-      </condition>
-    </compare>
-    <attributes />
-    <cluster_schema />
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>1632</xloc>
-      <yloc>176</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
     <name>Get steps to ignore</name>
     <type>GetVariable</type>
     <description />
@@ -765,6 +721,45 @@ export_bucket</note>
     </remotesteps>
     <GUI>
       <xloc>864</xloc>
+      <yloc>48</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Get steps to include</name>
+    <type>GetVariable</type>
+    <description />
+    <distribute>N</distribute>
+    <custom_distribution />
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name />
+    </partitioning>
+    <fields>
+      <field>
+        <name>included_step</name>
+        <variable>${NAMED_QUERY_INCLUDE_STEP}</variable>
+        <type>String</type>
+        <format />
+        <currency />
+        <decimal />
+        <group />
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>both</trim_type>
+      </field>
+    </fields>
+    <attributes />
+    <cluster_schema />
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1120</xloc>
       <yloc>48</yloc>
       <draw>Y</draw>
     </GUI>
@@ -933,7 +928,51 @@ export_bucket</note>
     </GUI>
   </step>
   <step>
-    <name>Not included step log</name>
+    <name>Ignored step filter</name>
+    <type>FilterRows</type>
+    <description />
+    <distribute>Y</distribute>
+    <custom_distribution />
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name />
+    </partitioning>
+    <send_true_to>Export bucket default</send_true_to>
+    <send_false_to>Ignored step log</send_false_to>
+    <compare>
+      <condition>
+        <negated>N</negated>
+        <leftvalue>step_to_ignore</leftvalue>
+        <function>=</function>
+        <rightvalue />
+        <value>
+          <name>constant</name>
+          <type>String</type>
+          <text />
+          <length>-1</length>
+          <precision>-1</precision>
+          <isnull>Y</isnull>
+          <mask />
+        </value>
+      </condition>
+    </compare>
+    <attributes />
+    <cluster_schema />
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1632</xloc>
+      <yloc>176</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Ignored step log</name>
     <type>WriteToLog</type>
     <description />
     <distribute>Y</distribute>
@@ -962,42 +1001,8 @@ export_bucket</note>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1504</xloc>
+      <xloc>1632</xloc>
       <yloc>288</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Join</name>
-    <type>MergeJoin</type>
-    <description />
-    <distribute>Y</distribute>
-    <custom_distribution />
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name />
-    </partitioning>
-    <join_type>LEFT OUTER</join_type>
-    <step1>Sort file</step1>
-    <step2>Unique order</step2>
-    <keys_1>
-      <key>order</key>
-    </keys_1>
-    <keys_2>
-      <key>manifest_order</key>
-    </keys_2>
-    <attributes />
-    <cluster_schema />
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>752</xloc>
-      <yloc>176</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1039,6 +1044,196 @@ export_bucket</note>
     </remotesteps>
     <GUI>
       <xloc>992</xloc>
+      <yloc>176</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Included step filter</name>
+    <type>FilterRows</type>
+    <description />
+    <distribute>Y</distribute>
+    <custom_distribution />
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name />
+    </partitioning>
+    <send_true_to>Ignored step filter</send_true_to>
+    <send_false_to>Not included step log</send_false_to>
+    <compare>
+      <condition>
+        <negated>N</negated>
+        <conditions>
+          <condition>
+            <negated>N</negated>
+            <leftvalue>included_step</leftvalue>
+            <function>=</function>
+            <rightvalue />
+            <value>
+              <name>constant</name>
+              <type>String</type>
+              <text />
+              <length>-1</length>
+              <precision>-1</precision>
+              <isnull>Y</isnull>
+              <mask />
+            </value>
+          </condition>
+          <condition>
+            <negated>N</negated>
+            <operator>OR</operator>
+            <conditions>
+              <condition>
+                <negated>N</negated>
+                <leftvalue>included_step</leftvalue>
+                <function>&lt;></function>
+                <rightvalue />
+                <value>
+                  <name>constant</name>
+                  <type>String</type>
+                  <text />
+                  <length>-1</length>
+                  <precision>-1</precision>
+                  <isnull>Y</isnull>
+                  <mask />
+                </value>
+              </condition>
+              <condition>
+                <negated>N</negated>
+                <operator>AND</operator>
+                <leftvalue>step_to_include</leftvalue>
+                <function>IS NOT NULL</function>
+                <rightvalue />
+              </condition>
+            </conditions>
+          </condition>
+        </conditions>
+      </condition>
+    </compare>
+    <attributes />
+    <cluster_schema />
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1504</xloc>
+      <yloc>176</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Included steps</name>
+    <type>StreamLookup</type>
+    <description />
+    <distribute>Y</distribute>
+    <custom_distribution />
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name />
+    </partitioning>
+    <from>Split field to rows in</from>
+    <input_sorted>N</input_sorted>
+    <preserve_memory>Y</preserve_memory>
+    <sorted_list>N</sorted_list>
+    <integer_pair>N</integer_pair>
+    <lookup>
+      <key>
+        <name>order</name>
+        <field>step_to_include</field>
+      </key>
+      <value>
+        <name>step_to_include</name>
+        <rename>step_to_include</rename>
+        <default />
+        <type>String</type>
+      </value>
+    </lookup>
+    <attributes />
+    <cluster_schema />
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1248</xloc>
+      <yloc>176</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Join</name>
+    <type>MergeJoin</type>
+    <description />
+    <distribute>Y</distribute>
+    <custom_distribution />
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name />
+    </partitioning>
+    <join_type>LEFT OUTER</join_type>
+    <step1>Sort file</step1>
+    <step2>Unique order</step2>
+    <keys_1>
+      <key>order</key>
+    </keys_1>
+    <keys_2>
+      <key>manifest_order</key>
+    </keys_2>
+    <attributes />
+    <cluster_schema />
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>752</xloc>
+      <yloc>176</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Join </name>
+    <type>JoinRows</type>
+    <description />
+    <distribute>Y</distribute>
+    <custom_distribution />
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name />
+    </partitioning>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>out</prefix>
+    <cache_size>500</cache_size>
+    <main>Ignored steps</main>
+    <compare>
+      <condition>
+        <negated>N</negated>
+        <leftvalue />
+        <function>=</function>
+        <rightvalue />
+      </condition>
+    </compare>
+    <attributes />
+    <cluster_schema />
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1120</xloc>
       <yloc>176</yloc>
       <draw>Y</draw>
     </GUI>
@@ -1158,6 +1353,41 @@ export_bucket</note>
     <GUI>
       <xloc>864</xloc>
       <yloc>176</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Not included step log</name>
+    <type>WriteToLog</type>
+    <description />
+    <distribute>Y</distribute>
+    <custom_distribution />
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name />
+    </partitioning>
+    <loglevel>log_level_basic</loglevel>
+    <displayHeader>Y</displayHeader>
+    <limitRows>N</limitRows>
+    <limitRowsNumber>0</limitRowsNumber>
+    <logmessage />
+    <fields>
+      <field>
+        <name>order</name>
+      </field>
+    </fields>
+    <attributes />
+    <cluster_schema />
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1504</xloc>
+      <yloc>288</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1460,11 +1690,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
       <exclude_filemask />
       <file_required>N</file_required>
       <include_subfolders>N</include_subfolders>
-      <name>/home/valdiney/Projects/Dafiti/bi_dafiti_group_named_query/spc_delivery_nps/</name>
-      <filemask>.*\.sql$</filemask>
-      <exclude_filemask />
-      <file_required>N</file_required>
-      <include_subfolders>N</include_subfolders>
     </file>
     <attributes />
     <cluster_schema />
@@ -1670,6 +1895,90 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     </GUI>
   </step>
   <step>
+    <name>Split field to rows in</name>
+    <type>UserDefinedJavaClass</type>
+    <description />
+    <distribute>Y</distribute>
+    <custom_distribution />
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name />
+    </partitioning>
+    <definitions>
+      <definition>
+        <class_type>TRANSFORM_CLASS</class_type>
+        <class_name>Processor</class_name>
+        <class_source>public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws KettleException {
+    Object[] r = getRow();
+    boolean process = (r != null);
+
+    if( process ){
+		//Get ignored step.
+		String included_step = get(Fields.In, "included_step").getString(r);
+		String[] steps = new String[0]; 
+
+		//Identify if are step to ignore. 
+		if( ! included_step.isEmpty() ){
+			//Split steps. 
+			steps = included_step.split(",");
+
+			for ( int i = 0; i &lt; steps.length; i++ ) {
+				//Identify if it is a range. 
+				if ( steps[i].contains("-") ){
+					String[] range = steps[i].split("-");
+
+					if ( range.length == 2 ) {	
+						//Evaluate the range and send the step to the output. 
+						for ( int j = Integer.valueOf(range[0]); j &lt;= Integer.valueOf(range[1]); j++ ) {
+							Object[] out = createOutputRow(r, data.outputRowMeta.size());
+							get(Fields.Out, "step_to_include").setValue( out, Integer.toString(j) );
+							putRow(data.outputRowMeta, out);
+						}	
+					}	
+				} else {
+					//Send the step to the output. 
+					Object[] out = createOutputRow(r, data.outputRowMeta.size());
+					get(Fields.Out, "step_to_include").setValue( out, steps[i].toString() );
+					putRow(data.outputRowMeta, out);
+				}
+			}
+		}
+    }else{
+      setOutputDone();
+    }
+
+    return process;
+}</class_source>
+      </definition>
+    </definitions>
+    <fields>
+      <field>
+        <field_name>step_to_include</field_name>
+        <field_type>String</field_type>
+        <field_length>-1</field_length>
+        <field_precision>-1</field_precision>
+      </field>
+    </fields>
+    <clear_result_fields>N</clear_result_fields>
+    <info_steps />
+    <target_steps />
+    <usage_parameters />
+    <attributes />
+    <cluster_schema />
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1248</xloc>
+      <yloc>48</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
     <name>Split field to rows out</name>
     <type>UserDefinedJavaClass</type>
     <description />
@@ -1785,320 +2094,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     <GUI>
       <xloc>752</xloc>
       <yloc>48</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Get steps to include</name>
-    <type>GetVariable</type>
-    <description />
-    <distribute>N</distribute>
-    <custom_distribution />
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name />
-    </partitioning>
-    <fields>
-      <field>
-        <name>included_step</name>
-        <variable>${NAMED_QUERY_INCLUDE_STEP}</variable>
-        <type>String</type>
-        <format />
-        <currency />
-        <decimal />
-        <group />
-        <length>-1</length>
-        <precision>-1</precision>
-        <trim_type>both</trim_type>
-      </field>
-    </fields>
-    <attributes />
-    <cluster_schema />
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>1120</xloc>
-      <yloc>48</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Included steps</name>
-    <type>StreamLookup</type>
-    <description />
-    <distribute>Y</distribute>
-    <custom_distribution />
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name />
-    </partitioning>
-    <from>Split field to rows in</from>
-    <input_sorted>N</input_sorted>
-    <preserve_memory>Y</preserve_memory>
-    <sorted_list>N</sorted_list>
-    <integer_pair>N</integer_pair>
-    <lookup>
-      <key>
-        <name>order</name>
-        <field>step_to_include</field>
-      </key>
-      <value>
-        <name>step_to_include</name>
-        <rename>step_to_include</rename>
-        <default />
-        <type>String</type>
-      </value>
-    </lookup>
-    <attributes />
-    <cluster_schema />
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>1248</xloc>
-      <yloc>176</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Split field to rows in</name>
-    <type>UserDefinedJavaClass</type>
-    <description />
-    <distribute>Y</distribute>
-    <custom_distribution />
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name />
-    </partitioning>
-    <definitions>
-      <definition>
-        <class_type>TRANSFORM_CLASS</class_type>
-        <class_name>Processor</class_name>
-        <class_source>public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws KettleException {
-    Object[] r = getRow();
-    boolean process = (r != null);
-
-    if( process ){
-		//Get ignored step.
-		String included_step = get(Fields.In, "included_step").getString(r);
-		String[] steps = new String[0]; 
-
-		//Identify if are step to ignore. 
-		if( ! included_step.isEmpty() ){
-			//Split steps. 
-			steps = included_step.split(",");
-
-			for ( int i = 0; i &lt; steps.length; i++ ) {
-				//Identify if it is a range. 
-				if ( steps[i].contains("-") ){
-					String[] range = steps[i].split("-");
-
-					if ( range.length == 2 ) {	
-						//Evaluate the range and send the step to the output. 
-						for ( int j = Integer.valueOf(range[0]); j &lt;= Integer.valueOf(range[1]); j++ ) {
-							Object[] out = createOutputRow(r, data.outputRowMeta.size());
-							get(Fields.Out, "step_to_include").setValue( out, Integer.toString(j) );
-							putRow(data.outputRowMeta, out);
-						}	
-					}	
-				} else {
-					//Send the step to the output. 
-					Object[] out = createOutputRow(r, data.outputRowMeta.size());
-					get(Fields.Out, "step_to_include").setValue( out, steps[i].toString() );
-					putRow(data.outputRowMeta, out);
-				}
-			}
-		}
-    }else{
-      setOutputDone();
-    }
-
-    return process;
-}</class_source>
-      </definition>
-    </definitions>
-    <fields>
-      <field>
-        <field_name>step_to_include</field_name>
-        <field_type>String</field_type>
-        <field_length>-1</field_length>
-        <field_precision>-1</field_precision>
-      </field>
-    </fields>
-    <clear_result_fields>N</clear_result_fields>
-    <info_steps />
-    <target_steps />
-    <usage_parameters />
-    <attributes />
-    <cluster_schema />
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>1248</xloc>
-      <yloc>48</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Included step filter</name>
-    <type>FilterRows</type>
-    <description />
-    <distribute>Y</distribute>
-    <custom_distribution />
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name />
-    </partitioning>
-    <send_true_to>Ignored step filter</send_true_to>
-    <send_false_to>Not included step log</send_false_to>
-    <compare>
-      <condition>
-        <negated>N</negated>
-        <conditions>
-          <condition>
-            <negated>N</negated>
-            <leftvalue>included_step</leftvalue>
-            <function>=</function>
-            <rightvalue />
-            <value>
-              <name>constant</name>
-              <type>String</type>
-              <text />
-              <length>-1</length>
-              <precision>-1</precision>
-              <isnull>Y</isnull>
-              <mask />
-            </value>
-          </condition>
-          <condition>
-            <negated>N</negated>
-            <operator>OR</operator>
-            <conditions>
-              <condition>
-                <negated>N</negated>
-                <leftvalue>included_step</leftvalue>
-                <function>&lt;></function>
-                <rightvalue />
-                <value>
-                  <name>constant</name>
-                  <type>String</type>
-                  <text />
-                  <length>-1</length>
-                  <precision>-1</precision>
-                  <isnull>Y</isnull>
-                  <mask />
-                </value>
-              </condition>
-              <condition>
-                <negated>N</negated>
-                <operator>AND</operator>
-                <leftvalue>step_to_include</leftvalue>
-                <function>IS NOT NULL</function>
-                <rightvalue />
-              </condition>
-            </conditions>
-          </condition>
-        </conditions>
-      </condition>
-    </compare>
-    <attributes />
-    <cluster_schema />
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>1504</xloc>
-      <yloc>176</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Join </name>
-    <type>JoinRows</type>
-    <description />
-    <distribute>Y</distribute>
-    <custom_distribution />
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name />
-    </partitioning>
-    <directory>%%java.io.tmpdir%%</directory>
-    <prefix>out</prefix>
-    <cache_size>500</cache_size>
-    <main>Ignored steps</main>
-    <compare>
-      <condition>
-        <negated>N</negated>
-        <leftvalue />
-        <function>=</function>
-        <rightvalue />
-      </condition>
-    </compare>
-    <attributes />
-    <cluster_schema />
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>1120</xloc>
-      <yloc>176</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Ignored step log</name>
-    <type>WriteToLog</type>
-    <description />
-    <distribute>Y</distribute>
-    <custom_distribution />
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name />
-    </partitioning>
-    <loglevel>log_level_basic</loglevel>
-    <displayHeader>Y</displayHeader>
-    <limitRows>N</limitRows>
-    <limitRowsNumber>0</limitRowsNumber>
-    <logmessage />
-    <fields>
-      <field>
-        <name>order</name>
-      </field>
-    </fields>
-    <attributes />
-    <cluster_schema />
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>1632</xloc>
-      <yloc>288</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
