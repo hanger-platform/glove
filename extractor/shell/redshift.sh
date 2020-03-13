@@ -122,7 +122,7 @@ full_load()
 	aws s3 cp ${RAWFILE_QUEUE_MANIFEST_PATH} ${STORAGE_MANIFEST_PATH} --recursive --only-show-errors
 	error_check	
 
-	psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} << EOF
+	psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} -v ON_ERROR_STOP=1 << EOF
 		TRUNCATE TABLE ${SCHEMA}.${TABLE};
 		
 		COPY ${SCHEMA}.${TABLE} ( ${FIELD_NAME_LIST} )
@@ -136,6 +136,8 @@ full_load()
 		COMPUPDATE OFF
 		STATUPDATE OFF;
 EOF
+
+	# Identifica a ocorrência de erros e interrompe processo.
 	error_check	
 	
     if [ ${DEBUG} = 0 ] ; then
@@ -161,7 +163,7 @@ delta_load()
 	aws s3 cp ${RAWFILE_QUEUE_MANIFEST_PATH} ${STORAGE_MANIFEST_PATH} --recursive --only-show-errors
 	error_check	
 
-	psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} << EOF
+	psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} -v ON_ERROR_STOP=1 << EOF
 		CREATE TABLE #tmp_${TABLE} ( like ${SCHEMA}.${TABLE} ); 
 
 		COPY #tmp_${TABLE} ( ${FIELD_NAME_LIST} )
@@ -192,6 +194,8 @@ delta_load()
 			
 		ANALYZE ${SCHEMA}.${TABLE} predicate columns;	
 EOF
+
+	# Identifica a ocorrência de erros e interrompe processo.
 	error_check	
 	
     if [ ${DEBUG} = 0 ] ; then
