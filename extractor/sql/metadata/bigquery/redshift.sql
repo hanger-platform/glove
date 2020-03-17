@@ -13,7 +13,8 @@ SELECT * FROM (
         'int'::varchar(50) AS field_type,
         '{"name": "partition_field","type":"INTEGER"}'::varchar(255) AS json,
         'partition_field'::varchar(50) 				AS column_name,
-        0 											AS column_key
+        0 											AS column_key,
+		''                                          AS encoding
     FROM
         information_schema.columns c
 	WHERE
@@ -32,7 +33,8 @@ SELECT * FROM (
 		'varchar(255)'::varchar(50) 									AS field_type,
 		'{"name": "custom_primary_key","type":"STRING"}'::varchar(255) 	AS json,
         'custom_primary_key'::varchar(50) 								AS column_name,
-        1 																AS column_key
+        1 																AS column_key,
+		''                                                              AS encoding
 
 	UNION ALL
 
@@ -61,7 +63,8 @@ SELECT * FROM (
                 WHEN data_type = 'boolean' 																							THEN '"BOOLEAN"'
             END::varchar(255) ||' }' ) 						AS json,
         lower( column_name ) 								AS column_name,
-        0 													AS column_key
+        0 													AS column_key,
+		''                                                  AS encoding
     FROM
 		information_schema.columns c
    	WHERE
@@ -78,6 +81,7 @@ SELECT * FROM (
         'timestamp'::varchar(50) 									AS field_type,
   		'{"name": "etl_load_date","type":"STRING"}'::varchar(255) 	AS json,
         'etl_load_date'::varchar(50) 								AS column_name,
-        0 															AS column_key
+        0 															AS column_key,
+		''                                                          AS encoding
 ) x
 ORDER BY x.ordinal_position

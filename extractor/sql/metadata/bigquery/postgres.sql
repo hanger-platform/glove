@@ -13,7 +13,8 @@ SELECT * FROM (
         'int' 											AS field_type,
         '{"name": "partition_field","type":"INTEGER"}'  AS json,
         'partition_field' 							 	AS column_name,
-        0 											 	AS column_key
+        0 											 	AS column_key,
+		''                                              AS encoding
     FROM
         information_schema.columns c
 	WHERE
@@ -32,7 +33,8 @@ SELECT * FROM (
 		'varchar(255)' 										AS field_type,
 		'{"name": "custom_primary_key","type":"STRING"}' 	AS json,
         'custom_primary_key' 								AS column_name,
-        1 													AS column_key
+        1 													AS column_key,
+		''                                                  AS encoding
     FROM pg_index i
          JOIN pg_attribute a ON a.attrelid = i.indrelid  AND a.attnum = any(i.indkey)
     WHERE
@@ -68,7 +70,8 @@ SELECT * FROM (
                 WHEN data_type = 'boolean' 																							THEN '"BOOLEAN"'
             END ||' }' ) 		AS json,
         lower( column_name )	AS column_name,
-        0 						AS column_key
+        0 						AS column_key,
+		''                      AS encoding
     FROM
 		information_schema.columns c
    	WHERE
@@ -85,6 +88,7 @@ SELECT * FROM (
         'varchar(19)' 									AS field_type,
   		'{"name": "etl_load_date","type":"STRING"}' 	AS json,
         'etl_load_date' 								AS column_name,
-        0 												AS column_key
+        0 												AS column_key,
+		''                                              AS encoding
 ) x
 ORDER BY x.ordinal_position
