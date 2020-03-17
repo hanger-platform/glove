@@ -537,8 +537,8 @@ if [ ${IS_RECREATE} = 1 -o ${IS_RELOAD} = 1 ]; then
 
 	# Cria o arquivo de recuperação a partir dos arquivos do processo.
 	if [ ${IS_RECREATE} = 1 ]; then
-		echo "Moving files to recovery folder ${STORAGE_RECOVERY_QUEUE_PATH}!"
-		aws s3 mv ${STORAGE_QUEUE_PATH} ${STORAGE_RECOVERY_QUEUE_PATH}${DATE}/ --recursive --only-show-errors
+		echo "Moving files to recovery folder ${STORAGE_DISASTER_RECOVERY_QUEUE_PATH}!"
+		aws s3 mv ${STORAGE_QUEUE_PATH} ${STORAGE_DISASTER_RECOVERY_QUEUE_PATH}${DATE}/ --recursive --only-show-errors
 	fi
 
 	if [ ${IS_RELOAD} = 0 ]; then
