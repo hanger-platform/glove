@@ -789,7 +789,6 @@
         <type>String</type>
       </value>
     </lookup>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -825,10 +824,8 @@
         <replace_field_by_string />
         <whole_word>no</whole_word>
         <case_sensitive>no</case_sensitive>
-        <is_unicode>no</is_unicode>
       </field>
     </fields>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -868,6 +865,7 @@
     <create_parent_folder>Y</create_parent_folder>
     <file>
       <name>file</name>
+      <is_command>N</is_command>
       <servlet_output>N</servlet_output>
       <do_not_open_new_file_init>N</do_not_open_new_file_init>
       <extention>txt</extention>
@@ -908,13 +906,24 @@
         <length>-1</length>
         <precision>-1</precision>
       </field>
+      <field>
+        <name>encoding</name>
+        <type>String</type>
+        <format />
+        <currency />
+        <decimal />
+        <group />
+        <nullif />
+        <trim_type>both</trim_type>
+        <length>-1</length>
+        <precision>-1</precision>
+      </field>
     </fields>
     <ConcatFields>
       <targetFieldName>field_name_type</targetFieldName>
       <targetFieldLength>0</targetFieldLength>
       <removeSelectedFields>N</removeSelectedFields>
     </ConcatFields>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -980,7 +989,6 @@
         <remove_special_characters>none</remove_special_characters>
       </field>
     </fields>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1014,7 +1022,6 @@
       </field>
     </fields>
     <use_formatting>Y</use_formatting>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1098,7 +1105,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     <info_steps />
     <target_steps />
     <usage_parameters />
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1138,7 +1144,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
         <remove_special_characters>none</remove_special_characters>
       </field>
     </fields>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1172,7 +1177,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
       </field>
     </fields>
     <use_formatting>Y</use_formatting>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1206,7 +1210,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
       </field>
     </fields>
     <use_formatting>Y</use_formatting>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1285,7 +1288,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
         <remove_special_characters>none</remove_special_characters>
       </field>
     </fields>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1339,7 +1341,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
         </conditions>
       </condition>
     </compare>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1381,7 +1382,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
         <type>String</type>
       </value>
     </lookup>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1423,7 +1423,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
         <type>String</type>
       </value>
     </lookup>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1465,7 +1464,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
         <type>String</type>
       </value>
     </lookup>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1528,7 +1526,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
         <trim_type>both</trim_type>
       </field>
     </fields>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1567,7 +1564,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
         <trim_type>both</trim_type>
       </field>
     </fields>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1599,7 +1595,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     <execute_each_row>N</execute_each_row>
     <variables_active>Y</variables_active>
     <lazy_conversion_active>N</lazy_conversion_active>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1642,7 +1637,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
         <valuefield />
       </field>
     </fields>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1685,7 +1679,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
         <valuefield />
       </field>
     </fields>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1728,7 +1721,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
         <valuefield />
       </field>
     </fields>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1753,7 +1745,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
       <method>none</method>
       <schema_name />
     </partitioning>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1779,7 +1770,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
       <schema_name />
     </partitioning>
     <resultfieldname>last</resultfieldname>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1816,7 +1806,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
         <rightvalue />
       </condition>
     </compare>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1891,7 +1880,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     <info_steps />
     <target_steps />
     <usage_parameters />
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1925,7 +1913,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
       </field>
     </fields>
     <use_formatting>Y</use_formatting>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1968,7 +1955,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
         <item>partition_field</item>
       </line>
     </data>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -2118,7 +2104,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     <rootUriNameFieldName />
     <extensionFieldName />
     <sizeFieldName />
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -2223,7 +2208,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     <rootUriNameFieldName />
     <extensionFieldName />
     <sizeFieldName />
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -2248,7 +2232,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
       <method>none</method>
       <schema_name />
     </partitioning>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -2283,7 +2266,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
         <rightvalue />
       </condition>
     </compare>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -2344,7 +2326,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     <info_steps />
     <target_steps />
     <usage_parameters />
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -2378,7 +2359,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
       </field>
     </fields>
     <use_formatting>Y</use_formatting>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -2418,7 +2398,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
         <remove_special_characters>none</remove_special_characters>
       </field>
     </fields>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -2458,6 +2437,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     <create_parent_folder>Y</create_parent_folder>
     <file>
       <name>${METADATA_QUEUE_JSON_FILE}</name>
+      <is_command>N</is_command>
       <servlet_output>N</servlet_output>
       <do_not_open_new_file_init>Y</do_not_open_new_file_init>
       <extention />
@@ -2487,7 +2467,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
         <precision>-1</precision>
       </field>
     </fields>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -2527,6 +2506,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     <create_parent_folder>Y</create_parent_folder>
     <file>
       <name>${METADATA_QUEUE_COLUMNS_FILE}</name>
+      <is_command>N</is_command>
       <servlet_output>N</servlet_output>
       <do_not_open_new_file_init>N</do_not_open_new_file_init>
       <extention />
@@ -2568,7 +2548,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
         <precision>0</precision>
       </field>
     </fields>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -2608,6 +2587,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     <create_parent_folder>Y</create_parent_folder>
     <file>
       <name>${METADATA_QUEUE_FIELDS_FILE}</name>
+      <is_command>N</is_command>
       <servlet_output>N</servlet_output>
       <do_not_open_new_file_init>N</do_not_open_new_file_init>
       <extention />
@@ -2637,7 +2617,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
         <precision>-1</precision>
       </field>
     </fields>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -2677,6 +2656,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     <create_parent_folder>Y</create_parent_folder>
     <file>
       <name>${METADATA_QUEUE_FIELDS_AND_TYPE_FILE}</name>
+      <is_command>N</is_command>
       <servlet_output>N</servlet_output>
       <do_not_open_new_file_init>N</do_not_open_new_file_init>
       <extention />
@@ -2706,7 +2686,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
         <precision>-1</precision>
       </field>
     </fields>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -2746,6 +2725,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     <create_parent_folder>Y</create_parent_folder>
     <file>
       <name>${METADATA_QUEUE_FIELDS_NAME_FILE}</name>
+      <is_command>N</is_command>
       <servlet_output>N</servlet_output>
       <do_not_open_new_file_init>N</do_not_open_new_file_init>
       <extention />
@@ -2775,7 +2755,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
         <precision>-1</precision>
       </field>
     </fields>
-    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -2794,5 +2773,4 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
   <slave-step-copy-partition-distribution>
   </slave-step-copy-partition-distribution>
   <slave_transformation>N</slave_transformation>
-  <attributes />
 </transformation>
