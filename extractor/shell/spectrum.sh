@@ -534,9 +534,11 @@ if [ ${IS_RECREATE} = 1 -o ${IS_RELOAD} = 1 ]; then
 
     DATE=`date '+%Y%m%d%H%M%S'`
 
-    # Cria o arquivo de recuperação a partir dos arquivos do processo.
-    echo "Moving files to recovery folder ${STORAGE_RECOVERY_QUEUE_PATH}!"
-    aws s3 mv ${STORAGE_QUEUE_PATH} ${STORAGE_RECOVERY_QUEUE_PATH}${DATE}/ --recursive --only-show-errors
+	# Cria o arquivo de recuperação a partir dos arquivos do processo.
+	if [ ${IS_RECREATE} = 1 ]; then
+		echo "Moving files to recovery folder ${STORAGE_RECOVERY_QUEUE_PATH}!"
+		aws s3 mv ${STORAGE_QUEUE_PATH} ${STORAGE_RECOVERY_QUEUE_PATH}${DATE}/ --recursive --only-show-errors
+	fi
 
 	if [ ${IS_RELOAD} = 0 ]; then
 		# Dropa a tabela para que possa ser recriada.         
