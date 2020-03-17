@@ -122,22 +122,24 @@ full_load()
 	aws s3 cp ${RAWFILE_QUEUE_MANIFEST_PATH} ${STORAGE_MANIFEST_PATH} --recursive --only-show-errors
 	error_check	
 
-	psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} << EOF
-		BEGIN;
-			TRUNCATE TABLE ${SCHEMA}.${TABLE};
-			
-			COPY ${SCHEMA}.${TABLE} ( ${FIELD_NAME_LIST} )
-			FROM '${STORAGE_MANIFEST_PATH}${DATA_FILE}.manifest' 
-			CREDENTIALS'aws_access_key_id=${ACCESS_KEY_ID};aws_secret_access_key=${SECRET_ACCESS_KEY}'
-			manifest
-			csv
-			delimiter '${DELIMITER}'
-			gzip 
-			timeformat 'YYYY-MM-DD HH:MI:SS'
-			COMPUPDATE OFF
-			STATUPDATE OFF;
-		END;
+	psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} -v ON_ERROR_STOP=1 << EOF
+    BEGIN;
+      TRUNCATE TABLE ${SCHEMA}.${TABLE};
+
+      COPY ${SCHEMA}.${TABLE} ( ${FIELD_NAME_LIST} )
+      FROM '${STORAGE_MANIFEST_PATH}${DATA_FILE}.manifest' 
+      CREDENTIALS'aws_access_key_id=${ACCESS_KEY_ID};aws_secret_access_key=${SECRET_ACCESS_KEY}'
+      manifest
+      csv
+      delimiter '${DELIMITER}'
+      gzip 
+      timeformat 'YYYY-MM-DD HH:MI:SS'
+      COMPUPDATE OFF
+      STATUPDATE OFF;
+    END;
 EOF
+
+	# Identifica a ocorrência de erros e interrompe processo.
 	error_check	
 	
     if [ ${DEBUG} = 0 ] ; then
@@ -163,7 +165,7 @@ delta_load()
 	aws s3 cp ${RAWFILE_QUEUE_MANIFEST_PATH} ${STORAGE_MANIFEST_PATH} --recursive --only-show-errors
 	error_check	
 
-	psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} << EOF
+	psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} -v ON_ERROR_STOP=1 << EOF
 		BEGIN;
 			CREATE TABLE #tmp_${TABLE} ( like ${SCHEMA}.${TABLE} ); 
 
@@ -196,6 +198,8 @@ delta_load()
 			ANALYZE ${SCHEMA}.${TABLE} predicate columns;	
 		END;
 EOF
+
+	# Identifica a ocorrência de erros e interrompe processo.
 	error_check	
 	
     if [ ${DEBUG} = 0 ] ; then
