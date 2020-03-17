@@ -192,6 +192,11 @@
       <description>Identifica os passos que devem ser ignorados na execução de uma named query. </description>
     </parameter>
     <parameter>
+      <name>NAMED_QUERY_INCLUDE_STEP</name>
+      <default_value />
+      <description>Identifica os passos que devem ser considerados na execução de uma named query.</description>
+    </parameter>
+    <parameter>
       <name>ONLY_EXPORT</name>
       <default_value>0</default_value>
       <description>Identifica se o processo apenas exporta o resultado sem materializar uma tabela. </description>
