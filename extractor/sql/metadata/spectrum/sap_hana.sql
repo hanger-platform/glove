@@ -5,7 +5,8 @@ SELECT * FROM (
 		field_type,
         json,
         column_name,
-        column_key
+        column_key,
+		encoding
     FROM (
 
         SELECT
@@ -21,7 +22,8 @@ SELECT * FROM (
             'int' AS field_type,
 			'{"name": "partition_field","type":["null", "int"], "default": null}' AS json,
             'partition_field' 							 AS column_name,
-            0 											 AS column_key
+            0 											 AS column_key,
+			''                                           AS encoding
         FROM
             TABLE_COLUMNS
         WHERE
@@ -44,7 +46,8 @@ SELECT * FROM (
             'varchar(255)' AS field_type,
             '{"name": "custom_primary_key","type":["null", "string"], "default": null}' AS json,
             'custom_primary_key' AS column_name,
-            1 AS column_key
+            1 AS column_key,
+			'' AS encoding
         FROM
             ${INPUT_TABLE_SCHEMA}.dd03l
         WHERE
@@ -104,7 +107,8 @@ SELECT * FROM (
                 	  WHEN DATA_TYPE_NAME = 'BOOLEAN' THEN '["null", "boolean"]'
                 end ||', "default": null}' ) AS json,
             LOWER( CASE '${FIELD_HAS_PREFIX}' WHEN '1' THEN REPLACE_REGEXPR( '\/' IN REPLACE_REGEXPR( '^\W|^_' IN COLUMN_NAME WITH '' ) WITH '_' ) ELSE REPLACE_REGEXPR( '\/\w+\/' IN COLUMN_NAME WITH '' ) END ) AS column_name,
-            0 AS column_key
+            0 AS column_key,
+			'' AS encoding
         FROM
             TABLE_COLUMNS
         WHERE
@@ -121,7 +125,8 @@ SELECT * FROM (
             'varchar(19)' AS field_type,
             '{"name": "etl_load_date","type":["null", "string"], "default": null}' AS json,
             'etl_load_date' AS column_name,
-            0 AS column_key
+            0 AS column_key,
+			'' AS encoding
         FROM dummy
     )x ORDER BY x.POSITION
 )

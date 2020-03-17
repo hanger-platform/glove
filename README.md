@@ -46,6 +46,10 @@ GOOGLE_TOOLS_HOME=<Google Cloud SDK path>
 # Sisense
 GLOVE_SISENSE_URL=<Sisense URL>
 GLOVE_SISENSE_TOKEN=<Sisense API Token>    
+
+# Support buckets
+GLOVE_STORARE_BUCKET_STAGING=<S3 bucket para dados temporários>
+GLOVE_STORARE_BUCKET_DISASTER_RECOVERY=<S3 bucket para disaster recovery>
 ```
 
 Para configuração do Spectrum Role, consulte esta documentação:  [Utilização do Amazon Redshift Spectrum para consultar dados externos](https://docs.aws.amazon.com/pt_br/redshift/latest/dg/c-using-spectrum.html)   
