@@ -123,18 +123,20 @@ full_load()
 	error_check	
 
 	psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} -v ON_ERROR_STOP=1 << EOF
-		TRUNCATE TABLE ${SCHEMA}.${TABLE};
-		
-		COPY ${SCHEMA}.${TABLE} ( ${FIELD_NAME_LIST} )
-		FROM '${STORAGE_MANIFEST_PATH}${DATA_FILE}.manifest' 
-		CREDENTIALS'aws_access_key_id=${ACCESS_KEY_ID};aws_secret_access_key=${SECRET_ACCESS_KEY}'
-		manifest
-		csv
-		delimiter '${DELIMITER}'
-		gzip 
-		timeformat 'YYYY-MM-DD HH:MI:SS'
-		COMPUPDATE OFF
-		STATUPDATE OFF;
+    BEGIN;
+      TRUNCATE TABLE ${SCHEMA}.${TABLE};
+
+      COPY ${SCHEMA}.${TABLE} ( ${FIELD_NAME_LIST} )
+      FROM '${STORAGE_MANIFEST_PATH}${DATA_FILE}.manifest' 
+      CREDENTIALS'aws_access_key_id=${ACCESS_KEY_ID};aws_secret_access_key=${SECRET_ACCESS_KEY}'
+      manifest
+      csv
+      delimiter '${DELIMITER}'
+      gzip 
+      timeformat 'YYYY-MM-DD HH:MI:SS'
+      COMPUPDATE OFF
+      STATUPDATE OFF;
+    END;
 EOF
 
 	# Identifica a ocorrência de erros e interrompe processo.
@@ -164,35 +166,37 @@ delta_load()
 	error_check	
 
 	psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} -v ON_ERROR_STOP=1 << EOF
-		CREATE TABLE #tmp_${TABLE} ( like ${SCHEMA}.${TABLE} ); 
+		BEGIN;
+			CREATE TABLE #tmp_${TABLE} ( like ${SCHEMA}.${TABLE} ); 
 
-		COPY #tmp_${TABLE} ( ${FIELD_NAME_LIST} )
-		FROM '${STORAGE_MANIFEST_PATH}${DATA_FILE}.manifest' 
-		CREDENTIALS'aws_access_key_id=${ACCESS_KEY_ID};aws_secret_access_key=${SECRET_ACCESS_KEY}'
-		manifest
-		csv
-		delimiter '${DELIMITER}'
-		gzip 
-		timeformat 'YYYY-MM-DD HH:MI:SS';
+			COPY #tmp_${TABLE} ( ${FIELD_NAME_LIST} )
+			FROM '${STORAGE_MANIFEST_PATH}${DATA_FILE}.manifest' 
+			CREDENTIALS'aws_access_key_id=${ACCESS_KEY_ID};aws_secret_access_key=${SECRET_ACCESS_KEY}'
+			manifest
+			csv
+			delimiter '${DELIMITER}'
+			gzip 
+			timeformat 'YYYY-MM-DD HH:MI:SS';
 
-		DELETE FROM 
-			${SCHEMA}.${TABLE} 
-		WHERE 
-			${SCHEMA}.${TABLE}.custom_primary_key 
-		IN (
+			DELETE FROM 
+				${SCHEMA}.${TABLE} 
+			WHERE 
+				${SCHEMA}.${TABLE}.custom_primary_key 
+			IN (
+				SELECT 
+					custom_primary_key 
+				FROM 
+					#tmp_${TABLE}
+			);
+
+			INSERT INTO ${SCHEMA}.${TABLE} ( ${FIELD_NAME_LIST} ) 
 			SELECT 
-				custom_primary_key 
+				${FIELD_NAME_LIST}
 			FROM 
-				#tmp_${TABLE}
-		);
-
-		INSERT INTO ${SCHEMA}.${TABLE} ( ${FIELD_NAME_LIST} ) 
-		SELECT 
-			${FIELD_NAME_LIST}
-		FROM 
-			#tmp_${TABLE};
-			
-		ANALYZE ${SCHEMA}.${TABLE} predicate columns;	
+				#tmp_${TABLE};
+				
+			ANALYZE ${SCHEMA}.${TABLE} predicate columns;	
+		END;
 EOF
 
 	# Identifica a ocorrência de erros e interrompe processo.

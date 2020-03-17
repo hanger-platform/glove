@@ -67,6 +67,11 @@
       <description>Identifica o estilo de distribuição do redshift.</description>
     </parameter>
     <parameter>
+      <name>ENCODE</name>
+      <default_value>zstd</default_value>
+      <description>Identifica o tipo de compressão aplicado nas colunas de tabelas do redshift</description>
+    </parameter>
+    <parameter>
       <name>EXPORT_BUCKET_DEFAULT</name>
       <default_value />
       <description>Identifica o bucket default para exportação de dados. </description>
@@ -185,6 +190,11 @@
       <name>NAMED_QUERY_IGNORE_STEP</name>
       <default_value />
       <description>Identifica os passos que devem ser ignorados na execução de uma named query. </description>
+    </parameter>
+    <parameter>
+      <name>NAMED_QUERY_INCLUDE_STEP</name>
+      <default_value />
+      <description>Identifica os passos que devem ser considerados na execução de uma named query.</description>
     </parameter>
     <parameter>
       <name>ONLY_EXPORT</name>
@@ -611,7 +621,6 @@
       <name>START</name>
       <description />
       <type>SPECIAL</type>
-      <attributes />
       <start>Y</start>
       <dummy>N</dummy>
       <repeat>N</repeat>
@@ -627,43 +636,36 @@
       <nr>0</nr>
       <xloc>80</xloc>
       <yloc>48</yloc>
-      <attributes_kjc />
     </entry>
     <entry>
       <name>Fail extracting data</name>
       <description />
       <type>ABORT</type>
-      <attributes />
       <message />
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>208</xloc>
       <yloc>608</yloc>
-      <attributes_kjc />
     </entry>
     <entry>
       <name>Success</name>
       <description />
       <type>SUCCESS</type>
-      <attributes />
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>336</xloc>
       <yloc>496</yloc>
-      <attributes_kjc />
     </entry>
     <entry>
       <name>Module selector</name>
       <description />
       <type>JOB</type>
-      <attributes />
       <specification_method>filename</specification_method>
       <job_object_id />
       <filename>${Internal.Job.Filename.Directory}/j_${MODULE}_module.kjb</filename>
       <jobname />
-      <directory />
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
       <exec_per_row>N</exec_per_row>
@@ -689,13 +691,11 @@
       <nr>0</nr>
       <xloc>208</xloc>
       <yloc>496</yloc>
-      <attributes_kjc />
     </entry>
     <entry>
       <name>Metadata folder exists?</name>
       <description />
       <type>SHELL</type>
-      <attributes />
       <filename />
       <work_directory />
       <arg_from_previous>N</arg_from_previous>
@@ -719,13 +719,11 @@ fi</script>
       <nr>0</nr>
       <xloc>80</xloc>
       <yloc>272</yloc>
-      <attributes_kjc />
     </entry>
     <entry>
       <name>Setup</name>
       <description />
       <type>WRITE_TO_LOG</type>
-      <attributes />
       <logmessage>   _____   _                        
   / ____| | |                       
  | |  __  | |   ___   __   __   ___ 
@@ -736,11 +734,13 @@ fi</script>
 #-----------------------------------------------------------
 # PATH
 #-----------------------------------------------------------
-GLOVE_HOME		== ${GLOVE_HOME}
-GLOVE_TEMP		== ${GLOVE_TEMP}
-GLOVE_METADATA		== ${GLOVE_METADATA}
-GLOVE_NAMED_QUERIES	== ${GLOVE_NAMED_QUERIES}
-GOOGLE_TOOLS_HOME	== ${GOOGLE_TOOLS_HOME}
+GLOVE_HOME				== ${GLOVE_HOME}
+GLOVE_TEMP				== ${GLOVE_TEMP}
+GLOVE_METADATA				== ${GLOVE_METADATA}
+GLOVE_NAMED_QUERIES			== ${GLOVE_NAMED_QUERIES}
+GOOGLE_TOOLS_HOME			== ${GOOGLE_TOOLS_HOME}
+GLOVE_STORARE_BUCKET_STAGING 		== ${GLOVE_STORARE_BUCKET_STAGING}
+GLOVE_STORARE_BUCKET_DISASTER_RECOVERY 	== ${GLOVE_STORARE_BUCKET_DISASTER_RECOVERY}
 #-----------------------------------------------------------</logmessage>
       <loglevel>Basic</loglevel>
       <logsubject>LOG</logsubject>
@@ -749,13 +749,11 @@ GOOGLE_TOOLS_HOME	== ${GOOGLE_TOOLS_HOME}
       <nr>0</nr>
       <xloc>80</xloc>
       <yloc>160</yloc>
-      <attributes_kjc />
     </entry>
     <entry>
       <name>Get process information</name>
       <description />
       <type>TRANS</type>
-      <attributes />
       <specification_method>filename</specification_method>
       <trans_object_id />
       <filename>${Internal.Entry.Current.Directory}/m_get_uuid.ktr</filename>
@@ -787,13 +785,11 @@ GOOGLE_TOOLS_HOME	== ${GOOGLE_TOOLS_HOME}
       <nr>0</nr>
       <xloc>80</xloc>
       <yloc>384</yloc>
-      <attributes_kjc />
     </entry>
     <entry>
       <name>Process ID</name>
       <description />
       <type>WRITE_TO_LOG</type>
-      <attributes />
       <logmessage>#-----------------------------------------------------------
 # UUID
 #-----------------------------------------------------------
@@ -806,7 +802,6 @@ UUID == ${UUID}
       <nr>0</nr>
       <xloc>80</xloc>
       <yloc>496</yloc>
-      <attributes_kjc />
     </entry>
   </entries>
   <hops>
