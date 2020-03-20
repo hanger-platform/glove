@@ -42,8 +42,6 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class AES implements Transformable {
 
-    private Parser parser;
-    private List<Object> record;
     private final String field;
     private final String key;
 
@@ -53,16 +51,14 @@ public class AES implements Transformable {
     }
 
     @Override
-    public void init(
-            Parser parser,
-            List<Object> record) {
-
-        this.parser = parser;
-        this.record = record;
+    public void init() {
     }
 
     @Override
-    public String getValue() {
+    public String getValue(
+            Parser parser,
+            List<Object> record) {
+
         String value = "";
 
         try {

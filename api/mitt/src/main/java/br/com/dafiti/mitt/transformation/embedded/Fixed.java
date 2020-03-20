@@ -40,13 +40,14 @@ public class Fixed implements Transformable {
     }
 
     @Override
-    public void init(
-            Parser parser,
-            List<Object> record) {
+    public void init() {
     }
 
     @Override
-    public String getValue() {
+    public String getValue(
+            Parser parser,
+            List<Object> record) {
+        
         return value;
     }
 }

@@ -37,16 +37,9 @@ import java.util.logging.Logger;
  */
 public class Parser {
 
-    private final Configuration configuration;
     private File file;
-
-    /**
-     *
-     * @param configuration
-     */
-    public Parser(Configuration configuration) {
-        this.configuration = configuration;
-    }
+    private final Scanner scanner;
+    private final Configuration configuration;
 
     /**
      *
@@ -66,10 +59,49 @@ public class Parser {
 
     /**
      *
+     * @param configuration
+     */
+    public Parser(Configuration configuration) {
+        this.scanner = new Scanner();
+        this.configuration = configuration;
+    }
+
+    /**
+     *
+     * @param configuration
+     * @param debug
+     */
+    public Parser(Configuration configuration, boolean debug) {
+        this.scanner = new Scanner();
+        this.configuration = configuration;
+    }
+
+    /**
+     *
      * @return
      */
     public Configuration getConfiguration() {
         return configuration;
+    }
+
+    /**
+     *
+     * @param record
+     * @return
+     */
+    public List<Object> evaluate(List<Object> record) {
+        List<Object> fields = new ArrayList();
+
+        configuration.getFields().forEach((field) -> {
+            fields.add(this.evaluate(record, field));
+        });
+
+        //Logs input and parsed output record. 
+        if (configuration.isDebug()) {
+            Logger.getLogger(Parser.class.getName()).log(Level.INFO, "{0} -> {1}", new Object[]{record, fields});
+        }
+
+        return fields;
     }
 
     /**
@@ -103,7 +135,7 @@ public class Parser {
         if (object instanceof Field) {
             field = (Field) object;
         } else {
-            field = Scanner.getInstance().scan((String) object);
+            field = scanner.scan((String) object);
         }
 
         return this.evaluate(record, field);
@@ -123,12 +155,12 @@ public class Parser {
 
         //Identifies if field has transformation. 
         if (field.getTransformation() != null) {
-            evaluated = field.getTransformation(this, record).getValue();
+            evaluated = field.getTransformation().getValue(this, record);
         } else {
             //Get only original fields. 
             List<Field> fields = configuration.getOriginalFields();
 
-            //Identifies if field exists.          
+            //Identifies if a field exists.          
             int index = fields.indexOf(field);
 
             if (index != -1) {
@@ -139,15 +171,15 @@ public class Parser {
                 //Get all fields. 
                 fields = configuration.getFields();
 
-                //Identifies if field exists.
+                //Identifies if a field exists.
                 index = fields.indexOf(field);
 
                 if (index != -1) {
                     Field other = fields.get(index);
 
-                    //Identifies if the field has transformation.
+                    //Identifies if a field has transformation.
                     if (other.getTransformation() != null) {
-                        evaluated = other.getTransformation(this, record).getValue();
+                        evaluated = other.getTransformation().getValue(this, record);
                     } else {
                         Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, "Field {0} does not have related value or transformation!", field.getName());
                     }
@@ -158,20 +190,5 @@ public class Parser {
         }
 
         return evaluated;
-    }
-
-    /**
-     *
-     * @param record
-     * @return
-     */
-    public List<Object> evaluate(List<Object> record) {
-        List<Object> fields = new ArrayList();
-
-        configuration.getFields().forEach((field) -> {
-            fields.add(this.evaluate(record, field));
-        });
-
-        return fields;
     }
 }

@@ -108,7 +108,7 @@ public class GoogleAdwords {
             CommandLineInterface cli = mitt.getCommandLineInterface(args);
 
             //Defines output file.
-            mitt.setOutput(cli.getParameter("output"));
+            mitt.setOutputFile(cli.getParameter("output"));
 
             //Defines fields.
             mitt.getConfiguration()
@@ -219,7 +219,7 @@ public class GoogleAdwords {
                     customers = cli.getParameterAsList("customer", "\\+");
                 }
 
-                Logger.getLogger(GoogleAdwords.class.getName()).log(Level.INFO, "GLOVE - Downloading reports for {0} accounts", customers.size());
+                Logger.getLogger(GoogleAdwords.class.getName()).log(Level.INFO, "Downloading reports for {0} accounts", customers.size());
 
                 //Dowload report for each customer. 
                 for (String customer : customers) {
@@ -262,8 +262,12 @@ public class GoogleAdwords {
                 });
             }
 
-            //Writes all source files to a single target.
-            mitt.write(outputPath, "*.csv", ',', mitt.getConfiguration().getOriginalFieldsName());
+            Logger.getLogger(GoogleAdwords.class.getName()).log(Level.INFO, "Writing on {0}", cli.getParameter("output"));
+
+            //Write to the output.
+            mitt.getReaderSettings().setDelimiter(',');
+            mitt.getWriterSettings().setHeader(mitt.getConfiguration().getOriginalFieldsName());
+            mitt.write(outputPath, "*.csv");
         } catch (RemoteException
                 | InterruptedException
                 | ValidationException
@@ -346,6 +350,7 @@ public class GoogleAdwords {
                         go = false;
                         reportException = new ReportException("Report request failed after maximum elapsed millis: " + backOff.getMaxElapsedTimeMillis(), ex);
                     } else {
+                        Logger.getLogger(GoogleAdwords.class.getName()).log(Level.SEVERE, "Trying to recover of: ", ex.getMessage());
                         Thread.sleep(sleep);
                     }
                 }

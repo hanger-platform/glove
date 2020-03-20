@@ -1,5 +1,5 @@
 # MITT Framework [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-### O MITT é um framework qua facilita a geração de arquivos de texto para serem consumidos pelo glove.
+### O MITT é um framework utilizado para criação de conectores para o Glove.
 
 ## How it works
 
@@ -8,11 +8,9 @@ O **MITT** é reponsável por encapsular a maioria das tarefas repetitivas envol
 - Identificação automática de charset dos dados.
 - Geração de arquivos como UTF 8. 
 - Transformação de dados de forma simples com uma série de transformadores embarcados. 
-- Geração de cli simplificada.
-- Definição de valores default para os parâmetros passados para o cli. 
-- Passagem de função como parâmetro na chamada do cli.
-- Entre muitas outras coisas.
-
+- Geração de *command line interface* simplificada.
+- Definição de valores default para os parâmetros passados para a *command line interface*. 
+- Passagem de função como parâmetro na chamada do *command line interface*.
 
 ## Instalação
 
@@ -24,47 +22,76 @@ O **MITT** é reponsável por encapsular a maioria das tarefas repetitivas envol
 
 ##### CONSTRUÇÃO
 
-O mitt deve ser importado como dependência nos projetos de extratores para o Glove. 
+O MITT deve ser importado como dependência nos projetos de extratores para o Glove. 
 
 ## Utilização
 
-1. Gravação de dados de stream em uma aplicação de linha de comando. 
+1. Neste exemplo, é apresentada a gravação de dados de stream em uma aplicação de linha de comando. 
 
 ```java
  public static void main(String[] args){       
-       //Define uma instância do Mitt. 
-	   Mitt mitt = new Mitt();
-	   mitt.setOutput("/tmp/mitt.csv");
-
-        //Define os parâmetros que serão recebidos pelo cli. Neste exemplo o valor default para o parâmetro país será brasil. 
-        mitt.getConfiguration().addParameter("p", "pais", "Pais", "brasil");
-
-        CommandLineInterface cli = mitt.getCommandLineInterface(parameter.toArray(new String[0]));
-
-        //Define a lista de campos do arquivo de saída.
-        mitt.getConfiguration().addField("id");
-        mitt.getConfiguration().addField("nome");
-		mitt.getConfiguration().addField("pais");
+	    Mitt mitt = new Mitt();
 		
-		//Define um campo customizadado que será resultado de uma transformação.
+		//Defines the command line interface expected parameters. 
+        mitt
+	        .getConfiguration()
+		        .addParameter("p", "pais", "Pais", "brasil");
+		
+		//Gets a instance of MITT CommandLineInterface class. 
+        CommandLineInterface cli = mitt.getCommandLineInterface(args);
+		
+		//Defines the output file. 
+		mitt.setOutputFile("/tmp/mitt.csv");
+
+        //Defines default output fields. 
+        mitt
+	        .getConfiguration()
+			    .addField("id")
+			    .addField("nome")
+				.addField("pais");
+		
+		//Defines custom fields, based on a transformation. 
         mitt.getConfiguration().addCustomField("etl_load_date", new Now());
 
-		//Grava os dados no arquivo. 
+		//Writes to the output file. 
         for (int i = 0; i < 10; i++) {
             List data = new ArrayList();
             data.add(i);
             data.add("nome do " + i );
-			//Recupera o valor passado por parâmetro, não faz sentido neste caso mas serve para exemplificar a recuperação do valor de um parâmetro. 
 			data.add(cli.getParameter("pais"));
-
-			//Escreve os dados para o arquivo de saída. 
+			
             mitt.write(data);
         }
-
-		//Fecha o arquivo de saída. 
         mitt.close();
 }
 ```
+
+## Transformations
+
+Uma das principais características do MITT é a possibilidade de transformação dos dados. Desta forma, o usuário de um extrator construído com o *framework* pode aplicar uma das várias transformações disponíveis em qualquer campo que estiver sendo gerado por um extrator, bem como adicionar novos campos a partir de campos existentes ou simplesmente criar um campo a partir de uma transformação. 
+
+##### EMBEDDED TRANSFORMATIONS
+
+| Transformation| Description| Example |
+|--|--|--|
+| **Concat** | Concatena dois ou mais campos | ::concat([[<campo\>,<campo\>]])|
+| **DateFormat**| Formata um campo do tipo data | ::dateformat(<campo\>,[formato_de_entrdada],<formato_de_saída\>)|
+| **Eval**| Transforma um campo usando funções do JavaScript | ::eval(\*\*<campo\>.replace('A','B')\*\*) |
+| **FarmFingerprint**| Aplica a função de hash FarmFingerprint em um ou mais campos | ::farmfingerprint([[<campo\>,<campo\>]]) |
+| **FileName**| Retorna o nome do arquivo que está sendo processado, quando o input for um arquivo  | ::filename() |
+| **Fixed**| Retorna uma valor fixo | ::fixed(oi) |
+| **MD5**| Aplica a função de hash MD5 em um ou mais campos | ::md5([[<campo\>,<campo\>]])|
+| **Now**| Retorna da data e hora corrente | ::now() |
+| **RegExp**| Extrai parte da informação de um campo usando RegExp | ::regexp(<campo\>,<regex\>) |
+
+##### RESERVED CHARACTERES
+
+Quando utilizamos uma transformação no MITT, muitas vezes é necessário informar não um único campo, mas uma lista de campos e, em outras situações específica, alguns valores não podem ser considerados pelo processador do MITT. Para estas situações temos alguns caracteres reservados que indicam ao processador do MITT como a informação passada deve ser processada. 
+
+| Type| Example |
+|--|--|
+| **List** | **[[**<campo\>,<campo\>**]]** |
+| **Unparsable** | **\*\***<expressão\>**\*\*** |
 
 ## Contributing, Bugs, Questions
 Contributions are more than welcome! If you want to propose new changes, fix bugs or improve something feel free to fork the repository and send us a Pull Request. You can also open new `Issues` for reporting bugs and general problems.

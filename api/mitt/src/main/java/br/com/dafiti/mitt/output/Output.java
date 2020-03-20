@@ -25,6 +25,8 @@ package br.com.dafiti.mitt.output;
 
 import br.com.dafiti.mitt.transformation.Parser;
 import br.com.dafiti.mitt.model.Configuration;
+import br.com.dafiti.mitt.settings.ReaderSettings;
+import br.com.dafiti.mitt.settings.WriterSettings;
 import com.google.common.io.PatternFilenameFilter;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
@@ -46,40 +48,27 @@ import org.apache.commons.io.FilenameUtils;
  */
 public class Output {
 
-    private final File output;
-    private final CsvWriter writer;
+    private CsvWriter writer;
     private final Parser parser;
     private final Configuration configuration;
-    private final char delimiter;
-    private final char quote;
-    private final char quoteEscape;
-    private final boolean parallel;
-
-    private final int THREAD_POOL = 5;
+    private final ReaderSettings readerSettings;
+    private final WriterSettings writerSettings;
 
     /**
      *
-     * @param output
      * @param configuration
-     * @param delimiter
-     * @param quote
-     * @param quoteEscape
+     * @param readerSettings
+     * @param writerSettings
      */
     public Output(
-            File output,
             Configuration configuration,
-            char delimiter,
-            char quote,
-            char quoteEscape) {
+            ReaderSettings readerSettings,
+            WriterSettings writerSettings) {
 
-        this.output = output;
-        this.delimiter = delimiter;
-        this.quote = quote;
-        this.quoteEscape = quoteEscape;
         this.configuration = configuration;
+        this.readerSettings = readerSettings;
+        this.writerSettings = writerSettings;
         this.parser = new Parser(configuration);
-        this.writer = this.getWriter(output);
-        this.parallel = FilenameUtils.getExtension(output.getName()).isEmpty();
     }
 
     /**
@@ -87,28 +76,21 @@ public class Output {
      * @param output
      * @return
      */
-    public CsvWriter getWriter(File output) {
-        CsvWriter currentWriter = null;
-
-        if (!FilenameUtils
-                .getExtension(output.getName())
-                .isEmpty()) {
-
+    private CsvWriter getWriter() {
+        if (writer == null) {
             CsvWriterSettings setting = new CsvWriterSettings();
-            setting.getFormat().setDelimiter(delimiter);
-            setting.getFormat().setQuote(quote);
-            setting.getFormat().setQuoteEscape(quoteEscape);
+            setting.getFormat().setDelimiter(writerSettings.getDelimiter());
+            setting.getFormat().setQuote(writerSettings.getQuote());
+            setting.getFormat().setQuoteEscape(writerSettings.getQuoteEscape());
             setting.setNullValue("");
             setting.setMaxCharsPerColumn(-1);
             setting.setHeaderWritingEnabled(true);
-            setting.setHeaders(
-                    parser.getConfiguration().getFieldsName(true).toArray(new String[0])
-            );
+            setting.setHeaders(parser.getConfiguration().getFieldsName(true).toArray(new String[0]));
 
-            currentWriter = new CsvWriter(output, setting);
+            writer = new CsvWriter(writerSettings.getOutputFile(), setting);
         }
 
-        return currentWriter;
+        return writer;
     }
 
     /**
@@ -116,10 +98,9 @@ public class Output {
      * @param record
      */
     public void write(List<Object> record) {
-        this.writer
+        this.getWriter()
                 .writeRow(
-                        parser.evaluate(record)
-                );
+                        parser.evaluate(record));
     }
 
     /**
@@ -138,40 +119,36 @@ public class Output {
      * @param record
      */
     public void write(CsvWriter writer, Object[] record) {
-        writer
-                .writeRow(
-                        parser.evaluate(
-                                Arrays.asList(record)
-                        )
-                );
+        writer.writeRow(
+                parser.evaluate(
+                        Arrays.asList(record)));
+    }
+
+    /**
+     *
+     * @param file
+     */
+    public void write(File file) {
+        new OutputProcessor(
+                file,
+                parser,
+                this.getWriter(),
+                readerSettings,
+                writerSettings).write();
     }
 
     /**
      *
      * @param files
-     * @param delimiter
-     * @param quote
-     * @param escape
-     * @param encode
-     * @param header
-     * @param remove
-     * @param skipLines
      */
-    public void write(
-            File[] files,
-            char delimiter,
-            char quote,
-            char escape,
-            String encode,
-            List<String> header,
-            boolean remove,
-            int skipLines) {
+    public void write(File[] files) {
+        File outputFile = writerSettings.getOutputFile();
+        boolean parallel = FilenameUtils.getExtension(outputFile.getName()).isEmpty();
+        ExecutorService executor = Executors.newFixedThreadPool(writerSettings.getThreadPool());
 
-        ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL);
-
-        //Remove all old files from the output folder. 
-        if (output.isDirectory()) {
-            File[] garbage = output.listFiles(new PatternFilenameFilter(".+\\.csv"));
+        //Remove old files from the output folder. 
+        if (outputFile.isDirectory()) {
+            File[] garbage = outputFile.listFiles(new PatternFilenameFilter(".+\\.csv"));
 
             for (File file : garbage) {
                 try {
@@ -182,31 +159,19 @@ public class Output {
             }
         }
 
+        //Process each input file. 
         for (File file : files) {
-            if (parallel) {
-                executor.execute(new OutputProcessor(
-                        file,
-                        new Parser(configuration),
-                        this.getWriter(new File(output.getAbsolutePath() + "/" + file.getName())),
-                        delimiter,
-                        quote,
-                        quoteEscape,
-                        encode,
-                        header,
-                        remove,
-                        skipLines));
-            } else {
-                new OutputProcessor(
-                        file,
-                        parser,
-                        writer,
-                        delimiter,
-                        quote,
-                        quoteEscape,
-                        encode,
-                        header,
-                        remove,
-                        skipLines).write();
+            //Empty file should be ignored. 
+            if (file.length() != 0) {
+                if (parallel) {
+                    executor.execute(new OutputProcessor(
+                            file,
+                            configuration,
+                            readerSettings,
+                            writerSettings));
+                } else {
+                    this.write(file);
+                }
             }
         }
 
@@ -217,40 +182,6 @@ public class Output {
         } catch (InterruptedException ex) {
             Logger.getLogger(Output.class.getName()).log(Level.SEVERE, "Fail waiting executor termination", ex);
         }
-    }
-
-    /**
-     *
-     * @param file
-     * @param delimiter
-     * @param quote
-     * @param quoteEscape
-     * @param encode
-     * @param header
-     * @param remove
-     * @param skipLines
-     */
-    public void write(
-            File file,
-            char delimiter,
-            char quote,
-            char quoteEscape,
-            String encode,
-            List<String> header,
-            boolean remove,
-            int skipLines) {
-
-        new OutputProcessor(
-                file,
-                parser,
-                writer,
-                delimiter,
-                quote,
-                quoteEscape,
-                encode,
-                header,
-                remove,
-                skipLines).write();
     }
 
     /**

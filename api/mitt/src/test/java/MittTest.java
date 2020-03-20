@@ -25,7 +25,6 @@ import br.com.dafiti.mitt.Mitt;
 import br.com.dafiti.mitt.exception.DuplicateEntityException;
 import br.com.dafiti.mitt.cli.CommandLineInterface;
 import br.com.dafiti.mitt.model.Field;
-import br.com.dafiti.mitt.transformation.embedded.Concat;
 import br.com.dafiti.mitt.transformation.embedded.Now;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +36,9 @@ import java.util.List;
 public class MittTest {
 
     public static void main(String[] args) throws DuplicateEntityException {
-        Mitt mitt = new Mitt("/tmp/mitt/mitt.csv");
+        Mitt mitt = new Mitt();
+        mitt.setOutputFile("/tmp/mitt/mitt.csv");
+        mitt.setDebug(true);
 
         List<Object> fields = new ArrayList<>();
         fields.add(new Field("id"));
@@ -45,13 +46,15 @@ public class MittTest {
         fields.add(new Field("data", new Now()));
 
         //Fields.
-        mitt.getConfiguration().addCustomField("custom_primary_key", new Concat(fields));
+        mitt.getConfiguration().addCustomField("custom_primary_key::farmfingerprint([[nome]])");
         mitt.getConfiguration().addField("id");
         mitt.getConfiguration().addField("nome");
         mitt.getConfiguration().addField("data");
-        mitt.getConfiguration().addCustomField("scanner::concat([id,nome,::now(),::Dateformat(data,YYYYMM),::eval({nome.replace('A','xxx')})])");
-        mitt.getConfiguration().addCustomField("fixed::concat([id,nome])");
-        mitt.getConfiguration().addCustomField("bola::eval({nome.replace(/[^0-9.]/g,'xxx')})");
+        mitt.getConfiguration().addCustomField("scanner::concat([[id,nome,::now(),::Dateformat(data,YYYYMM),::eval(**nome.replace('A','xxx')**)]])");
+        mitt.getConfiguration().addCustomField("fixed::concat([[id,nome,::eval(**nome.replace('A','xxx')**)]])");
+        mitt.getConfiguration().addCustomField("bola::eval(**nome.replace(/[^0-9.]/g,'xxx')**)");
+        mitt.getConfiguration().addCustomField("regex::regexp(nome,[9])");
+        mitt.getConfiguration().addCustomField("regex2::regexp(nome,[0],default)");
 
         //Parameters. 
         mitt.getConfiguration().addParameter("a", "primeiro", "Primeiro parâmetro", "xxx");

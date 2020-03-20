@@ -36,10 +36,19 @@ import java.util.stream.Collectors;
  */
 public class Configuration {
 
+    private final boolean debug;
+    private final Scanner scanner;
     private final List<Field> fields = new ArrayList();
     private final List<Parameter> parameters = new ArrayList();
 
     public Configuration() {
+        this.debug = false;
+        this.scanner = new Scanner();
+    }
+
+    public Configuration(boolean debug) {
+        this.debug = debug;
+        this.scanner = new Scanner();
     }
 
     /**
@@ -73,6 +82,8 @@ public class Configuration {
 
             if (removeSpecialCharacteres) {
                 name = name.replaceAll("\\W", "_").toLowerCase();
+                name = name.replaceAll("^_", "");
+                name = name.replaceAll("_$", "");
             }
 
             nameList.add(name);
@@ -145,7 +156,7 @@ public class Configuration {
      * @throws br.com.dafiti.mitt.exception.DuplicateEntityException
      */
     public Configuration addField(String name) throws DuplicateEntityException {
-        this.addField(Scanner.getInstance().scan(name));
+        this.addField(scanner.scan(name));
         return this;
     }
 
@@ -161,8 +172,7 @@ public class Configuration {
             String alias) throws DuplicateEntityException {
 
         this.addField(
-                new Field(name, alias)
-        );
+                new Field(name, alias));
 
         return this;
     }
@@ -179,7 +189,7 @@ public class Configuration {
             if (field instanceof Field) {
                 this.addField((Field) field);
             } else {
-                this.addField(Scanner.getInstance().scan((String) field));
+                this.addField(scanner.scan((String) field));
             }
         }
 
@@ -198,8 +208,7 @@ public class Configuration {
             Transformable transformation) throws DuplicateEntityException {
 
         this.addField(
-                new Field(name, transformation)
-        );
+                new Field(name, transformation));
 
         return this;
     }
@@ -218,8 +227,7 @@ public class Configuration {
             Transformable transformation) throws DuplicateEntityException {
 
         this.addField(
-                new Field(name, alias, transformation)
-        );
+                new Field(name, alias, transformation));
 
         return this;
     }
@@ -231,7 +239,7 @@ public class Configuration {
      * @throws br.com.dafiti.mitt.exception.DuplicateEntityException
      */
     public Configuration addCustomField(String name) throws DuplicateEntityException {
-        this.addField(Scanner.getInstance().scan(name, false));
+        this.addField(scanner.scan(name, false));
         return this;
     }
 
@@ -250,9 +258,7 @@ public class Configuration {
                 new Field(
                         name,
                         transformation,
-                        false
-                )
-        );
+                        false));
 
         return this;
     }
@@ -298,9 +304,7 @@ public class Configuration {
                         description,
                         "",
                         true,
-                        true
-                )
-        );
+                        true));
 
         return this;
     }
@@ -327,9 +331,7 @@ public class Configuration {
                         description,
                         defaultValue,
                         true,
-                        true
-                )
-        );
+                        true));
 
         return this;
     }
@@ -356,9 +358,7 @@ public class Configuration {
                         description,
                         "",
                         argument,
-                        true
-                )
-        );
+                        true));
 
         return this;
     }
@@ -387,9 +387,7 @@ public class Configuration {
                         description,
                         defaultValue,
                         argument,
-                        true
-                )
-        );
+                        true));
 
         return this;
     }
@@ -420,10 +418,16 @@ public class Configuration {
                         description,
                         defaultValue,
                         argument,
-                        optional
-                )
-        );
+                        optional));
 
         return this;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isDebug() {
+        return debug;
     }
 }

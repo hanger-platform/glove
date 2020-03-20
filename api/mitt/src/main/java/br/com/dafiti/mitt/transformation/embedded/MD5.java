@@ -34,8 +34,6 @@ import org.apache.commons.codec.digest.DigestUtils;
  */
 public class MD5 implements Transformable {
 
-    private Parser parser;
-    private List<Object> record;
     private final List<Object> fields;
 
     public MD5(List<Object> fields) {
@@ -43,16 +41,14 @@ public class MD5 implements Transformable {
     }
 
     @Override
-    public void init(
-            Parser parser,
-            List<Object> record) {
-
-        this.parser = parser;
-        this.record = record;
+    public void init() {
     }
 
     @Override
-    public String getValue() {
+    public String getValue(
+            Parser parser,
+            List<Object> record) {
+
         String value = new String();
 
         for (Object field : fields) {

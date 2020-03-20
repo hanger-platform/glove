@@ -33,7 +33,8 @@ import java.io.File;
 public class MittBatchTest {
 
     public static void main(String[] args) throws DuplicateEntityException {
-        Mitt mitt = new Mitt("/tmp/mitt/");
+        Mitt mitt = new Mitt();
+        mitt.setOutputFile("/tmp/mitt/");
 
         mitt.getConfiguration().addField("nome");
         mitt.getConfiguration().addCustomField("xxx", new Now());
