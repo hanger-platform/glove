@@ -115,7 +115,7 @@ public class S3 {
                 if (updatedDate.compareTo(LocalDate.parse(cli.getParameter("start_date"))) >= 0
                         && updatedDate.compareTo(LocalDate.parse(cli.getParameter("end_date"))) <= 0) {
 
-                    Logger.getLogger(S3.class.getName()).log(Level.INFO, "  Transfering: {0}", s3ObjectSummary.getLastModified() + s3ObjectSummary.getKey());
+                    Logger.getLogger(S3.class.getName()).log(Level.INFO, "Transfering: {0} of {1}", new Object[]{s3ObjectSummary.getKey(), s3ObjectSummary.getLastModified()});
 
                     //Identifies the output file. 
                     File outputFile = new File(outputPath.toString() + "/" + s3ObjectSummary.getKey().replaceAll("/", "_"));
