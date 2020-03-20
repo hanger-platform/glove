@@ -72,15 +72,16 @@ public class S3 {
             //Defines parameters.
             mitt.getConfiguration()
                     .addParameter("o", "output", "Output file", "", true, false)
-                    .addParameter("b", "bucket", "S3 bucket", "", true, false)
-                    .addParameter("p", "prefix", "files folder prefix, Example: folder1/folder2/folder_files", "", true, false)
+                    .addParameter("b", "bucket", "S3 Bucket name", "", true, false)
+                    .addParameter("p", "prefix", "Object prefix (folder/subfolder/ or folder/subfolder/key.csv)", "", true, true)
                     .addParameter("sd", "start_date", "Start date", "", true, false)
                     .addParameter("ed", "end_date", "End date", "", true, false)
                     .addParameter("f", "field", "Fields to be extracted from the file", "", true, false)
                     .addParameter("r", "retries", "(Optional)(Default is 3) Identify how many retries will do when limit rate exceeded.", "3")
                     .addParameter("d", "delimiter", "(Optional) File delimiter; ';' as default", ";")
                     .addParameter("p", "partition", "(Optional)  Partition, divided by + if has more than one field")
-                    .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "");
+                    .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "")
+                    .addParameter("n", "no_header", "(Optional)(Default is true) File has heaer", false);
 
             //Defines the command line interface. 
             CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -114,6 +115,9 @@ public class S3 {
                 if (updatedDate.compareTo(LocalDate.parse(cli.getParameter("start_date"))) >= 0
                         && updatedDate.compareTo(LocalDate.parse(cli.getParameter("end_date"))) <= 0) {
 
+                    Logger.getLogger(S3.class.getName()).log(Level.INFO, "  Transfering: {0}", s3ObjectSummary.getLastModified() + s3ObjectSummary.getKey());
+
+                    //Identifies the output file. 
                     File outputFile = new File(outputPath.toString() + "/" + s3ObjectSummary.getKey().replaceAll("/", "_"));
 
                     //Transfer a file to local filesystem.               
@@ -145,10 +149,20 @@ public class S3 {
 
                         Files.delete(outputFile.toPath());
                     }
+
+                    break;
                 }
             }
 
             Logger.getLogger(S3.class.getName()).log(Level.INFO, "Writing output file to: {0}", cli.getParameter("output"));
+
+            //Identifies if the input file has header. 
+            if (cli.hasParameter("no_header")) {
+                mitt.getWriterSettings().setHeader(
+                        mitt
+                                .getConfiguration()
+                                .getOriginalFieldsName());
+            }
 
             //Writes the final file.
             mitt.getReaderSettings().setDelimiter(cli.getParameter("delimiter").charAt(0));

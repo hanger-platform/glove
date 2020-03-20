@@ -23,7 +23,6 @@
  */
 import br.com.dafiti.mitt.Mitt;
 import br.com.dafiti.mitt.exception.DuplicateEntityException;
-import br.com.dafiti.mitt.transformation.embedded.Now;
 import java.io.File;
 
 /**
@@ -34,10 +33,17 @@ public class MittBatchTest {
 
     public static void main(String[] args) throws DuplicateEntityException {
         Mitt mitt = new Mitt();
-        mitt.setOutputFile("/tmp/mitt/");
+        mitt.setOutputFile("/tmp/mitt/");       
+        
+//        List<String> fields = new ArrayList();
+//        fields.add("sku_config");
+//        fields.add("sku_config");
+//        fields.add("sku_config");
+//        fields.add("sku_config");
 
-        mitt.getConfiguration().addField("nome");
-        mitt.getConfiguration().addCustomField("xxx", new Now());
+//        mitt.getWriterSettings().setHeader(fields);   
+        
+//        mitt.getConfiguration().addField(fields);
 
         mitt.write(new File("/home/valdiney/Downloads/"), "*");
 
