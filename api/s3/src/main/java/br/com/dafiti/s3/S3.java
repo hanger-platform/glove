@@ -149,8 +149,6 @@ public class S3 {
 
                         Files.delete(outputFile.toPath());
                     }
-
-                    break;
                 }
             }
 
