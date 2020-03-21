@@ -63,30 +63,58 @@ public class Parameter {
         this.optional = optional;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getAbreviation() {
         return abreviation;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getDefaultValue() {
         return defaultValue;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean hasArgument() {
         return argument;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isOptional() {
         return optional;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public int hashCode() {
         int hash = 7;
@@ -94,6 +122,11 @@ public class Parameter {
         return hash;
     }
 
+    /**
+     *
+     * @param obj
+     * @return
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
