@@ -35,7 +35,7 @@ import java.util.List;
  */
 public class FarmFingerprint implements Transformable {
 
-    private HashFunction hashFunction;
+    private HashFunction hash;
     private final List<Object> fields;
 
     public FarmFingerprint(List<Object> fields) {
@@ -44,7 +44,7 @@ public class FarmFingerprint implements Transformable {
 
     @Override
     public void init() {
-        this.hashFunction = Hashing.farmHashFingerprint64();
+        this.hash = Hashing.farmHashFingerprint64();
     }
 
     @Override
@@ -59,7 +59,7 @@ public class FarmFingerprint implements Transformable {
         }
 
         if (!value.isEmpty()) {
-            value = String.valueOf(hashFunction.hashBytes(value.getBytes()).asLong());
+            value = String.valueOf(hash.hashBytes(value.getBytes()).asLong());
         }
 
         return value;

@@ -54,7 +54,7 @@ public class MittTest {
         mitt.getConfiguration().addCustomField("fixed::concat([[id,nome,::eval(**nome.replace('A','xxx')**)]])");
         mitt.getConfiguration().addCustomField("bola::eval(**nome.replace(/[^0-9.]/g,'xxx')**)");
         mitt.getConfiguration().addCustomField("regex::regexp(nome,[9])");
-        mitt.getConfiguration().addCustomField("regex2::regexp(nome,[0],default)");
+        mitt.getConfiguration().addCustomField("checksum::checksum(SHA1)");
 
         //Parameters. 
         mitt.getConfiguration().addParameter("a", "primeiro", "Primeiro parâmetro", "xxx");

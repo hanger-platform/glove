@@ -1,3 +1,4 @@
+
 # MITT Framework [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ### O MITT é um framework utilizado para criação de conectores para o Glove.
 
@@ -83,6 +84,7 @@ Uma das principais características do MITT é a possibilidade de transformaçã
 | **MD5**| Aplica a função de hash MD5 em um ou mais campos | ::md5([[<campo\>,<campo\>]])|
 | **Now**| Retorna da data e hora corrente | ::now() |
 | **RegExp**| Extrai parte da informação de um campo usando RegExp | ::regexp(<campo\>,<regex\>) |
+| **Checksum**| Gera um hash utilizando MD5, SHA1 ou FARM_FINGERPRINT para a combinação de todos os campos originais de um registro | ::checksum(<algorítimo\>) |
 
 ##### RESERVED CHARACTERES
 
