@@ -861,10 +861,11 @@ error_check(){
 	if [ $? -gt 0 ]; then
        	 echo "An error has occurred :_("
 
-        	# Remove os arquivos temporários.
-        	if [ ${DEBUG} = 0 ] ; then
-            		rm -rf ${RAWFILE_QUEUE_PATH}*
-       	 fi
+		# Remove os arquivos temporários.
+		if [ ${DEBUG} = 0 ] ; then
+			rm -rf ${RAWFILE_QUEUE_PATH}*
+			rm -rf ${METADATA_QUEUE_PATH}*
+		fi
 
 		exit 1
 	fi
@@ -907,8 +908,7 @@ if [ ${HAS_RECORD} -gt 1 ]; then
 else
 	echo "Nothing to load from ${RAWFILE_QUEUE_PATH}!"
 	exit 1
-fi
-</script>
+fi</script>
       <loglevel>Basic</loglevel>
       <parallel>N</parallel>
       <draw>Y</draw>

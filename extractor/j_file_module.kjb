@@ -337,23 +337,13 @@
       <run_configuration>Pentaho local</run_configuration>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
-        <parameter>
-          <name>FILENAME</name>
-          <stream_name>filename</stream_name>
-          <value />
-        </parameter>
-        <parameter>
-          <name>SHORT_FILENAME</name>
-          <stream_name>short_filename</stream_name>
-          <value />
-        </parameter>
       </parameters>
       <set_append_logfile>N</set_append_logfile>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>400</xloc>
-      <yloc>384</yloc>
+      <xloc>64</xloc>
+      <yloc>272</yloc>
       <attributes_kjc />
     </entry>
     <entry>
@@ -364,8 +354,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>624</xloc>
-      <yloc>384</yloc>
+      <xloc>288</xloc>
+      <yloc>272</yloc>
       <attributes_kjc />
     </entry>
     <entry>
@@ -377,8 +367,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>400</xloc>
-      <yloc>496</yloc>
+      <xloc>64</xloc>
+      <yloc>384</yloc>
       <attributes_kjc />
     </entry>
     <entry>
@@ -393,6 +383,11 @@
         <field>
           <variable_name>DELIMITER</variable_name>
           <variable_value>${FILE_INPUT_DELIMITER}</variable_value>
+          <variable_type>ROOT_JOB</variable_type>
+        </field>
+        <field>
+          <variable_name>METADATA</variable_name>
+          <variable_value>${FILE_INPUT_METADATA}</variable_value>
           <variable_type>ROOT_JOB</variable_type>
         </field>
         <field>
@@ -411,14 +406,14 @@
           <variable_type>ROOT_JOB</variable_type>
         </field>
         <field>
-          <variable_name>TEMP_QUEUE_PATH</variable_name>
-          <variable_value>${GLOVE_TEMP}/${DATE}/file/${UUID}/${FILE_OUTPUT_SCHEMA}_${FILE_OUTPUT_TABLE}_${TARGET}/rawfile/temp/</variable_value>
-          <variable_type>ROOT_JOB</variable_type>
-        </field>
-        <field>
           <variable_name>RAWFILE_QUEUE_PATH</variable_name>
           <variable_value>${GLOVE_TEMP}/${DATE}/file/${UUID}/${FILE_OUTPUT_SCHEMA}_${FILE_OUTPUT_TABLE}_${TARGET}/rawfile/queue/</variable_value>
           <variable_type>ROOT_JOB</variable_type>
+        </field>
+        <field>
+          <variable_name>RAWFILE_QUEUE_FILE</variable_name>
+          <variable_value>${GLOVE_TEMP}/${DATE}/file/${UUID}/${FILE_OUTPUT_SCHEMA}_${FILE_OUTPUT_TABLE}_${TARGET}/rawfile/queue/${FILE_OUTPUT_SCHEMA}_${FILE_OUTPUT_TABLE}.csv</variable_value>
+          <variable_type>JVM</variable_type>
         </field>
         <field>
           <variable_name>RAWFILE_QUEUE_SAMPLE_PATH</variable_name>
@@ -509,197 +504,6 @@
       <attributes_kjc />
     </entry>
     <entry>
-      <name>Get all files</name>
-      <description />
-      <type>JOB</type>
-      <attributes />
-      <specification_method>filename</specification_method>
-      <job_object_id />
-      <filename>${Internal.Entry.Current.Directory}/j_get_files_from_bucket.kjb</filename>
-      <jobname />
-      <directory />
-      <arg_from_previous>N</arg_from_previous>
-      <params_from_previous>N</params_from_previous>
-      <exec_per_row>N</exec_per_row>
-      <set_logfile>N</set_logfile>
-      <logfile />
-      <logext />
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <loglevel>Nothing</loglevel>
-      <slave_server_name />
-      <wait_until_finished>Y</wait_until_finished>
-      <follow_abort_remote>N</follow_abort_remote>
-      <expand_remote_job>N</expand_remote_job>
-      <create_parent_folder>N</create_parent_folder>
-      <pass_export>N</pass_export>
-      <run_configuration>Pentaho local</run_configuration>
-      <parameters>
-        <pass_all_parameters>Y</pass_all_parameters>
-      </parameters>
-      <set_append_logfile>N</set_append_logfile>
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>64</xloc>
-      <yloc>272</yloc>
-      <attributes_kjc />
-    </entry>
-    <entry>
-      <name>Get file</name>
-      <description />
-      <type>TRANS</type>
-      <attributes />
-      <specification_method>filename</specification_method>
-      <trans_object_id />
-      <filename>${Internal.Entry.Current.Directory}/m_get_file.ktr</filename>
-      <transname />
-      <arg_from_previous>N</arg_from_previous>
-      <params_from_previous>N</params_from_previous>
-      <exec_per_row>N</exec_per_row>
-      <clear_rows>N</clear_rows>
-      <clear_files>N</clear_files>
-      <set_logfile>N</set_logfile>
-      <logfile />
-      <logext />
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <loglevel>Basic</loglevel>
-      <cluster>N</cluster>
-      <slave_server_name />
-      <set_append_logfile>N</set_append_logfile>
-      <wait_until_finished>Y</wait_until_finished>
-      <follow_abort_remote>N</follow_abort_remote>
-      <create_parent_folder>N</create_parent_folder>
-      <logging_remote_work>N</logging_remote_work>
-      <run_configuration>Pentaho local</run_configuration>
-      <parameters>
-        <pass_all_parameters>Y</pass_all_parameters>
-      </parameters>
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>288</xloc>
-      <yloc>384</yloc>
-      <attributes_kjc />
-    </entry>
-    <entry>
-      <name>Merge data</name>
-      <description />
-      <type>SHELL</type>
-      <attributes />
-      <filename />
-      <work_directory />
-      <arg_from_previous>N</arg_from_previous>
-      <exec_per_row>N</exec_per_row>
-      <set_logfile>N</set_logfile>
-      <logfile />
-      <set_append_logfile>N</set_append_logfile>
-      <logext />
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <insertScript>Y</insertScript>
-      <script>mkdir -p ${RAWFILE_QUEUE_STAGING_PATH}
-
-error_check(){
-	if [ $? -gt 0 ]; then
-       	 	echo "An error has occurred :_("
-
-        	# Remove os arquivos temporários.
-        	if [ ${DEBUG} = 0 ] ; then
-         		rm -rf ${TEMP_QUEUE_PATH}*
-			rm -rf ${RAWFILE_QUEUE_STAGING_PATH}*
-       	 	fi
-		exit 1
-	fi
-}
-
-FILE_COUNT=`ls   ${TEMP_QUEUE_PATH} | wc -l`
-
-if [ ${FILE_COUNT} -gt 0 ]; then
-	echo "Copying files from ${TEMP_QUEUE_PATH}!"
-	mv ${TEMP_QUEUE_PATH}* ${RAWFILE_QUEUE_STAGING_PATH}
-	error_check
-
-	echo "Merging data files!"
-	cd ${RAWFILE_QUEUE_STAGING_PATH}
-
-	for i in `ls *.csv`
-	do
-		FILE=${TEMP_QUEUE_PATH}${FILE_OUTPUT_TABLE}.csv
-
-		if [ -f "${FILE}" ]; then
-			tail -n +2 $i >> ${FILE}
-			error_check
-		else
-			cat $i > ${FILE}
-			error_check
-		fi
- 	done
-else
-	echo "NOTHING TO LOAD :/"
-fi
-
-echo "Removing temporary files!"
-rm -rf ${RAWFILE_QUEUE_STAGING_PATH}
-error_check</script>
-      <loglevel>Basic</loglevel>
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>176</xloc>
-      <yloc>384</yloc>
-      <attributes_kjc />
-    </entry>
-    <entry>
-      <name>Append ON?</name>
-      <description />
-      <type>SIMPLE_EVAL</type>
-      <attributes />
-      <valuetype>variable</valuetype>
-      <fieldname />
-      <variablename>FILE_OUTPUT_MODE</variablename>
-      <fieldtype>string</fieldtype>
-      <mask />
-      <comparevalue>append</comparevalue>
-      <minvalue />
-      <maxvalue />
-      <successcondition>equal</successcondition>
-      <successnumbercondition>equal</successnumbercondition>
-      <successbooleancondition>false</successbooleancondition>
-      <successwhenvarset>N</successwhenvarset>
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>288</xloc>
-      <yloc>272</yloc>
-      <attributes_kjc />
-    </entry>
-    <entry>
-      <name>Partition ON?</name>
-      <description />
-      <type>SIMPLE_EVAL</type>
-      <attributes />
-      <valuetype>variable</valuetype>
-      <fieldname />
-      <variablename>FILE_INPUT_PARTITONED</variablename>
-      <fieldtype>string</fieldtype>
-      <mask />
-      <comparevalue>1</comparevalue>
-      <minvalue />
-      <maxvalue />
-      <successcondition>equal</successcondition>
-      <successnumbercondition>equal</successnumbercondition>
-      <successbooleancondition>false</successbooleancondition>
-      <successwhenvarset>N</successwhenvarset>
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>176</xloc>
-      <yloc>272</yloc>
-      <attributes_kjc />
-    </entry>
-    <entry>
       <name>Temp files cleanup</name>
       <description />
       <type>SHELL</type>
@@ -722,8 +526,8 @@ error_check</script>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>512</xloc>
-      <yloc>384</yloc>
+      <xloc>176</xloc>
+      <yloc>272</yloc>
       <attributes_kjc />
     </entry>
   </entries>
@@ -738,15 +542,6 @@ error_check</script>
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>Module parameters</from>
-      <to>Get all files</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
       <from>START</from>
       <to>Module parameters</to>
       <from_nr>0</from_nr>
@@ -754,69 +549,6 @@ error_check</script>
       <enabled>Y</enabled>
       <evaluation>Y</evaluation>
       <unconditional>Y</unconditional>
-    </hop>
-    <hop>
-      <from>Get file</from>
-      <to>Extract data</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>Merge data</from>
-      <to>Get file</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>Append ON?</from>
-      <to>Merge data</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>N</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>Append ON?</from>
-      <to>Get file</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>Get all files</from>
-      <to>Partition ON?</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>Partition ON?</from>
-      <to>Append ON?</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>N</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>Partition ON?</from>
-      <to>Merge data</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
     </hop>
     <hop>
       <from>Extract data</from>
@@ -835,6 +567,15 @@ error_check</script>
       <enabled>Y</enabled>
       <evaluation>N</evaluation>
       <unconditional>Y</unconditional>
+    </hop>
+    <hop>
+      <from>Module parameters</from>
+      <to>Extract data</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
     </hop>
   </hops>
   <notepads>
