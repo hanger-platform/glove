@@ -778,13 +778,14 @@ if [ "${FILE_DONE_BUCKET}" != "" ]; then
 		error_check
 	fi
 else 
+	echo "Do not have a done bucket!"
+
 	if [[ "$FILE_DONE_BUCKET" != *"s3://"* ]]; then	
 		if [ ${DEBUG} = 0 ] ; then
+			echo "Cleaning up ${FILE_INPUT_BUCKET}"
 			rm -f ${FILE_INPUT_BUCKET}*
 		fi
 	fi
-
-    echo "Do not have a done bucket!"
 fi</script>
       <loglevel>Basic</loglevel>
       <parallel>N</parallel>
