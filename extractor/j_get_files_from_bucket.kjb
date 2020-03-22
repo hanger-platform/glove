@@ -361,8 +361,6 @@ if [ "${FILE_INPUT_BUCKET}" != "" ]; then
 		cp ${FILE_INPUT_BUCKET}* ${RAWFILE_QUEUE_STAGING_PATH}
 		error_check	
 	
-		cd ${RAWFILE_QUEUE_STAGING_PATH}
-	
 		#Identifies if FILE_OUTPUT_MODE is APPEND. 
 		if [[ ${FILE_OUTPUT_MODE} == "append" ]]; then	
 			#Identifies if should change the file extension to CSV. 
@@ -380,10 +378,12 @@ if [ "${FILE_INPUT_BUCKET}" != "" ]; then
 		do
 			if [[ ${FILE_OUTPUT_MODE} == "append" &amp;&amp; "${#FILE_INPUT_PARTITONED}" -eq "0" ]]; then	
 				echo "Copying file ${i} to ${RAWFILE_QUEUE_PATH}"
-				mv ${i}	${RAWFILE_QUEUE_PATH}${SCHEMA_NAME}_${TABLE_NAME}_${i}
+				mv ${i}	${RAWFILE_QUEUE_PATH}${SCHEMA_NAME}_${TABLE_NAME}_$(basename "${i}")
 				error_check			
 			else
 				if [ ${FILE_INDEX} = 0 ]; then	
+					echo ${RAWFILE_QUEUE_PATH}${SCHEMA_NAME}_${TABLE_NAME}_$(basename "${i}")
+				
 					cat ${i} >>	${RAWFILE_QUEUE_FILE}
 					error_check
 				else
