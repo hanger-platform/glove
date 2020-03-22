@@ -521,7 +521,11 @@
       <insertScript>Y</insertScript>
       <script> echo "Removing temporary folder ${QUEUE_PATH}"
  cd ${GLOVE_TEMP}
- rm -rf ${QUEUE_PATH}</script>
+
+if [ ${DEBUG} = 0 ] ; then
+	 rm -rf ${QUEUE_PATH}
+fi
+</script>
       <loglevel>Basic</loglevel>
       <parallel>N</parallel>
       <draw>Y</draw>

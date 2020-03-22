@@ -519,9 +519,8 @@ cp -rf ${METADATA_QUEUE_PATH}* ${METADATA_PATH}</script>
       <add_date>N</add_date>
       <add_time>N</add_time>
       <insertScript>Y</insertScript>
-      <script>mkdir -p ${METADATA_QUEUE_PATH}
-mkdir -p ${RAWFILE_QUEUE_PATH}
-mkdir -p ${RAWFILE_QUEUE_SAMPLE_PATH}
+      <script>mkdir -p ${RAWFILE_QUEUE_PATH}
+mkdir -p ${RAWFILE_QUEUE_STAGING_PATH}
 
 error_check(){
 	if [ $? -gt 0 ]; then
@@ -529,82 +528,79 @@ error_check(){
 
 		# Remove os arquivos temporários.
 		if [ ${DEBUG} = 0 ] ; then
-			rm -rf ${RAWFILE_QUEUE_PATH}*
-			rm -rf ${METADATA_QUEUE_PATH}*
-		fi
+			rm -rf ${RAWFILE_QUEUE_STAGING_PATH}*
+       	fi
 
 		exit 1
 	fi
 }
+	
+echo "Reatrieving files from ${FILE_INPUT_BUCKET}"
 
-# Identifies if the output mode is APPEND.
-if [[ ${FILE_OUTPUT_MODE} != "append" ]]; then	
-	HAS_RECORD=`head -5 ${RAWFILE_QUEUE_PATH}${SCHEMA_NAME}_${TABLE_NAME}*.csv | wc -l`
-else
-	FILE_INDEX=0
-
-	for i in `ls ${RAWFILE_QUEUE_PATH}*`
-	do
-		# Get samples data to extract metadata. 
-		if [ ${FILE_INDEX} = 0 ]; then	
-			cat ${i}	>> 	${RAWFILE_QUEUE_SAMPLE_FILE}
-			error_check
-		else
-			SAMPLE_FILE_RECORD=`cat ${RAWFILE_QUEUE_SAMPLE_FILE} | wc -l`
+if [ "${FILE_INPUT_BUCKET}" != "" ]; then
+	# Identifies if the source is a S3 bucket. 
+    if [[ "${FILE_INPUT_BUCKET}" == *"s3://"* ]]; then	
+		aws s3 cp ${FILE_INPUT_BUCKET} ${RAWFILE_QUEUE_STAGING_PATH} --recursive --exclude "*" --include "*.${FILE_INPUT_EXTENSION}" --only-show-errors
+		error_check
 		
-			if [ ${SAMPLE} -gt ${SAMPLE_FILE_RECORD} ]; then
-				sed '1d' ${i} >> ${RAWFILE_QUEUE_SAMPLE_FILE}	
-				error_check	
-			else
-				break
-			fi
-		fi
-
-		FILE_INDEX=$(( $FILE_INDEX + 1 ))
-	done
-	
-	HAS_RECORD=`head -5 ${RAWFILE_QUEUE_SAMPLE_FILE} | wc -l`
-fi
-
-# Identifies if there are records to process. 
-if [ ${HAS_RECORD} -gt 1 ]; then
-	echo "Getting data sample of ${SAMPLE} records"
-	
-	if [[ ${FILE_OUTPUT_MODE} != "append" ]]; then
-		head -n ${SAMPLE} ${RAWFILE_QUEUE_FILE} > ${RAWFILE_QUEUE_SAMPLE_FILE} 
-		error_check	
+		FILE_COUNT=`ls  ${RAWFILE_QUEUE_STAGING_PATH} | wc -l`
+    else
+		FILE_COUNT=`ls  ${FILE_INPUT_BUCKET} | wc -l`
 	fi
 
-	DIALECT=${TARGET}
+	echo "${FILE_COUNT} files found"
+
+	#Identifies if there are files to process.
+	if [ ${FILE_COUNT} -gt 0 ]; then
+		cp ${FILE_INPUT_BUCKET}* ${RAWFILE_QUEUE_STAGING_PATH}
+		error_check	
 	
-	if [ ${TARGET} == "spectrum"  ] &amp;&amp;  [ ${HAS_ATHENA} = 1 ]; then
-		DIALECT="athena"
-	fi 
+		#Identifies if FILE_OUTPUT_MODE is APPEND. 
+		if [[ ${FILE_OUTPUT_MODE} == "append" ]]; then	
+			#Identifies if should change the file extension to CSV. 
+			if [ ${FILE_INPUT_EXTENSION} != "csv" ]; then
+				for i in `ls ${RAWFILE_QUEUE_STAGING_PATH}*`
+				do
+					mv "$i" "${i%.*}.csv" 
+				done
+			fi
+		fi
+		
+		FILE_INDEX=0
 
-	echo "Dialect: " $DIALECT
+		for i in `ls ${RAWFILE_QUEUE_STAGING_PATH}*`
+		do
+			if [[ ${FILE_OUTPUT_MODE} == "append" &amp;&amp; "${#FILE_INPUT_PARTITONED}" -eq "0" ]]; then	
+				echo "Copying file ${i} to ${RAWFILE_QUEUE_PATH}"
+				mv ${i}	${RAWFILE_QUEUE_PATH}${SCHEMA_NAME}_${TABLE_NAME}_$(basename "${i}")
+				error_check			
+			else
+				if [ ${FILE_INDEX} = 0 ]; then	
+					cat ${i} >>	${RAWFILE_QUEUE_FILE}
+					error_check
+				else
+					#Avoid merging CSV file when FILE_INPUT_PARTITONED. 
+					if [ "${#FILE_INPUT_PARTITONED}" -gt "0" ]; then
+						mv ${i}	${RAWFILE_QUEUE_PATH}${SCHEMA_NAME}_${TABLE_NAME}_${FILE_INDEX}.csv
+						error_check
+					else
+						echo "Merging file ${i} in ${RAWFILE_QUEUE_FILE}"
+						sed '1d' ${i} >> ${RAWFILE_QUEUE_FILE}	
+						error_check	
+					fi
+				fi
 
-	echo "Extracting metadata"
-	java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
-		--folder=${RAWFILE_QUEUE_SAMPLE_PATH} \
-		--output=${METADATA_QUEUE_PATH} \
-		--metadata="${METADATA}" \
-		--sample=${SAMPLE} \
-		--header \
-		--delimiter="${DELIMITER}" \
-		--filename=${SCHEMA_NAME}_${TABLE_NAME}.csv  \
-		--target=metadata \
-		--dialect=${DIALECT} \
-		--reservedWords=${RESERVED_WORDS_FILE}
-	error_check
-
-	echo "INFERRED METADATA"
-	cat ${METADATA_QUEUE_METADATA_FILE}
-
-	rm -rf  ${RAWFILE_QUEUE_SAMPLE_PATH}
-	error_check
-else
-	echo "Nothing to load from ${RAWFILE_QUEUE_PATH}!"
-	exit 1
+				FILE_INDEX=$(( $FILE_INDEX + 1 ))
+			fi
+		done	
+	else
+		echo "There are no files in ${FILE_INPUT_BUCKET} :/"
+	fi	
+	
+	#Remove stage folder.
+	rm -rf ${RAWFILE_QUEUE_STAGING_PATH}
+else 
+    echo "Input bucket not provided :/"
 fi</script>
       <loglevel>Basic</loglevel>
       <parallel>N</parallel>
@@ -757,49 +753,34 @@ Check if query returned at least one record or if happened error on the process.
       <add_date>N</add_date>
       <add_time>N</add_time>
       <insertScript>Y</insertScript>
-      <script>mkdir -p ${TEMP_QUEUE_PATH}
-
-error_check(){
+      <script>error_check(){
 	if [ $? -gt 0 ]; then
-       	 echo "An error has occurred :_("
-        	# Remove os arquivos temporários.
-        	if [ ${DEBUG} = 0 ] ; then
-            		rm -rf ${TEMP_QUEUE_PATH}*
-       		fi
+       	echo "An error has occurred :_("
 		exit 1
 	fi
 }
 
 if [ "${FILE_DONE_BUCKET}" != "" ]; then
-    	if [[ "$FILE_DONE_BUCKET" == *"s3://"* ]]; then	
-		if [ ${FILE_INPUT_PARTITONED} == 1 ] || [ ${FILE_OUTPUT_MODE} != "append" ]; then	
-			echo "Backing up ${FILE_INPUT_BUCKET} on ${FILE_DONE_BUCKET}"
+	if [[ "$FILE_DONE_BUCKET" == *"s3://"* ]]; then	
+		echo "Saving ${FILE_INPUT_BUCKET} on ${FILE_DONE_BUCKET}"
 
-			aws s3 mv ${FILE_INPUT_BUCKET} ${FILE_DONE_BUCKET} --recursive --only-show-errors
-			rm -f ${FILE_INPUT_BUCKET}*
-		else
-			echo "Backing up ${FILE_INPUT_BUCKET}${SHORT_FILENAME} on ${FILE_DONE_BUCKET}${SHORT_FILENAME}"
-
-			aws s3 mv ${FILE_INPUT_BUCKET}${SHORT_FILENAME} ${FILE_DONE_BUCKET}${SHORT_FILENAME} --only-show-errors
-			rm -f ${FILE_INPUT_BUCKET}${SHORT_FILENAME}
-		fi
-
+		aws s3 mv ${FILE_INPUT_BUCKET} ${FILE_DONE_BUCKET} --recursive --only-show-errors
+		
+		rm -f ${FILE_INPUT_BUCKET}*
 		error_check
-    	else
-		if [ ${FILE_INPUT_PARTITONED} == 1 ] || [ ${FILE_OUTPUT_MODE} != "append" ]; then
-			echo "Backing up ${FILE_INPUT_BUCKET} on ${FILE_DONE_BUCKET}"
-
-			mv ${FILE_INPUT_BUCKET}* ${FILE_DONE_BUCKET}
-      			error_check
-		else
-			echo "Backing up ${FILE_INPUT_BUCKET}${SHORT_FILENAME} on ${FILE_DONE_BUCKET}${SHORT_FILENAME}"
-
-      			mv  ${FILE_INPUT_BUCKET}${SHORT_FILENAME} ${FILE_DONE_BUCKET}${SHORT_FILENAME}
-      			error_check
-		fi
-    	fi
+	else
+		echo "Saving ${FILE_INPUT_BUCKET} on ${FILE_DONE_BUCKET}"
+		
+		mv ${FILE_INPUT_BUCKET}* ${FILE_DONE_BUCKET}
+		error_check
+	fi
 else 
-    	echo "Do not have a done bucket!"
+	if [ ${DEBUG} = 0 ] ; then
+		echo "Cleaning up ${FILE_INPUT_BUCKET}"
+		rm -f ${FILE_INPUT_BUCKET}*
+	fi
+
+    echo "Do not have a done bucket!"
 fi</script>
       <loglevel>Basic</loglevel>
       <parallel>N</parallel>
