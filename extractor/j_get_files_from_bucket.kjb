@@ -380,11 +380,11 @@ if [ "${FILE_INPUT_BUCKET}" != "" ]; then
 		do
 			if [[ ${FILE_OUTPUT_MODE} == "append" &amp;&amp; "${#FILE_INPUT_PARTITONED}" -eq "0" ]]; then	
 				echo "Copying file ${i} to ${RAWFILE_QUEUE_PATH}"
-				mv ${i}	${RAWFILE_QUEUE_PATH}
+				mv ${i}	${RAWFILE_QUEUE_PATH}${SCHEMA_NAME}_${TABLE_NAME}_${i}
 				error_check			
 			else
 				if [ ${FILE_INDEX} = 0 ]; then	
-					cat ${i}	>> 	${RAWFILE_QUEUE_PATH}${SCHEMA_NAME}_${TABLE_NAME}_${i}
+					cat ${i} >>	${RAWFILE_QUEUE_FILE}
 					error_check
 				else
 					#Avoid merging CSV file when FILE_INPUT_PARTITONED. 
