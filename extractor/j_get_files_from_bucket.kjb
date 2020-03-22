@@ -340,10 +340,6 @@ error_check(){
 		exit 1
 	fi
 }
-
-# Remove data from output folders.
-# rm -rf ${RAWFILE_QUEUE_PATH}*	
-# rm -rf ${RAWFILE_QUEUE_STAGING_PATH}*
 	
 echo "Reatrieving files from ${FILE_INPUT_BUCKET}"
 
@@ -365,6 +361,8 @@ if [ "${FILE_INPUT_BUCKET}" != "" ]; then
 		cp ${FILE_INPUT_BUCKET}* ${RAWFILE_QUEUE_STAGING_PATH}
 		error_check	
 	
+		cd ${RAWFILE_QUEUE_STAGING_PATH}
+	
 		#Identifies if FILE_OUTPUT_MODE is APPEND. 
 		if [[ ${FILE_OUTPUT_MODE} == "append" ]]; then	
 			#Identifies if should change the file extension to CSV. 
@@ -380,13 +378,13 @@ if [ "${FILE_INPUT_BUCKET}" != "" ]; then
 
 		for i in `ls ${RAWFILE_QUEUE_STAGING_PATH}*`
 		do
-			if [[ ${FILE_OUTPUT_MODE} == "append" ]]; then	
+			if [[ ${FILE_OUTPUT_MODE} == "append" &amp;&amp; "${#FILE_INPUT_PARTITONED}" -eq "0" ]]; then	
 				echo "Copying file ${i} to ${RAWFILE_QUEUE_PATH}"
 				mv ${i}	${RAWFILE_QUEUE_PATH}
 				error_check			
 			else
 				if [ ${FILE_INDEX} = 0 ]; then	
-					cat ${i}	>> 	${RAWFILE_QUEUE_FILE}
+					cat ${i}	>> 	${RAWFILE_QUEUE_PATH}${SCHEMA_NAME}_${TABLE_NAME}_${i}
 					error_check
 				else
 					#Avoid merging CSV file when FILE_INPUT_PARTITONED. 
