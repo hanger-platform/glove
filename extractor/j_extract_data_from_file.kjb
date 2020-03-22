@@ -904,20 +904,20 @@ fi</script>
 # INPUT
 #-----------------------------------------------------------
 FILE_INPUT_BUCKET		== ${FILE_INPUT_BUCKET}
-FILE_INPUT_DELIMITER	== ${FILE_INPUT_DELIMITER}
+FILE_INPUT_DELIMITER		== ${FILE_INPUT_DELIMITER}
 FILE_INPUT_METADATA		== ${FILE_INPUT_METADATA}
 
 #-----------------------------------------------------------
 # INPUT SAMPLE
 #-----------------------------------------------------------
-SAMPLE					== ${SAMPLE}
+SAMPLE				== ${SAMPLE}
 
 #-----------------------------------------------------------
 # OUTPUT
 #-----------------------------------------------------------
-TARGET					== ${TARGET}
-SCHEMA					== ${SCHEMA_NAME}
-TABLE_NAME				== ${TABLE_NAME}
+TARGET				== ${TARGET}
+SCHEMA				== ${SCHEMA_NAME}
+TABLE_NAME			== ${TABLE_NAME}
 STORAGE_BUCKET			== ${STORAGE_BUCKET}
 OUTPUT_FORMAT			== ${OUTPUT_FORMAT}
 OUTPUT_COMPRESSION		== ${OUTPUT_COMPRESSION}
@@ -925,7 +925,7 @@ OUTPUT_COMPRESSION		== ${OUTPUT_COMPRESSION}
 #-----------------------------------------------------------
 # OUTPUT STRATEGY
 #-----------------------------------------------------------
-FILE_INPUT_PARTITONED	== ${FILE_INPUT_PARTITONED}
+FILE_INPUT_PARTITONED		== ${FILE_INPUT_PARTITONED}
 FILE_OUTPUT_MODE		== ${FILE_OUTPUT_MODE}
 FILE_DONE_BUCKET		== ${FILE_DONE_BUCKET}</logmessage>
       <loglevel>Basic</loglevel>
