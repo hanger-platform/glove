@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.s3.S3 --output="/tmp/mitt/solr_memcached/dafiti_br/" --bucket="dft-dwh-files" --prefix="rawdata/solr_memcached/dafiti_br_done/" --start_date="2020-03-20" --end_date="2020-03-20" --field="sku_config+sku_simple+quantity+stock_date+current_price" --no_header</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.s3.S3 --output="/tmp/mitt/solr_memcached/dafiti_br/" --bucket="dft-dwh-files" --prefix="rawdata/solr_memcached/dafiti_br_done/" --start_date="2020-03-20" --end_date="2020-03-20" --field="date::regexp(::filename(),**[0-9]**)+sku_config+sku_simple+quantity+stock_date+current_price" --no_header --key="::checksum()" --partition="::regexp(::filename(),**[0-9]**)"</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.s3.S3 --output="/tmp/mitt/solr_memcached/dafiti_br/" --bucket="dft-dwh-files" --prefix="rawdata/solr_memcached/dafiti_br_done/" --start_date="2020-03-20" --end_date="2020-03-20" --field="sku_config+sku_simple+quantity+stock_date+current_price" --no_header</exec.args>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.s3.S3 --output="/tmp/mitt/solr_memcached/dafiti_br/" --bucket="dft-dwh-files" --prefix="rawdata/solr_memcached/dafiti_br_done/" --start_date="2020-03-20" --end_date="2020-03-20" --field="date::regexp(::filename(),**[0-9]**)+sku_config+sku_simple+quantity+stock_date+current_price" --no_header --key="::checksum()" --partition="::regexp(::filename(),**[0-9]**)"</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.s3.S3 --output="/tmp/mitt/solr_memcached/dafiti_br/" --bucket="dft-dwh-files" --prefix="rawdata/solr_memcached/dafiti_br_done/" --start_date="2020-03-20" --end_date="2020-03-20" --field="sku_config+sku_simple+quantity+stock_date+current_price" --no_header</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.s3.S3 --output="/tmp/mitt/solr_memcached/dafiti_br/" --bucket="dft-dwh-files" --prefix="rawdata/solr_memcached/dafiti_br_done/" --start_date="2020-03-20" --end_date="2020-03-20" --field="date::regexp(::filename(),**[0-9]**)+sku_config+sku_simple+quantity+stock_date+current_price" --no_header --key="::checksum()" --partition="::regexp(::filename(),**[0-9]**)"</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
