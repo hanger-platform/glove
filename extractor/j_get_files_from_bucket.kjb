@@ -334,7 +334,6 @@ error_check(){
 
 		# Remove os arquivos temporários.
 		if [ ${DEBUG} = 0 ] ; then
-			rm -rf ${TEMP_QUEUE_PATH}*
 			rm -rf ${RAWFILE_QUEUE_STAGING_PATH}*
        	fi
 
@@ -343,8 +342,8 @@ error_check(){
 }
 
 # Remove data from output folders.
-rm -rf ${RAWFILE_QUEUE_PATH}*	
-rm -rf ${RAWFILE_QUEUE_STAGING_PATH}*
+# rm -rf ${RAWFILE_QUEUE_PATH}*	
+# rm -rf ${RAWFILE_QUEUE_STAGING_PATH}*
 	
 echo "Reatrieving files from ${FILE_INPUT_BUCKET}"
 
