@@ -539,7 +539,7 @@ error_check(){
 
 # Identifies if the output mode is APPEND.
 if [[ ${FILE_OUTPUT_MODE} != "append" ]]; then	
-	HAS_RECORD=`head -5 ${RAWFILE_QUEUE_PATH}${SCHEMA_NAME}_${TABLE}*.csv | wc -l`
+	HAS_RECORD=`head -5 ${RAWFILE_QUEUE_PATH}${SCHEMA_NAME}_${TABLE_NAME}*.csv | wc -l`
 else
 	FILE_INDEX=0
 
@@ -591,7 +591,7 @@ if [ ${HAS_RECORD} -gt 1 ]; then
 		--sample=${SAMPLE} \
 		--header \
 		--delimiter="${DELIMITER}" \
-		--filename=${SCHEMA_NAME}_${TABLE}.csv  \
+		--filename=${SCHEMA_NAME}_${TABLE_NAME}.csv  \
 		--target=metadata \
 		--dialect=${DIALECT} \
 		--reservedWords=${RESERVED_WORDS_FILE}
