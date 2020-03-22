@@ -305,7 +305,7 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>64</xloc>
+      <xloc>48</xloc>
       <yloc>272</yloc>
       <attributes_kjc />
     </entry>
@@ -488,48 +488,6 @@ cp -rf ${METADATA_QUEUE_PATH}* ${METADATA_PATH}</script>
       <nr>0</nr>
       <xloc>832</xloc>
       <yloc>496</yloc>
-      <attributes_kjc />
-    </entry>
-    <entry>
-      <name>Log</name>
-      <description />
-      <type>WRITE_TO_LOG</type>
-      <attributes />
-      <logmessage>#-----------------------------------------------------------
-# INPUT
-#-----------------------------------------------------------
-FILE_INPUT_BUCKET		== ${FILE_INPUT_BUCKET}
-FILE_INPUT_DELIMITER		== ${FILE_INPUT_DELIMITER}
-FILE_INPUT_METADATA		== ${FILE_INPUT_METADATA}
-
-#-----------------------------------------------------------
-# INPUT SAMPLE
-#-----------------------------------------------------------
-SAMPLE					== ${SAMPLE}
-
-#-----------------------------------------------------------
-# OUTPUT
-#-----------------------------------------------------------
-TARGET					== ${TARGET}
-SCHEMA					== ${SCHEMA_NAME}
-TABLE_NAME				== ${TABLE_NAME}
-STORAGE_BUCKET			== ${STORAGE_BUCKET}
-OUTPUT_FORMAT			== ${OUTPUT_FORMAT}
-OUTPUT_COMPRESSION		== ${OUTPUT_COMPRESSION}
-
-#-----------------------------------------------------------
-# OUTPUT STRATEGY
-#-----------------------------------------------------------
-FILE_INPUT_PARTITONED	== ${FILE_INPUT_PARTITONED}
-FILE_OUTPUT_MODE		== ${FILE_OUTPUT_MODE}
-FILE_DONE_BUCKET		== ${FILE_DONE_BUCKET}</logmessage>
-      <loglevel>Basic</loglevel>
-      <logsubject>LOG</logsubject>
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>272</xloc>
-      <yloc>272</yloc>
       <attributes_kjc />
     </entry>
     <entry>
@@ -921,7 +879,49 @@ fi</script>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>160</xloc>
+      <xloc>256</xloc>
+      <yloc>272</yloc>
+      <attributes_kjc />
+    </entry>
+    <entry>
+      <name>Log</name>
+      <description />
+      <type>WRITE_TO_LOG</type>
+      <attributes />
+      <logmessage>#-----------------------------------------------------------
+# INPUT
+#-----------------------------------------------------------
+FILE_INPUT_BUCKET		== ${FILE_INPUT_BUCKET}
+FILE_INPUT_DELIMITER		== ${FILE_INPUT_DELIMITER}
+FILE_INPUT_METADATA		== ${FILE_INPUT_METADATA}
+
+#-----------------------------------------------------------
+# INPUT SAMPLE
+#-----------------------------------------------------------
+SAMPLE					== ${SAMPLE}
+
+#-----------------------------------------------------------
+# OUTPUT
+#-----------------------------------------------------------
+TARGET					== ${TARGET}
+SCHEMA					== ${SCHEMA_NAME}
+TABLE_NAME				== ${TABLE_NAME}
+STORAGE_BUCKET			== ${STORAGE_BUCKET}
+OUTPUT_FORMAT			== ${OUTPUT_FORMAT}
+OUTPUT_COMPRESSION		== ${OUTPUT_COMPRESSION}
+
+#-----------------------------------------------------------
+# OUTPUT STRATEGY
+#-----------------------------------------------------------
+FILE_INPUT_PARTITONED	== ${FILE_INPUT_PARTITONED}
+FILE_OUTPUT_MODE		== ${FILE_OUTPUT_MODE}
+FILE_DONE_BUCKET		== ${FILE_DONE_BUCKET}</logmessage>
+      <loglevel>Basic</loglevel>
+      <logsubject>LOG</logsubject>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>144</xloc>
       <yloc>272</yloc>
       <attributes_kjc />
     </entry>
@@ -1063,15 +1063,6 @@ fi</script>
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>Log</from>
-      <to>Extract metadata</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
       <from>Set recreate to 0 </from>
       <to>Move to done</to>
       <from_nr>0</from_nr>
@@ -1145,7 +1136,7 @@ fi</script>
     </hop>
     <hop>
       <from>Get files</from>
-      <to>Log</to>
+      <to>Extract metadata</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -1154,12 +1145,21 @@ fi</script>
     </hop>
     <hop>
       <from>START</from>
-      <to>Get files</to>
+      <to>Log</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
       <evaluation>Y</evaluation>
       <unconditional>Y</unconditional>
+    </hop>
+    <hop>
+      <from>Log</from>
+      <to>Get files</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
     </hop>
   </hops>
   <notepads>
