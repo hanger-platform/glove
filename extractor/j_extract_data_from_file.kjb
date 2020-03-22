@@ -769,7 +769,6 @@ if [ "${FILE_DONE_BUCKET}" != "" ]; then
 		echo "Saving ${FILE_INPUT_BUCKET} on ${FILE_DONE_BUCKET}"
 
 		aws s3 mv ${FILE_INPUT_BUCKET} ${FILE_DONE_BUCKET} --recursive --only-show-errors
-		
 		rm -f ${FILE_INPUT_BUCKET}*
 		error_check
 	else
@@ -779,9 +778,10 @@ if [ "${FILE_DONE_BUCKET}" != "" ]; then
 		error_check
 	fi
 else 
-	if [ ${DEBUG} = 0 ] ; then
-		echo "Cleaning up ${FILE_INPUT_BUCKET}"
-		rm -f ${FILE_INPUT_BUCKET}*
+	if [[ "$FILE_DONE_BUCKET" != *"s3://"* ]]; then	
+		if [ ${DEBUG} = 0 ] ; then
+			rm -f ${FILE_INPUT_BUCKET}*
+		fi
 	fi
 
     echo "Do not have a done bucket!"
