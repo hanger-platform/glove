@@ -904,7 +904,7 @@ fi</script>
 # INPUT
 #-----------------------------------------------------------
 FILE_INPUT_BUCKET		== ${FILE_INPUT_BUCKET}
-FILE_INPUT_DELIMITER		== ${FILE_INPUT_DELIMITER}
+FILE_INPUT_DELIMITER	== ${FILE_INPUT_DELIMITER}
 FILE_INPUT_METADATA		== ${FILE_INPUT_METADATA}
 
 #-----------------------------------------------------------
