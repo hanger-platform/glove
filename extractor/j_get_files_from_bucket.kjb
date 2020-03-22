@@ -366,7 +366,7 @@ if [ "${FILE_INPUT_BUCKET}" != "" ]; then
 		error_check	
 	
 		#Identifies if FILE_OUTPUT_MODE is APPEND. 
-		if [ [ ${FILE_OUTPUT_MODE} == "append" ]; then	
+		if [[ ${FILE_OUTPUT_MODE} == "append" ]]; then	
 			#Identifies if should change the file extension to CSV. 
 			if [ ${FILE_INPUT_EXTENSION} != "csv" ]; then
 				for i in `ls ${RAWFILE_QUEUE_STAGING_PATH}*`
@@ -380,7 +380,7 @@ if [ "${FILE_INPUT_BUCKET}" != "" ]; then
 
 		for i in `ls ${RAWFILE_QUEUE_STAGING_PATH}*`
 		do
-			if [ [ ${FILE_OUTPUT_MODE} == "append" ]; then	
+			if [[ ${FILE_OUTPUT_MODE} == "append" ]]; then	
 				echo "Copying file ${i} to ${RAWFILE_QUEUE_PATH}"
 				mv ${i}	${RAWFILE_QUEUE_PATH}
 				error_check			
