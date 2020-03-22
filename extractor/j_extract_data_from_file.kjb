@@ -537,12 +537,44 @@ error_check(){
 	fi
 }
 
-HAS_RECORD=`head -5 ${RAWFILE_QUEUE_PATH}${SCHEMA_NAME}_${TABLE}*.csv | wc -l`
+# Identifies if the output mode is APPEND.
+if [[ ${FILE_OUTPUT_MODE} == "append" ]]; then	
+	FILE_INDEX=0
 
+	for i in `ls ${RAWFILE_QUEUE_STAGING_PATH}*`
+	do
+		# Get samples data to extract metadata. 
+		if [ ${FILE_INDEX} = 0 ]; then	
+			cat ${i}	>> 	${RAWFILE_QUEUE_SAMPLE_FILE}
+			error_check
+		else
+			SAMPLE_FILE_RECORD=`cat ${RAWFILE_QUEUE_SAMPLE_FILE} | wc -l`
+		
+			if [ ${SAMPLE} -gt ${SAMPLE_FILE_RECORD} ]; then
+				sed '1d' ${i} >> ${RAWFILE_QUEUE_SAMPLE_FILE}	
+				error_check	
+			else
+				break
+			fi
+		fi
+
+		FILE_INDEX=$(( $FILE_INDEX + 1 ))
+	done
+	
+	HAS_RECORD=`head -5 ${RAWFILE_QUEUE_SAMPLE_FILE} | wc -l`
+else
+	HAS_RECORD=`head -5 ${RAWFILE_QUEUE_PATH}${SCHEMA_NAME}_${TABLE}*.csv | wc -l`
+fi
+
+# Identifies if there are records to process. 
 if [ ${HAS_RECORD} -gt 1 ]; then
 	echo "Getting data sample of ${SAMPLE} records"
-	head -n ${SAMPLE} ${RAWFILE_QUEUE_FILE} > ${RAWFILE_QUEUE_SAMPLE_FILE} 
-	error_check
+	
+	if [[ ${FILE_OUTPUT_MODE} == "append" ]]; then	
+	else
+		head -n ${SAMPLE} ${RAWFILE_QUEUE_FILE} > ${RAWFILE_QUEUE_SAMPLE_FILE} 
+		error_check	
+	fi
 
 	DIALECT=${TARGET}
 	
