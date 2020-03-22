@@ -541,7 +541,7 @@ error_check(){
 if [[ ${FILE_OUTPUT_MODE} == "append" ]]; then	
 	FILE_INDEX=0
 
-	for i in `ls ${RAWFILE_QUEUE_STAGING_PATH}*`
+	for i in `ls ${RAWFILE_QUEUE_PATH}*`
 	do
 		# Get samples data to extract metadata. 
 		if [ ${FILE_INDEX} = 0 ]; then	
