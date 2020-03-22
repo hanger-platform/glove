@@ -538,7 +538,9 @@ error_check(){
 }
 
 # Identifies if the output mode is APPEND.
-if [[ ${FILE_OUTPUT_MODE} == "append" ]]; then	
+if [[ ${FILE_OUTPUT_MODE} != "append" ]]; then	
+	HAS_RECORD=`head -5 ${RAWFILE_QUEUE_PATH}${SCHEMA_NAME}_${TABLE}*.csv | wc -l`
+else
 	FILE_INDEX=0
 
 	for i in `ls ${RAWFILE_QUEUE_PATH}*`
@@ -562,16 +564,13 @@ if [[ ${FILE_OUTPUT_MODE} == "append" ]]; then
 	done
 	
 	HAS_RECORD=`head -5 ${RAWFILE_QUEUE_SAMPLE_FILE} | wc -l`
-else
-	HAS_RECORD=`head -5 ${RAWFILE_QUEUE_PATH}${SCHEMA_NAME}_${TABLE}*.csv | wc -l`
 fi
 
 # Identifies if there are records to process. 
 if [ ${HAS_RECORD} -gt 1 ]; then
 	echo "Getting data sample of ${SAMPLE} records"
 	
-	if [[ ${FILE_OUTPUT_MODE} == "append" ]]; then	
-	else
+	if [[ ${FILE_OUTPUT_MODE} != "append" ]]; then
 		head -n ${SAMPLE} ${RAWFILE_QUEUE_FILE} > ${RAWFILE_QUEUE_SAMPLE_FILE} 
 		error_check	
 	fi
