@@ -169,9 +169,9 @@ partition_load(){
 
 	# Identifica se será realizado merge.
 	if [ ${PARTITION_MERGE} -gt 0 ]; then
-		echo "Partition merge ACTIVED!"
+		echo "PARTITION_MERGE ACTIVED!"
     else
-        echo "Partition merge DISABLED!"    
+        echo "PARTITION_MERGE DISABLED!"    
 	fi
 
     # Converte os arquivos das partições para formato colunar.
@@ -537,7 +537,7 @@ if [ ${IS_RECREATE} = 1 -o ${IS_RELOAD} = 1 ]; then
 
 	# Cria o arquivo de recuperação a partir dos arquivos do processo.
 	if [ ${IS_RECREATE} = 1 ]; then
-		echo "IS_RECREATE is ON"
+		echo "IS_RECREATE ACTIVED!"
 		echo "Moving files to recovery folder ${STORAGE_DISASTER_RECOVERY_QUEUE_PATH}!"
 		aws s3 mv ${STORAGE_QUEUE_PATH} ${STORAGE_DISASTER_RECOVERY_QUEUE_PATH}${DATE}/ --recursive --only-show-errors
 	fi
@@ -565,7 +565,7 @@ EOF
 			table_check
 		fi
 	else
-		echo "IS_RELOAD is ON"
+		echo "IS_RELOAD ACTIVED!"
 		echo "Removing files from ${STORAGE_QUEUE_PATH}"
 		aws s3 rm ${STORAGE_QUEUE_PATH} --recursive --only-show-errors
 	fi
