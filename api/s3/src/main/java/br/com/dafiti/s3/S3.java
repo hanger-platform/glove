@@ -31,6 +31,7 @@ import br.com.dafiti.mitt.transformation.embedded.Now;
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.amazonaws.services.s3.transfer.Download;
 import com.amazonaws.services.s3.transfer.Transfer.TransferState;
@@ -97,11 +98,17 @@ public class S3 {
                     .addField(cli.getParameterAsList("field", "\\+"));
 
             //Defines a S3 client and lists objects of a folder.
-            List<S3ObjectSummary> s3ObjectSummaries = AmazonS3ClientBuilder
+            ObjectListing listing = AmazonS3ClientBuilder
                     .standard()
-                    .build()
-                    .listObjects(cli.getParameter("bucket"), cli.getParameter("prefix"))
-                    .getObjectSummaries();
+                    .build().listObjects(cli.getParameter("bucket"), cli.getParameter("prefix"));            
+            List<S3ObjectSummary> s3ObjectSummaries = listing.getObjectSummaries();
+            while (listing.isTruncated()) {
+                listing = AmazonS3ClientBuilder
+                        .standard()
+                        .build()
+                        .listNextBatchOfObjects(listing);
+                s3ObjectSummaries.addAll(listing.getObjectSummaries());
+            }
 
             //Defines the output path. 
             Path outputPath = Files.createTempDirectory("s3_");
