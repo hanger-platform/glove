@@ -40,7 +40,7 @@ public class WriterSettings extends Settings {
     public WriterSettings() {
         this.outputFile = null;
         this.header = new ArrayList();
-        this.threadPool = 5;
+        this.threadPool = 4;
     }
 
     public File getOutputFile() {

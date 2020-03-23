@@ -177,6 +177,7 @@ public class OutputProcessor implements Runnable {
         //Idenfies if the input file should be removed. 
         if (readerSettings.isRemove()) {
             input.delete();
+            System.gc();
         }
     }
 }
