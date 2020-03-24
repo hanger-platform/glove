@@ -136,7 +136,7 @@ public class OutputProcessor implements Runnable {
         setting.getFormat().setQuoteEscape(readerSettings.getQuoteEscape());
         setting.setNullValue("");
         setting.setMaxCharsPerColumn(-1);
-        setting.setInputBufferSize(10 * (1024 * 1024));
+        setting.setInputBufferSize(5 * (1024 * 1024));
         setting.setNumberOfRowsToSkip(readerSettings.getSkipLines());
 
         //Identifies if header was provided or should be infered. 
