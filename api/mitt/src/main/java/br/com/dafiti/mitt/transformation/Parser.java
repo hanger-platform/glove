@@ -27,7 +27,9 @@ import br.com.dafiti.mitt.model.Configuration;
 import br.com.dafiti.mitt.model.Field;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,6 +38,8 @@ import java.util.logging.Logger;
  * @author Valdiney V GOMES
  */
 public class Parser {
+
+    private final Map<String, Field> fields = new HashMap();
 
     private File file;
     private final Scanner scanner;
@@ -90,18 +94,18 @@ public class Parser {
      * @return
      */
     public List<Object> evaluate(List<Object> record) {
-        List<Object> fields = new ArrayList();
+        List<Object> values = new ArrayList();
 
         configuration.getFields().forEach((field) -> {
-            fields.add(this.evaluate(record, field));
+            values.add(this.evaluate(record, field));
         });
 
         //Logs input and parsed output record. 
         if (configuration.isDebug()) {
-            Logger.getLogger(Parser.class.getName()).log(Level.INFO, "{0} -> {1}", new Object[]{record, fields});
+            Logger.getLogger(Parser.class.getName()).log(Level.INFO, "{0} -> {1}", new Object[]{record, values});
         }
 
-        return fields;
+        return values;
     }
 
     /**
@@ -116,8 +120,7 @@ public class Parser {
 
         return this.evaluate(
                 record,
-                new Field(fieldName)
-        );
+                new Field(fieldName));
     }
 
     /**
@@ -135,7 +138,14 @@ public class Parser {
         if (object instanceof Field) {
             field = (Field) object;
         } else {
-            field = scanner.scan((String) object);
+            String key = String.valueOf(object);
+
+            if (fields.containsKey(key)) {
+                field = fields.get(key);
+            } else {
+            field = scanner.scan(key);
+                fields.put(key, field);
+            }
         }
 
         return this.evaluate(record, field);
@@ -157,29 +167,23 @@ public class Parser {
         if (field.getTransformation() != null) {
             evaluated = field.getTransformation().getValue(this, record);
         } else {
-            //Get only original fields. 
-            List<Field> fields = configuration.getOriginalFields();
-
             //Identifies if a field exists.          
-            int index = fields.indexOf(field);
+            Integer index = configuration.getOriginalFieldIndex(field);
 
-            if (index != -1) {
+            if (index != null) {
                 if (index < record.size()) {
-                    evaluated = record.get(fields.indexOf(field));
+                    evaluated = record.get(index);
                 }
             } else {
-                //Get all fields. 
-                fields = configuration.getFields();
-
                 //Identifies if a field exists.
-                index = fields.indexOf(field);
+                index = configuration.getFieldIndex(field);
 
-                if (index != -1) {
-                    Field other = fields.get(index);
+                if (index != null) {
+                    Field clone = configuration.getFields().get(index);
 
                     //Identifies if a field has transformation.
-                    if (other.getTransformation() != null) {
-                        evaluated = other.getTransformation().getValue(this, record);
+                    if (clone.getTransformation() != null) {
+                        evaluated = clone.getTransformation().getValue(this, record);
                     } else {
                         Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, "Field {0} does not have related value or transformation!", field.getName());
                     }

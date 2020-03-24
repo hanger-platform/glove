@@ -27,7 +27,9 @@ import br.com.dafiti.mitt.exception.DuplicateEntityException;
 import br.com.dafiti.mitt.transformation.Scanner;
 import br.com.dafiti.mitt.transformation.Transformable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -35,6 +37,11 @@ import java.util.stream.Collectors;
  * @author Valdiney V GOMES
  */
 public class Configuration {
+
+    private List<Field> originalFields;
+    private List<Transformable> fieldTransformations;
+    private Map<Field, Integer> fieldIndex;
+    private Map<Field, Integer> originalFieldIndex;
 
     private final boolean debug;
     private final Scanner scanner;
@@ -97,13 +104,15 @@ public class Configuration {
      * @return
      */
     public List<Transformable> getFieldsTransformation() {
-        List<Transformable> transformation = new ArrayList();
+        if (fieldTransformations == null) {
+            fieldTransformations = new ArrayList();
 
-        this.fields.forEach((value) -> {
-            transformation.add(value.getTransformation());
-        });
+            this.fields.forEach((field) -> {
+                fieldTransformations.add(field.getTransformation());
+            });
+        }
 
-        return transformation;
+        return fieldTransformations;
     }
 
     /**
@@ -111,12 +120,17 @@ public class Configuration {
      * @return
      */
     public List<Field> getOriginalFields() {
-        List<Field> original = this.fields
-                .stream()
-                .filter(originalField -> originalField.isOriginal())
-                .collect(Collectors.toList());
+        if (originalFields == null) {
+            originalFields = new ArrayList();
+            
+            this.fields.forEach((field) -> {
+                if (field.isOriginal()) {
+                    originalFields.add(field);
+                }
+            });
+        }
 
-        return original;
+        return originalFields;
     }
 
     /**
@@ -126,14 +140,52 @@ public class Configuration {
     public List<String> getOriginalFieldsName() {
         List<String> fieldName = new ArrayList();
 
-        this.fields
+        this
+                .getOriginalFields()
                 .stream()
-                .filter(originalField -> originalField.isOriginal())
                 .collect(Collectors.toList()).forEach((value) -> {
             fieldName.add(value.getName());
         });
 
         return fieldName;
+    }
+
+    /**
+     *
+     * @param field
+     * @return
+     */
+    public Integer getFieldIndex(Field field) {
+        if (fieldIndex == null) {
+            fieldIndex = new HashMap();
+
+            List<Field> all = this.getFields();
+
+            for (int i = 0; i < all.size(); i++) {
+                fieldIndex.put(all.get(i), i);
+            }
+        }
+
+        return fieldIndex.get(field);
+    }
+
+    /**
+     *
+     * @param field
+     * @return
+     */
+    public Integer getOriginalFieldIndex(Field field) {
+        if (originalFieldIndex == null) {
+            originalFieldIndex = new HashMap();
+
+            List<Field> originals = this.getOriginalFields();
+
+            for (int i = 0; i < originals.size(); i++) {
+                originalFieldIndex.put(originals.get(i), i);
+            }
+        }
+
+        return originalFieldIndex.get(field);
     }
 
     /**
