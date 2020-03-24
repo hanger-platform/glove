@@ -75,7 +75,7 @@ public class Converter {
         options.addOption("D", "delimiter", true, "Delimiter ofd csv files");
         options.addOption("T", "target", true, "Identify the target format");
         options.addOption("r", "replace", false, "Identify if csv files will be replaced to parquet files");
-        options.addOption("d", "debug", false, "Show full log messages");
+        options.addOption("d", "debug", true, "Show full log messages");
         options.addOption("t", "thread", true, "Limit of thread");
         options.addOption("o", "output", true, "Identify the output path");
         options.addOption("q", "quote", true, "Identify the quote character");

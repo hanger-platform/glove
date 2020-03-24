@@ -97,6 +97,7 @@ public class CSVToParquet implements Runnable {
      * @param merge Identify if should merge existing files.
      * @param bucket Identify storage bucket.
      * @param mode Identify partition mode.
+     * @param debug Identify if should show detailed log message.
      */
     public CSVToParquet(
             File inputFile,

@@ -100,6 +100,7 @@ public class CSVToORC implements Runnable {
      * @param merge Identify if should merge existing files.
      * @param bucket Identify storage bucket.
      * @param mode Identify partition mode.
+     * @param debug Identify if should show detailed log message.
      */
     public CSVToORC(
             File inputFile,
