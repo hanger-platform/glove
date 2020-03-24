@@ -228,8 +228,11 @@ public class Converter {
 
             //Identify the log level.
             if (line.hasOption("debug")) {
-                Logger.getRootLogger().setLevel(Level.DEBUG);
                 debug = (Integer.valueOf(line.getOptionValue("debug")) == 1);
+
+                if (debug) {
+                    Logger.getRootLogger().setLevel(Level.DEBUG);
+                }
             } else {
                 Logger.getRootLogger().setLevel(Level.ERROR);
             }
