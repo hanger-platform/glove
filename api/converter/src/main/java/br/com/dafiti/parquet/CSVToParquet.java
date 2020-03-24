@@ -79,6 +79,7 @@ public class CSVToParquet implements Runnable {
     private final boolean merge;
     private final String bucketPath;
     private final String mode;
+    private final boolean debug;
 
     /**
      * Constructor.
@@ -110,7 +111,8 @@ public class CSVToParquet implements Runnable {
             boolean duplicated,
             boolean merge,
             String bucket,
-            String mode) {
+            String mode,
+            boolean debug) {
 
         this.typeMap = new HashMap();
         this.logicalTypeMap = new HashMap();
@@ -127,6 +129,7 @@ public class CSVToParquet implements Runnable {
         this.merge = merge;
         this.bucketPath = bucket;
         this.mode = mode;
+        this.debug = debug;
 
         switch (compression) {
             case "gzip":
@@ -456,8 +459,10 @@ public class CSVToParquet implements Runnable {
             }
 
             //Identify duplicated key.
-            if (!add) {
-                System.out.println("Duplicated key in file: [" + record[fieldKey] + "]");
+            if (!add) {                
+                if (debug) {                
+                    System.out.println("Duplicated key in file: [" + record[fieldKey] + "]");
+                }
                 statistics.incrementDuplicatedRows();
             } else {
                 statistics.incrementInputRows();

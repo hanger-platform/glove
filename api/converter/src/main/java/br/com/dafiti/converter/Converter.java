@@ -135,6 +135,7 @@ public class Converter {
         boolean header;
         boolean merge = false;
         boolean duplicated = false;
+        boolean debug = false;
         int thread = 1;
         int fieldKeyPos = -1;
         int fieldPartitionPos = 0;
@@ -228,6 +229,7 @@ public class Converter {
             //Identify the log level.
             if (line.hasOption("debug")) {
                 Logger.getRootLogger().setLevel(Level.DEBUG);
+                debug = (Integer.valueOf(line.getOptionValue("debug")) == 1);
             } else {
                 Logger.getRootLogger().setLevel(Level.ERROR);
             }
@@ -308,7 +310,8 @@ public class Converter {
                                             duplicated,
                                             merge,
                                             bucketPath,
-                                            mode)
+                                            mode,
+                                            debug)
                             );
                         }
                     }
@@ -332,7 +335,8 @@ public class Converter {
                                             duplicated,
                                             merge,
                                             bucketPath,
-                                            mode)
+                                            mode,
+                                            debug)
                             );
                         }
                     }

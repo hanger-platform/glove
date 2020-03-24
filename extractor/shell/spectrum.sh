@@ -125,7 +125,8 @@ partition_load(){
 				--thread=${THREAD} \	
 				--escape=${QUOTE_ESCAPE} \			
 				--header \
-				--replace"
+				--replace \
+				--debug=${DEBUG}"
 		fi
     
         java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
@@ -138,7 +139,8 @@ partition_load(){
 			--thread=${THREAD} \
 			--escape=${QUOTE_ESCAPE} \
 			--header \
-			--replace
+			--replace \
+			--debug=${DEBUG}			
 		error_check
     else
 		if [ ${DEBUG} = 1 ] ; then
@@ -151,7 +153,8 @@ partition_load(){
 				--partition=0 \
 				--thread=${THREAD} \
 				--escape=${QUOTE_ESCAPE} \
-				--replace"
+				--replace \
+				--debug=${DEBUG}"
 		fi
 
         java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
@@ -163,7 +166,8 @@ partition_load(){
 			--partition=0 \
 			--thread=${THREAD} \
 			--escape=${QUOTE_ESCAPE} \
-			--replace
+			--replace \
+			--debug=${DEBUG}
 		error_check
     fi
 
@@ -191,7 +195,8 @@ partition_load(){
 			--bucket=${STORAGE_QUEUE_PATH} \
 			--mode=${PARTITION_MODE} \
 			--escape=${QUOTE_ESCAPE} \
-			--replace"
+			--replace \
+			--debug=${DEBUG}"
 	fi
 
     java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
@@ -208,7 +213,8 @@ partition_load(){
 		--bucket=${STORAGE_QUEUE_PATH} \
 		--mode=${PARTITION_MODE} \
 		--escape=${QUOTE_ESCAPE} \
-		--replace
+		--replace \
+		--debug=${DEBUG}
     error_check
 
     # Identifica se o particionamento é real ou virtual.
@@ -281,7 +287,8 @@ delta_load(){
 			--merge=${PARTITION_MERGE} \
 			--bucket=${STORAGE_QUEUE_PATH} \
 			--escape=${QUOTE_ESCAPE} \
-			--replace"
+			--replace \
+			--debug=${DEBUG}"
 	fi
 
     java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
@@ -297,7 +304,8 @@ delta_load(){
 		--merge=${PARTITION_MERGE} \
 		--bucket=${STORAGE_QUEUE_PATH} \
 		--escape=${QUOTE_ESCAPE} \
-		--replace
+		--replace \
+		--debug=${DEBUG}
     error_check
 
 
@@ -358,7 +366,8 @@ full_load(){
 				--thread=${THREAD} \
 				--duplicated=${ALLOW_DUPLICATED} \
 				--escape=${QUOTE_ESCAPE} \
-				--replace"
+				--replace \
+				--debug=${DEBUG}"
 		fi
 
     	java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
@@ -372,7 +381,8 @@ full_load(){
 			--thread=${THREAD} \
 			--duplicated=${ALLOW_DUPLICATED} \
 			--escape=${QUOTE_ESCAPE} \
-			--replace
+			--replace \
+			--debug=${DEBUG}
     	error_check
 
 		if [ ${FILE_OUTPUT_MODE} == "append" ]; then
@@ -395,7 +405,8 @@ full_load(){
 				--compression=${OUTPUT_COMPRESSION} \
 				--thread=${THREAD} \
 				--duplicated=${ALLOW_DUPLICATED} \
-				--replace"
+				--replace \
+				--debug=${DEBUG}"
 		fi
 
 		java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
@@ -408,7 +419,8 @@ full_load(){
 			--thread=${THREAD} \
 			--duplicated=${ALLOW_DUPLICATED} \
 			--escape=${QUOTE_ESCAPE} \
-			--replace
+			--replace \
+			--debug=${DEBUG}
 		error_check
 
 		# Remove os arquivos antigo do storage.

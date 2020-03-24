@@ -82,6 +82,7 @@ public class CSVToORC implements Runnable {
     private final boolean merge;
     private final String bucketPath;
     private final String mode;
+    private final boolean debug;
 
     /**
      * Constructor.
@@ -113,7 +114,8 @@ public class CSVToORC implements Runnable {
             boolean duplicated,
             boolean merge,
             String bucket,
-            String mode) {
+            String mode,
+            boolean debug) {
 
         this.inputFile = inputFile;
         this.schema = schema;
@@ -127,6 +129,7 @@ public class CSVToORC implements Runnable {
         this.merge = merge;
         this.bucketPath = bucket;
         this.mode = mode;
+        this.debug = debug;
 
         switch (compression) {
             case "lz4":
@@ -446,7 +449,9 @@ public class CSVToORC implements Runnable {
 
             //Identify duplicated key.
             if (!add) {
-                System.out.println("Duplicated key in file: [" + record[fieldKey] + "]");
+                if (debug) {
+                    System.out.println("Duplicated key in file: [" + record[fieldKey] + "]");
+                }
                 statistics.incrementDuplicatedRows();
             } else {
                 statistics.incrementInputRows();
