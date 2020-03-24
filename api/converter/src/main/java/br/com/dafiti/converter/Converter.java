@@ -232,9 +232,9 @@ public class Converter {
 
                 if (debug) {
                     Logger.getRootLogger().setLevel(Level.DEBUG);
-                }
-            } else {
-                Logger.getRootLogger().setLevel(Level.ERROR);
+                }else{
+                    Logger.getRootLogger().setLevel(Level.ERROR);
+                }                
             }
 
             //Identify how many files should be converted simultaneously. 
