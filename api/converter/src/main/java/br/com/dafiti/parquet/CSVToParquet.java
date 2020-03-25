@@ -362,7 +362,7 @@ public class CSVToParquet implements Runnable {
                 System.out.println("[" + parquetFile.getName() + "] records: "
                         + statistics.getOutputRows()
                         + ", Delta: "
-                        + statistics.getInputRows() + statistics.getDuplicatedRows()
+                        + (statistics.getInputRows() + statistics.getDuplicatedRows())
                         + ", ( Updated: " + statistics.getOutputUpdatedRows() + ", Inserted: " + (statistics.getInputRows() - statistics.getOutputUpdatedRows()) + ", Duplicated:" + statistics.getDuplicatedRows() + " )"
                         + " Final: "
                         + (statistics.getOutputRows() + (statistics.getInputRows() - statistics.getOutputUpdatedRows())));
@@ -460,8 +460,8 @@ public class CSVToParquet implements Runnable {
             }
 
             //Identify duplicated key.
-            if (!add) {                
-                if (debug) {                
+            if (!add) {
+                if (debug) {
                     System.out.println("Duplicated key in file: [" + record[fieldKey] + "]");
                 }
                 statistics.incrementDuplicatedRows();

@@ -308,7 +308,7 @@ public class CSVToORC implements Runnable {
                 System.out.println("[" + orcFile.getName() + "] records: "
                         + statistics.getOutputRows()
                         + ", Delta: "
-                        + statistics.getInputRows() + statistics.getDuplicatedRows()
+                        + (statistics.getInputRows() + statistics.getDuplicatedRows())
                         + ", ( Updated: " + statistics.getOutputUpdatedRows() + ", Inserted: " + (statistics.getInputRows() - statistics.getOutputUpdatedRows()) + ", Duplicated:" + statistics.getDuplicatedRows() + " )"
                         + " Final: "
                         + (statistics.getOutputRows() + (statistics.getInputRows() - statistics.getOutputUpdatedRows())));
