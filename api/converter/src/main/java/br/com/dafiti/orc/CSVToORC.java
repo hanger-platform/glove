@@ -309,9 +309,9 @@ public class CSVToORC implements Runnable {
                         + statistics.getOutputRows()
                         + ", Delta: "
                         + statistics.getInputRows()
-                        + ", ( Updated: " + statistics.getOutputUpdatedRows() + ", Inserted: " + (statistics.getInputRows() - statistics.getOutputUpdatedRows()) + ", Duplicated:" + statistics.getDuplicatedRows() + " )"
+                        + ", ( Updated: " + statistics.getOutputUpdatedRows() + ", Inserted: " + (statistics.getInputRows() - statistics.getOutputUpdatedRows() - statistics.getDuplicatedRows()) + ", Duplicated:" + statistics.getDuplicatedRows() + " )"
                         + " Final: "
-                        + (statistics.getOutputRows() + (statistics.getInputRows() - statistics.getOutputUpdatedRows())));
+                        + (statistics.getOutputRows() + (statistics.getInputRows() - statistics.getOutputUpdatedRows() - statistics.getDuplicatedRows())));
             }
 
             //Remove the original file.
