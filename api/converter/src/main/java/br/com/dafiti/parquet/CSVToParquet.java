@@ -362,10 +362,10 @@ public class CSVToParquet implements Runnable {
                 System.out.println("[" + parquetFile.getName() + "] records: "
                         + statistics.getOutputRows()
                         + ", Delta: "
-                        + statistics.getInputRows()
-                        + ", ( Updated: " + statistics.getOutputUpdatedRows() + ", Inserted: " + (statistics.getInputRows() - statistics.getOutputUpdatedRows() - statistics.getDuplicatedRows()) + ", Duplicated:" + statistics.getDuplicatedRows() + " )"
+                        + statistics.getInputRows() + statistics.getDuplicatedRows()
+                        + ", ( Updated: " + statistics.getOutputUpdatedRows() + ", Inserted: " + (statistics.getInputRows() - statistics.getOutputUpdatedRows()) + ", Duplicated:" + statistics.getDuplicatedRows() + " )"
                         + " Final: "
-                        + (statistics.getOutputRows() + (statistics.getInputRows() - statistics.getOutputUpdatedRows() - statistics.getDuplicatedRows())));
+                        + (statistics.getOutputRows() + (statistics.getInputRows() - statistics.getOutputUpdatedRows())));
             }
 
             //Remove the parquet crc file.
