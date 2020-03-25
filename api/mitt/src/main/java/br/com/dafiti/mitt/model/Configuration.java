@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  *
@@ -39,7 +38,7 @@ import java.util.stream.Collectors;
 public class Configuration {
 
     private List<Field> originalFields;
-    private List<Transformable> fieldTransformations;
+    private List<Transformable> tranformations;
     private Map<Field, Integer> fieldIndex;
     private Map<Field, Integer> originalFieldIndex;
 
@@ -87,6 +86,7 @@ public class Configuration {
                     ? field.getName()
                     : field.getAlias();
 
+            //Identifies if conform to accepted database field names. 
             if (removeSpecialCharacteres) {
                 name = name.replaceAll("\\W", "_").toLowerCase();
                 name = name.replaceAll("^_", "");
@@ -104,15 +104,15 @@ public class Configuration {
      * @return
      */
     public List<Transformable> getFieldsTransformation() {
-        if (fieldTransformations == null) {
-            fieldTransformations = new ArrayList();
+        if (tranformations == null) {
+            tranformations = new ArrayList();
 
             this.fields.forEach((field) -> {
-                fieldTransformations.add(field.getTransformation());
+                tranformations.add(field.getTransformation());
             });
         }
 
-        return fieldTransformations;
+        return tranformations;
     }
 
     /**
@@ -122,7 +122,7 @@ public class Configuration {
     public List<Field> getOriginalFields() {
         if (originalFields == null) {
             originalFields = new ArrayList();
-            
+
             this.fields.forEach((field) -> {
                 if (field.isOriginal()) {
                     originalFields.add(field);
@@ -138,16 +138,13 @@ public class Configuration {
      * @return
      */
     public List<String> getOriginalFieldsName() {
-        List<String> fieldName = new ArrayList();
+        List<String> originalFieldsNames = new ArrayList();
 
-        this
-                .getOriginalFields()
-                .stream()
-                .collect(Collectors.toList()).forEach((value) -> {
-            fieldName.add(value.getName());
+        this.getOriginalFields().forEach((field) -> {
+            originalFieldsNames.add(field.getName());
         });
 
-        return fieldName;
+        return originalFieldsNames;
     }
 
     /**
@@ -161,6 +158,7 @@ public class Configuration {
 
             List<Field> all = this.getFields();
 
+            //Relates a field to its position in the configuration. 
             for (int i = 0; i < all.size(); i++) {
                 fieldIndex.put(all.get(i), i);
             }
@@ -180,6 +178,7 @@ public class Configuration {
 
             List<Field> originals = this.getOriginalFields();
 
+            //Relates an original field to its position in the configuration. 
             for (int i = 0; i < originals.size(); i++) {
                 originalFieldIndex.put(originals.get(i), i);
             }

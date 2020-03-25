@@ -135,16 +135,21 @@ public class Parser {
 
         Field field;
 
+        //Identifies if the object is a field. 
         if (object instanceof Field) {
             field = (Field) object;
         } else {
-            String key = String.valueOf(object);
+            //Get the object identifier. 
+            String identifier = String.valueOf(object);
 
-            if (fields.containsKey(key)) {
-                field = fields.get(key);
+            //Identifies if it is in cache. 
+            if (fields.containsKey(identifier)) {
+                //Gets field from cache. 
+                field = fields.get(identifier);
             } else {
-            field = scanner.scan(key);
-                fields.put(key, field);
+                //Puts the scanned field in cache. 
+                field = scanner.scan(identifier);
+                fields.put(identifier, field);
             }
         }
 
@@ -161,31 +166,38 @@ public class Parser {
             List<Object> record,
             Field field) {
 
-        Object evaluated = null;
+        Object value = null;
 
-        //Identifies if field has transformation. 
+        //Identifies if the field has transformation. 
         if (field.getTransformation() != null) {
-            evaluated = field.getTransformation().getValue(this, record);
+            value = field
+                    .getTransformation()
+                    .getValue(this, record);
         } else {
-            //Identifies if a field exists.          
+            //Identifies if it is an original field.          
             Integer index = configuration.getOriginalFieldIndex(field);
 
             if (index != null) {
                 if (index < record.size()) {
-                    evaluated = record.get(index);
+                    //Picks up value from the record. 
+                    value = record.get(index);
                 }
             } else {
-                //Identifies if a field exists.
+                //Identifies if it is a custom field.   
                 index = configuration.getFieldIndex(field);
 
                 if (index != null) {
-                    Field clone = configuration.getFields().get(index);
+                    Field clone = configuration
+                            .getFields()
+                            .get(index);
 
                     //Identifies if a field has transformation.
                     if (clone.getTransformation() != null) {
-                        evaluated = clone.getTransformation().getValue(this, record);
+                        value = clone
+                                .getTransformation()
+                                .getValue(this, record);
                     } else {
-                        Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, "Field {0} does not have related value or transformation!", field.getName());
+                        Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, "Field {0} does not have value or transformation!", field.getName());
                     }
                 } else {
                     Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, "Field {0} does not exists!", field.getName());
@@ -193,6 +205,6 @@ public class Parser {
             }
         }
 
-        return evaluated;
+        return value;
     }
 }
