@@ -11,7 +11,12 @@
   <modified_user>-</modified_user>
   <modified_date>2017/08/17 12:57:55.350</modified_date>
   <parameters>
-    </parameters>
+    <parameter>
+      <name>METADATA</name>
+      <default_value />
+      <description />
+    </parameter>
+  </parameters>
   <slaveservers>
     </slaveservers>
   <job-log-table>
