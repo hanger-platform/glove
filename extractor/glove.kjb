@@ -102,9 +102,9 @@
       <description>Identifica o tipo de arquivos de entrada.</description>
     </parameter>
     <parameter>
-      <name>FILE_INPUT_METADATA</name>
+      <name>FILE_INPUT_MANIFEST</name>
       <default_value />
-      <description>Identifica o metadado do arquivo de entrada.</description>
+      <description>Identifica o arquivo de manifesto que deve ser usado para definição do metadado.</description>
     </parameter>
     <parameter>
       <name>FILE_INPUT_PARTITONED</name>

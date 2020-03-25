@@ -910,7 +910,11 @@ fi</script>
 #-----------------------------------------------------------
 FILE_INPUT_BUCKET		== ${FILE_INPUT_BUCKET}
 FILE_INPUT_DELIMITER		== ${FILE_INPUT_DELIMITER}
-FILE_INPUT_METADATA		== ${FILE_INPUT_METADATA}
+
+#-----------------------------------------------------------
+# INPUT
+#-----------------------------------------------------------
+METADATA				== ${METADATA}
 
 #-----------------------------------------------------------
 # INPUT SAMPLE
