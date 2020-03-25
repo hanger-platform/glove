@@ -9,11 +9,6 @@
     <trans_status>0</trans_status>
     <directory>/</directory>
     <parameters>
-      <parameter>
-        <name>FILE_INPUT_MANIFEST</name>
-        <default_value />
-        <description />
-      </parameter>
     </parameters>
     <log>
       <trans-log-table>
