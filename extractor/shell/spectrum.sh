@@ -704,7 +704,7 @@ EOF
 			
 			# Remove os arquivos antigos.
 			if [ ${DEBUG} = 0 ] ; then
-				echo "Removing staging files of ${STORAGE_STAGING_QUEUE_PATH}${ATHENA_QUERY_ID}!"
+				echo "Removing staging files of ${STORAGE_STAGING_QUEUE_PATH}/${ATHENA_QUERY_ID}*"
 				aws s3 rm ${STORAGE_STAGING_QUEUE_PATH} --recursive --exclude "*" --include "*${ATHENA_QUERY_ID}*" --only-show-errors
 			fi
 
