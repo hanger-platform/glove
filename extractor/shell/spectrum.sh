@@ -701,6 +701,10 @@ EOF
             else
                 echo "${ROW_COUNT} records in the table ${SCHEMA}.${TABLE}"   
             fi
+			
+			# Remove os arquivos antigos.
+			echo "Removing staging files of ${ATHENA_QUERY_ID} process!"
+			aws s3 rm ${STORAGE_STAGING_QUEUE_PATH} --recursive --exclude "*" --include "*${ATHENA_QUERY_ID}*" --only-show-errors
 
             break
         elif [[ "$ATHENA_QUERY_STATUS" == "FAILED" || "$ATHENA_QUERY_STATUS" == "CANCELLED" ]]; then
