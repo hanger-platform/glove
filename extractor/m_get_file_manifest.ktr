@@ -431,18 +431,53 @@
     <created_date>2020/03/25 15:23:20.105</created_date>
     <modified_user>-</modified_user>
     <modified_date>2020/03/25 15:23:20.105</modified_date>
-    <key_for_session_key />
+    <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA=</key_for_session_key>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
   </notepads>
   <order>
     <hop>
+      <from>Order</from>
+      <to>Join</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
       <from>Read manifest file</from>
+      <to>Join</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Join</from>
       <to>Copy rows to result</to>
       <enabled>Y</enabled>
     </hop>
   </order>
+  <step>
+    <name>Copy rows to result</name>
+    <type>RowsToResult</type>
+    <description />
+    <distribute>Y</distribute>
+    <custom_distribution />
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name />
+    </partitioning>
+    <attributes />
+    <cluster_schema />
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>336</xloc>
+      <yloc>64</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
   <step>
     <name>Read manifest file</name>
     <type>JsonInput</type>
@@ -508,14 +543,14 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>96</xloc>
+      <xloc>80</xloc>
       <yloc>64</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Copy rows to result</name>
-    <type>RowsToResult</type>
+    <name>Join</name>
+    <type>MergeJoin</type>
     <description />
     <distribute>Y</distribute>
     <custom_distribution />
@@ -524,6 +559,13 @@
       <method>none</method>
       <schema_name />
     </partitioning>
+    <join_type>LEFT OUTER</join_type>
+    <step1>Order</step1>
+    <step2>Read manifest file</step2>
+    <keys_1>
+    </keys_1>
+    <keys_2>
+    </keys_2>
     <attributes />
     <cluster_schema />
     <remotesteps>
@@ -533,8 +575,52 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>240</xloc>
+      <xloc>208</xloc>
       <yloc>64</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Order</name>
+    <type>RowGenerator</type>
+    <description />
+    <distribute>Y</distribute>
+    <custom_distribution />
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name />
+    </partitioning>
+    <fields>
+      <field>
+        <name>order</name>
+        <type>Integer</type>
+        <format />
+        <currency />
+        <decimal />
+        <group />
+        <nullif>1</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+    </fields>
+    <limit>1</limit>
+    <never_ending>N</never_ending>
+    <interval_in_ms>5000</interval_in_ms>
+    <row_time_field>now</row_time_field>
+    <last_time_field>FiveSecondsAgo</last_time_field>
+    <attributes />
+    <cluster_schema />
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>208</xloc>
+      <yloc>176</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
