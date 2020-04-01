@@ -27,12 +27,17 @@ import br.com.dafiti.mitt.model.Configuration;
 import br.com.dafiti.mitt.settings.ReaderSettings;
 import br.com.dafiti.mitt.settings.WriterSettings;
 import br.com.dafiti.mitt.transformation.Parser;
+import com.univocity.parsers.common.record.RecordMetaData;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -139,19 +144,6 @@ public class OutputProcessor implements Runnable {
         setting.setInputBufferSize(5 * (1024 * 1024));
         setting.setNumberOfRowsToSkip(readerSettings.getSkipLines());
 
-        //Identifies if header was provided or should be infered. 
-        if (header.isEmpty()) {
-            setting.setHeaderExtractionEnabled(true);
-        } else {
-            setting.setHeaders(header.toArray(new String[0]));
-        }
-
-        //Identifies which columns should be read. 
-        setting.selectFields(
-                parser.getConfiguration()
-                        .getOriginalFieldsName()
-                        .toArray(new String[0]));
-
         //Identifies which encoder should be used. 
         if ("auto".equalsIgnoreCase(encode)) {
             try {
@@ -165,6 +157,19 @@ public class OutputProcessor implements Runnable {
             }
         }
 
+        //Identifies if header was provided or should be infered. 
+        if (header.isEmpty()) {
+            setting.setHeaderExtractionEnabled(true);
+        } else {
+            setting.setHeaders(header.toArray(new String[0]));
+        }
+
+        //Identifies which columns should be read. 
+        setting.selectFields(
+                parser.getConfiguration()
+                        .getOriginalFieldsName()
+                        .toArray(new String[0]));
+
         //Read the input file and write to the output.
         CsvParser csvParser = new CsvParser(setting);
         csvParser.beginParsing(input, encode);
@@ -173,6 +178,9 @@ public class OutputProcessor implements Runnable {
             this.writer.writeRow(
                     parser.evaluate(Arrays.asList((Object[]) record)));
         }
+
+        //Stop the parser.
+        csvParser.stopParsing();
 
         //Idenfies if the input file should be removed. 
         if (readerSettings.isRemove()) {
