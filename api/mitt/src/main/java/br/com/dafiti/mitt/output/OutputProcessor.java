@@ -27,19 +27,16 @@ import br.com.dafiti.mitt.model.Configuration;
 import br.com.dafiti.mitt.settings.ReaderSettings;
 import br.com.dafiti.mitt.settings.WriterSettings;
 import br.com.dafiti.mitt.transformation.Parser;
-import com.univocity.parsers.common.record.RecordMetaData;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.mozilla.universalchardet.UniversalDetector;
@@ -159,16 +156,51 @@ public class OutputProcessor implements Runnable {
 
         //Identifies if header was provided or should be infered. 
         if (header.isEmpty()) {
-            setting.setHeaderExtractionEnabled(true);
-        } else {
-            setting.setHeaders(header.toArray(new String[0]));
+            //Defines the pre parser settings.
+            CsvParserSettings clone = setting.clone();
+            clone.setHeaderExtractionEnabled(true);
+
+            //Pre parser the output file.
+            CsvParser pre = new CsvParser(clone);
+            pre.beginParsing(input, encode);
+
+            //Identifies if there are duplicated headers.
+            Map<String, Integer> repeated = new HashMap();
+
+            for (String field : pre.getRecordMetadata().headers()) {
+                if (!header.contains(field)) {
+                    header.add(field);
+                } else {
+                    int repetitions;
+
+                    //Identifies how many times a header is repeated.  
+                    if (repeated.containsKey(field)) {
+                        repetitions = repeated.get(field) + 1;
+                    } else {
+                        repetitions = 1;
+                    }
+
+                    //Defines an index to identify repeated header. 
+                    header.add(field + "_" + repetitions);
+                    repeated.put(field, repetitions);
+                }
+            }
+
+            //Stop the pre parser.
+            pre.stopParsing();
+
+            //Marks the file first line to be ignored. 
+            setting.setNumberOfRowsToSkip(
+                    setting.getNumberOfRowsToSkip() + 1);
         }
+
+        //Identifies the file header. 
+        setting.setHeaders(header.toArray(new String[0]));
 
         //Identifies which columns should be read. 
         setting.selectFields(
                 parser.getConfiguration()
-                        .getOriginalFieldsName()
-                        .toArray(new String[0]));
+                        .getOriginalFieldsName().toArray(new String[0]));
 
         //Read the input file and write to the output.
         CsvParser csvParser = new CsvParser(setting);
