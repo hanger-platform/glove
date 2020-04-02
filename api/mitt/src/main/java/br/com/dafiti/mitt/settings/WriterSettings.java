@@ -52,7 +52,7 @@ public class WriterSettings extends Settings {
     }
 
     public List<String> getHeader() {
-        return header;
+        return new ArrayList(header);
     }
 
     public WriterSettings setHeader(List<String> header) {
