@@ -48,7 +48,7 @@ import org.apache.avro.generic.GenericRecordBuilder;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.parquet.avro.AvroParquetReader;
@@ -504,7 +504,7 @@ public class CSVToParquet implements Runnable {
                                     break;
                                 case INT:
                                     if (logicalType == null) {
-                                        builder.set(field, Integer.parseInt(value));
+                                        builder.set(field, NumberUtils.toInt(value, 0));
                                     } else if (logicalType.equals("date")) {
                                         //A date logical type annotates an Avro int, where the int stores the number of days from the unix epoch.
                                         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -522,7 +522,7 @@ public class CSVToParquet implements Runnable {
                                     break;
                                 case LONG:
                                     if (logicalType == null) {
-                                        builder.set(field, Long.parseLong(value));
+                                        builder.set(field, NumberUtils.toLong(value, 0));
                                     } else if (logicalType.equals("timestamp-millis")) {
                                         //A timestamp-millis logical type annotates an Avro long, where the long stores the number of milliseconds from the unix epoch.
                                         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
@@ -539,10 +539,10 @@ public class CSVToParquet implements Runnable {
 
                                     break;
                                 case FLOAT:
-                                    builder.set(field, Float.parseFloat(value));
+                                    builder.set(field, NumberUtils.toFloat(value, 0));
                                     break;
                                 case DOUBLE:
-                                    builder.set(field, Double.parseDouble(value));
+                                    builder.set(field, NumberUtils.toDouble(value, 0));
                                     break;
                                 case BYTES:
                                 case FIXED:
@@ -565,7 +565,7 @@ public class CSVToParquet implements Runnable {
                                     break;
                             }
                         } catch (NumberFormatException | ParseException ex) {
-                            throw new Exception(ex.getMessage() + " on record " + String.join("|", record) + " at field " + field.name() + " with value: " + value);
+                            throw new Exception(ex.getMessage() + " on record " + String.join("|", record) + " at field " + field.name() + " with value " + value);
                         }
                     }
                 }
