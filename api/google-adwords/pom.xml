@@ -10,7 +10,7 @@
         <dependency>
             <groupId>com.google.api-ads</groupId>
             <artifactId>adwords-axis</artifactId>
-            <version>4.8.0</version>
+            <version>4.9.1</version>
             <type>jar</type>
         </dependency>
         <dependency>

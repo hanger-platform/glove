@@ -99,7 +99,7 @@ public class SFTP {
             CommandLineInterface cli = mitt.getCommandLineInterface(args);
 
             //Defines output file.
-            mitt.setOutput(cli.getParameter("output"));
+            mitt.setOutputFile(cli.getParameter("output"));
 
             //Defines fields.
             mitt.getConfiguration()
@@ -188,8 +188,9 @@ public class SFTP {
                 }
             }
 
-            //Writes the final file.
-            mitt.write(outputPath.toFile(), "*", cli.getParameter("delimiter").charAt(0));
+            //Write to the output.
+            mitt.getReaderSettings().setDelimiter(cli.getParameter("delimiter").charAt(0));
+            mitt.write(outputPath.toFile(), "*");
 
             //Remove temporary path. 
             Files.delete(outputPath);
