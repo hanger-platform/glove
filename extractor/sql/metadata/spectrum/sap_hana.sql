@@ -26,106 +26,40 @@ SELECT * FROM (
 			''                                           AS encoding
         FROM
             (
-            SELECT
-             SCHEMA_NAME
-            ,TABLE_NAME
-            ,TABLE_OID
-            ,COLUMN_NAME
-            ,POSITION
-            ,DATA_TYPE_ID
-            ,DATA_TYPE_NAME
-            ,OFFSET
-            ,LENGTH
-            ,SCALE
-            ,IS_NULLABLE
-            ,DEFAULT_VALUE
-            ,COLLATION
-            ,COMMENTS
-            ,MAX_VALUE
-            ,MIN_VALUE
-            ,CS_DATA_TYPE_ID
-            ,CS_DATA_TYPE_NAME
-            ,DDIC_DATA_TYPE_ID
-            ,DDIC_DATA_TYPE_NAME
-            ,COMPRESSION_TYPE
-            ,INDEX_TYPE
-            ,COLUMN_ID
-            ,PRELOAD
-            ,GENERATED_ALWAYS_AS
-            ,HAS_SCHEMA_FLEXIBILITY
-            ,FUZZY_SEARCH_INDEX
-            ,FUZZY_SEARCH_MODE
-            ,MEMORY_THRESHOLD
-            ,LOAD_UNIT
-            ,GENERATION_TYPE
-            ,IS_CACHABLE
-            ,IS_CACHE_KEY
-            ,ROW_ORDER_POSITION
-            ,IS_HIDDEN
-            ,IS_MASKED
-            ,MASK_EXPRESSION
-            ,CLIENTSIDE_ENCRYPTION_STATUS
-            ,CLIENTSIDE_ENCRYPTION_COLUMN_KEY_ID
-            ,CLIENTSIDE_ENCRYPTION_MODE
-            ,PERSISTENT_MEMORY
-            FROM TABLE_COLUMNS
-            WHERE
-             LOWER( SCHEMA_NAME ) = LOWER( REPLACE( '${INPUT_TABLE_SCHEMA}', '"', '' ) )
-            AND LOWER( TABLE_NAME ) = LOWER( REPLACE( '${INPUT_TABLE_NAME}', '"', '' ) )
-            UNION ALL
-            SELECT
-            SCHEMA_NAME
-            ,VIEW_NAME AS TABLE_NAME
-            ,VIEW_OID  AS TABLE_OID
-            ,COLUMN_NAME
-            ,POSITION
-            ,DATA_TYPE_ID
-            ,DATA_TYPE_NAME
-            ,OFFSET
-            ,LENGTH
-            ,SCALE
-            ,IS_NULLABLE
-            ,DEFAULT_VALUE
-            ,COLLATION
-            ,COMMENTS
-            ,MAX_VALUE
-            ,MIN_VALUE
-            ,CS_DATA_TYPE_ID
-            ,CS_DATA_TYPE_NAME
-            ,DDIC_DATA_TYPE_ID
-            ,DDIC_DATA_TYPE_NAME
-            ,COMPRESSION_TYPE
-            ,INDEX_TYPE
-            ,COLUMN_ID
-            ,PRELOAD
-            ,GENERATED_ALWAYS_AS
-            ,HAS_SCHEMA_FLEXIBILITY
-            ,FUZZY_SEARCH_INDEX
-            ,FUZZY_SEARCH_MODE
-            ,MEMORY_THRESHOLD
-            ,LOAD_UNIT
-            ,GENERATION_TYPE
-            ,IS_CACHABLE
-            ,IS_CACHE_KEY
-            ,ROW_ORDER_POSITION
-            ,IS_HIDDEN
-            ,IS_MASKED
-            ,MASK_EXPRESSION
-            ,CLIENTSIDE_ENCRYPTION_STATUS
-            ,CLIENTSIDE_ENCRYPTION_COLUMN_KEY_ID
-            ,CLIENTSIDE_ENCRYPTION_MODE
-            ,PERSISTENT_MEMORY
-            FROM VIEW_COLUMNS
-            WHERE
-             LOWER( SCHEMA_NAME ) = LOWER( REPLACE( '${INPUT_TABLE_SCHEMA}', '"', '' ) )
-            AND LOWER( VIEW_NAME ) = LOWER( REPLACE( '${INPUT_TABLE_NAME}', '"', '' ) )
+				SELECT
+					 SCHEMA_NAME
+					,TABLE_NAME
+					,COLUMN_NAME
+					,DATA_TYPE_NAME
+					,POSITION
+					,LENGTH
+				FROM TABLE_COLUMNS
+				WHERE
+				LOWER( SCHEMA_NAME ) = LOWER( REPLACE( '${INPUT_TABLE_SCHEMA}', '"', '' ) )
+				AND 
+				LOWER( TABLE_NAME ) = LOWER( REPLACE( '${INPUT_TABLE_NAME}', '"', '' ) )
+				
+				UNION ALL
+				
+				SELECT
+					 SCHEMA_NAME
+					,VIEW_NAME AS TABLE_NAME
+					,COLUMN_NAME
+					,DATA_TYPE_NAME
+					,POSITION
+					,LENGTH
+				FROM VIEW_COLUMNS
+				WHERE
+				LOWER( SCHEMA_NAME ) = LOWER( REPLACE( '${INPUT_TABLE_SCHEMA}', '"', '' ) )
+				AND 
+				LOWER( VIEW_NAME ) = LOWER( REPLACE( '${INPUT_TABLE_NAME}', '"', '' ) )
             )q
         WHERE
             LOWER( SCHEMA_NAME ) = LOWER( REPLACE( '${INPUT_TABLE_SCHEMA}', '"', '' ) )
             AND
             LOWER( TABLE_NAME ) = LOWER( REPLACE( '${INPUT_TABLE_NAME}', '"', '' ) )
             AND
-			LOWER( COLUMN_NAME ) = LOWER( REPLACE( '${PARTITION_FIELD}', '"', '' ) )
+	   LOWER( COLUMN_NAME ) = LOWER( REPLACE( '${PARTITION_FIELD}', '"', '' ) )
 
 		UNION ALL
 
@@ -193,112 +127,46 @@ SELECT * FROM (
 			END	AS field_type,
             ( '{"name": "' || LOWER( CASE '${FIELD_HAS_PREFIX}' WHEN '1' THEN REPLACE_REGEXPR( '\/' IN REPLACE_REGEXPR( '^\W|^_' IN COLUMN_NAME WITH '' ) WITH '_' ) ELSE REPLACE_REGEXPR( '\/\w+\/' IN COLUMN_NAME WITH '' ) END ) ||  '","type":' ||
                 CASE
-                	  WHEN DATA_TYPE_NAME IN ( 'TINYINT', 'SMALLINT', 'INTEGER' ) THEN '["null", "int"]'
+                	WHEN DATA_TYPE_NAME IN ( 'TINYINT', 'SMALLINT', 'INTEGER' ) THEN '["null", "int"]'
                     WHEN DATA_TYPE_NAME IN ( 'BIGINT' ) THEN '["null", "long"]'
                     WHEN DATA_TYPE_NAME IN ( 'VARCHAR', 'VARBINARY', 'NVARCHAR', 'CHAR', 'BLOB', 'CLOB', 'NCLOB', 'TEXT' ) THEN '["null", "string"]'
                     WHEN DATA_TYPE_NAME IN ( 'REAL', 'DOUBLE', 'SMALLDECIMAL', 'DECIMAL' ) THEN '["null", "double"]'
                     WHEN DATA_TYPE_NAME IN ( 'DATE', 'TIME', 'SECONDDATE', 'TIMESTAMP' ) THEN '["null", "string"]'
-                	  WHEN DATA_TYPE_NAME = 'BOOLEAN' THEN '["null", "boolean"]'
+                	WHEN DATA_TYPE_NAME = 'BOOLEAN' THEN '["null", "boolean"]'
                 end ||', "default": null}' ) AS json,
             LOWER( CASE '${FIELD_HAS_PREFIX}' WHEN '1' THEN REPLACE_REGEXPR( '\/' IN REPLACE_REGEXPR( '^\W|^_' IN COLUMN_NAME WITH '' ) WITH '_' ) ELSE REPLACE_REGEXPR( '\/\w+\/' IN COLUMN_NAME WITH '' ) END ) AS column_name,
             0 AS column_key,
 			'' AS encoding
         FROM
-            (
-              SELECT
-               SCHEMA_NAME
-              ,TABLE_NAME
-              ,TABLE_OID
-              ,COLUMN_NAME
-              ,POSITION
-              ,DATA_TYPE_ID
-              ,DATA_TYPE_NAME
-              ,OFFSET
-              ,LENGTH
-              ,SCALE
-              ,IS_NULLABLE
-              ,DEFAULT_VALUE
-              ,COLLATION
-              ,COMMENTS
-              ,MAX_VALUE
-              ,MIN_VALUE
-              ,CS_DATA_TYPE_ID
-              ,CS_DATA_TYPE_NAME
-              ,DDIC_DATA_TYPE_ID
-              ,DDIC_DATA_TYPE_NAME
-              ,COMPRESSION_TYPE
-              ,INDEX_TYPE
-              ,COLUMN_ID
-              ,PRELOAD
-              ,GENERATED_ALWAYS_AS
-              ,HAS_SCHEMA_FLEXIBILITY
-              ,FUZZY_SEARCH_INDEX
-              ,FUZZY_SEARCH_MODE
-              ,MEMORY_THRESHOLD
-              ,LOAD_UNIT
-              ,GENERATION_TYPE
-              ,IS_CACHABLE
-              ,IS_CACHE_KEY
-              ,ROW_ORDER_POSITION
-              ,IS_HIDDEN
-              ,IS_MASKED
-              ,MASK_EXPRESSION
-              ,CLIENTSIDE_ENCRYPTION_STATUS
-              ,CLIENTSIDE_ENCRYPTION_COLUMN_KEY_ID
-              ,CLIENTSIDE_ENCRYPTION_MODE
-              ,PERSISTENT_MEMORY
-              FROM TABLE_COLUMNS
-              WHERE
-               LOWER( SCHEMA_NAME ) = LOWER( REPLACE( '${INPUT_TABLE_SCHEMA}', '"', '' ) )
-              AND LOWER( TABLE_NAME ) = LOWER( REPLACE( '${INPUT_TABLE_NAME}', '"', '' ) )
-              UNION ALL
-              SELECT
-              SCHEMA_NAME
-              ,VIEW_NAME AS TABLE_NAME
-              ,VIEW_OID  AS TABLE_OID
-              ,COLUMN_NAME
-              ,POSITION
-              ,DATA_TYPE_ID
-              ,DATA_TYPE_NAME
-              ,OFFSET
-              ,LENGTH
-              ,SCALE
-              ,IS_NULLABLE
-              ,DEFAULT_VALUE
-              ,COLLATION
-              ,COMMENTS
-              ,MAX_VALUE
-              ,MIN_VALUE
-              ,CS_DATA_TYPE_ID
-              ,CS_DATA_TYPE_NAME
-              ,DDIC_DATA_TYPE_ID
-              ,DDIC_DATA_TYPE_NAME
-              ,COMPRESSION_TYPE
-              ,INDEX_TYPE
-              ,COLUMN_ID
-              ,PRELOAD
-              ,GENERATED_ALWAYS_AS
-              ,HAS_SCHEMA_FLEXIBILITY
-              ,FUZZY_SEARCH_INDEX
-              ,FUZZY_SEARCH_MODE
-              ,MEMORY_THRESHOLD
-              ,LOAD_UNIT
-              ,GENERATION_TYPE
-              ,IS_CACHABLE
-              ,IS_CACHE_KEY
-              ,ROW_ORDER_POSITION
-              ,IS_HIDDEN
-              ,IS_MASKED
-              ,MASK_EXPRESSION
-              ,CLIENTSIDE_ENCRYPTION_STATUS
-              ,CLIENTSIDE_ENCRYPTION_COLUMN_KEY_ID
-              ,CLIENTSIDE_ENCRYPTION_MODE
-              ,PERSISTENT_MEMORY
-              FROM VIEW_COLUMNS
-              WHERE
-               LOWER( SCHEMA_NAME ) = LOWER( REPLACE( '${INPUT_TABLE_SCHEMA}', '"', '' ) )
-              AND LOWER( VIEW_NAME ) = LOWER( REPLACE( '${INPUT_TABLE_NAME}', '"', '' ) )
-              )q
+	    (
+		SELECT
+			 SCHEMA_NAME
+			,TABLE_NAME
+			,COLUMN_NAME
+			,DATA_TYPE_NAME
+			,POSITION
+			,LENGTH
+		FROM TABLE_COLUMNS
+		WHERE
+		LOWER( SCHEMA_NAME ) = LOWER( REPLACE( '${INPUT_TABLE_SCHEMA}', '"', '' ) )
+		AND 
+		LOWER( TABLE_NAME ) = LOWER( REPLACE( '${INPUT_TABLE_NAME}', '"', '' ) )
+
+		UNION ALL
+
+		SELECT
+			 SCHEMA_NAME
+			,VIEW_NAME AS TABLE_NAME
+			,COLUMN_NAME
+			,DATA_TYPE_NAME
+			,POSITION
+			,LENGTH
+		FROM VIEW_COLUMNS
+		WHERE
+		LOWER( SCHEMA_NAME ) = LOWER( REPLACE( '${INPUT_TABLE_SCHEMA}', '"', '' ) )
+		AND 
+		LOWER( VIEW_NAME ) = LOWER( REPLACE( '${INPUT_TABLE_NAME}', '"', '' ) ) 
+	      )q
         WHERE
             LOWER( SCHEMA_NAME ) = LOWER( REPLACE( '${INPUT_TABLE_SCHEMA}', '"', '' ) )
             and
