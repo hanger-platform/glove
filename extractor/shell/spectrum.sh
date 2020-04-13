@@ -554,7 +554,7 @@ EOF
         fi
 
 		# Realiza a verificação da estrutura das tabelas.
-		if [ "${#PARTITION_FIELD}" -gt "0" || ${FILE_INPUT_PARTITONED} == 1]; then
+		if [ "${#PARTITION_FIELD}" -gt "0"] || [${FILE_INPUT_PARTITONED} == 1]; then
 			if [ ${PARTITION_MODE} == "real" ]; then
 				partitioned_table_check
 			else
