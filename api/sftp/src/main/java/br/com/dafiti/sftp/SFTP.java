@@ -103,7 +103,7 @@ public class SFTP {
             //Defines fields.
             mitt.getConfiguration()
                     .addCustomField("partition_field", new Concat((List) cli.getParameterAsList("partition", "\\+")))
-                    .addCustomField("custom_primary_key", new MD5((List) cli.getParameterAsList("key", "\\+")))
+                    .addCustomField("custom_primary_key", new Concat((List) cli.getParameterAsList("key", "\\+")))
                     .addCustomField("etl_load_date", new Now())
                     .addField(cli.getParameterAsList("field", "\\+"));
 
@@ -155,7 +155,6 @@ public class SFTP {
                 if (updatedDate.compareTo(LocalDate.parse(cli.getParameter("start_date"))) >= 0
                         && updatedDate.compareTo(LocalDate.parse(cli.getParameter("end_date"))) <= 0) {
 
-                    ArchiveEntry archiveEntry;
                     File outputFile = new File(outputPath.toString() + "/" + entry.getFilename());
 
                     //Transfer a file to local filesystem. 
