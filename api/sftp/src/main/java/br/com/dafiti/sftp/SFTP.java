@@ -35,7 +35,6 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
@@ -48,12 +47,12 @@ import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import org.apache.commons.compress.archivers.ArchiveEntry;
-import org.apache.commons.compress.archivers.ArchiveException;
-import org.apache.commons.compress.archivers.ArchiveInputStream;
-import org.apache.commons.compress.archivers.ArchiveStreamFactory;
-import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.joda.time.LocalDate;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -167,23 +166,34 @@ public class SFTP {
                     );
 
                     //Identifies if file is compressed.
-                    if ("|zip|gz|tar|".contains(FilenameUtils.getExtension(outputFile.getName()))) {
-                        try (ArchiveInputStream archiveInputStream
-                                = new ArchiveStreamFactory()
-                                        .createArchiveInputStream(
-                                                new BufferedInputStream(
-                                                        new FileInputStream(outputFile)))) {
-                                    while ((archiveEntry = archiveInputStream.getNextEntry()) != null) {
-                                        File decompressedOutputFile = new File(outputPath.toString() + "/" + archiveEntry.getName());
+                    File uncompressed;
+                    String extension = FilenameUtils.getExtension(outputFile.getName());
 
-                                        try (OutputStream outputStream = Files.newOutputStream(decompressedOutputFile.toPath())) {
-                                            IOUtils.copy(archiveInputStream, outputStream);
-                                        }
-                                    }
+                    switch (extension) {
+                        case "gz":
+                            GZIPInputStream gzip = new GZIPInputStream(new FileInputStream(outputFile));
+                            uncompressed = new File(outputFile.getParent() + "/" + FilenameUtils.removeExtension(outputFile.getName()));
+
+                            try (OutputStream outputStream = Files.newOutputStream(uncompressed.toPath())) {
+                                IOUtils.copy(gzip, outputStream);
+                            }
+
+                            Files.delete(outputFile.toPath());
+                            break;
+                        case "zip":
+                            ZipEntry zipEntry;
+                            ZipInputStream zip = new ZipInputStream(new FileInputStream(outputFile));
+
+                            while ((zipEntry = zip.getNextEntry()) != null) {
+                                uncompressed = new File(outputFile.getParent() + "/" + zipEntry.getName());
+
+                                try (OutputStream outputStream = Files.newOutputStream(uncompressed.toPath())) {
+                                    IOUtils.copy(zip, outputStream);
                                 }
+                            }
 
-                                //Remove compressed file. 
-                                Files.delete(outputFile.toPath());
+                            Files.delete(outputFile.toPath());
+                            break;
                     }
                 }
             }
@@ -198,8 +208,7 @@ public class SFTP {
                 | SftpException
                 | IOException
                 | ParseException
-                | DuplicateEntityException
-                | ArchiveException ex) {
+                | DuplicateEntityException                 ex) {
 
             Logger.getLogger(SFTP.class.getName()).log(Level.SEVERE, "SFTP Failure: ", ex);
             System.exit(1);

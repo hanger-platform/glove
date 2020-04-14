@@ -47,6 +47,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.joda.time.LocalDate;
@@ -100,7 +102,7 @@ public class S3 {
             //Defines a S3 client and lists objects of a folder.
             ObjectListing listing = AmazonS3ClientBuilder
                     .standard()
-                    .build().listObjects(cli.getParameter("bucket"), cli.getParameter("prefix"));            
+                    .build().listObjects(cli.getParameter("bucket"), cli.getParameter("prefix"));
             List<S3ObjectSummary> s3ObjectSummaries = listing.getObjectSummaries();
             while (listing.isTruncated()) {
                 listing = AmazonS3ClientBuilder
@@ -146,15 +148,34 @@ public class S3 {
                     }
 
                     //Identifies if file is compressed.
-                    if ("|gz|".contains(FilenameUtils.getExtension(outputFile.getName()))) {
-                        GZIPInputStream gis = new GZIPInputStream(new FileInputStream(outputFile));
-                        File decompressed = new File(outputFile.getParent() + "/" + FilenameUtils.removeExtension(outputFile.getName()));
+                    File uncompressed;
+                    String extension = FilenameUtils.getExtension(outputFile.getName());
 
-                        try (OutputStream outputStream = Files.newOutputStream(decompressed.toPath())) {
-                            IOUtils.copy(gis, outputStream);
-                        }
+                    switch (extension) {
+                        case "gz":
+                            GZIPInputStream gzip = new GZIPInputStream(new FileInputStream(outputFile));
+                            uncompressed = new File(outputFile.getParent() + "/" + FilenameUtils.removeExtension(outputFile.getName()));
 
-                        Files.delete(outputFile.toPath());
+                            try (OutputStream outputStream = Files.newOutputStream(uncompressed.toPath())) {
+                                IOUtils.copy(gzip, outputStream);
+                            }
+
+                            Files.delete(outputFile.toPath());
+                            break;
+                        case "zip":
+                            ZipEntry zipEntry;
+                            ZipInputStream zip = new ZipInputStream(new FileInputStream(outputFile));
+
+                            while ((zipEntry = zip.getNextEntry()) != null) {
+                                uncompressed = new File(outputFile.getParent() + "/" + zipEntry.getName());
+
+                                try (OutputStream outputStream = Files.newOutputStream(uncompressed.toPath())) {
+                                    IOUtils.copy(zip, outputStream);
+                                }
+                            }
+
+                            Files.delete(outputFile.toPath());
+                            break;
                     }
                 }
             }
