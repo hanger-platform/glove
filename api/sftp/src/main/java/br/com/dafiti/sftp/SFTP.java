@@ -208,7 +208,7 @@ public class SFTP {
                 | SftpException
                 | IOException
                 | ParseException
-                | DuplicateEntityException                 ex) {
+                | DuplicateEntityException ex) {
 
             Logger.getLogger(SFTP.class.getName()).log(Level.SEVERE, "SFTP Failure: ", ex);
             System.exit(1);
