@@ -142,7 +142,7 @@ public class SFTP {
             //Lists all files that satisfies a pattern.
             Vector<ChannelSftp.LsEntry> list = channelSftp.ls(cli.getParameter("pattern"));
 
-            //Defines the output path. 
+            //Defines the output path.
             outputPath = Files.createTempDirectory("sftp_");
 
             //Transfers a file.
@@ -157,7 +157,7 @@ public class SFTP {
 
                     File outputFile = new File(outputPath.toString() + "/" + entry.getFilename());
 
-                    //Transfer a file to local filesystem. 
+                    //Transfer a file to local filesystem.
                     channelSftp.get(
                             entry.getFilename(),
                             outputFile.getAbsolutePath(),
