@@ -423,7 +423,7 @@
       <attributes />
       <sql>BEGIN;
 	CREATE TABLE #${SCHEMA_NAME}_${TABLE_NAME} AS ${INPUT_DATA_STATEMENT};
-	UNLOAD ( 'SELECT * FROM #${SCHEMA_NAME}_${TABLE_NAME};' ) TO 's3://${STORAGE_BUCKET}/unload/${SCHEMA_NAME}/${TABLE_NAME}/'
+	UNLOAD ( 'SELECT * FROM #${SCHEMA_NAME}_${TABLE_NAME};' ) TO 's3://${GLOVE_STORARE_BUCKET_STAGING}/unload/${SCHEMA_NAME}/${TABLE_NAME}/'
 		CREDENTIALS 'aws_access_key_id=${AWS_ACCESS_KEY_ID};aws_secret_access_key=${AWS_SECRET_ACCESS_KEY}'
 		HEADER
 		DELIMITER ';'
@@ -480,8 +480,8 @@ error_check(){
 echo "Synchronizing Amazon S3 Buckets"
 sleep 45
 
-echo "Copying files from s3://${STORAGE_BUCKET}/unload/${SCHEMA_NAME}/${TABLE_NAME}/!"
-aws s3 cp s3://${STORAGE_BUCKET}/unload/${SCHEMA_NAME}/${TABLE_NAME}/ ${RAWFILE_QUEUE_STAGING_PATH} --recursive --only-show-errors
+echo "Copying files from s3://${GLOVE_STORARE_BUCKET_STAGING}/unload/${SCHEMA_NAME}/${TABLE_NAME}/!"
+aws s3 cp s3://${GLOVE_STORARE_BUCKET_STAGING}/unload/${SCHEMA_NAME}/${TABLE_NAME}/ ${RAWFILE_QUEUE_STAGING_PATH} --recursive --only-show-errors
 error_check
 
 echo "Unzipping data!"
@@ -511,7 +511,7 @@ done
 
 echo "Removing temporary files!"
 rm -rf ${RAWFILE_QUEUE_STAGING_PATH}
-aws s3 rm s3://${STORAGE_BUCKET}/unload/${SCHEMA_NAME}/${TABLE_NAME}/ --recursive --only-show-errors</script>
+aws s3 rm s3://${GLOVE_STORARE_BUCKET_STAGING}/unload/${SCHEMA_NAME}/${TABLE_NAME}/ --recursive --only-show-errors</script>
       <loglevel>Basic</loglevel>
       <parallel>N</parallel>
       <draw>Y</draw>
