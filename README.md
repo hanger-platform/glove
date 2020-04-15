@@ -365,7 +365,7 @@ O metadado possui os seguintes atributos obrigatórios:
 | SPECTRUM           | FIELD_HAS_PREFIX         | Identifica se o prefixo dos campos das tabelas do HANA devem ser mantidos.                                                                                                                                                                                                                                                                        |
 | SPECTRUM           | SPLIT_STRATEGY         | Identifica a estratégia utilizada para o particionamento dos dados sendo: FAST, os dados sendo processados são confiáveis e não contém caracteres especiais ou quebra de linas. SECURE, os dados não são confiáveis. Default: SECURE.                                                                                                                                                                                                                                                                       |
 | REDSHIFT           | QUOTE                | Identifica se o unload de dados do Redshift devem conter aspas duplas, sendo 0 para não e 1 para sim.
-
+| REDSHIFT           | ENCODE               | Identifica o tipo de compressão aplicado nas colunas de tabelas do redshift, sendo o valor padrão ZSTD.
 
 ## Contributing, Bugs, Questions
 Contributions are more than welcome! If you want to propose new changes, fix bugs or improve something feel free to fork the repository and send us a Pull Request. You can also open new `Issues` for reporting bugs and general problems.
