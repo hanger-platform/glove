@@ -39,35 +39,33 @@ import org.apache.commons.lang3.math.NumberUtils;
  */
 public class Eval implements Transformable {
 
-    private Parser parser;
-    private List<Object> record;
-    private List<String> fields;
+    private ScriptEngine engine;
     private final String expression;
-    private final ScriptEngine engine;
 
     public Eval(String expression) {
         this.expression = expression;
+    }
+
+    @Override
+    public void init() {
         this.engine = new ScriptEngineManager().getEngineByName("JavaScript");
     }
 
     @Override
-    public void init(
+    public String getValue(
             Parser parser,
             List<Object> record) {
 
-        this.parser = parser;
-        this.record = record;
-        this.fields = parser.getConfiguration().getFieldsName();
-    }
-
-    @Override
-    public String getValue() {
         String value = new String();
         String parseable = this.expression;
 
         for (String chunck : expression.split("\\W")) {
-            if (this.fields.contains(chunck)) {
-                String evaluated = this.parser.evaluate(record, chunck).toString();
+            if (parser
+                    .getConfiguration()
+                    .getFieldsName()
+                    .contains(chunck)) {
+                
+                String evaluated = parser.evaluate(record, chunck).toString();
                 parseable = parseable.replaceFirst(
                         chunck,
                         NumberUtils.isCreatable(evaluated) ? evaluated : '"' + evaluated + '"'

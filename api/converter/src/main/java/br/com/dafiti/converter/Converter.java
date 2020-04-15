@@ -75,7 +75,7 @@ public class Converter {
         options.addOption("D", "delimiter", true, "Delimiter ofd csv files");
         options.addOption("T", "target", true, "Identify the target format");
         options.addOption("r", "replace", false, "Identify if csv files will be replaced to parquet files");
-        options.addOption("d", "debug", false, "Show full log messages");
+        options.addOption("d", "debug", true, "Show full log messages");
         options.addOption("t", "thread", true, "Limit of thread");
         options.addOption("o", "output", true, "Identify the output path");
         options.addOption("q", "quote", true, "Identify the quote character");
@@ -135,6 +135,7 @@ public class Converter {
         boolean header;
         boolean merge = false;
         boolean duplicated = false;
+        boolean debug = false;
         int thread = 1;
         int fieldKeyPos = -1;
         int fieldPartitionPos = 0;
@@ -227,9 +228,13 @@ public class Converter {
 
             //Identify the log level.
             if (line.hasOption("debug")) {
-                Logger.getRootLogger().setLevel(Level.DEBUG);
-            } else {
-                Logger.getRootLogger().setLevel(Level.ERROR);
+                debug = (Integer.valueOf(line.getOptionValue("debug")) == 1);
+
+                if (debug) {
+                    Logger.getRootLogger().setLevel(Level.DEBUG);
+                }else{
+                    Logger.getRootLogger().setLevel(Level.ERROR);
+                }                
             }
 
             //Identify how many files should be converted simultaneously. 
@@ -308,7 +313,8 @@ public class Converter {
                                             duplicated,
                                             merge,
                                             bucketPath,
-                                            mode)
+                                            mode,
+                                            debug)
                             );
                         }
                     }
@@ -332,7 +338,8 @@ public class Converter {
                                             duplicated,
                                             merge,
                                             bucketPath,
-                                            mode)
+                                            mode,
+                                            debug)
                             );
                         }
                     }

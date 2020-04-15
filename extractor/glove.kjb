@@ -102,6 +102,11 @@
       <description>Identifica o tipo de arquivos de entrada.</description>
     </parameter>
     <parameter>
+      <name>FILE_INPUT_MANIFEST</name>
+      <default_value />
+      <description>Identifica o arquivo de manifesto que deve ser usado para definição do metadado.</description>
+    </parameter>
+    <parameter>
       <name>FILE_INPUT_PARTITONED</name>
       <default_value>0</default_value>
       <description>Identifica o tipo de particionamento do arquivo.</description>
@@ -751,8 +756,8 @@ GLOVE_TEMP				== ${GLOVE_TEMP}
 GLOVE_METADATA				== ${GLOVE_METADATA}
 GLOVE_NAMED_QUERIES			== ${GLOVE_NAMED_QUERIES}
 GOOGLE_TOOLS_HOME			== ${GOOGLE_TOOLS_HOME}
-GLOVE_STORARE_BUCKET_STAGING 		== ${GLOVE_STORARE_BUCKET_STAGING}
-GLOVE_STORARE_BUCKET_DISASTER_RECOVERY 	== ${GLOVE_STORARE_BUCKET_DISASTER_RECOVERY}
+GLOVE_STORARE_BUCKET_STAGING		== ${GLOVE_STORARE_BUCKET_STAGING}
+GLOVE_STORARE_BUCKET_DISASTER_RECOVERY	== ${GLOVE_STORARE_BUCKET_DISASTER_RECOVERY}
 #-----------------------------------------------------------</logmessage>
       <loglevel>Basic</loglevel>
       <logsubject>LOG</logsubject>

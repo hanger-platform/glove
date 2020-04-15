@@ -46,13 +46,14 @@ public class Now implements Transformable {
     }
 
     @Override
-    public void init(
-            Parser parser,
-            List<Object> record) {
+    public void init() {
     }
 
     @Override
-    public String getValue() {
+    public String getValue(
+            Parser parser,
+            List<Object> record) {
+
         return new SimpleDateFormat(outputFormat).format(new Date());
     }
 }

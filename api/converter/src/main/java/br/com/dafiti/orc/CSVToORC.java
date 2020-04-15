@@ -82,6 +82,7 @@ public class CSVToORC implements Runnable {
     private final boolean merge;
     private final String bucketPath;
     private final String mode;
+    private final boolean debug;
 
     /**
      * Constructor.
@@ -99,6 +100,7 @@ public class CSVToORC implements Runnable {
      * @param merge Identify if should merge existing files.
      * @param bucket Identify storage bucket.
      * @param mode Identify partition mode.
+     * @param debug Identify if should show detailed log message.
      */
     public CSVToORC(
             File inputFile,
@@ -113,7 +115,8 @@ public class CSVToORC implements Runnable {
             boolean duplicated,
             boolean merge,
             String bucket,
-            String mode) {
+            String mode,
+            boolean debug) {
 
         this.inputFile = inputFile;
         this.schema = schema;
@@ -127,6 +130,7 @@ public class CSVToORC implements Runnable {
         this.merge = merge;
         this.bucketPath = bucket;
         this.mode = mode;
+        this.debug = debug;
 
         switch (compression) {
             case "lz4":
@@ -304,7 +308,7 @@ public class CSVToORC implements Runnable {
                 System.out.println("[" + orcFile.getName() + "] records: "
                         + statistics.getOutputRows()
                         + ", Delta: "
-                        + statistics.getInputRows()
+                        + (statistics.getInputRows() + statistics.getDuplicatedRows())
                         + ", ( Updated: " + statistics.getOutputUpdatedRows() + ", Inserted: " + (statistics.getInputRows() - statistics.getOutputUpdatedRows()) + ", Duplicated:" + statistics.getDuplicatedRows() + " )"
                         + " Final: "
                         + (statistics.getOutputRows() + (statistics.getInputRows() - statistics.getOutputUpdatedRows())));
@@ -446,7 +450,9 @@ public class CSVToORC implements Runnable {
 
             //Identify duplicated key.
             if (!add) {
-                System.out.println("Duplicated key in file: [" + record[fieldKey] + "]");
+                if (debug) {
+                    System.out.println("Duplicated key in file: [" + record[fieldKey] + "]");
+                }
                 statistics.incrementDuplicatedRows();
             } else {
                 statistics.incrementInputRows();

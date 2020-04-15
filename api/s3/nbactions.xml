@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>run</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-classpath %classpath br.com.dafiti.s3.S3 --output="/tmp/mitt/" --bucket="bi-dafiti-group-adjust-dafiti" --start_date="2020-03-20" --end_date="2020-03-20" --field="date::regexp(::filename(),**[0-9]{4}-[0-9]{2}-[0-9]{2}**)+file::filename()+{app_name}+{adgroup_name}+{adid}+[amount_sessions]+[amount_transactions]+{android_id}+{app_id}+{app_version}+[brand]+br.com.dafiti+{campaign_name}+[cart_currency_code]+[category]+[category_id]+{city}+{click_time}+[colour]+{country}+{creative_name}+{currency}+[currency_code]+[customer_token]+{device_name}+[device_manufacturer]+[device_model]+{device_type}+[discount]+[display_size]+[duration]+{environment}+{event_name}+{fb_adgroup_id}+{fb_adgroup_name}+{fb_adset_id}+{fb_adset_name}+{fb_campaign_id}+{fb_campaign_name}+{gclid}+{gender}+{gps_adid}+{idfa}+{idfv}+{installed_at}+{ip_address}+[keywords]+{language}+{last_time_spent}+{mac_md5}+{network_name}+[new_customer]+[oi9ldf]+{os_name}+{os_version}+[product]+[quantity]+{referrer}+{reftag}+{region}+{revenue}+{session_count}+[shop_country]+[size]+[sku]+{store}+{created_at}+{time_spent}+{timezone}+[total_cart]+[total_transaction]+[total_wishlist]+{tracking_enabled}+[transaction_currency]+[transaction_id]+[price]+[tree]+{user_agent}+[user_id]+[value]+[wishlist_currency_code]+[a4s_andr_device_id]+{activity_kind}+{install_begin_time}+{install_finish_time}+{rejection_reason}+{uninstalled_at}+{reinstalled_at}"  --partition="::regexp(::filename(),**[0-9]**)" --delimiter=","</exec.args>
+                <exec.executable>java</exec.executable>
+            </properties>
+        </action>
+        <action>
+            <actionName>debug</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.s3.S3 --output="/tmp/mitt/" --bucket="bi-dafiti-group-adjust-dafiti" --start_date="2020-03-20" --end_date="2020-03-20" --field="date::regexp(::filename(),**[0-9]{4}-[0-9]{2}-[0-9]{2}**)+file::filename()+{app_name}+{adgroup_name}+{adid}+[amount_sessions]+[amount_transactions]+{android_id}+{app_id}+{app_version}+[brand]+br.com.dafiti+{campaign_name}+[cart_currency_code]+[category]+[category_id]+{city}+{click_time}+[colour]+{country}+{creative_name}+{currency}+[currency_code]+[customer_token]+{device_name}+[device_manufacturer]+[device_model]+{device_type}+[discount]+[display_size]+[duration]+{environment}+{event_name}+{fb_adgroup_id}+{fb_adgroup_name}+{fb_adset_id}+{fb_adset_name}+{fb_campaign_id}+{fb_campaign_name}+{gclid}+{gender}+{gps_adid}+{idfa}+{idfv}+{installed_at}+{ip_address}+[keywords]+{language}+{last_time_spent}+{mac_md5}+{network_name}+[new_customer]+[oi9ldf]+{os_name}+{os_version}+[product]+[quantity]+{referrer}+{reftag}+{region}+{revenue}+{session_count}+[shop_country]+[size]+[sku]+{store}+{created_at}+{time_spent}+{timezone}+[total_cart]+[total_transaction]+[total_wishlist]+{tracking_enabled}+[transaction_currency]+[transaction_id]+[price]+[tree]+{user_agent}+[user_id]+[value]+[wishlist_currency_code]+[a4s_andr_device_id]+{activity_kind}+{install_begin_time}+{install_finish_time}+{rejection_reason}+{uninstalled_at}+{reinstalled_at}"  --partition="::regexp(::filename(),**[0-9]**)" --delimiter=","</exec.args>
+                <exec.executable>java</exec.executable>
+                <jpda.listen>true</jpda.listen>
+            </properties>
+        </action>
+        <action>
+            <actionName>profile</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-classpath %classpath br.com.dafiti.s3.S3 --output="/tmp/mitt/" --bucket="bi-dafiti-group-adjust-dafiti" --start_date="2020-03-20" --end_date="2020-03-20" --field="date::regexp(::filename(),**[0-9]{4}-[0-9]{2}-[0-9]{2}**)+file::filename()+{app_name}+{adgroup_name}+{adid}+[amount_sessions]+[amount_transactions]+{android_id}+{app_id}+{app_version}+[brand]+br.com.dafiti+{campaign_name}+[cart_currency_code]+[category]+[category_id]+{city}+{click_time}+[colour]+{country}+{creative_name}+{currency}+[currency_code]+[customer_token]+{device_name}+[device_manufacturer]+[device_model]+{device_type}+[discount]+[display_size]+[duration]+{environment}+{event_name}+{fb_adgroup_id}+{fb_adgroup_name}+{fb_adset_id}+{fb_adset_name}+{fb_campaign_id}+{fb_campaign_name}+{gclid}+{gender}+{gps_adid}+{idfa}+{idfv}+{installed_at}+{ip_address}+[keywords]+{language}+{last_time_spent}+{mac_md5}+{network_name}+[new_customer]+[oi9ldf]+{os_name}+{os_version}+[product]+[quantity]+{referrer}+{reftag}+{region}+{revenue}+{session_count}+[shop_country]+[size]+[sku]+{store}+{created_at}+{time_spent}+{timezone}+[total_cart]+[total_transaction]+[total_wishlist]+{tracking_enabled}+[transaction_currency]+[transaction_id]+[price]+[tree]+{user_agent}+[user_id]+[value]+[wishlist_currency_code]+[a4s_andr_device_id]+{activity_kind}+{install_begin_time}+{install_finish_time}+{rejection_reason}+{uninstalled_at}+{reinstalled_at}"  --partition="::regexp(::filename(),**[0-9]**)" --delimiter=","</exec.args>
+                <exec.executable>java</exec.executable>
+            </properties>
+        </action>
+    </actions>

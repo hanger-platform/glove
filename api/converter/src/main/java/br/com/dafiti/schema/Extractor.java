@@ -46,7 +46,7 @@ import org.json.JSONException;
  */
 public class Extractor implements Runnable {
 
-    public static final int MAX_SAMPLE = 100000;
+    public static final int MAX_SAMPLE = 1000000;
 
     private final File file;
     private final File reserverWordsFile;

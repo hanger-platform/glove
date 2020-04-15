@@ -26,9 +26,10 @@ package br.com.dafiti.mitt;
 import br.com.dafiti.mitt.cli.CommandLineInterface;
 import br.com.dafiti.mitt.model.Configuration;
 import br.com.dafiti.mitt.output.Output;
+import br.com.dafiti.mitt.settings.ReaderSettings;
+import br.com.dafiti.mitt.settings.WriterSettings;
 import java.io.File;
 import java.io.FileFilter;
-import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 
@@ -38,188 +39,30 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
  */
 public class Mitt {
 
-    public static final Character DELIMITER = ';';
-    public static final Character QUOTE = '"';
-    public static final Character QUOTE_ESCAPE = '"';
-    public static final String ENCODE = "UTF-8";
-
-    private char delimiter;
-    private char quote;
-    private char quoteEscape;
-    private File file;
-    private Configuration configuration;
     private Output output;
+    private File outputFile;
+    private Configuration configuration;
+    private ReaderSettings readerSettings;
+    private WriterSettings writerSettings;
     private CommandLineInterface commandLineInterface;
 
-    /**
-     *
-     */
-    public Mitt() {
-        this.delimiter = DELIMITER;
-        this.quote = QUOTE;
-        this.quoteEscape = QUOTE_ESCAPE;
-    }
-
-    /**
-     *
-     * @param file
-     */
-    public Mitt(File file) {
-        this.file = file;
-        this.delimiter = DELIMITER;
-        this.quote = QUOTE;
-        this.quoteEscape = QUOTE_ESCAPE;
-    }
-
-    /**
-     *
-     * @param file
-     */
-    public Mitt(String file) {
-        this.file = new File(file);
-        this.delimiter = DELIMITER;
-        this.quote = QUOTE;
-        this.quoteEscape = QUOTE_ESCAPE;
-    }
-
-    /**
-     *
-     * @param delimiter
-     * @param quote
-     * @param escape
-     * @param file
-     */
-    public Mitt(
-            File file,
-            char delimiter,
-            char quote,
-            char escape) {
-
-        this.file = file;
-        this.delimiter = delimiter;
-        this.quote = quote;
-        this.quoteEscape = escape;
-    }
-
-    /**
-     *
-     * @param delimiter
-     * @param quote
-     * @param escape
-     * @param file
-     */
-    public Mitt(
-            String file,
-            char delimiter,
-            char quote,
-            char escape) {
-
-        this.file = new File(file);
-        this.delimiter = delimiter;
-        this.quote = quote;
-        this.quoteEscape = escape;
-    }
-
-    /**
-     *
-     * @param delimiter
-     */
-    public void setDelimiter(char delimiter) {
-        this.delimiter = delimiter;
-    }
-
-    /**
-     *
-     * @param quote
-     */
-    public void setQuote(char quote) {
-        this.quote = quote;
-    }
-
-    /**
-     *
-     * @param quoteEscape
-     */
-    public void setQuoteEscape(char quoteEscape) {
-        this.quoteEscape = quoteEscape;
-    }
-
-    /**
-     *
-     * @param file
-     */
-    public void setFile(File file) {
-        this.file = file;
-    }
+    private boolean debug = false;
 
     /**
      *
      * @param output
      */
-    public void setOutput(String output) {
-        this.file = new File(output);
+    public void setOutputFile(String output) {
+        this.getWriterSettings()
+                .setOutputFile(new File(output));
     }
 
     /**
      *
-     * @return
+     * @param debug
      */
-    public File getFile() {
-        return file;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public char getDelimiter() {
-        return delimiter;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public char getQuote() {
-        return quote;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public char getQuoteEscape() {
-        return quoteEscape;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public Configuration getConfiguration() {
-        if (configuration == null) {
-            configuration = new Configuration();
-        }
-
-        return configuration;
-    }
-
-    /**
-     *
-     * @return
-     */
-    private Output getWriter() {
-        if (output == null) {
-            output = new Output(
-                    file,
-                    this.getConfiguration(),
-                    this.getDelimiter(),
-                    this.getQuote(),
-                    this.getQuoteEscape()
-            );
-        }
-
-        return output;
+    public void setDebug(boolean debug) {
+        this.debug = debug;
     }
 
     /**
@@ -231,11 +74,61 @@ public class Mitt {
         if (commandLineInterface == null) {
             commandLineInterface = new CommandLineInterface(
                     this.getConfiguration(),
-                    arguments
-            );
+                    arguments);
         }
 
         return commandLineInterface;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Configuration getConfiguration() {
+        if (configuration == null) {
+            configuration = new Configuration(debug);
+        }
+
+        return configuration;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public ReaderSettings getReaderSettings() {
+        if (readerSettings == null) {
+            readerSettings = new ReaderSettings();
+        }
+
+        return readerSettings;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public WriterSettings getWriterSettings() {
+        if (writerSettings == null) {
+            writerSettings = new WriterSettings();
+        }
+
+        return writerSettings;
+    }
+
+    /**
+     *
+     * @return
+     */
+    private Output getWriter() {
+        if (output == null) {
+            output = new Output(
+                    this.getConfiguration(),
+                    this.getReaderSettings(),
+                    this.getWriterSettings());
+        }
+
+        return output;
     }
 
     /**
@@ -259,113 +152,7 @@ public class Mitt {
      * @param file
      */
     public void write(File file) {
-        this.getWriter().write(file,
-                DELIMITER,
-                QUOTE,
-                QUOTE_ESCAPE,
-                ENCODE,
-                new ArrayList(),
-                true,
-                0
-        );
-    }
-
-    /**
-     *
-     * @param file
-     * @param delimiter
-     * @param skipLines
-     */
-    public void write(
-            File file,
-            char delimiter,
-            int skipLines) {
-
-        this.getWriter().write(file,
-                delimiter,
-                QUOTE,
-                QUOTE_ESCAPE,
-                ENCODE,
-                new ArrayList(),
-                true,
-                skipLines
-        );
-    }
-
-    /**
-     *
-     * @param file
-     * @param delimiter
-     * @param quote
-     * @param quoteEscape
-     * @param encode
-     */
-    public void write(
-            File file,
-            char delimiter,
-            char quote,
-            char quoteEscape,
-            String encode) {
-
-        this.getWriter().write(
-                file,
-                delimiter,
-                quote,
-                quoteEscape,
-                encode,
-                new ArrayList(),
-                true,
-                0
-        );
-    }
-
-    /**
-     *
-     * @param file
-     * @param header
-     */
-    public void write(
-            File file,
-            List<String> header) {
-
-        this.getWriter().write(file,
-                DELIMITER,
-                QUOTE,
-                QUOTE_ESCAPE,
-                ENCODE,
-                header,
-                true,
-                0
-        );
-    }
-
-    /**
-     *
-     * @param file
-     * @param delimiter
-     * @param quote
-     * @param quoteEscape
-     * @param encode
-     * @param header
-     */
-    public void write(
-            File file,
-            char delimiter,
-            char quote,
-            char quoteEscape,
-            String encode,
-            List<String> header) {
-
-        this.getWriter().write(
-                file,
-                delimiter,
-                quote,
-                quoteEscape,
-                encode,
-                header,
-                true,
-                0
-        );
+        this.write(file, "*");
     }
 
     /**
@@ -377,144 +164,6 @@ public class Mitt {
             File file,
             String wildcard) {
 
-        this.write(file,
-                wildcard,
-                DELIMITER,
-                QUOTE,
-                QUOTE_ESCAPE,
-                ENCODE,
-                new ArrayList(),
-                true,
-                0
-        );
-    }
-
-    /**
-     *
-     * @param file
-     * @param wildcard
-     * @param delimiter
-     */
-    public void write(
-            File file,
-            String wildcard,
-            char delimiter) {
-
-        this.write(file,
-                wildcard,
-                delimiter,
-                QUOTE,
-                QUOTE_ESCAPE,
-                ENCODE,
-                new ArrayList(),
-                true,
-                0
-        );
-    }
-
-    /**
-     *
-     * @param file
-     * @param wildcard
-     * @param delimiter
-     * @param header
-     */
-    public void write(
-            File file,
-            String wildcard,
-            char delimiter,
-            List<String> header) {
-
-        this.write(file,
-                wildcard,
-                delimiter,
-                QUOTE,
-                QUOTE_ESCAPE,
-                ENCODE,
-                header,
-                true,
-                0
-        );
-    }
-
-    /**
-     *
-     * @param file
-     * @param wildcard
-     * @param header
-     */
-    public void write(
-            File file,
-            String wildcard,
-            List<String> header) {
-
-        this.write(file,
-                wildcard,
-                DELIMITER,
-                QUOTE,
-                QUOTE_ESCAPE,
-                ENCODE,
-                header,
-                true,
-                0
-        );
-    }
-
-    /**
-     *
-     * @param file
-     * @param wildcard
-     * @param delimiter
-     * @param quote
-     * @param quoteEscape
-     * @param encode
-     * @param header
-     */
-    public void write(
-            File file,
-            String wildcard,
-            char delimiter,
-            char quote,
-            char quoteEscape,
-            String encode,
-            List<String> header) {
-
-        this.write(
-                file,
-                wildcard,
-                delimiter,
-                quote,
-                quoteEscape,
-                encode,
-                header,
-                true,
-                0
-        );
-    }
-
-    /**
-     *
-     * @param file
-     * @param wildcard
-     * @param delimiter
-     * @param quote
-     * @param quoteEscape
-     * @param encode
-     * @param header
-     * @param remove
-     * @param skipLines
-     */
-    public void write(
-            File file,
-            String wildcard,
-            char delimiter,
-            char quote,
-            char quoteEscape,
-            String encode,
-            List<String> header,
-            boolean remove,
-            int skipLines) {
-
         FileFilter fileFilter;
         File[] files = null;
 
@@ -524,16 +173,7 @@ public class Mitt {
         }
 
         if (files != null) {
-            this.getWriter().write(
-                    files,
-                    delimiter,
-                    quote,
-                    quoteEscape,
-                    encode,
-                    header,
-                    remove,
-                    skipLines
-            );
+            this.getWriter().write(files);
         }
     }
 
@@ -541,7 +181,7 @@ public class Mitt {
      *
      */
     public void close() {
-        if (file != null) {
+        if (outputFile != null) {
             this.getWriter().close();
         }
     }

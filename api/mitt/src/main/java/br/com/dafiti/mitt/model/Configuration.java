@@ -27,8 +27,9 @@ import br.com.dafiti.mitt.exception.DuplicateEntityException;
 import br.com.dafiti.mitt.transformation.Scanner;
 import br.com.dafiti.mitt.transformation.Transformable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 /**
  *
@@ -36,10 +37,24 @@ import java.util.stream.Collectors;
  */
 public class Configuration {
 
+    private List<Field> originalFields;
+    private List<Transformable> tranformations;
+    private Map<Field, Integer> fieldIndex;
+    private Map<Field, Integer> originalFieldIndex;
+
+    private final boolean debug;
+    private final Scanner scanner;
     private final List<Field> fields = new ArrayList();
     private final List<Parameter> parameters = new ArrayList();
 
     public Configuration() {
+        this.debug = false;
+        this.scanner = new Scanner();
+    }
+
+    public Configuration(boolean debug) {
+        this.debug = debug;
+        this.scanner = new Scanner();
     }
 
     /**
@@ -71,8 +86,11 @@ public class Configuration {
                     ? field.getName()
                     : field.getAlias();
 
+            //Identifies if conform to accepted database field names. 
             if (removeSpecialCharacteres) {
                 name = name.replaceAll("\\W", "_").toLowerCase();
+                name = name.replaceAll("^_", "");
+                name = name.replaceAll("_$", "");
             }
 
             nameList.add(name);
@@ -86,13 +104,15 @@ public class Configuration {
      * @return
      */
     public List<Transformable> getFieldsTransformation() {
-        List<Transformable> transformation = new ArrayList();
+        if (tranformations == null) {
+            tranformations = new ArrayList();
 
-        this.fields.forEach((value) -> {
-            transformation.add(value.getTransformation());
-        });
+            this.fields.forEach((field) -> {
+                tranformations.add(field.getTransformation());
+            });
+        }
 
-        return transformation;
+        return tranformations;
     }
 
     /**
@@ -100,12 +120,17 @@ public class Configuration {
      * @return
      */
     public List<Field> getOriginalFields() {
-        List<Field> original = this.fields
-                .stream()
-                .filter(originalField -> originalField.isOriginal())
-                .collect(Collectors.toList());
+        if (originalFields == null) {
+            originalFields = new ArrayList();
 
-        return original;
+            this.fields.forEach((field) -> {
+                if (field.isOriginal()) {
+                    originalFields.add(field);
+                }
+            });
+        }
+
+        return originalFields;
     }
 
     /**
@@ -113,16 +138,53 @@ public class Configuration {
      * @return
      */
     public List<String> getOriginalFieldsName() {
-        List<String> fieldName = new ArrayList();
+        List<String> originalFieldsNames = new ArrayList();
 
-        this.fields
-                .stream()
-                .filter(originalField -> originalField.isOriginal())
-                .collect(Collectors.toList()).forEach((value) -> {
-            fieldName.add(value.getName());
+        this.getOriginalFields().forEach((field) -> {
+            originalFieldsNames.add(field.getName());
         });
 
-        return fieldName;
+        return originalFieldsNames;
+    }
+
+    /**
+     *
+     * @param field
+     * @return
+     */
+    public Integer getFieldIndex(Field field) {
+        if (fieldIndex == null) {
+            fieldIndex = new HashMap();
+
+            List<Field> all = this.getFields();
+
+            //Relates a field to its position in the configuration. 
+            for (int i = 0; i < all.size(); i++) {
+                fieldIndex.put(all.get(i), i);
+            }
+        }
+
+        return fieldIndex.get(field);
+    }
+
+    /**
+     *
+     * @param field
+     * @return
+     */
+    public Integer getOriginalFieldIndex(Field field) {
+        if (originalFieldIndex == null) {
+            originalFieldIndex = new HashMap();
+
+            List<Field> originals = this.getOriginalFields();
+
+            //Relates an original field to its position in the configuration. 
+            for (int i = 0; i < originals.size(); i++) {
+                originalFieldIndex.put(originals.get(i), i);
+            }
+        }
+
+        return originalFieldIndex.get(field);
     }
 
     /**
@@ -145,7 +207,7 @@ public class Configuration {
      * @throws br.com.dafiti.mitt.exception.DuplicateEntityException
      */
     public Configuration addField(String name) throws DuplicateEntityException {
-        this.addField(Scanner.getInstance().scan(name));
+        this.addField(scanner.scan(name));
         return this;
     }
 
@@ -161,8 +223,7 @@ public class Configuration {
             String alias) throws DuplicateEntityException {
 
         this.addField(
-                new Field(name, alias)
-        );
+                new Field(name, alias));
 
         return this;
     }
@@ -179,7 +240,7 @@ public class Configuration {
             if (field instanceof Field) {
                 this.addField((Field) field);
             } else {
-                this.addField(Scanner.getInstance().scan((String) field));
+                this.addField(scanner.scan((String) field));
             }
         }
 
@@ -198,8 +259,7 @@ public class Configuration {
             Transformable transformation) throws DuplicateEntityException {
 
         this.addField(
-                new Field(name, transformation)
-        );
+                new Field(name, transformation));
 
         return this;
     }
@@ -218,8 +278,7 @@ public class Configuration {
             Transformable transformation) throws DuplicateEntityException {
 
         this.addField(
-                new Field(name, alias, transformation)
-        );
+                new Field(name, alias, transformation));
 
         return this;
     }
@@ -231,7 +290,7 @@ public class Configuration {
      * @throws br.com.dafiti.mitt.exception.DuplicateEntityException
      */
     public Configuration addCustomField(String name) throws DuplicateEntityException {
-        this.addField(Scanner.getInstance().scan(name, false));
+        this.addField(scanner.scan(name, false));
         return this;
     }
 
@@ -250,9 +309,7 @@ public class Configuration {
                 new Field(
                         name,
                         transformation,
-                        false
-                )
-        );
+                        false));
 
         return this;
     }
@@ -298,9 +355,7 @@ public class Configuration {
                         description,
                         "",
                         true,
-                        true
-                )
-        );
+                        true));
 
         return this;
     }
@@ -327,9 +382,7 @@ public class Configuration {
                         description,
                         defaultValue,
                         true,
-                        true
-                )
-        );
+                        true));
 
         return this;
     }
@@ -356,9 +409,7 @@ public class Configuration {
                         description,
                         "",
                         argument,
-                        true
-                )
-        );
+                        true));
 
         return this;
     }
@@ -387,9 +438,7 @@ public class Configuration {
                         description,
                         defaultValue,
                         argument,
-                        true
-                )
-        );
+                        true));
 
         return this;
     }
@@ -420,10 +469,16 @@ public class Configuration {
                         description,
                         defaultValue,
                         argument,
-                        optional
-                )
-        );
+                        optional));
 
         return this;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isDebug() {
+        return debug;
     }
 }

@@ -32,17 +32,17 @@ import java.util.List;
 public interface Transformable {
 
     /**
-     *
-     * @param parser
-     * @param record
+     * 
      */
-    public void init(
-            Parser parser,
-            List<Object> record);
+    public void init();
 
     /**
      *
+     * @param parser
+     * @param record
      * @return
      */
-    public String getValue();
+    public String getValue(
+            Parser parser,
+            List<Object> record);
 }

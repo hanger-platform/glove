@@ -38,9 +38,7 @@ import java.util.logging.Logger;
  */
 public class DateFormat implements Transformable {
 
-    private Parser parser;
-    private List<Object> record;
-    private final String field;
+    private final Object field;
     private final String inputFormat;
     private final String outputFormat;
 
@@ -57,16 +55,14 @@ public class DateFormat implements Transformable {
     }
 
     @Override
-    public void init(
-            Parser parser,
-            List<Object> record) {
-
-        this.parser = parser;
-        this.record = record;
+    public void init() {
     }
 
     @Override
-    public String getValue() {
+    public String getValue(
+            Parser parser,
+            List<Object> record) {
+
         String value = new String();
         Object date = parser.evaluate(record, field);
 

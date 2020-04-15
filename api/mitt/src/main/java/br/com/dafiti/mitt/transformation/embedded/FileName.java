@@ -32,18 +32,16 @@ import java.util.List;
  * @author Valdiney V GOMES
  */
 public class FileName implements Transformable {
-    private Parser parser;
 
     @Override
-    public void init(
-            Parser parser,
-            List<Object> record) {
-
-        this.parser = parser;
+    public void init() {
     }
 
     @Override
-    public String getValue() {
+    public String getValue(
+            Parser parser,
+            List<Object> record) {
+
         String fileName = "";
 
         if (parser.getFile() != null) {

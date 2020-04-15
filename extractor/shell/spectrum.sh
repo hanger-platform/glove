@@ -125,7 +125,8 @@ partition_load(){
 				--thread=${THREAD} \	
 				--escape=${QUOTE_ESCAPE} \			
 				--header \
-				--replace"
+				--replace \
+				--debug=${DEBUG}"
 		fi
     
         java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
@@ -138,7 +139,8 @@ partition_load(){
 			--thread=${THREAD} \
 			--escape=${QUOTE_ESCAPE} \
 			--header \
-			--replace
+			--replace \
+			--debug=${DEBUG}			
 		error_check
     else
 		if [ ${DEBUG} = 1 ] ; then
@@ -151,7 +153,8 @@ partition_load(){
 				--partition=0 \
 				--thread=${THREAD} \
 				--escape=${QUOTE_ESCAPE} \
-				--replace"
+				--replace \
+				--debug=${DEBUG}"
 		fi
 
         java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
@@ -163,15 +166,16 @@ partition_load(){
 			--partition=0 \
 			--thread=${THREAD} \
 			--escape=${QUOTE_ESCAPE} \
-			--replace
+			--replace \
+			--debug=${DEBUG}
 		error_check
     fi
 
 	# Identifica se será realizado merge.
 	if [ ${PARTITION_MERGE} -gt 0 ]; then
-		echo "Partition merge ACTIVED!"
+		echo "PARTITION_MERGE ACTIVED!"
     else
-        echo "Partition merge DISABLED!"    
+        echo "PARTITION_MERGE DISABLED!"    
 	fi
 
     # Converte os arquivos das partições para formato colunar.
@@ -191,7 +195,8 @@ partition_load(){
 			--bucket=${STORAGE_QUEUE_PATH} \
 			--mode=${PARTITION_MODE} \
 			--escape=${QUOTE_ESCAPE} \
-			--replace"
+			--replace \
+			--debug=${DEBUG}"
 	fi
 
     java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
@@ -208,7 +213,8 @@ partition_load(){
 		--bucket=${STORAGE_QUEUE_PATH} \
 		--mode=${PARTITION_MODE} \
 		--escape=${QUOTE_ESCAPE} \
-		--replace
+		--replace \
+		--debug=${DEBUG}
     error_check
 
     # Identifica se o particionamento é real ou virtual.
@@ -281,7 +287,8 @@ delta_load(){
 			--merge=${PARTITION_MERGE} \
 			--bucket=${STORAGE_QUEUE_PATH} \
 			--escape=${QUOTE_ESCAPE} \
-			--replace"
+			--replace \
+			--debug=${DEBUG}"
 	fi
 
     java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
@@ -297,7 +304,8 @@ delta_load(){
 		--merge=${PARTITION_MERGE} \
 		--bucket=${STORAGE_QUEUE_PATH} \
 		--escape=${QUOTE_ESCAPE} \
-		--replace
+		--replace \
+		--debug=${DEBUG}
     error_check
 
 
@@ -358,7 +366,8 @@ full_load(){
 				--thread=${THREAD} \
 				--duplicated=${ALLOW_DUPLICATED} \
 				--escape=${QUOTE_ESCAPE} \
-				--replace"
+				--replace \
+				--debug=${DEBUG}"
 		fi
 
     	java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
@@ -372,7 +381,8 @@ full_load(){
 			--thread=${THREAD} \
 			--duplicated=${ALLOW_DUPLICATED} \
 			--escape=${QUOTE_ESCAPE} \
-			--replace
+			--replace \
+			--debug=${DEBUG}
     	error_check
 
 		if [ ${FILE_OUTPUT_MODE} == "append" ]; then
@@ -395,7 +405,8 @@ full_load(){
 				--compression=${OUTPUT_COMPRESSION} \
 				--thread=${THREAD} \
 				--duplicated=${ALLOW_DUPLICATED} \
-				--replace"
+				--replace \
+				--debug=${DEBUG}"
 		fi
 
 		java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
@@ -408,7 +419,8 @@ full_load(){
 			--thread=${THREAD} \
 			--duplicated=${ALLOW_DUPLICATED} \
 			--escape=${QUOTE_ESCAPE} \
-			--replace
+			--replace \
+			--debug=${DEBUG}
 		error_check
 
 		# Remove os arquivos antigo do storage.
@@ -537,6 +549,7 @@ if [ ${IS_RECREATE} = 1 -o ${IS_RELOAD} = 1 ]; then
 
 	# Cria o arquivo de recuperação a partir dos arquivos do processo.
 	if [ ${IS_RECREATE} = 1 ]; then
+		echo "IS_RECREATE ACTIVED!"
 		echo "Moving files to recovery folder ${STORAGE_DISASTER_RECOVERY_QUEUE_PATH}!"
 		aws s3 mv ${STORAGE_QUEUE_PATH} ${STORAGE_DISASTER_RECOVERY_QUEUE_PATH}${DATE}/ --recursive --only-show-errors
 	fi
@@ -563,6 +576,10 @@ EOF
 		else
 			table_check
 		fi
+	else
+		echo "IS_RELOAD ACTIVED!"
+		echo "Removing files from ${STORAGE_QUEUE_PATH}"
+		aws s3 rm ${STORAGE_QUEUE_PATH} --recursive --only-show-errors
 	fi
 fi
 
@@ -684,6 +701,12 @@ EOF
             else
                 echo "${ROW_COUNT} records in the table ${SCHEMA}.${TABLE}"   
             fi
+			
+			# Remove os arquivos antigos.
+			if [ ${DEBUG} = 0 ] ; then
+				echo "Removing staging files of ${STORAGE_STAGING_QUEUE_PATH}/${ATHENA_QUERY_ID}*"
+				aws s3 rm ${STORAGE_STAGING_QUEUE_PATH} --recursive --exclude "*" --include "*${ATHENA_QUERY_ID}*" --only-show-errors
+			fi
 
             break
         elif [[ "$ATHENA_QUERY_STATUS" == "FAILED" || "$ATHENA_QUERY_STATUS" == "CANCELLED" ]]; then

@@ -23,9 +23,7 @@
  */
 package br.com.dafiti.mitt.model;
 
-import br.com.dafiti.mitt.transformation.Parser;
 import br.com.dafiti.mitt.transformation.Transformable;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -78,6 +76,8 @@ public class Field {
         this.transformation = transformation;
         this.alias = null;
         this.original = true;
+
+        this.transformation.init();
     }
 
     /**
@@ -95,6 +95,8 @@ public class Field {
         this.transformation = transformation;
         this.alias = alias;
         this.original = true;
+
+        this.transformation.init();
     }
 
     /**
@@ -112,6 +114,8 @@ public class Field {
         this.transformation = transformation;
         this.alias = null;
         this.original = original;
+
+        this.transformation.init();
     }
 
     /**
@@ -131,6 +135,8 @@ public class Field {
         this.transformation = transformation;
         this.alias = alias;
         this.original = original;
+
+        this.transformation.init();
     }
 
     /**
@@ -146,20 +152,6 @@ public class Field {
      * @return
      */
     public Transformable getTransformation() {
-        return transformation;
-    }
-
-    /**
-     *
-     * @param parser
-     * @param record
-     * @return
-     */
-    public Transformable getTransformation(
-            Parser parser,
-            List<Object> record) {
-
-        transformation.init(parser, record);
         return transformation;
     }
 

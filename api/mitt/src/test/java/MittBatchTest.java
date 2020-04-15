@@ -23,8 +23,8 @@
  */
 import br.com.dafiti.mitt.Mitt;
 import br.com.dafiti.mitt.exception.DuplicateEntityException;
-import br.com.dafiti.mitt.transformation.embedded.Now;
 import java.io.File;
+import java.util.Arrays;
 
 /**
  *
@@ -33,12 +33,15 @@ import java.io.File;
 public class MittBatchTest {
 
     public static void main(String[] args) throws DuplicateEntityException {
-        Mitt mitt = new Mitt("/tmp/mitt/");
+        Mitt mitt = new Mitt();
+        mitt.getReaderSettings().setDelimiter(',');
 
-        mitt.getConfiguration().addField("nome");
-        mitt.getConfiguration().addCustomField("xxx", new Now());
+        String xxx = "date::regexp(::filename(),**[0-9]{4}-[0-9]{2}-[0-9]{2}**)+file::filename()+{app_name}+{adgroup_name}+{adid}+[amount_sessions]+[amount_transactions]+{android_id}+{app_id}+{app_version}+[brand]+br.com.dafiti+{campaign_name}+[cart_currency_code]+[category]+[category_id]+{city}+{click_time}+[colour]+{country}+{creative_name}+{currency}+[currency_code]+[customer_token]+{device_name}+[device_manufacturer]+[device_model]+{device_type}+[discount]+[display_size]+[duration]+{environment}+{event_name}+{fb_adgroup_id}+{fb_adgroup_name}+{fb_adset_id}+{fb_adset_name}+{fb_campaign_id}+{fb_campaign_name}+{gclid}+{gender}+{gps_adid}+{idfa}+{idfv}+{installed_at}+{ip_address}+[keywords]+{language}+{last_time_spent}+{mac_md5}+{network_name}+[new_customer]+[oi9ldf]+{os_name}+{os_version}+[product]+[quantity]+{referrer}+{reftag}+{region}+{revenue}+{session_count}+[shop_country]+[size]+[sku]+{store}+{created_at}+{time_spent}+{timezone}+[total_cart]+[total_transaction]+[total_wishlist]+{tracking_enabled}+[transaction_currency]+[transaction_id]+[price]+[tree]+{user_agent}+[user_id]+[value]+[wishlist_currency_code]+[a4s_andr_device_id]+{activity_kind}+{install_begin_time}+{install_finish_time}+{rejection_reason}+{uninstalled_at}+{reinstalled_at}";
 
-        mitt.write(new File("/home/valdiney/Downloads/"), "*");
+        mitt.setOutputFile("/tmp/mitt/");
+        mitt.getConfiguration().addField(Arrays.asList(xxx.split("\\+")));
+
+        mitt.write(new File("/home/valdiney/Downloads/"), "*.csv");
 
         mitt.close();
     }

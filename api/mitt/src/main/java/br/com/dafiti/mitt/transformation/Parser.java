@@ -27,7 +27,9 @@ import br.com.dafiti.mitt.model.Configuration;
 import br.com.dafiti.mitt.model.Field;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,16 +39,11 @@ import java.util.logging.Logger;
  */
 public class Parser {
 
-    private final Configuration configuration;
-    private File file;
+    private final Map<String, Field> fields = new HashMap();
 
-    /**
-     *
-     * @param configuration
-     */
-    public Parser(Configuration configuration) {
-        this.configuration = configuration;
-    }
+    private File file;
+    private final Scanner scanner;
+    private final Configuration configuration;
 
     /**
      *
@@ -66,10 +63,49 @@ public class Parser {
 
     /**
      *
+     * @param configuration
+     */
+    public Parser(Configuration configuration) {
+        this.scanner = new Scanner();
+        this.configuration = configuration;
+    }
+
+    /**
+     *
+     * @param configuration
+     * @param debug
+     */
+    public Parser(Configuration configuration, boolean debug) {
+        this.scanner = new Scanner();
+        this.configuration = configuration;
+    }
+
+    /**
+     *
      * @return
      */
     public Configuration getConfiguration() {
         return configuration;
+    }
+
+    /**
+     *
+     * @param record
+     * @return
+     */
+    public List<Object> evaluate(List<Object> record) {
+        List<Object> values = new ArrayList();
+
+        configuration.getFields().forEach((field) -> {
+            values.add(this.evaluate(record, field));
+        });
+
+        //Logs input and parsed output record. 
+        if (configuration.isDebug()) {
+            Logger.getLogger(Parser.class.getName()).log(Level.INFO, "{0} -> {1}", new Object[]{record, values});
+        }
+
+        return values;
     }
 
     /**
@@ -84,8 +120,7 @@ public class Parser {
 
         return this.evaluate(
                 record,
-                new Field(fieldName)
-        );
+                new Field(fieldName));
     }
 
     /**
@@ -100,10 +135,22 @@ public class Parser {
 
         Field field;
 
+        //Identifies if the object is a field. 
         if (object instanceof Field) {
             field = (Field) object;
         } else {
-            field = Scanner.getInstance().scan((String) object);
+            //Get the object identifier. 
+            String identifier = String.valueOf(object);
+
+            //Identifies if it is in cache. 
+            if (fields.containsKey(identifier)) {
+                //Gets field from cache. 
+                field = fields.get(identifier);
+            } else {
+                //Puts the scanned field in cache. 
+                field = scanner.scan(identifier);
+                fields.put(identifier, field);
+            }
         }
 
         return this.evaluate(record, field);
@@ -119,37 +166,38 @@ public class Parser {
             List<Object> record,
             Field field) {
 
-        Object evaluated = null;
+        Object value = null;
 
-        //Identifies if field has transformation. 
+        //Identifies if the field has transformation. 
         if (field.getTransformation() != null) {
-            evaluated = field.getTransformation(this, record).getValue();
+            value = field
+                    .getTransformation()
+                    .getValue(this, record);
         } else {
-            //Get only original fields. 
-            List<Field> fields = configuration.getOriginalFields();
+            //Identifies if it is an original field.          
+            Integer index = configuration.getOriginalFieldIndex(field);
 
-            //Identifies if field exists.          
-            int index = fields.indexOf(field);
-
-            if (index != -1) {
+            if (index != null) {
                 if (index < record.size()) {
-                    evaluated = record.get(fields.indexOf(field));
+                    //Picks up value from the record. 
+                    value = record.get(index);
                 }
             } else {
-                //Get all fields. 
-                fields = configuration.getFields();
+                //Identifies if it is a custom field.   
+                index = configuration.getFieldIndex(field);
 
-                //Identifies if field exists.
-                index = fields.indexOf(field);
+                if (index != null) {
+                    Field clone = configuration
+                            .getFields()
+                            .get(index);
 
-                if (index != -1) {
-                    Field other = fields.get(index);
-
-                    //Identifies if the field has transformation.
-                    if (other.getTransformation() != null) {
-                        evaluated = other.getTransformation(this, record).getValue();
+                    //Identifies if a field has transformation.
+                    if (clone.getTransformation() != null) {
+                        value = clone
+                                .getTransformation()
+                                .getValue(this, record);
                     } else {
-                        Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, "Field {0} does not have related value or transformation!", field.getName());
+                        Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, "Field {0} does not have value or transformation!", field.getName());
                     }
                 } else {
                     Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, "Field {0} does not exists!", field.getName());
@@ -157,21 +205,6 @@ public class Parser {
             }
         }
 
-        return evaluated;
-    }
-
-    /**
-     *
-     * @param record
-     * @return
-     */
-    public List<Object> evaluate(List<Object> record) {
-        List<Object> fields = new ArrayList();
-
-        configuration.getFields().forEach((field) -> {
-            fields.add(this.evaluate(record, field));
-        });
-
-        return fields;
+        return value;
     }
 }

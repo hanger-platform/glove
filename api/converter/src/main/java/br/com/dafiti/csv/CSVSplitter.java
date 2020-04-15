@@ -222,6 +222,9 @@ public class CSVSplitter implements Runnable {
             lineNumber++;
         }
 
+        //Stop the parser.
+        csvParser.stopParsing();
+
         //Flush and close the output stream.
         partitions.forEach((k, v) -> {
             v.flush();

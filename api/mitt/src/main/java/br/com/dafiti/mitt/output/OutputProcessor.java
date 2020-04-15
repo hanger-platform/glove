@@ -23,14 +23,20 @@
  */
 package br.com.dafiti.mitt.output;
 
+import br.com.dafiti.mitt.model.Configuration;
+import br.com.dafiti.mitt.settings.ReaderSettings;
+import br.com.dafiti.mitt.settings.WriterSettings;
 import br.com.dafiti.mitt.transformation.Parser;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import com.univocity.parsers.csv.CsvWriter;
+import com.univocity.parsers.csv.CsvWriterSettings;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.mozilla.universalchardet.UniversalDetector;
@@ -44,49 +50,61 @@ public class OutputProcessor implements Runnable {
     private final File input;
     private final Parser parser;
     private final CsvWriter writer;
-    private final char delimiter;
-    private final char quote;
-    private final char quoteEscape;
-    private final String encode;
-    private final List<String> header;
-    private final boolean remove;
-    private final int skipLines;
+    private final ReaderSettings readerSettings;
+    private final WriterSettings writerSettings;
 
     /**
      *
      * @param input
      * @param parser
      * @param writer
-     * @param delimiter
-     * @param quote
-     * @param quoteEscape
-     * @param encode
-     * @param header
-     * @param remove
-     * @param skipLines
+     * @param readerSettings
+     * @param writerSettings
      */
     public OutputProcessor(
             File input,
             Parser parser,
             CsvWriter writer,
-            char delimiter,
-            char quote,
-            char quoteEscape,
-            String encode,
-            List<String> header,
-            boolean remove,
-            int skipLines) {
+            ReaderSettings readerSettings,
+            WriterSettings writerSettings) {
 
         this.input = input;
         this.parser = parser;
         this.writer = writer;
-        this.delimiter = delimiter;
-        this.quote = quote;
-        this.quoteEscape = quoteEscape;
-        this.encode = encode;
-        this.header = header;
-        this.remove = remove;
-        this.skipLines = skipLines;
+        this.readerSettings = readerSettings;
+        this.writerSettings = writerSettings;
+    }
+
+    /**
+     *
+     * @param input
+     * @param configuration
+     * @param readerSettings
+     * @param writerSettings
+     */
+    public OutputProcessor(
+            File input,
+            Configuration configuration,
+            ReaderSettings readerSettings,
+            WriterSettings writerSettings) {
+
+        this.input = input;
+        this.parser = new Parser(configuration);
+        this.readerSettings = readerSettings;
+        this.writerSettings = writerSettings;
+
+        //Sets the writer settings. 
+        CsvWriterSettings setting = new CsvWriterSettings();
+        setting.getFormat().setDelimiter(writerSettings.getDelimiter());
+        setting.getFormat().setQuote(writerSettings.getQuote());
+        setting.getFormat().setQuoteEscape(writerSettings.getQuoteEscape());
+        setting.setNullValue("");
+        setting.setMaxCharsPerColumn(-1);
+        setting.setHeaderWritingEnabled(true);
+        setting.setHeaders(parser.getConfiguration().getFieldsName(true).toArray(new String[0]));
+
+        //Defines the writer. 
+        this.writer = new CsvWriter(new File(writerSettings.getOutputFile().getAbsolutePath() + "/" + input.getName()), setting);
     }
 
     /**
@@ -107,56 +125,97 @@ public class OutputProcessor implements Runnable {
      */
     public void write() {
         String[] record;
-        String encoding = null;
+        String encode = readerSettings.getEncode();
+        List<String> header = writerSettings.getHeader();
 
+        //Identifies which file are being read. 
         parser.setFile(input);
 
+        //Sets the reader settings. 
         CsvParserSettings setting = new CsvParserSettings();
-        setting.getFormat().setDelimiter(delimiter);
-        setting.getFormat().setQuote(quote);
-        setting.getFormat().setQuoteEscape(quoteEscape);
+        setting.getFormat().setDelimiter(readerSettings.getDelimiter());
+        setting.getFormat().setQuote(readerSettings.getQuote());
+        setting.getFormat().setQuoteEscape(readerSettings.getQuoteEscape());
         setting.setNullValue("");
         setting.setMaxCharsPerColumn(-1);
         setting.setInputBufferSize(5 * (1024 * 1024));
-        setting.setNumberOfRowsToSkip(skipLines);
+        setting.setNumberOfRowsToSkip(readerSettings.getSkipLines());
 
-        if (header.isEmpty()) {
-            setting.setHeaderExtractionEnabled(true);
-        } else {
-            setting.setHeaders(header.toArray(new String[0]));
-        }
-
-        setting.selectFields(
-                parser
-                        .getConfiguration()
-                        .getOriginalFieldsName()
-                        .toArray(new String[0]));
-
+        //Identifies which encoder should be used. 
         if ("auto".equalsIgnoreCase(encode)) {
             try {
-                encoding = UniversalDetector.detectCharset(input);
+                encode = UniversalDetector.detectCharset(input);
             } catch (IOException ex) {
                 Logger.getLogger(Output.class.getName()).log(Level.SEVERE, "Encode do not detected!", ex);
             } finally {
-                if (encoding == null) {
-                    encoding = "UTF-8";
+                if (encode == null) {
+                    encode = "UTF-8";
                 }
             }
-        } else {
-            encoding = encode;
         }
 
+        //Identifies if header was provided or should be infered. 
+        if (header.isEmpty()) {
+            //Defines the pre parser settings.
+            CsvParserSettings clone = setting.clone();
+            clone.setHeaderExtractionEnabled(true);
+
+            //Pre parser the output file.
+            CsvParser pre = new CsvParser(clone);
+            pre.beginParsing(input, encode);
+
+            //Identifies if there are duplicated headers.
+            Map<String, Integer> repeated = new HashMap();
+
+            for (String field : pre.getRecordMetadata().headers()) {
+                if (!header.contains(field)) {
+                    header.add(field);
+                } else {
+                    int repetitions;
+
+                    //Identifies how many times a header is repeated.  
+                    if (repeated.containsKey(field)) {
+                        repetitions = repeated.get(field) + 1;
+                    } else {
+                        repetitions = 1;
+                    }
+
+                    //Defines an index to identify repeated header. 
+                    header.add(field + "_" + repetitions);
+                    repeated.put(field, repetitions);
+                }
+            }
+
+            //Stop the pre parser.
+            pre.stopParsing();
+
+            //Marks the file first line to be ignored. 
+            setting.setNumberOfRowsToSkip(
+                    setting.getNumberOfRowsToSkip() + 1);
+        }
+
+        //Identifies the file header. 
+        setting.setHeaders(header.toArray(new String[0]));
+
+        //Identifies which columns should be read. 
+        setting.selectFields(
+                parser.getConfiguration()
+                        .getOriginalFieldsName().toArray(new String[0]));
+
+        //Read the input file and write to the output.
         CsvParser csvParser = new CsvParser(setting);
-        csvParser.beginParsing(input, encoding);
+        csvParser.beginParsing(input, encode);
 
         while ((record = csvParser.parseNext()) != null) {
-            this.writer
-                    .writeRow(
-                            parser.evaluate(Arrays.asList(record))
-                    );
+            this.writer.writeRow(
+                    parser.evaluate(Arrays.asList((Object[]) record)));
         }
 
-        if (remove) {
+        //Stop the parser.
+        csvParser.stopParsing();
+
+        //Idenfies if the input file should be removed. 
+        if (readerSettings.isRemove()) {
             input.delete();
         }
     }

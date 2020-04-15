@@ -34,10 +34,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.reflections.Reflections;
 
@@ -47,25 +47,18 @@ import org.reflections.Reflections;
  */
 public class Scanner {
 
-    private static Scanner self;
+    private final Map<String, Transformable> transformationInstances = new HashMap();
     private final Map<String, Class<? extends Transformable>> transformations = new HashMap();
 
-    /**
-     *
-     * @return
-     */
-    public static Scanner getInstance() {
-        if (self == null) {
-            self = new Scanner();
-        }
-
-        return self;
-    }
+    private static final String LIST_OPEN = "[[";
+    private static final String LIST_CLOSE = "]]";
+    private static final String FREEZE_OPEN = "**";
+    private static final String FREEZE_CLOSE = "**";
 
     /**
      *
      */
-    private Scanner() {
+    public Scanner() {
         Set<Class<? extends Transformable>> classes = new Reflections().getSubTypesOf(Transformable.class);
         Iterator<Class<? extends Transformable>> iterator = classes.iterator();
 
@@ -92,143 +85,180 @@ public class Scanner {
      * @return
      */
     public Field scan(String content, boolean original) {
-        String name;
+        String fieldName;
         Field field;
         Transformable instance = null;
 
+        //Identifies if should parse content.
         if (content.contains("::")) {
-            String chunck = "";
-            boolean partial = false;
             List<String> parameters = new ArrayList();
-            List<String> functionListParameterItem = new ArrayList();
+            List<String> transformationClassParameterListItem = new ArrayList();
 
-            name = StringUtils.substringBefore(content, "::");
+            //Sets an ID for each transformation. 
+            String id = DigestUtils.md5Hex(content).toUpperCase();
 
-            if (name.isEmpty()) {
-                name = "anonymous_" + UUID.randomUUID();
-            }
+            //Identifies if a field name was provided.
+            fieldName = StringUtils.substringBefore(content, "::");
 
-            String function = StringUtils.substringAfter(content, "::");
-            String functionName = StringUtils.substringBefore(function, "(").toLowerCase();
-            String functionParameter = StringUtils.substringBeforeLast(StringUtils.substringAfter(function, "("), ")");
-            String functionListParameter = StringUtils.substringBefore(StringUtils.substringAfter(functionParameter, "["), "]");
-            String[] functionListParameterChunck = StringUtils.split(functionListParameter, ',');
+            //Defines the field name as anonymous plus transformation ID if it was not provided.
+            fieldName = fieldName.isEmpty() ? ("anonymous_" + id) : fieldName;
 
-            for (String string : functionListParameterChunck) {
-                if (string.contains("(") && string.contains(")")) {
-                    functionListParameterItem.add(string);
-                } else if (string.contains("(")) {
-                    partial = true;
-                    chunck = string + ",";
-                } else if (partial && !(string.contains("(") || string.contains(")"))) {
-                    chunck += string + ",";
-                } else if (string.contains(")") && partial) {
-                    partial = false;
-                    functionListParameterItem.add(chunck + string);
-                    chunck = "";
-                } else {
-                    functionListParameterItem.add(string);
-                }
-            }
-
-            if (functionParameter.startsWith("{") && functionParameter.endsWith("}")) {
-                parameters.add(
-                        functionParameter
-                                .replace("{", "")
-                                .replace("}", "")
-                );
+            //Identifies if it have a transformation instance in cache. 
+            if (transformationInstances.containsKey(id)) {
+                instance = transformationInstances.get(id);
             } else {
-                functionParameter = functionParameter.replace(
-                        functionListParameter,
-                        Base64.encodeBase64String(
-                                String.join("+", functionListParameterItem).getBytes()
-                        )
-                );
+                //Identifies each part of the function. 
+                String transformation = StringUtils.substringAfter(content, "::");
+                String tranformantionClass = StringUtils.substringBefore(transformation, "(").toLowerCase();
+                String transformationClassParameter = StringUtils.substringBeforeLast(StringUtils.substringAfter(transformation, "("), ")");
+                String transformationClassParameterList = StringUtils.substringBefore(StringUtils.substringAfter(transformationClassParameter, LIST_OPEN), LIST_CLOSE);
 
-                parameters = Arrays.asList(
-                        StringUtils
-                                .split(functionParameter, ',')
-                );
-            }
+                //Supports parameter parser. 
+                String token = null;
+                boolean partial = false;
 
-            if (this.transformations.containsKey(functionName)) {
-                try {
-                    Class<? extends Transformable> clazz = this.transformations.get(functionName);
-                    Constructor[] constructors = clazz.getDeclaredConstructors();
-
-                    if (constructors.length == 0) {
-                        instance = clazz.newInstance();
+                //Identifies each item in a parameter list.  
+                for (String string : StringUtils.split(transformationClassParameterList, ',')) {
+                    if (string.contains("(") && string.contains(")")) {
+                        transformationClassParameterListItem.add(string);
+                    } else if (string.contains("(")) {
+                        partial = true;
+                        token = string + ",";
+                    } else if (partial && !(string.contains("(") || string.contains(")"))) {
+                        token += string + ",";
+                    } else if (string.contains(")") && partial) {
+                        partial = false;
+                        transformationClassParameterListItem.add(token + string);
+                        token = "";
                     } else {
-                        for (Constructor constructor : constructors) {
-                            int functionParameterCount = parameters.size();
+                        transformationClassParameterListItem.add(string);
+                    }
+                }
 
-                            if (functionParameterCount == 0) {
-                                instance = clazz.newInstance();
-                                break;
-                            } else {
-                                if (constructor.getParameterCount() == functionParameterCount) {
-                                    List<Object> constructorParameters = new ArrayList();
+                //Identifies if any parameter should not be parsed.
+                if (transformationClassParameter.startsWith(FREEZE_OPEN)
+                        && transformationClassParameter.endsWith(FREEZE_CLOSE)) {
+                    //**...** identifies freezed parameter. 
+                    parameters.add(
+                            transformationClassParameter
+                                    .replace(FREEZE_OPEN, "")
+                                    .replace(FREEZE_CLOSE, ""));
+                } else {
+                    //Otherwise, it encode parameters using encodeBase64String to avoid break the parser. 
+                    parameters = Arrays.asList(
+                            StringUtils.split(
+                                    transformationClassParameter = transformationClassParameter.replace(
+                                            transformationClassParameterList,
+                                            Base64.encodeBase64String(
+                                                    String.join("+", transformationClassParameterListItem).getBytes()
+                                            )
+                                    ), ','));
 
-                                    for (int i = 0; i < functionParameterCount; i++) {
-                                        switch (constructor.getParameterTypes()[i].getSimpleName()) {
-                                            case "List":
-                                                List<Field> fieldList = new ArrayList();
+                    for (int i = 0; i < parameters.size(); i++) {
+                        if (parameters.get(i).startsWith(FREEZE_OPEN)
+                                && parameters.get(i).endsWith(FREEZE_OPEN)) {
 
-                                                for (String parameter : parameters) {
-                                                    if (parameter.startsWith("[") && parameter.endsWith("]")) {
-                                                        String[] fields = new String(
-                                                                Base64.decodeBase64(
-                                                                        parameter.replace("[", "").replace("]", ""))
-                                                        ).split("\\+");
+                            //**...** identifies freezed parameter. 
+                            parameters.set(i, parameters.get(i)
+                                    .replace(FREEZE_OPEN, "")
+                                    .replace(FREEZE_OPEN, ""));
+                        }
+                    }
+                }
 
-                                                        for (String parameterField : fields) {
-                                                            fieldList.add(this.scan(parameterField));
+                //Identifies which transformation should be runned. 
+                if (this.transformations.containsKey(tranformantionClass)) {
+                    try {
+                        //Instantiate transformation class by it name. 
+                        Class<? extends Transformable> clazz = this.transformations.get(tranformantionClass);
+                        Constructor[] constructors = clazz.getDeclaredConstructors();
+
+                        //Identifies if the transformation has parameter. 
+                        if (constructors.length == 0) {
+                            instance = clazz.newInstance();
+                        } else {
+                            //Iterates each transformation constructors. 
+                            for (Constructor constructor : constructors) {
+                                int transformationParameterNumber = parameters.size();
+
+                                //Identifies parameter number on each constructor. 
+                                if (transformationParameterNumber == 0) {
+                                    instance = clazz.newInstance();
+                                    break;
+                                } else {
+                                    if (constructor.getParameterCount() == transformationParameterNumber) {
+                                        List<Object> constructorParameters = new ArrayList();
+
+                                        //Iterates each constructor parameter. 
+                                        for (int i = 0; i < transformationParameterNumber; i++) {
+                                            //Identifies each parameter type. 
+                                            switch (constructor.getParameterTypes()[i].getSimpleName()) {
+                                                case "List":
+                                                    List<Field> fieldList = new ArrayList();
+
+                                                    for (String parameter : parameters) {
+                                                        //If the parameter is a list, it should be decoded using decodeBase64. 
+                                                        if (parameter.startsWith(LIST_OPEN)
+                                                                && parameter.endsWith(LIST_CLOSE)) {
+                                                            String[] fields = new String(
+                                                                    Base64.decodeBase64(
+                                                                            parameter.replace(LIST_OPEN, "").replace(LIST_CLOSE, ""))
+                                                            ).split("\\+");
+
+                                                            for (String parameterField : fields) {
+                                                                fieldList.add(this.scan(parameterField));
+                                                            }
                                                         }
                                                     }
-                                                }
 
-                                                constructorParameters.add(fieldList);
-                                                break;
-                                            case "Field":
-                                                constructorParameters.add(this.scan(parameters.get(i)));
-                                            case "String":
-                                                constructorParameters.add(parameters.get(i));
-                                                break;
-                                            default:
-                                                if (constructor.getParameterTypes()[i].isPrimitive()) {
-                                                    Method method = constructor
-                                                            .getParameterTypes()[i]
-                                                            .getDeclaredMethod("valueOf", String.class);
-                                                    constructorParameters.add(method.invoke(parameters.get(i)));
-                                                }
+                                                    constructorParameters.add(fieldList);
+                                                    break;
+                                                case "Field":
+                                                    constructorParameters.add(this.scan(parameters.get(i)));
+                                                case "String":
+                                                    constructorParameters.add(parameters.get(i));
+                                                    break;
+                                                default:
+                                                    if (constructor.getParameterTypes()[i].isPrimitive()) {
+                                                        Method method = constructor
+                                                                .getParameterTypes()[i]
+                                                                .getDeclaredMethod("valueOf", String.class);
+                                                        constructorParameters.add(method.invoke(parameters.get(i)));
+                                                    }
 
-                                                break;
+                                                    break;
+                                            }
                                         }
-                                    }
 
-                                    instance = (Transformable) constructor.newInstance(constructorParameters.toArray());
+                                        instance = (Transformable) constructor.newInstance(constructorParameters.toArray());
+                                    }
                                 }
                             }
                         }
-                    }
-                } catch (InstantiationException
-                        | IllegalAccessException
-                        | IllegalArgumentException
-                        | InvocationTargetException
-                        | NoSuchMethodException
-                        | SecurityException ex) {
 
-                    Logger.getLogger(Scanner.class.getName()).log(Level.SEVERE, "Fail evaluating transformation " + functionName + " with parameter  " + functionParameter, ex);
+                        //Puts instance of each transformation in cache.  
+                        if (instance != null) {
+                            transformationInstances.put(id, instance);
+                        }
+                    } catch (InstantiationException
+                            | IllegalAccessException
+                            | IllegalArgumentException
+                            | InvocationTargetException
+                            | NoSuchMethodException
+                            | SecurityException ex) {
+
+                        Logger.getLogger(Scanner.class.getName()).log(Level.SEVERE, "Fail evaluating transformation " + tranformantionClass + " with parameter  " + transformationClassParameter, ex);
+                    }
                 }
             }
         } else {
-            name = content;
+            fieldName = content;
         }
 
         if (instance == null) {
-            field = new Field(name);
+            field = new Field(fieldName);
         } else {
-            field = new Field(name, instance, original);
+            field = new Field(fieldName, instance, original);
         }
 
         return field;
