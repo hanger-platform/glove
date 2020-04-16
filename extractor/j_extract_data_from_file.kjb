@@ -556,14 +556,16 @@ else
 				cat ${i}	>> 	${RAWFILE_QUEUE_SAMPLE_FILE}
 				error_check
 			else
-				SAMPLE_FILE_RECORD=`cat ${RAWFILE_QUEUE_SAMPLE_FILE} | wc -l`
+				#SAMPLE_FILE_RECORD=`cat ${RAWFILE_QUEUE_SAMPLE_FILE} | wc -l`
 			
-				if [ ${SAMPLE} -gt ${SAMPLE_FILE_RECORD} ]; then
-					sed '1d' ${i} >> ${RAWFILE_QUEUE_SAMPLE_FILE}	
-					error_check	
-				else
-					break
-				fi
+				# if [ ${SAMPLE} -gt ${SAMPLE_FILE_RECORD} ]; then
+				#	  sed '1d' ${i} >> ${RAWFILE_QUEUE_SAMPLE_FILE}	
+				#	  error_check	
+				# else
+				#	  break
+				# fi
+        
+        break
 			fi
 
 			FILE_INDEX=$(( $FILE_INDEX + 1 ))
