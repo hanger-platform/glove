@@ -41,7 +41,7 @@ REDSHIFT_JDBC_PASSWORD=<Password>
 SPECTRUM_ROLE=<Role>
 
 # Redshift Unload and Copy credentials. 
-REDSHIFT_UNLOAD_COPY_AUTHENTICATION=<CREDENTIALS'aws_access_key_id=XXX;aws_secret_access_key=YYY' ou IAM_ROLE 'arn:aws:iam::XXX:role/YYY' >
+REDSHIFT_UNLOAD_COPY_AUTHENTICATION=<CREDENTIALS\ \'aws_access_key_id=XXX;aws_secret_access_key=YYY\' ou IAM_ROLE\ \'arn:aws:iam::XXX:role/YYY\' >
  
 # Google Cloud SDK
 GOOGLE_TOOLS_HOME=<Google Cloud SDK path>
