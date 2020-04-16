@@ -550,6 +550,9 @@ else
 
 	for i in `ls ${RAWFILE_QUEUE_PATH}*`
 	do
+		echo ${FILE_INDEX}
+		echo ${i}
+
 		# Get samples data to extract metadata. 
 		if [ ${FILE_INDEX} = 0 ]; then	
 			cat ${i}	>> 	${RAWFILE_QUEUE_SAMPLE_FILE}
