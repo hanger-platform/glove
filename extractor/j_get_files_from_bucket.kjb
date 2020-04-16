@@ -358,7 +358,7 @@ if [ "${FILE_INPUT_BUCKET}" != "" ]; then
 
 	#Identifies if there are files to process.
 	if [ ${FILE_COUNT} -gt 0 ]; then
-		cp ${FILE_INPUT_BUCKET}*.${FILE_INPUT_EXTENSION} ${RAWFILE_QUEUE_STAGING_PATH}
+		cp ${FILE_INPUT_BUCKET}* ${RAWFILE_QUEUE_STAGING_PATH}
 		error_check	
 	
 		#Identifies if FILE_OUTPUT_MODE is APPEND. 
