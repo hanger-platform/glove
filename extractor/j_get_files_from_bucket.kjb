@@ -376,27 +376,29 @@ if [ "${FILE_INPUT_BUCKET}" != "" ]; then
 
 		for i in `ls ${RAWFILE_QUEUE_STAGING_PATH}*`
 		do
-			if [[ ${FILE_OUTPUT_MODE} == "append" &amp;&amp; "${#FILE_INPUT_PARTITONED}" -eq "0" ]]; then	
-				echo "Copying file ${i} to ${RAWFILE_QUEUE_PATH}"
-				mv ${i}	${RAWFILE_QUEUE_PATH}${SCHEMA_NAME}_${TABLE_NAME}_$(basename "${i}")
-				error_check			
-			else
-				if [ ${FILE_INDEX} = 0 ]; then	
-					cat ${i} >>	${RAWFILE_QUEUE_FILE}
-					error_check
+			if [ -f "${i}" ]; then
+				if [[ ${FILE_OUTPUT_MODE} == "append" &amp;&amp; "${#FILE_INPUT_PARTITONED}" -eq "0" ]]; then	
+					echo "Copying file ${i} to ${RAWFILE_QUEUE_PATH}"
+					mv ${i}	${RAWFILE_QUEUE_PATH}${SCHEMA_NAME}_${TABLE_NAME}_$(basename "${i}")
+					error_check			
 				else
-					#Avoid merging CSV file when FILE_INPUT_PARTITONED. 
-					if [ "${#FILE_INPUT_PARTITONED}" -gt "0" ]; then
-						mv ${i}	${RAWFILE_QUEUE_PATH}${SCHEMA_NAME}_${TABLE_NAME}_${FILE_INDEX}.csv
+					if [ ${FILE_INDEX} = 0 ]; then	
+						cat ${i} >>	${RAWFILE_QUEUE_FILE}
 						error_check
 					else
-						echo "Merging file ${i} in ${RAWFILE_QUEUE_FILE}"
-						sed '1d' ${i} >> ${RAWFILE_QUEUE_FILE}	
-						error_check	
+						#Avoid merging CSV file when FILE_INPUT_PARTITONED. 
+						if [ "${#FILE_INPUT_PARTITONED}" -gt "0" ]; then
+							mv ${i}	${RAWFILE_QUEUE_PATH}${SCHEMA_NAME}_${TABLE_NAME}_${FILE_INDEX}.csv
+							error_check
+						else
+							echo "Merging file ${i} in ${RAWFILE_QUEUE_FILE}"
+							sed '1d' ${i} >> ${RAWFILE_QUEUE_FILE}	
+							error_check	
+						fi
 					fi
-				fi
 
-				FILE_INDEX=$(( $FILE_INDEX + 1 ))
+					FILE_INDEX=$(( $FILE_INDEX + 1 ))
+				fi
 			fi
 		done	
 	else
