@@ -311,8 +311,6 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 	echo "Generating manifest file!"
 	mkdir -p ${RAWFILE_QUEUE_MANIFEST_PATH}
 	
-	echo ${REDSHIFT_UNLOAD_COPY_AUTHENTICATION}
-	
 	echo { > ${RAWFILE_QUEUE_MANIFEST_PATH}${DATA_FILE}.manifest
 	echo  -e '\t' \"entries\": [ >> ${RAWFILE_QUEUE_MANIFEST_PATH}${DATA_FILE}.manifest
 	
