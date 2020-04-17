@@ -55,38 +55,18 @@ public class OutputProcessor implements Runnable {
 
     /**
      *
-     * @param input
-     * @param parser
-     * @param writer
-     * @param readerSettings
-     * @param writerSettings
-     */
-    public OutputProcessor(
-            File input,
-            Parser parser,
-            CsvWriter writer,
-            ReaderSettings readerSettings,
-            WriterSettings writerSettings) {
-
-        this.input = input;
-        this.parser = parser;
-        this.writer = writer;
-        this.readerSettings = readerSettings;
-        this.writerSettings = writerSettings;
-    }
-
-    /**
-     *
-     * @param input
      * @param configuration
      * @param readerSettings
      * @param writerSettings
+     * @param input
+     * @param parallel
      */
     public OutputProcessor(
-            File input,
             Configuration configuration,
             ReaderSettings readerSettings,
-            WriterSettings writerSettings) {
+            WriterSettings writerSettings,
+            File input,
+            boolean parallel) {
 
         this.input = input;
         this.parser = new Parser(configuration);
@@ -104,7 +84,11 @@ public class OutputProcessor implements Runnable {
         setting.setHeaders(parser.getConfiguration().getFieldsName(true).toArray(new String[0]));
 
         //Defines the writer. 
-        this.writer = new CsvWriter(new File(writerSettings.getOutputFile().getAbsolutePath() + "/" + input.getName()), setting);
+        if (!parallel) {
+            this.writer = new CsvWriter(writerSettings.getOutputFile(), setting);
+        } else {
+            this.writer = new CsvWriter(new File(writerSettings.getOutputFile().getAbsolutePath() + "/" + input.getName()), setting);
+        }
     }
 
     /**
@@ -113,11 +97,35 @@ public class OutputProcessor implements Runnable {
     @Override
     public void run() {
         this.write();
+        this.close();
+    }
 
-        if (this.writer != null) {
-            this.writer.flush();
-            this.writer.close();
-        }
+    /**
+     *
+     * @return
+     */
+    public CsvWriter getWriter() {
+        return writer;
+    }
+
+    /**
+     *
+     * @param record
+     */
+    public void write(List<Object> record) {
+        this.getWriter()
+                .writeRow(
+                        parser.evaluate(record));
+    }
+
+    /**
+     *
+     * @param record
+     */
+    public void write(Object[] record) {
+        this.write(
+                Arrays.asList(record)
+        );
     }
 
     /**
@@ -217,6 +225,16 @@ public class OutputProcessor implements Runnable {
         //Idenfies if the input file should be removed. 
         if (readerSettings.isRemove()) {
             input.delete();
+        }
+    }
+
+    /**
+     *
+     */
+    public void close() {
+        if (this.writer != null) {
+            this.writer.flush();
+            this.writer.close();
         }
     }
 }

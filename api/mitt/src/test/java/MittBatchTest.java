@@ -42,7 +42,5 @@ public class MittBatchTest {
         mitt.getConfiguration().addField(Arrays.asList(xxx.split("\\+")));
 
         mitt.write(new File("/home/valdiney/Downloads/"), "*.csv");
-
-        mitt.close();
     }
 }
