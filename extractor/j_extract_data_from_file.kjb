@@ -553,7 +553,7 @@ else
 		if [ -f "${i}" ]; then
 			# Get samples data to extract metadata. 
 			if [ ${FILE_INDEX} = 0 ]; then	
-				cat ${i}	>> 	${RAWFILE_QUEUE_SAMPLE_FILE}
+				head -n ${SAMPLE} ${i} > ${RAWFILE_QUEUE_SAMPLE_FILE} 
 				error_check
 			else
 				SAMPLE_FILE_RECORD=`cat ${RAWFILE_QUEUE_SAMPLE_FILE} | wc -l`
