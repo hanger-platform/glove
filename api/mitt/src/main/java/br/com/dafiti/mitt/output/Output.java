@@ -100,23 +100,19 @@ public class Output {
      * @param files
      */
     public void write(File[] files) {
-        File[] garbage;
         File outputFile = writerSettings.getOutputFile();
         boolean parallel = FilenameUtils.getExtension(outputFile.getName()).isEmpty();
 
         //Identifies if there are trash. 
         if (outputFile.isDirectory()) {
-            garbage = outputFile.listFiles(new PatternFilenameFilter(".+\\.csv"));
-        } else {
-            garbage = outputFile.getParentFile().listFiles(new PatternFilenameFilter(".+\\.csv"));
-        }
+            File[] garbage = outputFile.listFiles(new PatternFilenameFilter(".+\\.csv"));
 
-        //Clean ups the output directory.
-        for (File file : garbage) {
-            try {
-                Files.deleteIfExists(file.toPath());
-            } catch (IOException ex) {
-                Logger.getLogger(Output.class.getName()).log(Level.SEVERE, "Fail deleting file " + file.getName(), ex);
+            for (File file : garbage) {
+                try {
+                    Files.deleteIfExists(file.toPath());
+                } catch (IOException ex) {
+                    Logger.getLogger(Output.class.getName()).log(Level.SEVERE, "Fail deleting file " + file.getName(), ex);
+                }
             }
         }
 
