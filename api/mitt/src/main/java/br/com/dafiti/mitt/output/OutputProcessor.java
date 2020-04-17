@@ -47,7 +47,7 @@ import org.mozilla.universalchardet.UniversalDetector;
  */
 public class OutputProcessor implements Runnable {
 
-    private final File input;
+    private File input;
     private final Parser parser;
     private final CsvWriter writer;
     private final ReaderSettings readerSettings;
@@ -58,22 +58,49 @@ public class OutputProcessor implements Runnable {
      * @param configuration
      * @param readerSettings
      * @param writerSettings
+     */
+    public OutputProcessor(
+            Configuration configuration,
+            ReaderSettings readerSettings,
+            WriterSettings writerSettings) {
+
+        this.parser = new Parser(configuration);
+        this.readerSettings = readerSettings;
+        this.writerSettings = writerSettings;
+
+        this.writer = new CsvWriter(
+                writerSettings.getOutputFile(),
+                this.getCSVSettings());
+    }
+
+    /**
+     *
+     * @param configuration
+     * @param readerSettings
+     * @param writerSettings
      * @param input
-     * @param parallel
      */
     public OutputProcessor(
             Configuration configuration,
             ReaderSettings readerSettings,
             WriterSettings writerSettings,
-            File input,
-            boolean parallel) {
+            File input) {
 
         this.input = input;
         this.parser = new Parser(configuration);
         this.readerSettings = readerSettings;
         this.writerSettings = writerSettings;
 
-        //Sets the writer settings. 
+        this.writer = new CsvWriter(
+                new File(writerSettings.getOutputFile().getAbsolutePath() + "/" + input.getName()),
+                this.getCSVSettings());
+    }
+
+    /**
+     *
+     * @return
+     */
+    private CsvWriterSettings getCSVSettings() {
         CsvWriterSettings setting = new CsvWriterSettings();
         setting.getFormat().setDelimiter(writerSettings.getDelimiter());
         setting.getFormat().setQuote(writerSettings.getQuote());
@@ -83,21 +110,23 @@ public class OutputProcessor implements Runnable {
         setting.setHeaderWritingEnabled(true);
         setting.setHeaders(parser.getConfiguration().getFieldsName(true).toArray(new String[0]));
 
-        //Defines the writer. 
-        if (!parallel) {
-            this.writer = new CsvWriter(writerSettings.getOutputFile(), setting);
-        } else {
-            this.writer = new CsvWriter(new File(writerSettings.getOutputFile().getAbsolutePath() + "/" + input.getName()), setting);
-        }
+        return setting;
     }
 
     /**
      *
+     * @return
      */
-    @Override
-    public void run() {
-        this.write();
-        this.close();
+    public File getInput() {
+        return input;
+    }
+
+    /**
+     *
+     * @param input
+     */
+    public void setInput(File input) {
+        this.input = input;
     }
 
     /**
@@ -126,6 +155,15 @@ public class OutputProcessor implements Runnable {
         this.write(
                 Arrays.asList(record)
         );
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void run() {
+        this.write();
+        this.close();
     }
 
     /**

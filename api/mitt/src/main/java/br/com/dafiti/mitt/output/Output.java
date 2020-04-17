@@ -87,9 +87,7 @@ public class Output {
             outputProcessor = new OutputProcessor(
                     configuration,
                     readerSettings,
-                    writerSettings,
-                    null,
-                    false);
+                    writerSettings);
         }
 
         return outputProcessor;
@@ -128,8 +126,7 @@ public class Output {
                             configuration,
                             readerSettings,
                             writerSettings,
-                            file,
-                            true));
+                            file));
                 }
             }
 
@@ -151,11 +148,10 @@ public class Output {
                         processor = new OutputProcessor(
                                 configuration,
                                 readerSettings,
-                                writerSettings,
-                                file,
-                                false);
+                                writerSettings);
                     }
 
+                    processor.setInput(file);
                     processor.write();
                 }
             }
