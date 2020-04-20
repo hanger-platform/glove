@@ -40,7 +40,7 @@ public class FactoryDecoder {
             case "zip":
                 decoder = new ZipDecoder();
                 break;
-            case "gzip":
+            case "gz":
                 decoder = new GZipDecoder();
                 break;
             case "avro":

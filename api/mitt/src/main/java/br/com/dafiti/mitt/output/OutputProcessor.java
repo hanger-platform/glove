@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.io.FilenameUtils;
 import org.mozilla.universalchardet.UniversalDetector;
 
 /**
@@ -94,7 +95,7 @@ public class OutputProcessor implements Runnable {
         this.writerSettings = writerSettings;
 
         this.writer = new CsvWriter(
-                new File(writerSettings.getOutputFile().getAbsolutePath() + "/" + input.getName()),
+                new File(writerSettings.getOutputFile().getAbsolutePath() + "/" + FilenameUtils.removeExtension(input.getName()) + ".csv"),
                 this.getCSVSettings());
     }
 
