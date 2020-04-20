@@ -146,37 +146,6 @@ public class S3 {
                             throw new AmazonClientException("Fail downloading object" + cli.getParameter("bucket") + "/" + s3ObjectSummary.getKey() + " with state " + transferState.name() + "!");
                         }
                     }
-
-                    //Identifies if file is compressed.
-                    File uncompressed;
-                    String extension = FilenameUtils.getExtension(outputFile.getName());
-
-                    switch (extension) {
-                        case "gz":
-                            GZIPInputStream gzip = new GZIPInputStream(new FileInputStream(outputFile));
-                            uncompressed = new File(outputFile.getParent() + "/" + FilenameUtils.removeExtension(outputFile.getName()));
-
-                            try (OutputStream outputStream = Files.newOutputStream(uncompressed.toPath())) {
-                                IOUtils.copy(gzip, outputStream);
-                            }
-
-                            Files.delete(outputFile.toPath());
-                            break;
-                        case "zip":
-                            ZipEntry zipEntry;
-                            ZipInputStream zip = new ZipInputStream(new FileInputStream(outputFile));
-
-                            while ((zipEntry = zip.getNextEntry()) != null) {
-                                uncompressed = new File(outputFile.getParent() + "/" + zipEntry.getName());
-
-                                try (OutputStream outputStream = Files.newOutputStream(uncompressed.toPath())) {
-                                    IOUtils.copy(zip, outputStream);
-                                }
-                            }
-
-                            Files.delete(outputFile.toPath());
-                            break;
-                    }
                 }
             }
 
