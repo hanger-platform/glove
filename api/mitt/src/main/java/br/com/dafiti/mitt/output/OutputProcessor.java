@@ -23,6 +23,8 @@
  */
 package br.com.dafiti.mitt.output;
 
+import br.com.dafiti.mitt.decoder.Decoder;
+import br.com.dafiti.mitt.decoder.FactoryDecoder;
 import br.com.dafiti.mitt.model.Configuration;
 import br.com.dafiti.mitt.settings.ReaderSettings;
 import br.com.dafiti.mitt.settings.WriterSettings;
@@ -176,6 +178,13 @@ public class OutputProcessor implements Runnable {
 
         //Identifies which file are being read. 
         parser.setFile(input);
+
+        //Identifies if should decode the input file.
+        Decoder decoder = FactoryDecoder.getDecoder(input);
+
+        if (decoder != null) {
+            this.setInput(decoder.decode(input));
+        }
 
         //Sets the reader settings. 
         CsvParserSettings setting = new CsvParserSettings();

@@ -70,7 +70,7 @@ public class MittTest {
         cli.getParameter("primeiro");
         cli.getParameterAsList("segundo", "\\+");
 
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 10; i++) {
             List<Object> data = new ArrayList();
             data.add(i);
             data.add("A" + i);
