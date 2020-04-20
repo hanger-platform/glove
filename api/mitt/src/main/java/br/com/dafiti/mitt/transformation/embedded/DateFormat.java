@@ -71,10 +71,18 @@ public class DateFormat implements Transformable {
                 value = new SimpleDateFormat(outputFormat).format(date);
             } else {
                 try {
-                    value = new SimpleDateFormat(outputFormat)
-                            .format(
-                                    new SimpleDateFormat(inputFormat)
-                                            .parse((String) date));
+                    if (inputFormat.equalsIgnoreCase("UNIXTIMEMILLIS")) {
+                        value = new SimpleDateFormat(outputFormat)
+                                .format(new Date(Long.valueOf((String) date)));
+                    } else if (inputFormat.equalsIgnoreCase("UNIXTIME")) {
+                        value = new SimpleDateFormat(outputFormat)
+                                .format(new Date(Long.valueOf((String) date) * 1000L));
+                    } else {
+                        value = new SimpleDateFormat(outputFormat)
+                                .format(
+                                        new SimpleDateFormat(inputFormat)
+                                                .parse((String) date));
+                    }
                 } catch (ParseException ex) {
                     Logger.getLogger(DateFormat.class.getName()).log(Level.SEVERE, "Error converting data " + date, ex);
                 }
