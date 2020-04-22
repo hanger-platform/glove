@@ -110,11 +110,13 @@ public class Output {
         }
 
         //Clean ups the output directory.
-        for (File file : garbage) {
-            try {
-                Files.deleteIfExists(file.toPath());
-            } catch (IOException ex) {
-                Logger.getLogger(Output.class.getName()).log(Level.SEVERE, "Fail deleting file " + file.getName(), ex);
+        if (garbage != null) {
+            for (File file : garbage) {
+                try {
+                    Files.deleteIfExists(file.toPath());
+                } catch (IOException ex) {
+                    Logger.getLogger(Output.class.getName()).log(Level.SEVERE, "Fail deleting file " + file.getName(), ex);
+                }
             }
         }
 
