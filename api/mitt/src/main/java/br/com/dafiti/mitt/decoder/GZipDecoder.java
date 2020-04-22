@@ -25,7 +25,6 @@ package br.com.dafiti.mitt.decoder;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
