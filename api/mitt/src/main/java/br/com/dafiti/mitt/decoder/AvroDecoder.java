@@ -45,6 +45,33 @@ import org.apache.commons.io.FilenameUtils;
  */
 public class AvroDecoder implements Decoder {
 
+    private static GenericData data;
+    private static AvroDecoder instance;
+
+    /**
+     *
+     */
+    private AvroDecoder() {
+        data = new GenericDatumReader<>().getData();
+    }
+
+    /**
+     *
+     * @return
+     */
+    public static AvroDecoder getInstance() {
+        if (instance == null) {
+            synchronized (AvroDecoder.class) {
+                if (instance == null) {
+                    instance = new AvroDecoder();
+                }
+
+            }
+        }
+
+        return instance;
+    }
+
     /**
      *
      * @param file
@@ -56,8 +83,9 @@ public class AvroDecoder implements Decoder {
 
         try {
             //Defines a generic reader.   
-            GenericDatumReader<GenericData.Record> datum = new GenericDatumReader<GenericData.Record>();
-            DataFileReader<GenericData.Record> reader = new DataFileReader<GenericData.Record>(file, datum);
+            DataFileReader<GenericData.Record> reader = new DataFileReader<>(
+                    file,
+                    new GenericDatumReader<>(null, null, this.data));
 
             //Extracts schema.
             Schema schema = reader.getSchema();
