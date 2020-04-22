@@ -26,6 +26,7 @@ package br.com.dafiti.mitt;
 import br.com.dafiti.mitt.cli.CommandLineInterface;
 import br.com.dafiti.mitt.model.Configuration;
 import br.com.dafiti.mitt.output.Output;
+import br.com.dafiti.mitt.output.OutputProcessor;
 import br.com.dafiti.mitt.settings.ReaderSettings;
 import br.com.dafiti.mitt.settings.WriterSettings;
 import java.io.File;
@@ -39,14 +40,13 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
  */
 public class Mitt {
 
+    private boolean debug = false;
     private Output output;
-    private File outputFile;
+    private OutputProcessor outputProcessor;
     private Configuration configuration;
     private ReaderSettings readerSettings;
     private WriterSettings writerSettings;
     private CommandLineInterface commandLineInterface;
-
-    private boolean debug = false;
 
     /**
      *
@@ -63,6 +63,33 @@ public class Mitt {
      */
     public void setDebug(boolean debug) {
         this.debug = debug;
+    }
+
+    /**
+     *
+     * @return
+     */
+    private Output getOutput() {
+        if (output == null) {
+            output = new Output(
+                    this.getConfiguration(),
+                    this.getReaderSettings(),
+                    this.getWriterSettings());
+        }
+
+        return output;
+    }
+
+    /**
+     *
+     * @return
+     */
+    private OutputProcessor getOutputProcessor() {
+        if (outputProcessor == null) {
+            outputProcessor = this.getOutput().getOutputProcessor();
+        }
+
+        return outputProcessor;
     }
 
     /**
@@ -118,25 +145,10 @@ public class Mitt {
 
     /**
      *
-     * @return
-     */
-    private Output getWriter() {
-        if (output == null) {
-            output = new Output(
-                    this.getConfiguration(),
-                    this.getReaderSettings(),
-                    this.getWriterSettings());
-        }
-
-        return output;
-    }
-
-    /**
-     *
      * @param record
      */
     public void write(List record) {
-        this.getWriter().write(record);
+        this.getOutputProcessor().write(record);
     }
 
     /**
@@ -144,7 +156,7 @@ public class Mitt {
      * @param record
      */
     public void write(String[] record) {
-        this.getWriter().write(record);
+        this.getOutputProcessor().write(record);
     }
 
     /**
@@ -173,7 +185,7 @@ public class Mitt {
         }
 
         if (files != null) {
-            this.getWriter().write(files);
+            this.getOutput().write(files);
         }
     }
 
@@ -181,8 +193,10 @@ public class Mitt {
      *
      */
     public void close() {
-        if (outputFile != null) {
-            this.getWriter().close();
+        if (this.getWriterSettings().getOutputFile() != null) {
+            if (outputProcessor != null) {
+                outputProcessor.close();
+            }
         }
     }
 }

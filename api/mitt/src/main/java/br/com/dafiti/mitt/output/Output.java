@@ -23,18 +23,14 @@
  */
 package br.com.dafiti.mitt.output;
 
-import br.com.dafiti.mitt.transformation.Parser;
 import br.com.dafiti.mitt.model.Configuration;
 import br.com.dafiti.mitt.settings.ReaderSettings;
 import br.com.dafiti.mitt.settings.WriterSettings;
 import com.google.common.io.PatternFilenameFilter;
 import com.univocity.parsers.csv.CsvWriter;
-import com.univocity.parsers.csv.CsvWriterSettings;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -49,7 +45,7 @@ import org.apache.commons.io.FilenameUtils;
 public class Output {
 
     private CsvWriter writer;
-    private final Parser parser;
+    private OutputProcessor outputProcessor;
     private final Configuration configuration;
     private final ReaderSettings readerSettings;
     private final WriterSettings writerSettings;
@@ -68,26 +64,15 @@ public class Output {
         this.configuration = configuration;
         this.readerSettings = readerSettings;
         this.writerSettings = writerSettings;
-        this.parser = new Parser(configuration);
     }
 
     /**
      *
-     * @param output
      * @return
      */
-    private CsvWriter getWriter() {
+    public CsvWriter getWriter() {
         if (writer == null) {
-            CsvWriterSettings setting = new CsvWriterSettings();
-            setting.getFormat().setDelimiter(writerSettings.getDelimiter());
-            setting.getFormat().setQuote(writerSettings.getQuote());
-            setting.getFormat().setQuoteEscape(writerSettings.getQuoteEscape());
-            setting.setNullValue("");
-            setting.setMaxCharsPerColumn(-1);
-            setting.setHeaderWritingEnabled(true);
-            setting.setHeaders(parser.getConfiguration().getFieldsName(true).toArray(new String[0]));
-
-            writer = new CsvWriter(writerSettings.getOutputFile(), setting);
+            writer = this.getOutputProcessor().getWriter();
         }
 
         return writer;
@@ -95,46 +80,17 @@ public class Output {
 
     /**
      *
-     * @param record
+     * @return
      */
-    public void write(List<Object> record) {
-        this.getWriter()
-                .writeRow(
-                        parser.evaluate(record));
-    }
+    public OutputProcessor getOutputProcessor() {
+        if (outputProcessor == null) {
+            outputProcessor = new OutputProcessor(
+                    configuration,
+                    readerSettings,
+                    writerSettings);
+        }
 
-    /**
-     *
-     * @param record
-     */
-    public void write(Object[] record) {
-        this.write(
-                Arrays.asList(record)
-        );
-    }
-
-    /**
-     *
-     * @param writer
-     * @param record
-     */
-    public void write(CsvWriter writer, Object[] record) {
-        writer.writeRow(
-                parser.evaluate(
-                        Arrays.asList(record)));
-    }
-
-    /**
-     *
-     * @param file
-     */
-    public void write(File file) {
-        new OutputProcessor(
-                file,
-                parser,
-                this.getWriter(),
-                readerSettings,
-                writerSettings).write();
+        return outputProcessor;
     }
 
     /**
@@ -142,14 +98,19 @@ public class Output {
      * @param files
      */
     public void write(File[] files) {
+        File[] garbage;
         File outputFile = writerSettings.getOutputFile();
         boolean parallel = FilenameUtils.getExtension(outputFile.getName()).isEmpty();
-        ExecutorService executor = Executors.newFixedThreadPool(writerSettings.getThreadPool());
 
-        //Remove old files from the output folder. 
+        //Identifies if there are trash. 
         if (outputFile.isDirectory()) {
-            File[] garbage = outputFile.listFiles(new PatternFilenameFilter(".+\\.csv"));
+            garbage = outputFile.listFiles(new PatternFilenameFilter(".+\\.csv"));
+        } else {
+            garbage = outputFile.getParentFile().listFiles(new PatternFilenameFilter(".+\\.csv"));
+        }
 
+        //Clean ups the output directory.
+        if (garbage != null) {
             for (File file : garbage) {
                 try {
                     Files.deleteIfExists(file.toPath());
@@ -159,38 +120,51 @@ public class Output {
             }
         }
 
-        //Process each input file. 
-        for (File file : files) {
-            //Empty file should be ignored. 
-            if (file.length() != 0) {
-                if (parallel) {
+        //Identifies if is a parallel process. 
+        if (parallel) {
+            ExecutorService executor = Executors.newFixedThreadPool(writerSettings.getThreadPool());
+
+            //Process each input file. 
+            for (File file : files) {
+                //Empty file should be ignored. 
+                if (file.length() != 0) {
                     executor.execute(new OutputProcessor(
-                            file,
                             configuration,
                             readerSettings,
-                            writerSettings));
-                } else {
-                    this.write(file);
+                            writerSettings,
+                            file));
                 }
             }
-        }
 
-        executor.shutdown();
+            executor.shutdown();
 
-        try {
-            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(Output.class.getName()).log(Level.SEVERE, "Fail waiting executor termination", ex);
-        }
-    }
+            try {
+                executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Output.class.getName()).log(Level.SEVERE, "Fail waiting executor termination", ex);
+            }
+        } else {
+            OutputProcessor processor = null;
 
-    /**
-     *
-     */
-    public void close() {
-        if (this.writer != null) {
-            this.writer.flush();
-            this.writer.close();
+            //Process each input file. 
+            for (File file : files) {
+                //Empty file should be ignored. 
+                if (file.length() != 0) {
+                    if (processor == null) {
+                        processor = new OutputProcessor(
+                                configuration,
+                                readerSettings,
+                                writerSettings);
+                    }
+
+                    processor.setInput(file);
+                    processor.write();
+                }
+            }
+
+            if (processor != null) {
+                processor.close();
+            }
         }
     }
 }

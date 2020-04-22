@@ -48,6 +48,10 @@ public class WriterSettings extends Settings {
     }
 
     public void setOutputFile(File outputFile) {
+        if (!outputFile.exists()) {
+            outputFile.mkdirs();
+        }
+
         this.outputFile = outputFile;
     }
 

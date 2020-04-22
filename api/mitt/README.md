@@ -12,6 +12,7 @@ O **MITT** é reponsável por encapsular a maioria das tarefas repetitivas envol
 - Geração de *command line interface* simplificada.
 - Definição de valores default para os parâmetros passados para a *command line interface*. 
 - Passagem de função como parâmetro na chamada do *command line interface*.
+- Suporte para arquivos csv, gz, zip ou avro.
 
 ## Instalação
 
@@ -76,13 +77,13 @@ Uma das principais características do MITT é a possibilidade de transformaçã
 | Transformation| Description| Example |
 |--|--|--|
 | **Concat** | Concatena dois ou mais campos | ::concat([[<campo\>,<campo\>]])|
-| **DateFormat**| Formata um campo do tipo data | ::dateformat(<campo\>,[formato_de_entrdada],<formato_de_saída\>)|
+| **DateFormat**| Formata um campo do tipo data | ::dateformat(<campo\>,[formato_de_entrada, para formato de entrada Unix Timestamp informar neste parâmetro UNIXTIME e caso o formato esteja em milissegundos informar UNIXTIMEMILLIS],<formato_de_saída\>)|
 | **Eval**| Transforma um campo usando funções do JavaScript | ::eval(\*\*<campo\>.replace('A','B')\*\*) |
 | **FarmFingerprint**| Aplica a função de hash FarmFingerprint em um ou mais campos | ::farmfingerprint([[<campo\>,<campo\>]]) |
 | **FileName**| Retorna o nome do arquivo que está sendo processado, quando o input for um arquivo  | ::filename() |
 | **Fixed**| Retorna uma valor fixo | ::fixed(oi) |
 | **MD5**| Aplica a função de hash MD5 em um ou mais campos | ::md5([[<campo\>,<campo\>]])|
-| **Now**| Retorna da data e hora corrente | ::now() |
+| **Now**| Retorna a data e hora corrente | ::now() |
 | **RegExp**| Extrai parte da informação de um campo usando RegExp | ::regexp(<campo\>,<regex\>) |
 | **Checksum**| Gera um hash utilizando MD5, SHA1 ou FARM_FINGERPRINT para a combinação de todos os campos originais de um registro | ::checksum(<algorítimo\>) |
 

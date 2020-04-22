@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.sftp.SFTP --host=files.dc2.responsys.net --credentials=/home/valdiney/responsys_br.sftp.json --directory="/home/cli/dafitibr_scp/CED FIles" --pattern=54206_OPEN_* --output=/tmp/open.csv --start_date=2019-10-08 --end_date=2019-10-09 --field=CUSTOMER_ID --delimiter=,</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.sftp.SFTP --host="sftp.ad4push.msp.fr.clara.net" --credentials="/home/valdiney/credentials/accengage.json" --directory="/exports" --pattern="exportDevices_519_*.csv" --output="/tmp/accengage/export_devices/xxx.csv" --start_date=2020-04-15 --end_date=2020-04-17 --field="--field=campo_valor_fixo::fixed(valor_fixo)+firstopen+opencount+model+version+::md5([[version]])+::concat([[opencount,model,version]])+version_so_numero::regexp(version,[0-9]{1,2}[.,]\d[.,][0-9]{1,2},DEFAULTVALUE)" --key="::FarmFingerprint([[opencount,model,version]])" --partition="::FileName()" --delimiter=","</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.sftp.SFTP --host=files.dc2.responsys.net --credentials=/home/valdiney/responsys_br.sftp.json --directory="/home/cli/dafitibr_scp/CED FIles" --pattern=54206_OPEN_* --output=/tmp/open.csv --start_date=2019-10-08 --end_date=2019-10-09 --field=CUSTOMER_ID --delimiter=,</exec.args>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.sftp.SFTP --host="sftp.ad4push.msp.fr.clara.net" --credentials="/home/valdiney/credentials/accengage.json" --directory="/exports" --pattern="exportDevices_519_*.csv" --output="/tmp/accengage/export_devices/xxx.csv" --start_date=2020-04-15 --end_date=2020-04-17 --field="--field=campo_valor_fixo::fixed(valor_fixo)+firstopen+opencount+model+version+::md5([[version]])+::concat([[opencount,model,version]])+version_so_numero::regexp(version,[0-9]{1,2}[.,]\d[.,][0-9]{1,2},DEFAULTVALUE)" --key="::FarmFingerprint([[opencount,model,version]])" --partition="::FileName()" --delimiter=","</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.sftp.SFTP --host=files.dc2.responsys.net --credentials=/home/valdiney/responsys_br.sftp.json --directory="/home/cli/dafitibr_scp/CED FIles" --pattern=54206_OPEN_* --output=/tmp/open.csv --start_date=2019-10-08 --end_date=2019-10-09 --field=CUSTOMER_ID --delimiter=,</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.sftp.SFTP --host="sftp.ad4push.msp.fr.clara.net" --credentials="/home/valdiney/credentials/accengage.json" --directory="/exports" --pattern="exportDevices_519_*.csv" --output="/tmp/accengage/export_devices/xxx.csv" --start_date=2020-04-15 --end_date=2020-04-17 --field="--field=campo_valor_fixo::fixed(valor_fixo)+firstopen+opencount+model+version+::md5([[version]])+::concat([[opencount,model,version]])+version_so_numero::regexp(version,[0-9]{1,2}[.,]\d[.,][0-9]{1,2},DEFAULTVALUE)" --key="::FarmFingerprint([[opencount,model,version]])" --partition="::FileName()" --delimiter=","</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
