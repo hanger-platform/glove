@@ -126,6 +126,9 @@ public class AvroDecoder implements Decoder {
                 csvWriter.writeRow(row);
             }
 
+            //Close the reader. 
+            reader.close();
+            
             //Flush and close writer.
             csvWriter.flush();
             csvWriter.close();
