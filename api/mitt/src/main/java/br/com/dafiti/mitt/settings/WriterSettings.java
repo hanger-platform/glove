@@ -49,7 +49,9 @@ public class WriterSettings extends Settings {
 
     public void setOutputFile(File outputFile) {
         if (!outputFile.exists()) {
-            outputFile.mkdirs();
+            outputFile
+                    .getParentFile()
+                    .mkdirs();
         }
 
         this.outputFile = outputFile;
