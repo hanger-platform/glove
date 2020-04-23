@@ -29,11 +29,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.codec.binary.Base64;
@@ -47,8 +47,10 @@ import org.reflections.Reflections;
  */
 public class Scanner {
 
-    private final Map<String, Transformable> transformationInstances = new HashMap();
-    private final Map<String, Class<? extends Transformable>> transformations = new HashMap();
+    private static Scanner instance;
+
+    private final Map<String, Transformable> transformationInstances = new ConcurrentHashMap();
+    private final Map<String, Class<? extends Transformable>> transformations = new ConcurrentHashMap();
 
     private static final String LIST_OPEN = "[[";
     private static final String LIST_CLOSE = "]]";
@@ -58,7 +60,7 @@ public class Scanner {
     /**
      *
      */
-    public Scanner() {
+    private Scanner() {
         Set<Class<? extends Transformable>> classes = new Reflections().getSubTypesOf(Transformable.class);
         Iterator<Class<? extends Transformable>> iterator = classes.iterator();
 
@@ -67,6 +69,23 @@ public class Scanner {
             String transformationName = tranformation.getSimpleName().toLowerCase();
             this.transformations.put(transformationName, tranformation);
         }
+    }
+
+    /**
+     *
+     * @return
+     */
+    public static Scanner getInstance() {
+        if (instance == null) {
+            synchronized (Scanner.class) {
+                if (instance == null) {
+                    instance = new Scanner();
+                }
+
+            }
+        }
+
+        return instance;
     }
 
     /**

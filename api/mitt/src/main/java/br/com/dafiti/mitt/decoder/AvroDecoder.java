@@ -45,7 +45,7 @@ import org.apache.commons.io.FilenameUtils;
  */
 public class AvroDecoder implements Decoder {
 
-    private static GenericData data;
+    private final GenericData data;
     private static AvroDecoder instance;
 
     /**

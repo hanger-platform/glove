@@ -66,7 +66,7 @@ public class Parser {
      * @param configuration
      */
     public Parser(Configuration configuration) {
-        this.scanner = new Scanner();
+        this.scanner = Scanner.getInstance();
         this.configuration = configuration;
     }
 
@@ -76,7 +76,7 @@ public class Parser {
      * @param debug
      */
     public Parser(Configuration configuration, boolean debug) {
-        this.scanner = new Scanner();
+        this.scanner = Scanner.getInstance();
         this.configuration = configuration;
     }
 

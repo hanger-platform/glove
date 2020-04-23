@@ -49,12 +49,12 @@ public class Configuration {
 
     public Configuration() {
         this.debug = false;
-        this.scanner = new Scanner();
+        this.scanner = Scanner.getInstance();
     }
 
     public Configuration(boolean debug) {
         this.debug = debug;
-        this.scanner = new Scanner();
+        this.scanner = Scanner.getInstance();
     }
 
     /**
