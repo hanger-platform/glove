@@ -47,10 +47,10 @@ import org.reflections.Reflections;
  */
 public class Scanner {
 
-    private static Scanner instance;
+    private static Scanner scanner;
 
-    private final Map<String, Transformable> transformationInstances = new ConcurrentHashMap();
-    private final Map<String, Class<? extends Transformable>> transformations = new ConcurrentHashMap();
+    private final Map<String, Transformable> instances = new ConcurrentHashMap();
+    private final Map<String, Class<? extends Transformable>> clazzes = new ConcurrentHashMap();
 
     private static final String LIST_OPEN = "[[";
     private static final String LIST_CLOSE = "]]";
@@ -67,7 +67,7 @@ public class Scanner {
         while (iterator.hasNext()) {
             Class<? extends Transformable> tranformation = iterator.next();
             String transformationName = tranformation.getSimpleName().toLowerCase();
-            this.transformations.put(transformationName, tranformation);
+            this.clazzes.put(transformationName, tranformation);
         }
     }
 
@@ -76,16 +76,16 @@ public class Scanner {
      * @return
      */
     public static Scanner getInstance() {
-        if (instance == null) {
+        if (scanner == null) {
             synchronized (Scanner.class) {
-                if (instance == null) {
-                    instance = new Scanner();
+                if (scanner == null) {
+                    scanner = new Scanner();
                 }
 
             }
         }
 
-        return instance;
+        return scanner;
     }
 
     /**
@@ -123,8 +123,8 @@ public class Scanner {
             fieldName = fieldName.isEmpty() ? ("anonymous_" + id) : fieldName;
 
             //Identifies if it have a transformation instance in cache. 
-            if (transformationInstances.containsKey(id)) {
-                instance = transformationInstances.get(id);
+            if (instances.containsKey(id)) {
+                instance = instances.get(id);
             } else {
                 //Identifies each part of the function. 
                 String transformation = StringUtils.substringAfter(content, "::");
@@ -186,10 +186,10 @@ public class Scanner {
                 }
 
                 //Identifies which transformation should be runned. 
-                if (this.transformations.containsKey(tranformantionClass)) {
+                if (this.clazzes.containsKey(tranformantionClass)) {
                     try {
                         //Instantiate transformation class by it name. 
-                        Class<? extends Transformable> clazz = this.transformations.get(tranformantionClass);
+                        Class<? extends Transformable> clazz = this.clazzes.get(tranformantionClass);
                         Constructor[] constructors = clazz.getDeclaredConstructors();
 
                         //Identifies if the transformation has parameter. 
@@ -257,7 +257,7 @@ public class Scanner {
 
                         //Puts instance of each transformation in cache.  
                         if (instance != null) {
-                            transformationInstances.put(id, instance);
+                            instances.put(id, instance);
                         }
                     } catch (InstantiationException
                             | IllegalAccessException

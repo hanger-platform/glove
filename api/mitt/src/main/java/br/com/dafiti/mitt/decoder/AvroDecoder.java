@@ -46,7 +46,7 @@ import org.apache.commons.io.FilenameUtils;
 public class AvroDecoder implements Decoder {
 
     private final GenericData data;
-    private static AvroDecoder instance;
+    private static AvroDecoder avroDecoder;
 
     /**
      *
@@ -60,16 +60,16 @@ public class AvroDecoder implements Decoder {
      * @return
      */
     public static AvroDecoder getInstance() {
-        if (instance == null) {
+        if (avroDecoder == null) {
             synchronized (AvroDecoder.class) {
-                if (instance == null) {
-                    instance = new AvroDecoder();
+                if (avroDecoder == null) {
+                    avroDecoder = new AvroDecoder();
                 }
 
             }
         }
 
-        return instance;
+        return avroDecoder;
     }
 
     /**
