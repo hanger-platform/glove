@@ -105,7 +105,7 @@ public class Configuration {
      *
      * @return
      */
-    public List<Transformable> getFieldsTransformation() {
+    public synchronized List<Transformable> getFieldsTransformation() {
         if (tranformations == null) {
             tranformations = new ArrayList();
 
@@ -122,7 +122,7 @@ public class Configuration {
      *
      * @return
      */
-    public List<Field> getOriginalFields() {
+    public synchronized List<Field> getOriginalFields() {
         if (originalFields == null) {
             originalFields = new ArrayList();
 
@@ -141,7 +141,7 @@ public class Configuration {
      *
      * @return
      */
-    public List<String> getOriginalFieldsName() {
+    public synchronized List<String> getOriginalFieldsName() {
         if (originalFieldsNames == null) {
             originalFieldsNames = new ArrayList();
 
@@ -159,15 +159,15 @@ public class Configuration {
      * @param field
      * @return
      */
-    public Integer getFieldIndex(Field field) {
+    public synchronized Integer getFieldIndex(Field field) {
         if (fieldIndex == null) {
             fieldIndex = new HashMap();
 
-            List<Field> fields = this.getFields();
+            List<Field> all = this.getFields();
 
             //Relates a field to its position in the configuration. 
-            for (int i = 0; i < fields.size(); i++) {
-                fieldIndex.put(fields.get(i), i);
+            for (int i = 0; i < all.size(); i++) {
+                fieldIndex.put(all.get(i), i);
             }
         }
 
@@ -179,7 +179,7 @@ public class Configuration {
      * @param field
      * @return
      */
-    public Integer getOriginalFieldIndex(Field field) {
+    public synchronized Integer getOriginalFieldIndex(Field field) {
         if (originalFieldIndex == null) {
             originalFieldIndex = new HashMap();
 
