@@ -27,9 +27,9 @@ import br.com.dafiti.mitt.exception.DuplicateEntityException;
 import br.com.dafiti.mitt.transformation.Scanner;
 import br.com.dafiti.mitt.transformation.Transformable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -105,7 +105,7 @@ public class Configuration {
      *
      * @return
      */
-    public synchronized List<Transformable> getFieldsTransformation() {
+    public List<Transformable> getFieldsTransformation() {
         if (tranformations == null) {
             tranformations = new ArrayList();
 
@@ -122,7 +122,7 @@ public class Configuration {
      *
      * @return
      */
-    public synchronized List<Field> getOriginalFields() {
+    public List<Field> getOriginalFields() {
         if (originalFields == null) {
             originalFields = new ArrayList();
 
@@ -159,9 +159,9 @@ public class Configuration {
      * @param field
      * @return
      */
-    public synchronized Integer getFieldIndex(Field field) {
+    public Integer getFieldIndex(Field field) {
         if (fieldIndex == null) {
-            fieldIndex = new HashMap();
+            fieldIndex = new ConcurrentHashMap<>();
 
             List<Field> all = this.getFields();
 
@@ -179,9 +179,9 @@ public class Configuration {
      * @param field
      * @return
      */
-    public synchronized Integer getOriginalFieldIndex(Field field) {
+    public Integer getOriginalFieldIndex(Field field) {
         if (originalFieldIndex == null) {
-            originalFieldIndex = new HashMap();
+            originalFieldIndex = new ConcurrentHashMap();
 
             List<Field> originals = this.getOriginalFields();
 
