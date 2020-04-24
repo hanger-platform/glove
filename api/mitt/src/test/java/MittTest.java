@@ -46,15 +46,17 @@ public class MittTest {
         fields.add(new Field("data", new Now()));
 
         //Fields.
-        mitt.getConfiguration().addCustomField("custom_primary_key::farmfingerprint([[nome]])");
         mitt.getConfiguration().addField("id");
         mitt.getConfiguration().addField("nome");
         mitt.getConfiguration().addField("data");
+
+        mitt.getConfiguration().addCustomField("custom_primary_key::farmfingerprint([[nome]])");
         mitt.getConfiguration().addCustomField("scanner::concat([[id,nome,::now(),::Dateformat(data,YYYYMM),::eval(**nome.replace('A','xxx')**)]])");
         mitt.getConfiguration().addCustomField("fixed::concat([[id,nome,::eval(**nome.replace('A','xxx')**)]])");
         mitt.getConfiguration().addCustomField("bola::eval(**nome.replace(/[^0-9.]/g,'xxx')**)");
         mitt.getConfiguration().addCustomField("regex::regexp(nome,[9])");
         mitt.getConfiguration().addCustomField("checksum::checksum()");
+        //mitt.getConfiguration().addCustomField("::dateformat(data,dd-MMM-yyyy hh:mm:ss,yyyyMM,pt,BR)");
 
         //Parameters. 
         mitt.getConfiguration().addParameter("a", "primeiro", "Primeiro parâmetro", "xxx");

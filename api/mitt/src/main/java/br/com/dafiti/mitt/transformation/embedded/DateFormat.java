@@ -29,6 +29,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,17 +42,27 @@ public class DateFormat implements Transformable {
     private final Object field;
     private final String inputFormat;
     private final String outputFormat;
+    private final Locale locale;
 
     public DateFormat(String field, String outputFormat) {
         this.field = field;
         this.outputFormat = outputFormat;
         this.inputFormat = "yyyy-MM-dd HH:mm:ss";
+        this.locale = Locale.ENGLISH;
     }
 
     public DateFormat(String field, String inputFormat, String outputFormat) {
         this.field = field;
         this.inputFormat = inputFormat;
         this.outputFormat = outputFormat;
+        this.locale = Locale.ENGLISH;
+    }
+
+    public DateFormat(String field, String inputFormat, String outputFormat, String language, String country) {
+        this.field = field;
+        this.inputFormat = inputFormat;
+        this.outputFormat = outputFormat;
+        this.locale = new Locale(language, country);
     }
 
     @Override
@@ -68,19 +79,19 @@ public class DateFormat implements Transformable {
 
         if (date != null) {
             if (date instanceof Date) {
-                value = new SimpleDateFormat(outputFormat).format(date);
+                value = new SimpleDateFormat(outputFormat, locale).format(date);
             } else {
                 try {
                     if (inputFormat.equalsIgnoreCase("UNIXTIMEMILLIS")) {
-                        value = new SimpleDateFormat(outputFormat)
+                        value = new SimpleDateFormat(outputFormat, locale)
                                 .format(new Date(Long.valueOf((String) date)));
                     } else if (inputFormat.equalsIgnoreCase("UNIXTIME")) {
-                        value = new SimpleDateFormat(outputFormat)
+                        value = new SimpleDateFormat(outputFormat, locale)
                                 .format(new Date(Long.valueOf((String) date) * 1000L));
                     } else {
-                        value = new SimpleDateFormat(outputFormat)
+                        value = new SimpleDateFormat(outputFormat, locale)
                                 .format(
-                                        new SimpleDateFormat(inputFormat)
+                                        new SimpleDateFormat(inputFormat, locale)
                                                 .parse((String) date));
                     }
                 } catch (ParseException ex) {
