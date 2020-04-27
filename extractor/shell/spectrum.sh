@@ -626,7 +626,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 				# Envia o arquivo para o storage.
 				echo "Exporting resultset to ${EXPORT_BUCKET}!"
 				aws s3 rm ${EXPORT_BUCKET}${RAWFILE_QUEUE_FILE}.gz --recursive --only-show-errors
-				aws s3 cp ${RAWFILE_QUEUE_FILE}.gz ${EXPORT_BUCKET} --only-show-errors
+				aws s3 cp ${RAWFILE_QUEUE_FILE}.gz ${EXPORT_BUCKET} --only-show-errors --acl bucket-owner-full-control
 				error_check
 
 				# Remove o arquivo compactado do diretório.
