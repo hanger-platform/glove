@@ -25,26 +25,26 @@ package br.com.dafiti.mitt.transformation.embedded;
 
 import br.com.dafiti.mitt.transformation.Parser;
 import br.com.dafiti.mitt.transformation.Transformable;
-import com.google.common.base.Splitter;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 
 /**
- * Returns only a part of a field value based on a given delimiter
+ * Trims a string: all, right or left.
  *
- * @author Fernando Saga
  * @author Helio Leal
  */
-public class SplitPart implements Transformable {
+public class Trim implements Transformable {
 
     private final String field;
-    private final String delimiter;
-    private final String part;
+    private final String type;
 
-    public SplitPart(String field, String delimiter, String part) {
+    public Trim(String field) {
         this.field = field;
-        this.delimiter = delimiter;
-        this.part = part;
+        this.type = "";
+    }
+
+    public Trim(String field, String type) {
+        this.field = field;
+        this.type = type;
     }
 
     @Override
@@ -55,17 +55,18 @@ public class SplitPart implements Transformable {
     public String getValue(
             Parser parser,
             List<Object> record) {
-        String value = "";
+        String value;
 
-        if (StringUtils.isNumeric(this.part)) {
-            List<String> list = Splitter
-                    .on(this.delimiter)
-                    .splitToList((String) parser.evaluate(record, field));
-
-            //Identifies if array out of bounds won't happen.
-            if (Integer.valueOf(this.part) < list.size()) {
-                value = list.get(Integer.valueOf(this.part));
-            }
+        switch (this.type) {
+            case "RTRIM":
+                value = ((String) parser.evaluate(record, field)).replaceAll("\\s+$", "");
+                break;
+            case "LTRIM":
+                value = ((String) parser.evaluate(record, field)).replaceAll("^\\s+", "");
+                break;
+            default:
+                value = ((String) parser.evaluate(record, field)).trim();
+                break;
         }
 
         return value;
