@@ -22,21 +22,27 @@
  *
  */
 package br.com.dafiti.mitt.transformation.embedded;
+
 import br.com.dafiti.mitt.transformation.Parser;
 import br.com.dafiti.mitt.transformation.Transformable;
 import java.util.List;
+
 /**
  *
  * @author Fernando Saga
  */
 public class Upper implements Transformable {
+
     private final String field;
+
     public Upper(String field) {
         this.field = field;
     }
+
     @Override
     public void init() {
     }
+
     @Override
     public String getValue(
             Parser parser,

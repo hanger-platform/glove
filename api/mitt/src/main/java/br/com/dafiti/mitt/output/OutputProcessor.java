@@ -187,88 +187,93 @@ public class OutputProcessor implements Runnable {
             this.setInput(decoder.decode(input));
         }
 
-        //Sets the reader settings. 
-        CsvParserSettings setting = new CsvParserSettings();
-        setting.getFormat().setDelimiter(readerSettings.getDelimiter());
-        setting.getFormat().setQuote(readerSettings.getQuote());
-        setting.getFormat().setQuoteEscape(readerSettings.getQuoteEscape());
-        setting.setNullValue("");
-        setting.setMaxCharsPerColumn(-1);
-        setting.setInputBufferSize(5 * (1024 * 1024));
-        setting.setNumberOfRowsToSkip(readerSettings.getSkipLines());
+        //Identifies if the input file is empty after decode. 
+        if (input.length() != 0) {
+            //Sets the reader settings. 
+            CsvParserSettings setting = new CsvParserSettings();
+            setting.getFormat().setDelimiter(readerSettings.getDelimiter());
+            setting.getFormat().setQuote(readerSettings.getQuote());
+            setting.getFormat().setQuoteEscape(readerSettings.getQuoteEscape());
+            setting.setNullValue("");
+            setting.setMaxCharsPerColumn(-1);
+            setting.setInputBufferSize(5 * (1024 * 1024));
+            setting.setNumberOfRowsToSkip(readerSettings.getSkipLines());
 
-        //Identifies which encoder should be used. 
-        if ("auto".equalsIgnoreCase(encode)) {
-            try {
-                encode = UniversalDetector.detectCharset(input);
-            } catch (IOException ex) {
-                Logger.getLogger(Output.class.getName()).log(Level.SEVERE, "Encode do not detected!", ex);
-            } finally {
-                if (encode == null) {
-                    encode = "UTF-8";
-                }
-            }
-        }
-
-        //Identifies if header was provided or should be infered. 
-        if (header.isEmpty()) {
-            //Defines the pre parser settings.
-            CsvParserSettings clone = setting.clone();
-            clone.setHeaderExtractionEnabled(true);
-
-            //Pre parser the output file.
-            CsvParser pre = new CsvParser(clone);
-            pre.beginParsing(input, encode);
-
-            //Identifies if there are duplicated headers.
-            Map<String, Integer> repeated = new HashMap();
-
-            for (String field : pre.getRecordMetadata().headers()) {
-                if (!header.contains(field)) {
-                    header.add(field);
-                } else {
-                    int repetitions;
-
-                    //Identifies how many times a header is repeated.  
-                    if (repeated.containsKey(field)) {
-                        repetitions = repeated.get(field) + 1;
-                    } else {
-                        repetitions = 1;
+            //Identifies which encoder should be used. 
+            if ("auto".equalsIgnoreCase(encode)) {
+                try {
+                    encode = UniversalDetector.detectCharset(input);
+                } catch (IOException ex) {
+                    Logger.getLogger(Output.class.getName()).log(Level.SEVERE, "Encode do not detected!", ex);
+                } finally {
+                    if (encode == null) {
+                        encode = "UTF-8";
                     }
-
-                    //Defines an index to identify repeated header. 
-                    header.add(field + "_" + repetitions);
-                    repeated.put(field, repetitions);
                 }
             }
 
-            //Stop the pre parser.
-            pre.stopParsing();
+            //Identifies if header was provided or should be infered. 
+            if (header.isEmpty()) {
+                //Defines the pre parser settings.
+                CsvParserSettings clone = setting.clone();
+                clone.setHeaderExtractionEnabled(true);
 
-            //Marks the file first line to be ignored. 
-            setting.setNumberOfRowsToSkip(
-                    setting.getNumberOfRowsToSkip() + 1);
+                //Pre parser the output file.
+                CsvParser pre = new CsvParser(clone);
+                pre.beginParsing(input, encode);
+
+                //Identifies if there are duplicated headers.
+                Map<String, Integer> repeated = new HashMap();
+
+                for (String field : pre.getRecordMetadata().headers()) {
+                    if (!header.contains(field)) {
+                        header.add(field);
+                    } else {
+                        int repetitions;
+
+                        //Identifies how many times a header is repeated.  
+                        if (repeated.containsKey(field)) {
+                            repetitions = repeated.get(field) + 1;
+                        } else {
+                            repetitions = 1;
+                        }
+
+                        //Defines an index to identify repeated header. 
+                        header.add(field + "_" + repetitions);
+                        repeated.put(field, repetitions);
+                    }
+                }
+
+                //Stop the pre parser.
+                pre.stopParsing();
+
+                //Marks the file first line to be ignored. 
+                setting.setNumberOfRowsToSkip(
+                        setting.getNumberOfRowsToSkip() + 1);
+            }
+
+            //Identifies the file header. 
+            setting.setHeaders(header.toArray(new String[0]));
+
+            //Identifies which columns should be read. 
+            setting.selectFields(
+                    parser.getConfiguration()
+                            .getOriginalFieldsName().toArray(new String[0]));
+
+            //Read the input file and write to the output.
+            CsvParser csvParser = new CsvParser(setting);
+            csvParser.beginParsing(input, encode);
+
+            while ((record = csvParser.parseNext()) != null) {
+                this.writer.writeRow(
+                        parser.evaluate(Arrays.asList((Object[]) record)));
+            }
+
+            //Stop the parser.
+            csvParser.stopParsing();
+        } else {
+            Logger.getLogger(Output.class.getName()).log(Level.INFO, "File {0} is empty", input.getName());
         }
-
-        //Identifies the file header. 
-        setting.setHeaders(header.toArray(new String[0]));
-
-        //Identifies which columns should be read. 
-        setting.selectFields(
-                parser.getConfiguration()
-                        .getOriginalFieldsName().toArray(new String[0]));
-
-        //Read the input file and write to the output.
-        CsvParser csvParser = new CsvParser(setting);
-        csvParser.beginParsing(input, encode);
-
-        while ((record = csvParser.parseNext()) != null) {
-            this.writer.writeRow(
-                    parser.evaluate(Arrays.asList((Object[]) record)));
-        }
-
-        //Stop the parser.
-        csvParser.stopParsing();
 
         //Idenfies if the input file should be removed. 
         if (readerSettings.isRemove()) {

@@ -31,7 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * Returns only a part of a field value based on a given delimiter
- * 
+ *
  * @author Fernando Saga
  * @author Helio Leal
  */
