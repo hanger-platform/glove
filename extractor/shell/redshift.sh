@@ -8,10 +8,6 @@ REDSHIFT_USER=${REDSHIFT_JDBC_USER_NAME}
 REDSHIFT_PORT=${REDSHIFT_JDBC_PORT}
 REDSHIFT_DATASET=${REDSHIFT_JDBC_DB}
 
-# S3 variables from kettle.properties.
-ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-
 # Entity.
 SCHEMA="${SCHEMA_NAME}"
 TABLE="${TABLE_NAME}"
@@ -128,7 +124,7 @@ full_load()
 
       COPY ${SCHEMA}.${TABLE} ( ${FIELD_NAME_LIST} )
       FROM '${STORAGE_MANIFEST_PATH}${DATA_FILE}.manifest' 
-      CREDENTIALS'aws_access_key_id=${ACCESS_KEY_ID};aws_secret_access_key=${SECRET_ACCESS_KEY}'
+      ${REDSHIFT_UNLOAD_COPY_AUTHENTICATION}
       manifest
       csv
       delimiter '${DELIMITER}'
@@ -171,7 +167,7 @@ delta_load()
 
 			COPY #tmp_${TABLE} ( ${FIELD_NAME_LIST} )
 			FROM '${STORAGE_MANIFEST_PATH}${DATA_FILE}.manifest' 
-			CREDENTIALS'aws_access_key_id=${ACCESS_KEY_ID};aws_secret_access_key=${SECRET_ACCESS_KEY}'
+			${REDSHIFT_UNLOAD_COPY_AUTHENTICATION}
 			manifest
 			csv
 			delimiter '${DELIMITER}'
