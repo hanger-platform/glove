@@ -141,14 +141,18 @@ public class Configuration {
      *
      * @return
      */
-    public synchronized List<String> getOriginalFieldsName() {
+    public List<String> getOriginalFieldsName() {
         if (originalFieldsNames == null) {
-            originalFieldsNames = new ArrayList();
+            synchronized (Configuration.class) {
+                if (originalFieldsNames == null) {
+                    originalFieldsNames = new ArrayList();
 
-            this.getOriginalFields()
-                    .forEach((field) -> {
-                        originalFieldsNames.add(field.getName());
-                    });
+                    this.getOriginalFields()
+                            .forEach((field) -> {
+                                originalFieldsNames.add(field.getName());
+                            });
+                }
+            }
         }
 
         return originalFieldsNames;

@@ -65,7 +65,6 @@ public class AvroDecoder implements Decoder {
                 if (avroDecoder == null) {
                     avroDecoder = new AvroDecoder();
                 }
-
             }
         }
 
@@ -128,7 +127,7 @@ public class AvroDecoder implements Decoder {
 
             //Close the reader. 
             reader.close();
-            
+
             //Flush and close writer.
             csvWriter.flush();
             csvWriter.close();
