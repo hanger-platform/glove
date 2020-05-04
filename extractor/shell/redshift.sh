@@ -117,6 +117,9 @@ full_load()
 	echo "Uploading manifest file to ${STORAGE_MANIFEST_PATH}"
 	aws s3 cp ${RAWFILE_QUEUE_MANIFEST_PATH} ${STORAGE_MANIFEST_PATH} --recursive --only-show-errors
 	error_check	
+	
+	echo "Synchronizing Amazon S3 Buckets"
+	sleep 45	
 
 	psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} -v ON_ERROR_STOP=1 << EOF
     BEGIN;
@@ -160,6 +163,9 @@ delta_load()
 	echo "Uploading manifest file to ${STORAGE_MANIFEST_PATH}"
 	aws s3 cp ${RAWFILE_QUEUE_MANIFEST_PATH} ${STORAGE_MANIFEST_PATH} --recursive --only-show-errors
 	error_check	
+	
+	echo "Synchronizing Amazon S3 Buckets"
+	sleep 45	
 
 	psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} -v ON_ERROR_STOP=1 << EOF
 		BEGIN;
