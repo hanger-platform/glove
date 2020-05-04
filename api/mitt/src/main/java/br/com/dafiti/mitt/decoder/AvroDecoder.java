@@ -45,6 +45,32 @@ import org.apache.commons.io.FilenameUtils;
  */
 public class AvroDecoder implements Decoder {
 
+    private final GenericData data;
+    private static AvroDecoder avroDecoder;
+
+    /**
+     *
+     */
+    private AvroDecoder() {
+        data = new GenericDatumReader<>().getData();
+    }
+
+    /**
+     *
+     * @return
+     */
+    public static AvroDecoder getInstance() {
+        if (avroDecoder == null) {
+            synchronized (AvroDecoder.class) {
+                if (avroDecoder == null) {
+                    avroDecoder = new AvroDecoder();
+                }
+            }
+        }
+
+        return avroDecoder;
+    }
+
     /**
      *
      * @param file
@@ -56,8 +82,9 @@ public class AvroDecoder implements Decoder {
 
         try {
             //Defines a generic reader.   
-            GenericDatumReader<GenericData.Record> datum = new GenericDatumReader<GenericData.Record>();
-            DataFileReader<GenericData.Record> reader = new DataFileReader<GenericData.Record>(file, datum);
+            DataFileReader<GenericData.Record> reader = new DataFileReader<>(
+                    file,
+                    new GenericDatumReader<>(null, null, this.data));
 
             //Extracts schema.
             Schema schema = reader.getSchema();
@@ -97,6 +124,9 @@ public class AvroDecoder implements Decoder {
 
                 csvWriter.writeRow(row);
             }
+
+            //Close the reader. 
+            reader.close();
 
             //Flush and close writer.
             csvWriter.flush();

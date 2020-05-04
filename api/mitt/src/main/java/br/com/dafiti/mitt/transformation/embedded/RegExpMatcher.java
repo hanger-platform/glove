@@ -36,21 +36,20 @@ import java.util.regex.Pattern;
  *
  * @author Helio Leal
  */
-@Deprecated
-public class RegExp implements Transformable {
+public class RegExpMatcher implements Transformable {
 
     private final Object field;
     private final String regexp;
     private final String defaultValue;
     private final HashMap<String, Pattern> patterns = new HashMap();
 
-    public RegExp(String field, String regexp) {
+    public RegExpMatcher(String field, String regexp) {
         this.field = field;
         this.regexp = regexp;
         this.defaultValue = "";
     }
 
-    public RegExp(String field, String regexp, String defaultValue) {
+    public RegExpMatcher(String field, String regexp, String defaultValue) {
         this.field = field;
         this.regexp = regexp;
         this.defaultValue = defaultValue;

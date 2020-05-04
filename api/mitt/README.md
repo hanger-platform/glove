@@ -81,11 +81,18 @@ Uma das principais características do MITT é a possibilidade de transformaçã
 | **Eval**| Transforma um campo usando funções do JavaScript | ::eval(\*\*<campo\>.replace('A','B')\*\*) |
 | **FarmFingerprint**| Aplica a função de hash FarmFingerprint em um ou mais campos | ::farmfingerprint([[<campo\>,<campo\>]]) |
 | **FileName**| Retorna o nome do arquivo que está sendo processado, quando o input for um arquivo  | ::filename() |
-| **Fixed**| Retorna uma valor fixo | ::fixed(oi) |
+| **Fixed**| Retorna um valor fixo | ::fixed(oi) |
 | **MD5**| Aplica a função de hash MD5 em um ou mais campos | ::md5([[<campo\>,<campo\>]])|
 | **Now**| Retorna a data e hora corrente | ::now() |
 | **RegExp**| Extrai parte da informação de um campo usando RegExp | ::regexp(<campo\>,<regex\>) |
 | **Checksum**| Gera um hash utilizando MD5, SHA1 ou FARM_FINGERPRINT para a combinação de todos os campos originais de um registro | ::checksum(<algorítimo\>) |
+| **Upper**| Retorna um valor em caixa alta | ::upper(<campo\>) |
+| **Lower**| Retorna um valor em caixa baixa | ::lower(<campo\>) |
+| **SplitPart**| Divide uma string no delimitador informado e retorna a parte na posição especificada | ::splitpart(<campo\>,<delimitador\>,<posição\>) |
+| **Replace**| Substitui todas as ocorrências de um conjunto de caracteres em uma string existente por outros caracteres especificados | ::replace(<campo\>,<valor a substituir\>,<novo valor\>) |
+| **Trim**| Remove os espaços em branco iniciais e finais, ou pode remover apenas os iniciais ou apenas os finais | ::trim(<campo\>,[(Opcional) Para limpar apenas os iniciais informar LTRIM, para limpar apenas os finais informar RTRIM]) |
+| **JsonPath**| Retorna o valor para o par de valor:chave referenciado por um JSON | ::jsonpath(<campo\>,<valor:chave, exemplo: $['book']['title']\>) |
+
 
 ##### RESERVED CHARACTERES
 

@@ -44,7 +44,7 @@ public class FactoryDecoder {
                 decoder = new GZipDecoder();
                 break;
             case "avro":
-                decoder = new AvroDecoder();
+                decoder = AvroDecoder.getInstance();
                 break;
         }
 

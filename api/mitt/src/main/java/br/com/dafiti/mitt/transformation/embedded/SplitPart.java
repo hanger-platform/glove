@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2020 Dafiti Group
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -8,10 +8,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -19,41 +19,32 @@
  * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- * 
+ *
  */
 package br.com.dafiti.mitt.transformation.embedded;
 
 import br.com.dafiti.mitt.transformation.Parser;
 import br.com.dafiti.mitt.transformation.Transformable;
-import java.util.HashMap;
+import com.google.common.base.Splitter;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
 
 /**
+ * Returns only a part of a field value based on a given delimiter
  *
+ * @author Fernando Saga
  * @author Helio Leal
  */
-@Deprecated
-public class RegExp implements Transformable {
+public class SplitPart implements Transformable {
 
-    private final Object field;
-    private final String regexp;
-    private final String defaultValue;
-    private final HashMap<String, Pattern> patterns = new HashMap();
+    private final String field;
+    private final String delimiter;
+    private final String part;
 
-    public RegExp(String field, String regexp) {
+    public SplitPart(String field, String delimiter, String part) {
         this.field = field;
-        this.regexp = regexp;
-        this.defaultValue = "";
-    }
-
-    public RegExp(String field, String regexp, String defaultValue) {
-        this.field = field;
-        this.regexp = regexp;
-        this.defaultValue = defaultValue;
+        this.delimiter = delimiter;
+        this.part = part;
     }
 
     @Override
@@ -64,31 +55,16 @@ public class RegExp implements Transformable {
     public String getValue(
             Parser parser,
             List<Object> record) {
+        String value = "";
 
-        String value = defaultValue;
-        Object content = parser.evaluate(record, field);
-        Pattern pattern;
-        Matcher matcher;
+        if (StringUtils.isNumeric(this.part)) {
+            List<String> list = Splitter
+                    .on(this.delimiter)
+                    .splitToList((String) parser.evaluate(record, field));
 
-        if (content != null) {
-            try {
-                if (patterns.containsKey(regexp)) {
-                    pattern = patterns.get(regexp);
-                } else {
-                    pattern = Pattern.compile(regexp);
-
-                    if (pattern != null) {
-                        patterns.put(regexp, Pattern.compile(regexp));
-                    }
-                }
-
-                matcher = pattern.matcher(String.valueOf(content));
-
-                if (matcher.find()) {
-                    value = matcher.group();
-                }
-            } catch (Exception ex) {
-                Logger.getLogger(DateFormat.class.getName()).log(Level.SEVERE, "Error parsing RegExp " + regexp, ex);
+            //Identifies if array out of bounds won't happen.
+            if (Integer.valueOf(this.part) < list.size()) {
+                value = list.get(Integer.valueOf(this.part));
             }
         }
 
