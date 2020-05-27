@@ -59,7 +59,7 @@ table_check(){
             schema_check
 
             psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} << EOF
-                CREATE EXTERNAL TABLE ${SCHEMA}.${TABLE}
+                CREATE EXTERNAL TABLE \"${SCHEMA}\".\"${TABLE}\"
                 (${FIELD_NAME_AND_TYPE_LIST})
                 STORED AS ${OUTPUT_FORMAT}
                 LOCATION '${STORAGE_QUEUE_PATH}';
@@ -71,7 +71,7 @@ EOF
         schema_check
         
         # Cria a tabela.
-        run_on_athena "CREATE EXTERNAL TABLE IF NOT EXISTS ${SCHEMA}.${TABLE} (${FIELD_NAME_AND_TYPE_LIST}) STORED AS ${OUTPUT_FORMAT} LOCATION '${STORAGE_QUEUE_PATH}';"  
+        run_on_athena "CREATE EXTERNAL TABLE IF NOT EXISTS \"${SCHEMA}\".\"${TABLE}\" (${FIELD_NAME_AND_TYPE_LIST}) STORED AS ${OUTPUT_FORMAT} LOCATION '${STORAGE_QUEUE_PATH}';"  
     fi
 }
 
@@ -88,7 +88,7 @@ partitioned_table_check(){
             schema_check
 
             psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} << EOF
-                CREATE EXTERNAL TABLE ${SCHEMA}.${TABLE}
+                CREATE EXTERNAL TABLE \"${SCHEMA}\".\"${TABLE}\"
                 (  ${FIELD_NAME_AND_TYPE_LIST}	)
                 PARTITIONED BY ( PARTITION_VALUE INT )
                 STORED AS ${OUTPUT_FORMAT}
@@ -101,7 +101,7 @@ EOF
         schema_check
         
         # Cria a tabela.
-        run_on_athena "CREATE EXTERNAL TABLE IF NOT EXISTS ${SCHEMA}.${TABLE} (${FIELD_NAME_AND_TYPE_LIST}) PARTITIONED BY ( partition_value int ) STORED AS ${OUTPUT_FORMAT} LOCATION '${STORAGE_QUEUE_PATH}';"       
+        run_on_athena "CREATE EXTERNAL TABLE IF NOT EXISTS \"${SCHEMA}\".\"${TABLE}\" (${FIELD_NAME_AND_TYPE_LIST}) PARTITIONED BY ( partition_value int ) STORED AS ${OUTPUT_FORMAT} LOCATION '${STORAGE_QUEUE_PATH}';"       
     fi
 }
 
@@ -245,8 +245,8 @@ partition_load(){
         do
             PARTITION=`echo $i | cut -d '=' -f 2`
 
-			echo "Adding partition ${PARTITION} to table ${SCHEMA}.${TABLE}!"
-            run_on_athena "ALTER TABLE ${SCHEMA}.${TABLE} ADD IF NOT EXISTS PARTITION ( partition_value = '${PARTITION}');"
+			echo "Adding partition ${PARTITION} to table \"${SCHEMA}\".\"${TABLE}\"!"
+            run_on_athena "ALTER TABLE \"${SCHEMA}\".\"${TABLE}\" ADD IF NOT EXISTS PARTITION ( partition_value = '${PARTITION}');"
         done
 	fi
 
@@ -563,13 +563,13 @@ if [ ${IS_RECREATE} = 1 -o ${IS_RELOAD} = 1 ]; then
 	if [ ${IS_RELOAD} = 0 ]; then
 		# Dropa a tabela para que possa ser recriada.         
         if [ ${IS_SPECTRUM} = 1 ] && [ ${HAS_ATHENA} = 0 ]; then
-            echo "Dropping table ${SCHEMA}.${TABLE} from Spectrum!"
+            echo "Dropping table \"${SCHEMA}\".\"${TABLE}\" from Spectrum!"
             psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} << EOF
-			     drop table ${SCHEMA}.${TABLE};
+			     drop table \"${SCHEMA}\".\"${TABLE}\";
 EOF
         else
-            echo "Dropping table ${SCHEMA}.${TABLE} from Athena!"
-            run_on_athena "DROP TABLE IF EXISTS ${SCHEMA}.${TABLE};"    
+            echo "Dropping table \"${SCHEMA}\".\"${TABLE}\" from Athena!"
+            run_on_athena "DROP TABLE IF EXISTS \"${SCHEMA}\".\"${TABLE}\";"    
         fi
 
 		# Realiza a verificação da estrutura das tabelas.
@@ -679,7 +679,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
     fi
 
 	# Identifica a quantidade de registros na tabela.
-    ATHENA_QUERY_ID=`aws athena start-query-execution --query-string "select count(1) from ${SCHEMA}.${TABLE};" --output text --result-configuration OutputLocation=${STORAGE_STAGING_QUEUE_PATH}`
+    ATHENA_QUERY_ID=`aws athena start-query-execution --query-string "select count(1) from \"${SCHEMA}\".\"${TABLE}\";" --output text --result-configuration OutputLocation=${STORAGE_STAGING_QUEUE_PATH}`
     error_check
 
     while true
@@ -697,7 +697,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
                 if [ ${ROW_COUNT} -gt 0 ]; then
                     echo "Updating table properties: ${ROW_COUNT} records!"
                     psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} << EOF
-                      ALTER TABLE ${SCHEMA}.${TABLE} SET TABLE PROPERTIES ('numRows'='${ROW_COUNT}');
+                      ALTER TABLE \"${SCHEMA}\".\"${TABLE}\" SET TABLE PROPERTIES ('numRows'='${ROW_COUNT}');
 EOF
                 fi
                 
@@ -705,7 +705,7 @@ EOF
                 TABLE_VERSION=`aws glue get-table-versions --max-items=100 --database-name ${SCHEMA} --table-name ${TABLE} | jq --compact-output "[.TableVersions[].VersionId]" | sed -e 's/\,/ /g;s/\[/ /g;s/\]/ /g;s/\"//g'`
                 aws glue batch-delete-table-version --database-name ${SCHEMA} --table-name ${TABLE} --version-ids $TABLE_VERSION               
             else
-                echo "${ROW_COUNT} records in the table ${SCHEMA}.${TABLE}"   
+                echo "${ROW_COUNT} records in the table \"${SCHEMA}\".\"${TABLE}\""   
             fi
 			
 			# Remove os arquivos antigos.
