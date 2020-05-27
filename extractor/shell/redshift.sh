@@ -45,7 +45,7 @@ table_check()
 		if [ "${#DISTKEY}" -gt "0" ]; then
             if [ "${#SORTKEY}" -gt "0" ]; then
                 psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} << EOF
-                    CREATE TABLE IF NOT EXISTS ${SCHEMA}.${TABLE}
+                    CREATE TABLE IF NOT EXISTS \"${SCHEMA}\".\"${TABLE}\"
                     ( ${FIELD_NAME_AND_TYPE_LIST} )
                     diststyle key
                     distkey( ${DISTKEY} )
@@ -54,7 +54,7 @@ EOF
                 error_check            
             else
                  psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} << EOF
-                    CREATE TABLE IF NOT EXISTS ${SCHEMA}.${TABLE}
+                    CREATE TABLE IF NOT EXISTS \"${SCHEMA}\".\"${TABLE}\"
                     ( ${FIELD_NAME_AND_TYPE_LIST} )
                     diststyle key
                     distkey( ${DISTKEY} )
@@ -68,7 +68,7 @@ EOF
 	elif [ ${DISTSTYLE} == "all" ]; then
         if [ "${#SORTKEY}" -gt "0" ]; then
             psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} << EOF
-                CREATE TABLE IF NOT EXISTS ${SCHEMA}.${TABLE}
+                CREATE TABLE IF NOT EXISTS \"${SCHEMA}\".\"${TABLE}\"
                 ( ${FIELD_NAME_AND_TYPE_LIST} )
                 diststyle all
                 ${SORTKEY};
@@ -76,7 +76,7 @@ EOF
             error_check
         else
             psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} << EOF
-                CREATE TABLE IF NOT EXISTS ${SCHEMA}.${TABLE}
+                CREATE TABLE IF NOT EXISTS \"${SCHEMA}\".\"${TABLE}\"
                 ( ${FIELD_NAME_AND_TYPE_LIST} )
                 diststyle all;
 EOF
@@ -85,14 +85,14 @@ EOF
 	else
         if [ "${#SORTKEY}" -gt "0" ]; then
             psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} << EOF
-                CREATE TABLE IF NOT EXISTS ${SCHEMA}.${TABLE}
+                CREATE TABLE IF NOT EXISTS \"${SCHEMA}\".\"${TABLE}\"
                 ( ${FIELD_NAME_AND_TYPE_LIST} )
                  ${SORTKEY};
 EOF
             error_check        
         else
             psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} << EOF
-                CREATE TABLE IF NOT EXISTS ${SCHEMA}.${TABLE}
+                CREATE TABLE IF NOT EXISTS \"${SCHEMA}\".\"${TABLE}\"
                 ( ${FIELD_NAME_AND_TYPE_LIST} );
 EOF
             error_check        
@@ -123,9 +123,9 @@ full_load()
 
 	psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} -v ON_ERROR_STOP=1 << EOF
     BEGIN;
-      TRUNCATE TABLE ${SCHEMA}.${TABLE};
+      TRUNCATE TABLE \"${SCHEMA}\".\"${TABLE}\";
 
-      COPY ${SCHEMA}.${TABLE} ( ${FIELD_NAME_LIST} )
+      COPY \"${SCHEMA}\".\"${TABLE}\" ( ${FIELD_NAME_LIST} )
       FROM '${STORAGE_MANIFEST_PATH}${DATA_FILE}.manifest' 
       ${REDSHIFT_UNLOAD_COPY_AUTHENTICATION}
       manifest
@@ -169,7 +169,7 @@ delta_load()
 
 	psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} -v ON_ERROR_STOP=1 << EOF
 		BEGIN;
-			CREATE TABLE #tmp_${TABLE} ( like ${SCHEMA}.${TABLE} ); 
+			CREATE TABLE #tmp_${TABLE} ( like \"${SCHEMA}\".\"${TABLE}\" ); 
 
 			COPY #tmp_${TABLE} ( ${FIELD_NAME_LIST} )
 			FROM '${STORAGE_MANIFEST_PATH}${DATA_FILE}.manifest' 
@@ -181,9 +181,9 @@ delta_load()
 			timeformat 'YYYY-MM-DD HH:MI:SS';
 
 			DELETE FROM 
-				${SCHEMA}.${TABLE} 
+				\"${SCHEMA}\".\"${TABLE}\" 
 			WHERE 
-				${SCHEMA}.${TABLE}.custom_primary_key 
+				\"${SCHEMA}\".\"${TABLE}\".custom_primary_key 
 			IN (
 				SELECT 
 					custom_primary_key 
@@ -191,13 +191,13 @@ delta_load()
 					#tmp_${TABLE}
 			);
 
-			INSERT INTO ${SCHEMA}.${TABLE} ( ${FIELD_NAME_LIST} ) 
+			INSERT INTO \"${SCHEMA}\".\"${TABLE}\" ( ${FIELD_NAME_LIST} ) 
 			SELECT 
 				${FIELD_NAME_LIST}
 			FROM 
 				#tmp_${TABLE};
 				
-			ANALYZE ${SCHEMA}.${TABLE} predicate columns;	
+			ANALYZE \"${SCHEMA}\".\"${TABLE}\" predicate columns;	
 		END;
 EOF
 
@@ -254,9 +254,9 @@ fi
 # Identifica se deve recriar a tabela.
 if [ ${IS_RECREATE} = 1 ]; then
     # Dropa a tabela para que possa ser recriada.
-	echo "Dropping table ${REDSHIFT_DATASET}.${SCHEMA}.${TABLE}!"
+	echo "Dropping table ${REDSHIFT_DATASET}.\"${SCHEMA}\".\"${TABLE}\"!"
 	psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} << EOF
-			DROP TABLE IF EXISTS ${SCHEMA}.${TABLE};
+			DROP TABLE IF EXISTS \"${SCHEMA}\".\"${TABLE}\";
 EOF
 
 	# Realiza a verificação da estrutura das tabelas.
