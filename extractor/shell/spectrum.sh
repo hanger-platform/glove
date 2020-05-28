@@ -679,7 +679,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
     fi
 
 	# Identifica a quantidade de registros na tabela.
-    ATHENA_QUERY_ID=`aws athena start-query-execution --query-string "select count(1) from \"${SCHEMA}\".\"${TABLE}\";" --output text --result-configuration OutputLocation=${STORAGE_STAGING_QUEUE_PATH}`
+    ATHENA_QUERY_ID=`aws athena start-query-execution --query-string "select count(1) from ${SCHEMA}.${TABLE};" --output text --result-configuration OutputLocation=${STORAGE_STAGING_QUEUE_PATH}`
     error_check
 
     while true
