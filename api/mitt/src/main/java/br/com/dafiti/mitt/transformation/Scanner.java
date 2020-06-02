@@ -47,8 +47,6 @@ import org.reflections.Reflections;
  */
 public class Scanner {
 
-    private static Scanner scanner;
-
     private final Map<String, Transformable> instances = new ConcurrentHashMap();
     private final Map<String, Class<? extends Transformable>> clazzes = new ConcurrentHashMap();
 
@@ -60,7 +58,7 @@ public class Scanner {
     /**
      *
      */
-    private Scanner() {
+    public Scanner() {
         Set<Class<? extends Transformable>> classes = new Reflections().getSubTypesOf(Transformable.class);
         Iterator<Class<? extends Transformable>> iterator = classes.iterator();
 
@@ -69,23 +67,6 @@ public class Scanner {
             String transformationName = tranformation.getSimpleName().toLowerCase();
             this.clazzes.put(transformationName, tranformation);
         }
-    }
-
-    /**
-     *
-     * @return
-     */
-    public static Scanner getInstance() {
-        if (scanner == null) {
-            synchronized (Scanner.class) {
-                if (scanner == null) {
-                    scanner = new Scanner();
-                }
-
-            }
-        }
-
-        return scanner;
     }
 
     /**
