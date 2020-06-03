@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.sftp.SFTP --host="sftp.ad4push.msp.fr.clara.net" --credentials="/home/valdiney/credentials/accengage.json" --directory="/exports" --pattern="exportDevices_519_*.csv" --output="/tmp/accengage/export_devices/xxx.csv" --start_date=2020-04-15 --end_date=2020-04-17 --field="--field=campo_valor_fixo::fixed(valor_fixo)+firstopen+opencount+model+version+::md5([[version]])+::concat([[opencount,model,version]])+version_so_numero::regexp(version,[0-9]{1,2}[.,]\d[.,][0-9]{1,2},DEFAULTVALUE)" --key="::FarmFingerprint([[opencount,model,version]])" --partition="::FileName()" --delimiter=","</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.sftp.SFTP --host=files.dc2.responsys.net --credentials=/home/valdiney/credentials/responsys '--directory=/home/cli/dafitibr_scp/CED\ FIles' '--pattern=*54206_SKIPPED_*' --output=/tmp/responsys/dafiti_br/skipped/ --start_date=2020-05-31 --end_date=2020-06-02 --field=event_type_id+account_id+list_id+riid+customer_id+event_captured_dt+event_stored_dt+campaign_id+launch_id+email+email_isp+email_format+offer_signature_id+dynamic_content_signature_id+message_size+segment_info+contact_info+reason+track '--partition=::dateformat(event_captured_dt,dd-MMM-yyyy HH:mm:ss,yyyyMM)' '--key=::md5([[riid,event_captured_dt,launch_id]])' --delimiter=,</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.sftp.SFTP --host="sftp.ad4push.msp.fr.clara.net" --credentials="/home/valdiney/credentials/accengage.json" --directory="/exports" --pattern="exportDevices_519_*.csv" --output="/tmp/accengage/export_devices/xxx.csv" --start_date=2020-04-15 --end_date=2020-04-17 --field="--field=campo_valor_fixo::fixed(valor_fixo)+firstopen+opencount+model+version+::md5([[version]])+::concat([[opencount,model,version]])+version_so_numero::regexp(version,[0-9]{1,2}[.,]\d[.,][0-9]{1,2},DEFAULTVALUE)" --key="::FarmFingerprint([[opencount,model,version]])" --partition="::FileName()" --delimiter=","</exec.args>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.sftp.SFTP --host=files.dc2.responsys.net --credentials=/home/valdiney/credentials/responsys '--directory=/home/cli/dafitibr_scp/CED\ FIles' '--pattern=*54206_SKIPPED_*' --output=/tmp/responsys/dafiti_br/skipped/ --start_date=2020-05-31 --end_date=2020-06-02 --field=event_type_id+account_id+list_id+riid+customer_id+event_captured_dt+event_stored_dt+campaign_id+launch_id+email+email_isp+email_format+offer_signature_id+dynamic_content_signature_id+message_size+segment_info+contact_info+reason+track '--partition=::dateformat(event_captured_dt,dd-MMM-yyyy HH:mm:ss,yyyyMM)' '--key=::md5([[riid,event_captured_dt,launch_id]])' --delimiter=,</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.sftp.SFTP --host="sftp.ad4push.msp.fr.clara.net" --credentials="/home/valdiney/credentials/accengage.json" --directory="/exports" --pattern="exportDevices_519_*.csv" --output="/tmp/accengage/export_devices/xxx.csv" --start_date=2020-04-15 --end_date=2020-04-17 --field="--field=campo_valor_fixo::fixed(valor_fixo)+firstopen+opencount+model+version+::md5([[version]])+::concat([[opencount,model,version]])+version_so_numero::regexp(version,[0-9]{1,2}[.,]\d[.,][0-9]{1,2},DEFAULTVALUE)" --key="::FarmFingerprint([[opencount,model,version]])" --partition="::FileName()" --delimiter=","</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.sftp.SFTP --host=files.dc2.responsys.net --credentials=/home/valdiney/credentials/responsys '--directory=/home/cli/dafitibr_scp/CED\ FIles' '--pattern=*54206_SKIPPED_*' --output=/tmp/responsys/dafiti_br/skipped/ --start_date=2020-05-31 --end_date=2020-06-02 --field=event_type_id+account_id+list_id+riid+customer_id+event_captured_dt+event_stored_dt+campaign_id+launch_id+email+email_isp+email_format+offer_signature_id+dynamic_content_signature_id+message_size+segment_info+contact_info+reason+track '--partition=::dateformat(event_captured_dt,dd-MMM-yyyy HH:mm:ss,yyyyMM)' '--key=::md5([[riid,event_captured_dt,launch_id]])' --delimiter=,</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>

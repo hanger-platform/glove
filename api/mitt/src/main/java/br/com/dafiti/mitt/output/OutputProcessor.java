@@ -96,6 +96,7 @@ public class OutputProcessor implements Runnable {
 
         this.writer = new CsvWriter(
                 new File(writerSettings.getOutputFile().getAbsolutePath() + "/" + FilenameUtils.removeExtension(input.getName()) + ".csv"),
+                this.writerSettings.getEncode(),
                 this.getCSVSettings());
     }
 
