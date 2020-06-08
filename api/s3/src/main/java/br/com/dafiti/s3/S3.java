@@ -111,32 +111,34 @@ public class S3 {
             Logger.getLogger(S3.class.getName()).log(Level.INFO, "Downloading files from: {0}/{1}", new Object[]{cli.getParameter("bucket"), cli.getParameter("prefix")});
 
             for (S3ObjectSummary s3ObjectSummary : s3ObjectSummaries) {
-                LocalDate updatedDate = LocalDate.fromDateFields(s3ObjectSummary.getLastModified());
+                if (s3ObjectSummary.getSize() > 0) {
+                    LocalDate updatedDate = LocalDate.fromDateFields(s3ObjectSummary.getLastModified());
 
-                //Identifies if the file modification date is between start_date and end_date.
-                if (updatedDate.compareTo(LocalDate.parse(cli.getParameter("start_date"))) >= 0
-                        && updatedDate.compareTo(LocalDate.parse(cli.getParameter("end_date"))) <= 0) {
+                    //Identifies if the file modification date is between start_date and end_date.
+                    if (updatedDate.compareTo(LocalDate.parse(cli.getParameter("start_date"))) >= 0
+                            && updatedDate.compareTo(LocalDate.parse(cli.getParameter("end_date"))) <= 0) {
 
-                    Logger.getLogger(S3.class.getName()).log(Level.INFO, "Transfering: {0} of {1}", new Object[]{s3ObjectSummary.getKey(), s3ObjectSummary.getLastModified()});
+                        Logger.getLogger(S3.class.getName()).log(Level.INFO, "Transfering: {0} of {1}", new Object[]{s3ObjectSummary.getKey(), s3ObjectSummary.getLastModified()});
 
-                    //Identifies the output file. 
-                    File outputFile = new File(outputPath.toString() + "/" + s3ObjectSummary.getKey().replaceAll("/", "_"));
+                        //Identifies the output file. 
+                        File outputFile = new File(outputPath.toString() + "/" + s3ObjectSummary.getKey().replaceAll("/", "_"));
 
-                    //Transfer a file to local filesystem.               
-                    TransferState transferState = downloadObject(cli.getParameter("bucket"), s3ObjectSummary.getKey(), outputFile);
+                        //Transfer a file to local filesystem.               
+                        TransferState transferState = downloadObject(cli.getParameter("bucket"), s3ObjectSummary.getKey(), outputFile);
 
-                    //Identifies if should retry.
-                    if (!transferState.equals(TransferState.Completed)) {
-                        for (int i = 0; i < cli.getParameterAsInteger("retries"); i++) {
-                            transferState = downloadObject(cli.getParameter("bucket"), s3ObjectSummary.getKey(), outputFile);
-
-                            if (transferState.equals(TransferState.Completed)) {
-                                break;
-                            }
-                        }
-
+                        //Identifies if should retry.
                         if (!transferState.equals(TransferState.Completed)) {
-                            throw new AmazonClientException("Fail downloading object" + cli.getParameter("bucket") + "/" + s3ObjectSummary.getKey() + " with state " + transferState.name() + "!");
+                            for (int i = 0; i < cli.getParameterAsInteger("retries"); i++) {
+                                transferState = downloadObject(cli.getParameter("bucket"), s3ObjectSummary.getKey(), outputFile);
+
+                                if (transferState.equals(TransferState.Completed)) {
+                                    break;
+                                }
+                            }
+
+                            if (!transferState.equals(TransferState.Completed)) {
+                                throw new AmazonClientException("Fail downloading object" + cli.getParameter("bucket") + "/" + s3ObjectSummary.getKey() + " with state " + transferState.name() + "!");
+                            }
                         }
                     }
                 }
