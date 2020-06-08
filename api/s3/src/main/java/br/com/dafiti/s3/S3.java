@@ -108,7 +108,7 @@ public class S3 {
             //Defines the output path. 
             Path outputPath = Files.createTempDirectory("s3_");
 
-            Logger.getLogger(S3.class.getName()).log(Level.INFO, "Downloading files from: {0}{1}", new Object[]{cli.getParameter("bucket"), cli.getParameter("prefix")});
+            Logger.getLogger(S3.class.getName()).log(Level.INFO, "Downloading files from: {0}/{1}", new Object[]{cli.getParameter("bucket"), cli.getParameter("prefix")});
 
             for (S3ObjectSummary s3ObjectSummary : s3ObjectSummaries) {
                 LocalDate updatedDate = LocalDate.fromDateFields(s3ObjectSummary.getLastModified());
