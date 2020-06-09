@@ -151,7 +151,9 @@ public class Converter {
         converter = new Converter();
 
         try {
-            Logger.getLogger(Converter.class).info("GLOVE - File converter started");
+            System.out.println("GLOVE - File converter started");
+            System.out.println("Parquet 1.11.0");
+            System.out.println("ORC 1.5.6");
 
             //Parse the options.
             CommandLine line = new DefaultParser().parse(options, args);
