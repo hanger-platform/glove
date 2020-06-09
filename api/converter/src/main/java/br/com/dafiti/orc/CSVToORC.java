@@ -34,7 +34,6 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import org.apache.commons.io.FileUtils;
