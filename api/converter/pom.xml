@@ -34,23 +34,23 @@
                 </configuration>
             </plugin>
         </plugins>
-         <finalName>converter</finalName>
+        <finalName>converter</finalName>
     </build>
     <dependencies>
         <dependency>
             <groupId>org.apache.avro</groupId>
             <artifactId>avro</artifactId>
-            <version>1.8.2</version>
+            <version>1.9.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-common</artifactId>
-            <version>3.2.0</version>
+            <version>3.2.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.parquet</groupId>
             <artifactId>parquet-avro</artifactId>
-            <version>1.10.1</version>
+            <version>1.11.0</version>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
@@ -60,7 +60,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20190722</version>
+            <version>20200518</version>
         </dependency>
         <dependency>
             <groupId>commons-validator</groupId>
@@ -80,7 +80,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.11.306</version>
+            <version>1.11.442</version>
         </dependency>
     </dependencies>
     <properties>

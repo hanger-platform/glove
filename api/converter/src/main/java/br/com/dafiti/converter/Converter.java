@@ -151,6 +151,8 @@ public class Converter {
         converter = new Converter();
 
         try {
+            Logger.getLogger(Converter.class).info("GLOVE - File converter started");
+
             //Parse the options.
             CommandLine line = new DefaultParser().parse(options, args);
 
@@ -232,9 +234,9 @@ public class Converter {
 
                 if (debug) {
                     Logger.getRootLogger().setLevel(Level.DEBUG);
-                }else{
+                } else {
                     Logger.getRootLogger().setLevel(Level.ERROR);
-                }                
+                }
             }
 
             //Identify how many files should be converted simultaneously. 
