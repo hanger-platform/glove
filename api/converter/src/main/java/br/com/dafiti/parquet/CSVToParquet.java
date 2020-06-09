@@ -30,7 +30,6 @@ import com.univocity.parsers.csv.CsvParserSettings;
 import java.io.File;
 import java.math.BigDecimal;
 import java.nio.file.Files;
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -56,6 +55,8 @@ import org.apache.parquet.avro.AvroParquetWriter;
 import org.apache.parquet.hadoop.ParquetReader;
 import org.apache.parquet.hadoop.ParquetWriter;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
+
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 /**
  * This class read a csv file and write the records into a parquet file.

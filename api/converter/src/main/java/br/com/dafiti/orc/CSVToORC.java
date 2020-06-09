@@ -30,7 +30,6 @@ import com.univocity.parsers.csv.CsvParserSettings;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -60,6 +59,8 @@ import org.apache.orc.TypeDescription;
 import org.apache.orc.TypeDescription.Category;
 import org.apache.orc.Writer;
 import org.apache.orc.mapred.OrcTimestamp;
+
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 /**
  * This class read a csv file and write the records into a orc file
