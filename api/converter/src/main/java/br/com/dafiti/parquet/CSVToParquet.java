@@ -382,7 +382,7 @@ public class CSVToParquet implements Runnable {
                 }
             }
         } catch (Exception ex) {
-            Logger.getLogger(this.getClass()).error("Error [" + ex + "] generation parquet file " + parquetFile.getName());
+            Logger.getLogger(this.getClass()).error("Error [" + ex + "] generating parquet file " + parquetFile.getName());
             System.exit(1);
         }
     }
