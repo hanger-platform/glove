@@ -20,7 +20,7 @@
         <dependency>
             <groupId>com.google.api-ads</groupId>
             <artifactId>dfp-axis</artifactId>
-            <version>RELEASE</version>
+            <version>4.10.0</version>
         </dependency>               
     </dependencies>
 
@@ -36,6 +36,18 @@
                         <goals>
                             <goal>shade</goal>
                         </goals>
+                        <configuration>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>                        
                     </execution>
                 </executions>
             </plugin>
