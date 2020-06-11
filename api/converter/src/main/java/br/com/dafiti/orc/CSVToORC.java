@@ -33,7 +33,6 @@ import java.nio.file.Files;
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import org.apache.commons.io.FileUtils;
@@ -60,6 +59,8 @@ import org.apache.orc.TypeDescription;
 import org.apache.orc.TypeDescription.Category;
 import org.apache.orc.Writer;
 import org.apache.orc.mapred.OrcTimestamp;
+
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 /**
  * This class read a csv file and write the records into a orc file
@@ -162,14 +163,16 @@ public class CSVToORC implements Runnable {
         //Log the process init.
         Logger.getLogger(this.getClass()).info("Converting CSV to Parquet: " + inputFile.getAbsolutePath());
 
+        //Identifies the file name pattern. 
+        String path = FilenameUtils.getFullPath(inputFile.getAbsolutePath());
+        String name = FilenameUtils.getBaseName(inputFile.getName());
+
+        //Get the parquet and crc file.
+        File originalFile = new File(path + name + ".original");
+        File transientFile = new File(path + name + ".transient");
+        File orcFile = new File(path + name + "." + this.compression.toString().toLowerCase() + ".orc");
+
         try {
-            String path = FilenameUtils.getFullPath(inputFile.getAbsolutePath());
-            String name = FilenameUtils.getBaseName(inputFile.getName());
-
-            //Get the parquet and crc file.
-            File orcFile = new File(path + name + "." + this.compression.toString().toLowerCase() + ".orc");
-            File originalFile = new File(path + name + ".original.orc");
-
             //Unique key list.
             HashSet<String> key = new HashSet();
 
@@ -177,14 +180,12 @@ public class CSVToORC implements Runnable {
             Statistics statistics = new Statistics();
 
             //Remove old files. 
+            Files.deleteIfExists(originalFile.toPath());
+            Files.deleteIfExists(transientFile.toPath());
             Files.deleteIfExists(orcFile.toPath());
 
-            if (merge) {
-                Files.deleteIfExists(originalFile.toPath());
-            }
-
             //Define the writer.
-            Writer orcWriter = OrcFile.createWriter(new Path(orcFile.getAbsolutePath()), OrcFile
+            Writer orcWriter = OrcFile.createWriter(new Path(transientFile.getAbsolutePath()), OrcFile
                     .writerOptions(new Configuration())
                     .setSchema(this.schema)
                     .compress(this.compression)
@@ -314,10 +315,11 @@ public class CSVToORC implements Runnable {
                         + (statistics.getOutputRows() + (statistics.getInputRows() - statistics.getOutputUpdatedRows())));
             }
 
+            //Rename transient to final file. 
+            Files.move(transientFile.toPath(), orcFile.toPath(), REPLACE_EXISTING);
+
             //Remove the original file.
-            if (merge) {
-                Files.deleteIfExists(originalFile.toPath());
-            }
+            Files.deleteIfExists(originalFile.toPath());
 
             //Identify if should remove csv file. 
             if (replace) {
@@ -329,9 +331,7 @@ public class CSVToORC implements Runnable {
                 }
             }
         } catch (Exception ex) {
-            Logger.getLogger(this.getClass()).error("Error [" + ex + "] converting CSV to ORC");
-            Logger.getLogger(this.getClass()).error(Arrays.toString(ex.getStackTrace()));
-
+            Logger.getLogger(this.getClass()).error("Error [" + ex + "] generating orc file " + orcFile.getName());
             System.exit(1);
         }
     }
@@ -422,7 +422,7 @@ public class CSVToORC implements Runnable {
         parserSettings.getFormat().setQuoteEscape(quoteEscape);
 
         //Define the input buffer.        
-        parserSettings.setInputBufferSize(5 * (1024 * 1024));
+        parserSettings.setInputBufferSize(2 * (1024 * 1024));
 
         //Define a csv parser.
         CsvParser csvParser = new CsvParser(parserSettings);

@@ -151,6 +151,8 @@ public class Converter {
         converter = new Converter();
 
         try {
+            System.out.println("GLOVE - File converter started");
+
             //Parse the options.
             CommandLine line = new DefaultParser().parse(options, args);
 
@@ -232,9 +234,9 @@ public class Converter {
 
                 if (debug) {
                     Logger.getRootLogger().setLevel(Level.DEBUG);
-                }else{
+                } else {
                     Logger.getRootLogger().setLevel(Level.ERROR);
-                }                
+                }
             }
 
             //Identify how many files should be converted simultaneously. 
@@ -297,6 +299,8 @@ public class Converter {
                 if (target.equalsIgnoreCase("parquet")) {
                     Schema schema = new Parser(new File(schemaFile)).getAvroSchema();
 
+                    System.out.println("Parquet 1.11.0");
+
                     for (File file : files) {
                         if (file.isDirectory() || "csv".equals(FilenameUtils.getExtension(file.getName()))) {
                             executor.execute(
@@ -321,6 +325,8 @@ public class Converter {
 
                 } else if (target.equalsIgnoreCase("orc")) {
                     TypeDescription schema = new Parser(new File(schemaFile)).getOrcSchema();
+
+                    System.out.println("ORC 1.5.6");
 
                     for (File file : files) {
                         if (file.isDirectory() || "csv".equals(FilenameUtils.getExtension(file.getName()))) {

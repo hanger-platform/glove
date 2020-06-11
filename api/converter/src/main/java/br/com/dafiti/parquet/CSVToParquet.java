@@ -32,7 +32,6 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -48,7 +47,7 @@ import org.apache.avro.generic.GenericRecordBuilder;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.parquet.avro.AvroParquetReader;
@@ -56,6 +55,8 @@ import org.apache.parquet.avro.AvroParquetWriter;
 import org.apache.parquet.hadoop.ParquetReader;
 import org.apache.parquet.hadoop.ParquetWriter;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
+
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 /**
  * This class read a csv file and write the records into a parquet file.
@@ -261,15 +262,16 @@ public class CSVToParquet implements Runnable {
         //Log the process init.
         Logger.getLogger(this.getClass()).info("Converting CSV to Parquet: " + inputFile.getAbsolutePath());
 
+        //Identifies the file name pattern. 
+        String path = FilenameUtils.getFullPath(inputFile.getAbsolutePath());
+        String name = FilenameUtils.getBaseName(inputFile.getName());
+
+        //Get the parquet and crc file.            
+        File originalFile = new File(path + name + ".original");
+        File transientFile = new File(path + name + ".transient");
+        File parquetFile = new File(path + name + "." + this.compression.toString().toLowerCase() + ".parquet");
+
         try {
-            String path = FilenameUtils.getFullPath(inputFile.getAbsolutePath());
-            String name = FilenameUtils.getBaseName(inputFile.getName());
-
-            //Get the parquet and crc file.
-            File parquetFile = new File(path + name + "." + this.compression.toString().toLowerCase() + ".parquet");
-            File parquetCRCFile = new File(path + name + ".parquet.crc");
-            File originalFile = new File(path + name + ".original.parquet");
-
             //Unique key list.
             HashSet<String> key = new HashSet();
 
@@ -277,21 +279,16 @@ public class CSVToParquet implements Runnable {
             Statistics statistics = new Statistics();
 
             //Remove old files. 
+            Files.deleteIfExists(originalFile.toPath());
+            Files.deleteIfExists(transientFile.toPath());
             Files.deleteIfExists(parquetFile.toPath());
-
-            if (merge) {
-                Files.deleteIfExists(originalFile.toPath());
-            }
-
-            //Remove old crc files.
-            Files.deleteIfExists(parquetCRCFile.toPath());
 
             //Enable decimal conversion support.
             GenericData genericData = new GenericData();
             genericData.addLogicalTypeConversion(new Conversions.DecimalConversion());
 
             //Define the writer.
-            ParquetWriter<GenericRecord> parquetWriter = AvroParquetWriter.<GenericRecord>builder(new Path(parquetFile.getAbsolutePath()))
+            ParquetWriter<GenericRecord> parquetWriter = AvroParquetWriter.<GenericRecord>builder(new Path(transientFile.getAbsolutePath()))
                     .withSchema(schema)
                     .withDataModel(genericData)
                     .withCompressionCodec(this.compression)
@@ -369,13 +366,11 @@ public class CSVToParquet implements Runnable {
                         + (statistics.getOutputRows() + (statistics.getInputRows() - statistics.getOutputUpdatedRows())));
             }
 
-            //Remove the parquet crc file.
-            Files.deleteIfExists(parquetCRCFile.toPath());
+            //Rename transient to final file. 
+            Files.move(transientFile.toPath(), parquetFile.toPath(), REPLACE_EXISTING);
 
             //Remove the original file.
-            if (merge) {
-                Files.deleteIfExists(originalFile.toPath());
-            }
+            Files.deleteIfExists(originalFile.toPath());
 
             //Identify if should remove csv file. 
             if (replace) {
@@ -387,9 +382,7 @@ public class CSVToParquet implements Runnable {
                 }
             }
         } catch (Exception ex) {
-            Logger.getLogger(this.getClass()).error("Error [" + ex + "] converting CSV to Parquet");
-            Logger.getLogger(this.getClass()).error(Arrays.toString(ex.getStackTrace()));
-
+            Logger.getLogger(this.getClass()).error("Error [" + ex + "] generating parquet file " + parquetFile.getName());
             System.exit(1);
         }
     }
@@ -427,7 +420,7 @@ public class CSVToParquet implements Runnable {
         parserSettings.getFormat().setQuoteEscape(quoteEscape);
 
         //Define the input buffer.
-        parserSettings.setInputBufferSize(5 * (1024 * 1024));
+        parserSettings.setInputBufferSize(2 * (1024 * 1024));
 
         //Define a csv parser.
         CsvParser csvParser = new CsvParser(parserSettings);
