@@ -156,6 +156,8 @@ public class SFTP {
                     );
                 }
             }
+            
+            Logger.getLogger(SFTP.class.getName()).log(Level.INFO, "Writing output file to: {0}", cli.getParameter("output"));
 
             //Write to the output.
             mitt.getReaderSettings().setDelimiter(cli.getParameter("delimiter").charAt(0));
