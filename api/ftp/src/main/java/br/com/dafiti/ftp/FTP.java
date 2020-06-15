@@ -121,18 +121,18 @@ public class FTP {
                 //Identifies if the file modification date is between start_date and end_date.
                 if (updatedDate.compareTo(LocalDate.parse(cli.getParameter("start_date"))) >= 0
                         && updatedDate.compareTo(LocalDate.parse(cli.getParameter("end_date"))) <= 0) {
-                    
+
                     Logger.getLogger(FTP.class.getName()).log(Level.INFO, "Transfering: {0} of {1}", new Object[]{ftpFile.getName(), updatedDate});
-                    
+
                     //Defines output file.
                     File outputFile = new File(outputPath.toString() + "/" + ftpFile.getName());
                     OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile));
-                    
+
                     //Downloads file from FTP.
                     if (!ftpClient.retrieveFile(ftpFile.getName(), outputStream)) {
                         Logger.getLogger(FTP.class.getName()).log(Level.SEVERE, "Fail downloading file {0} ", new Object[]{ftpFile.getName()});
                     }
-                    
+
                     outputStream.close();
                 }
             }
