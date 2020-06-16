@@ -42,14 +42,20 @@ public class Configuration {
     private List<Transformable> tranformations;
     private Map<Field, Integer> fieldIndex;
     private Map<Field, Integer> originalFieldIndex;
-    private boolean debug;
 
+    private final boolean debug;
     private final Scanner scanner;
     private final List<Field> fields = new ArrayList();
     private final List<Parameter> parameters = new ArrayList();
 
     public Configuration() {
-        this.scanner = new Scanner();
+        this.debug = false;
+        this.scanner = Scanner.getInstance();
+    }
+
+    public Configuration(boolean debug) {
+        this.debug = debug;
+        this.scanner = Scanner.getInstance();
     }
 
     /**
@@ -477,14 +483,6 @@ public class Configuration {
                         optional));
 
         return this;
-    }
-
-    /**
-     *
-     * @param debug
-     */
-    public void setDebug(boolean debug) {
-        this.debug = debug;
     }
 
     /**

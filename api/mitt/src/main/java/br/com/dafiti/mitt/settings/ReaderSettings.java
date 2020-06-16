@@ -23,14 +23,17 @@
  */
 package br.com.dafiti.mitt.settings;
 
+import java.util.Properties;
+
 /**
  *
  * @author Valdiney V GOMES
  */
-public class ReaderSettings extends Settings {
+public class ReaderSettings extends Settings<ReaderSettings> {
 
     private int skipLines;
     private boolean remove;
+    private Properties properties;
 
     public ReaderSettings() {
         this.skipLines = 0;
@@ -52,6 +55,24 @@ public class ReaderSettings extends Settings {
 
     public ReaderSettings setRemove(boolean remove) {
         this.remove = remove;
+        return this;
+    }
+
+    public Properties getProperties() {
+        if (properties == null) {
+            properties = new Properties();
+        }
+
+        return properties;
+    }
+
+    public ReaderSettings setProperties(Properties properties) {
+        this.properties = properties;
+        return this;
+    }
+
+    public ReaderSettings addProperties(String key, String value) {
+        this.getProperties().setProperty(key, value);
         return this;
     }
 }

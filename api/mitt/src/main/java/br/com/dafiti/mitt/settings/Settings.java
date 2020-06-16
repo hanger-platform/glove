@@ -27,7 +27,7 @@ package br.com.dafiti.mitt.settings;
  *
  * @author Valdiney V GOMES
  */
-abstract class Settings {
+abstract class Settings<T> {
 
     private char delimiter;
     private char quote;
@@ -50,36 +50,35 @@ abstract class Settings {
         return delimiter;
     }
 
-    public Settings setDelimiter(char delimiter) {
+    public T setDelimiter(char delimiter) {
         this.delimiter = delimiter;
-
-        return this;
+        return (T) this;
     }
 
     public char getQuote() {
         return quote;
     }
 
-    public Settings setQuote(char quote) {
+    public T setQuote(char quote) {
         this.quote = quote;
-        return this;
+        return (T) this;
     }
 
     public char getQuoteEscape() {
         return quoteEscape;
     }
 
-    public Settings setQuoteEscape(char quoteEscape) {
+    public T setQuoteEscape(char quoteEscape) {
         this.quoteEscape = quoteEscape;
-        return this;
+        return (T) this;
     }
 
     public String getEncode() {
         return encode;
     }
 
-    public Settings setEncode(String encode) {
+    public T setEncode(String encode) {
         this.encode = encode;
-        return this;
+        return (T) this;
     }
 }
