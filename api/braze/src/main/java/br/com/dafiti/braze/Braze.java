@@ -23,14 +23,16 @@
  */
 package br.com.dafiti.braze;
 
-import java.io.BufferedReader;
+import br.com.dafiti.mitt.Mitt;
+import br.com.dafiti.mitt.cli.CommandLineInterface;
+import br.com.dafiti.mitt.exception.DuplicateEntityException;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -46,7 +48,59 @@ public class Braze {
      *
      * @param args cli parameteres provided by command line.
      */
-    public static void main(String[] args) {        
-        
+    public static void main(String[] args) {
+        Logger.getLogger(Braze.class.getName()).info("GLOVE - Braze Extractor started");
+
+        //Define the mitt.
+        Mitt mitt = new Mitt();
+
+        try {
+            //Defines parameters.
+            mitt.getConfiguration()
+                    .addParameter("c", "credentials", "Credentials file", "", true, false)
+                    .addParameter("o", "output", "Output file", "", true, false)
+                    .addParameter("e", "endpoint", "Identifies the endpoint to extract data from", "", true, false)
+                    .addParameter("f", "field", "Fields to be extracted from the file", "", true, false)
+                    .addParameter("d", "delimiter", "(Optional) File delimiter; ';' as default", ";")
+                    .addParameter("p", "partition", "(Optional)  Partition, divided by + if has more than one field")
+                    .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "");
+
+            //Reads the command line interface. 
+            CommandLineInterface cli = mitt.getCommandLineInterface(args);
+
+            //Reads the credentials file. 
+            JSONParser parser = new JSONParser();
+            JSONObject credentials = (JSONObject) parser.parse(new FileReader(cli.getParameter("credentials")));
+
+            //Identifies the approprieted report to extract.
+            switch (cli.getParameter("endpoint").toLowerCase()) {
+                case "campaigns":
+                    new Campaigns(
+                            (String) credentials.get("url"),
+                            (String) credentials.get("authorization"),
+                            cli.getParameter("output"),
+                            cli.getParameterAsList("key", "\\+"),
+                            cli.getParameterAsList("partition", "\\+"),
+                            cli.getParameterAsList("field", "\\+")).extract();
+                    break;
+                default:
+                    Logger.getLogger(Braze.class.getName()).log(Level.SEVERE, "Endpoint {0} not yet implemented", cli.getParameter("endpoint"));
+            }
+
+        } catch (DuplicateEntityException
+                | FileNotFoundException
+                | ParseException ex) {
+
+            Logger.getLogger(Braze.class.getName()).log(Level.SEVERE, "GLOVE - Braze fail: ", ex);
+            System.exit(1);
+        } catch (IOException ex) {
+
+            Logger.getLogger(Braze.class.getName()).log(Level.SEVERE, "GLOVE - Braze fail: ", ex);
+            System.exit(1);
+        } finally {
+            mitt.close();
+        }
+
+        Logger.getLogger(Braze.class.getName()).info("GLOVE - Braze Extractor finalized");
     }
 }
