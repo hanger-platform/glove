@@ -76,7 +76,9 @@ public class MicrosoftBlobStorage {
                     .addParameter("d", "delimiter", "(Optional) File delimiter; ';' as default", ";")
                     .addParameter("P", "prefix", "(Optional) Return blobs whose names begin with the specified prefix", null)
                     .addParameter("pa", "partition", "(Optional)  Partition, divided by + if has more than one field")
-                    .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "");
+                    .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "")
+                    .addParameter("t", "timeout", "(Optional)(Default is 60) API timeout in minutes.", "60")
+                    .addParameter("t", "encode", "(Optional)(Default is ISO-8859-1) Encode blob file.", "ISO-8859-1");
 
             //Read the command line interface. 
             CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -99,41 +101,52 @@ public class MicrosoftBlobStorage {
             String accountKey = credentials.get("accountKey").toString();
 
             //Use your storage account name and key to create a credential object.
-            StorageSharedKeyCredential credential = new StorageSharedKeyCredential(accountName, accountKey);
+            StorageSharedKeyCredential credential = new StorageSharedKeyCredential(
+                    accountName, 
+                    accountKey
+            );
 
             //Get your Storage account blob service URL endpoint.
-            String endpoint = String.format(Locale.ROOT, "https://%s.blob.core.windows.net", accountName);
+            String endpoint = String.format(
+                    Locale.ROOT, 
+                    "https://%s.blob.core.windows.net", 
+                    accountName
+            );
 
-            //Create a BlobServiceClient object that wraps the service endpoint, credential and a request pipeline.
+            //Create an instance of the client.
             BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
                     .endpoint(endpoint)
                     .credential(credential)
                     .buildClient();
 
+            //Create an instance of the specified container.
             BlobContainerClient blobContainerClient = blobServiceClient.getBlobContainerClient(cli.getParameter("container"));
             
+            //Get list blobs
             PagedIterable<BlobItem> listBlobs = blobContainerClient.listBlobs(
                     new ListBlobsOptions().setPrefix(cli.getParameter("prefix")),
-                    Duration.ofDays(1) // *************Verificar
+                    Duration.ofMinutes(Long.valueOf(cli.getParameter("timeout")))
             );
 
             Path outputPath = Files.createTempDirectory("microsoft_blob_storage_");
-
-            System.out.println("Path: " + outputPath.toString());
+            
+            Logger.getLogger(MicrosoftBlobStorage.class.getName()).log(Level.INFO, "Downloading files from: {0} / prefix: {1}", new Object[]{cli.getParameter("container"), cli.getParameter("prefix")});
 
             for (BlobItem blobItem : listBlobs) {
                 String fileName = blobItem.getName();
-
+                
+                //Create an instance of the specified blob.
                 BlobClient blobClient = blobContainerClient.getBlobClient(fileName);
 
                 if (blobClient.exists()) {
-
                     LocalDate updatedDate = blobClient.getProperties().getLastModified().toLocalDate();
 
                     //Identifies if the file modification date is between start_date and end_date.
                     if (updatedDate.compareTo(LocalDate.parse(cli.getParameter("start_date"))) >= 0
                             && updatedDate.compareTo(LocalDate.parse(cli.getParameter("end_date"))) <= 0) {
-
+                        
+                        Logger.getLogger(MicrosoftBlobStorage.class.getName()).log(Level.INFO, "Transfering: {0}", fileName);
+                        
                         blobClient.downloadToFile(outputPath.toString().concat("/").concat(fileName));
                     }
                 }
@@ -143,11 +156,12 @@ public class MicrosoftBlobStorage {
             
             // Write to the output.
             mitt.getReaderSettings().setDelimiter(cli.getParameter("delimiter").charAt(0));
-            mitt.getReaderSettings().setEncode("ISO-8859-1");
+            mitt.getReaderSettings().setEncode(cli.getParameter("encode"));
             mitt.write(outputPath.toFile());
 
             //Remove temporary path. 
             Files.delete(outputPath);
+            
         } catch (DuplicateEntityException
                 | IOException ex) {
             Logger.getLogger(MicrosoftBlobStorage.class.getName()).log(Level.SEVERE, "Microsoft Blob Storage - Failure: ", ex);

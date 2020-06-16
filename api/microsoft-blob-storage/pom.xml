@@ -5,10 +5,37 @@
 
     <groupId>br.com.dafiti</groupId>
     <artifactId>microsoft-azure-storage-blob</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>jar</packaging>
 
     <name>microsoft-blob-storage</name>
+
+    <dependencies>
+        
+        <!-- Azure Storage Blob -->
+        <dependency>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-storage-blob</artifactId>
+            <version>12.6.0</version>
+        </dependency>
+        
+        <!-- MITT -->
+        <dependency>
+            <groupId>br.com.dafiti</groupId>
+            <artifactId>mitt</artifactId>
+            <version>1.0.1</version>
+            <type>jar</type>
+        </dependency>
+        
+        <!-- JSON -->
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1.1</version>
+            <type>jar</type>
+        </dependency>
+        
+    </dependencies>
     
     <build>
         <plugins>
@@ -45,38 +72,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-    </properties>
-
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.11</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.azure</groupId>
-            <artifactId>azure-storage-blob</artifactId>
-            <version>12.6.0</version>
-        </dependency>
-        <dependency>
-            <groupId>br.com.dafiti</groupId>
-            <artifactId>mitt</artifactId>
-            <version>1.0.1</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>com.googlecode.json-simple</groupId>
-            <artifactId>json-simple</artifactId>
-            <version>1.1.1</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <version>2.10.5</version>
-            <type>jar</type>
-        </dependency>
-    </dependencies>
+    </properties>    
     
 </project>
