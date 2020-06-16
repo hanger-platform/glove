@@ -24,14 +24,18 @@
 package br.com.dafiti.mitt;
 
 import br.com.dafiti.mitt.cli.CommandLineInterface;
+import br.com.dafiti.mitt.decoder.GZipDecoder;
 import br.com.dafiti.mitt.model.Configuration;
 import br.com.dafiti.mitt.output.Output;
 import br.com.dafiti.mitt.output.OutputProcessor;
 import br.com.dafiti.mitt.settings.ReaderSettings;
 import br.com.dafiti.mitt.settings.WriterSettings;
+import com.jcabi.manifests.Manifests;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 
 /**
@@ -47,6 +51,14 @@ public class Mitt {
     private ReaderSettings readerSettings;
     private WriterSettings writerSettings;
     private CommandLineInterface commandLineInterface;
+
+    public Mitt() {
+        try {
+            System.out.println("MITT " + Manifests.read("Implementation-Version"));
+        } catch (Exception ex) {
+            Logger.getLogger(Mitt.class.getName()).log(Level.WARNING, "Fail reading MITT version ", ex);
+        }
+    }
 
     /**
      *
