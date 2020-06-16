@@ -73,7 +73,7 @@ public class MicrosoftBlobStorage {
                     .addParameter("sd", "start_date", "Start date", "", true, false)
                     .addParameter("ed", "end_date", "End date", "", true, false)
                     .addParameter("f", "field", "Fields to be extracted from the file", "", true, false)
-                    .addParameter("d", "delimiter", "(Optional) File delimiter; ';' as default", ";")
+                    .addParameter("d", "delimiter", "(Optional) File delimiter; ',' as default", ",")
                     .addParameter("P", "prefix", "(Optional) Return blobs whose names begin with the specified prefix", null)
                     .addParameter("pa", "partition", "(Optional)  Partition, divided by + if has more than one field")
                     .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "")
