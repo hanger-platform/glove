@@ -37,10 +37,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import br.com.dafiti.mitt.Mitt;
-import br.com.dafiti.mitt.cli.CommandLineInterface;
 import br.com.dafiti.mitt.exception.DuplicateEntityException;
 import br.com.dafiti.mitt.transformation.embedded.Concat;
-import br.com.dafiti.mitt.transformation.embedded.DateFormat;
 import br.com.dafiti.mitt.transformation.embedded.Now;
 import java.util.ArrayList;
 
@@ -183,7 +181,7 @@ public class Campaigns {
                 }
             }
             httpURLConnection.disconnect();
-            
+
             //Identify if has sleep time until next API call.
             if (sleep > 0) {
                 try {

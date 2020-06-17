@@ -63,7 +63,6 @@ public class Braze {
                     .addParameter("s", "sleep", "(Optional) Sleep time in seconds at one request and another; 0 is default", "0")
                     .addParameter("p", "partition", "(Optional)  Partition, divided by + if has more than one field")
                     .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "");
-                    
 
             //Reads the command line interface. 
             CommandLineInterface cli = mitt.getCommandLineInterface(args);
