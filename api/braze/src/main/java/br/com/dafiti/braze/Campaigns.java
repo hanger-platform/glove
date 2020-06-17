@@ -129,67 +129,63 @@ public class Campaigns {
             HttpURLConnection httpURLConnection = this.getAPIResponse(this.url + CAMPAIGNS_LIST + page);
 
             //Get API Call response.
-            BufferedReader bufferedReader = new BufferedReader(
-                    new InputStreamReader(httpURLConnection.getInputStream()));
+            try (BufferedReader bufferedReader = new BufferedReader(
+                    new InputStreamReader(httpURLConnection.getInputStream()))) {
+                String output;
 
-            String output;
+                //Get campaign list from API.
+                while ((output = bufferedReader.readLine()) != null) {
+                    JSONObject jsonObject = (JSONObject) new JSONParser().parse(output);
+                    JSONArray campaigns = (JSONArray) jsonObject.get("campaigns");
 
-            //Get campaign list from API.
-            while ((output = bufferedReader.readLine()) != null) {
-                JSONObject jsonObject = (JSONObject) new JSONParser().parse(output);
-                JSONArray campaigns = (JSONArray) jsonObject.get("campaigns");
+                    Logger.getLogger(Campaigns.class.getName()).log(Level.SEVERE, "{0} campaigns found ", new Object[]{campaigns.size()});
 
-                Logger.getLogger(Campaigns.class.getName()).log(Level.SEVERE, "{0} campaigns found ", new Object[]{campaigns.size()});
+                    //Identify if at least 1 campaign was found on the page.
+                    if (campaigns.size() > 0) {
+                        page++;
 
-                //Identify if at least 1 campaign was found on the page.
-                if (campaigns.size() > 0) {
-                    page++;
+                        //Fetchs campaigns list.
+                        for (Object campaign : campaigns) {
+                            JSONObject jsonCampaign = (JSONObject) campaign;
 
-                    //Fetchs campaigns list.
-                    for (Object campaign : campaigns) {
-                        JSONObject jsonCampaign = (JSONObject) campaign;
+                            HttpURLConnection connectionCampaignDetails
+                                    = this.getAPIResponse(this.url
+                                            + CAMPAIGNS_DETAIL
+                                            + jsonCampaign.get("id"));
 
-                        HttpURLConnection connectionCampaignDetails
-                                = this.getAPIResponse(this.url
-                                        + CAMPAIGNS_DETAIL
-                                        + jsonCampaign.get("id"));
+                            //Get API Call response.
+                            try (BufferedReader brCampaignDetail = new BufferedReader(
+                                    new InputStreamReader(connectionCampaignDetails.getInputStream()))) {
+                                String line;
 
-                        //Get API Call response.
-                        BufferedReader brCampaignDetail = new BufferedReader(
-                                new InputStreamReader(connectionCampaignDetails.getInputStream()));
+                                //Get a campaign details from API.
+                                while ((line = brCampaignDetail.readLine()) != null) {
+                                    List record = new ArrayList();
+                                    JSONObject details = (JSONObject) new JSONParser().parse(line);
 
-                        String line;                        
+                                    for (String field : fields) {
+                                        //Identifies if the field exists.
+                                        if (details.containsKey(field)) {
+                                            record.add(details.get(field));
+                                        } else {
+                                            record.add(null);
+                                        }
+                                    }
 
-                        //Get a campaign details from API.
-                        while ((line = brCampaignDetail.readLine()) != null) {
-                            List record = new ArrayList();                            
-                            JSONObject details = (JSONObject) new JSONParser().parse(line);
-
-                            for (String field : fields) {
-                                //Identifies if the field exists. 
-                                if (details.containsKey(field)) {
-                                    record.add(details.get(field));
-                                } else {
-                                    record.add(null);
+                                    mitt.write(record);
                                 }
                             }
-
-                            mitt.write(record);
+                            connectionCampaignDetails.disconnect();
                         }
-
-                        brCampaignDetail.close();
-                        connectionCampaignDetails.disconnect();
+                    } else {
+                        nextPage = false;
                     }
-                } else {
-                    nextPage = false;
                 }
             }
-            
-            bufferedReader.close();
             httpURLConnection.disconnect();
 
         } while (nextPage);
-        
+
         mitt.close();
     }
 
