@@ -130,7 +130,7 @@ public class MicrosoftBlobStorage {
 
             Path outputPath = Files.createTempDirectory("microsoft_blob_storage_");
             
-            Logger.getLogger(MicrosoftBlobStorage.class.getName()).log(Level.INFO, "Downloading files from: {0} / prefix: {1}", new Object[]{cli.getParameter("container"), cli.getParameter("prefix")});
+            Logger.getLogger(MicrosoftBlobStorage.class.getName()).log(Level.INFO, "Downloading files from: {0}", cli.getParameter("container"));
 
             for (BlobItem blobItem : listBlobs) {
                 String fileName = blobItem.getName();
