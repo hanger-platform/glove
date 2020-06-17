@@ -37,7 +37,6 @@ public class MittBatchTest {
 
         mitt
                 .getReaderSettings()
-                .setDelimiter(';')
                 .setProperties("{\"skip\":\"4\",\"sheet\":\"teste\"}");
 
         mitt.setDebug(true);
