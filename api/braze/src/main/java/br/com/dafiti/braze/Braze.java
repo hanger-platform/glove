@@ -58,7 +58,7 @@ public class Braze {
                     .addParameter("c", "credentials", "Credentials file", "", true, false)
                     .addParameter("o", "output", "Output file", "", true, false)
                     .addParameter("e", "endpoint", "Identifies the endpoint to extract data from", "", true, false)
-                    .addParameter("f", "field", "Fields to be extracted from the file", "", true, false)
+                    .addParameter("f", "field", "Fields to be extracted from the file", "", true, true)
                     .addParameter("d", "delimiter", "(Optional) File delimiter; ';' as default", ";")
                     .addParameter("s", "sleep", "(Optional) Sleep time in seconds at one request and another; 0 is default", "0")
                     .addParameter("p", "partition", "(Optional)  Partition, divided by + if has more than one field")
