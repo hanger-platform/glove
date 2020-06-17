@@ -106,6 +106,14 @@
             <version>4.1.2</version>
             <type>jar</type>
         </dependency>
+        
+        <!--JSON-->
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1.1</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
        
     <properties>

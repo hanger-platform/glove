@@ -23,7 +23,14 @@
  */
 package br.com.dafiti.mitt.settings;
 
+import java.io.FileReader;
+import java.util.Iterator;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  *
@@ -66,8 +73,20 @@ public class ReaderSettings extends Settings<ReaderSettings> {
         return properties;
     }
 
-    public ReaderSettings setProperties(Properties properties) {
-        this.properties = properties;
+    public ReaderSettings setProperties(String payload) {
+        try {
+            JSONParser parser = new JSONParser();
+            JSONObject propertyObject = (JSONObject) parser.parse(payload);
+
+            if (!propertyObject.isEmpty()) {
+                propertyObject
+                        .keySet()
+                        .forEach(e -> this.addProperties((String) e, (String) propertyObject.get(e)));
+            }
+        } catch (ParseException ex) {
+            Logger.getLogger(ReaderSettings.class.getName()).log(Level.SEVERE, "Fail parsing reader settings payload", ex);
+        }
+
         return this;
     }
 
