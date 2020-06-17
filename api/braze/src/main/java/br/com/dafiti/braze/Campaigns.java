@@ -183,6 +183,18 @@ public class Campaigns {
                 }
             }
             httpURLConnection.disconnect();
+            
+            //Identify if has sleep time until next API call.
+            if (sleep > 0) {
+                try {
+                    Logger.getLogger(Campaigns.class.getName())
+                            .log(Level.INFO, "Sleeping {0} seconds until next API call", sleep);
+
+                    Thread.sleep(Long.valueOf(sleep * 1000));
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Campaigns.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
 
         } while (nextPage);
 
