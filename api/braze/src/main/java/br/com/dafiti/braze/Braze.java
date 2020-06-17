@@ -29,8 +29,6 @@ import br.com.dafiti.mitt.exception.DuplicateEntityException;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.simple.JSONObject;
@@ -62,8 +60,10 @@ public class Braze {
                     .addParameter("e", "endpoint", "Identifies the endpoint to extract data from", "", true, false)
                     .addParameter("f", "field", "Fields to be extracted from the file", "", true, false)
                     .addParameter("d", "delimiter", "(Optional) File delimiter; ';' as default", ";")
+                    .addParameter("s", "sleep", "(Optional) Sleep time in seconds at one request and another; 0 is default", "0")
                     .addParameter("p", "partition", "(Optional)  Partition, divided by + if has more than one field")
                     .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "");
+                    
 
             //Reads the command line interface. 
             CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -81,7 +81,8 @@ public class Braze {
                             cli.getParameter("output"),
                             cli.getParameterAsList("key", "\\+"),
                             cli.getParameterAsList("partition", "\\+"),
-                            cli.getParameterAsList("field", "\\+")).extract();
+                            cli.getParameterAsList("field", "\\+"),
+                            cli.getParameterAsInteger("sleep")).extract();
                     break;
                 default:
                     Logger.getLogger(Braze.class.getName()).log(Level.SEVERE, "Endpoint {0} not yet implemented", cli.getParameter("endpoint"));

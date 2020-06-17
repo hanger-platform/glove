@@ -36,6 +36,13 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import br.com.dafiti.mitt.Mitt;
+import br.com.dafiti.mitt.cli.CommandLineInterface;
+import br.com.dafiti.mitt.exception.DuplicateEntityException;
+import br.com.dafiti.mitt.transformation.embedded.Concat;
+import br.com.dafiti.mitt.transformation.embedded.DateFormat;
+import br.com.dafiti.mitt.transformation.embedded.Now;
+import java.util.ArrayList;
 
 /**
  *
@@ -48,10 +55,11 @@ public class Campaigns {
     private final String output;
     private final List key;
     private final List partition;
-    private final List fields;
+    private final List field;
+    private final int sleep;
 
-    public static final String CAMPAIGNS_LIST = "campaigns/list";
-    public static final String CAMPAIGNS_DETAIL = "campaigns/details";
+    public static final String CAMPAIGNS_LIST = "campaigns/list?page=";
+    public static final String CAMPAIGNS_DETAIL = "campaigns/details?campaign_id=";
 
     public Campaigns(
             String url,
@@ -59,48 +67,149 @@ public class Campaigns {
             String output,
             List key,
             List partition,
-            List fields) {
+            List field,
+            int sleep) {
 
         this.url = url;
         this.token = token;
         this.output = output;
         this.key = key;
         this.partition = partition;
-        this.fields = fields;
+        this.field = field;
+        this.sleep = sleep;
     }
 
     /**
      *
      */
-    void extract() throws MalformedURLException, IOException, ParseException {
+    void extract() throws
+            MalformedURLException,
+            IOException,
+            ParseException,
+            DuplicateEntityException {
+        boolean nextPage = true;
+        int page = 0;
+
+        //Defines a MITT instance. 
+        Mitt mitt = new Mitt();
+
+        //Defines output file.
+        mitt.setOutputFile(this.output);
+
+        //Defines custom fields.
+        mitt.getConfiguration()
+                .addCustomField("partition_field", new Concat(this.partition))
+                .addCustomField("custom_primary_key", new Concat(this.key))
+                .addCustomField("etl_load_date", new Now());
+
+        //Identifies if fields parameter was filled.
+        if (this.field.isEmpty()) {
+            mitt.getConfiguration()
+                    .addField("created_at")
+                    .addField("updated_at")
+                    .addField("name")
+                    .addField("archived")
+                    .addField("draft")
+                    .addField("schedule_type")
+                    .addField("channels")
+                    .addField("first_sent")
+                    .addField("last_sent")
+                    .addField("tags")
+                    .addField("messages")
+                    .addField("conversion_behaviors");
+        } else {
+            mitt.getConfiguration().addField(this.field);
+        }
+
+        //Identifies original fields.
+        List<String> fields = mitt.getConfiguration().getOriginalFieldsName();
+
+        do {
+            Logger.getLogger(Campaigns.class.getName()).log(Level.INFO, "Retrieving data from URL: {0}", new Object[]{this.url + CAMPAIGNS_LIST + page});
+            HttpURLConnection httpURLConnection = this.getAPIResponse(this.url + CAMPAIGNS_LIST + page);
+
+            //Get API Call response.
+            BufferedReader bufferedReader = new BufferedReader(
+                    new InputStreamReader(httpURLConnection.getInputStream()));
+
+            String output;
+
+            //Get campaign list from API.
+            while ((output = bufferedReader.readLine()) != null) {
+                JSONObject jsonObject = (JSONObject) new JSONParser().parse(output);
+                JSONArray campaigns = (JSONArray) jsonObject.get("campaigns");
+
+                Logger.getLogger(Campaigns.class.getName()).log(Level.SEVERE, "{0} campaigns found ", new Object[]{campaigns.size()});
+
+                //Identify if at least 1 campaign was found on the page.
+                if (campaigns.size() > 0) {
+                    page++;
+
+                    //Fetchs campaigns list.
+                    for (Object campaign : campaigns) {
+                        JSONObject jsonCampaign = (JSONObject) campaign;
+
+                        HttpURLConnection connectionCampaignDetails
+                                = this.getAPIResponse(this.url
+                                        + CAMPAIGNS_DETAIL
+                                        + jsonCampaign.get("id"));
+
+                        //Get API Call response.
+                        BufferedReader brCampaignDetail = new BufferedReader(
+                                new InputStreamReader(connectionCampaignDetails.getInputStream()));
+
+                        String line;                        
+
+                        //Get a campaign details from API.
+                        while ((line = brCampaignDetail.readLine()) != null) {
+                            List record = new ArrayList();                            
+                            JSONObject details = (JSONObject) new JSONParser().parse(line);
+
+                            for (String field : fields) {
+                                //Identifies if the field exists. 
+                                if (details.containsKey(field)) {
+                                    record.add(details.get(field));
+                                } else {
+                                    record.add(null);
+                                }
+                            }
+
+                            mitt.write(record);
+                        }
+
+                        brCampaignDetail.close();
+                        connectionCampaignDetails.disconnect();
+                    }
+                } else {
+                    nextPage = false;
+                }
+            }
+            
+            bufferedReader.close();
+            httpURLConnection.disconnect();
+
+        } while (nextPage);
+        
+        mitt.close();
+    }
+
+    /**
+     * Get API response.
+     *
+     * @param url String
+     * @return BufferedReader
+     * @throws MalformedURLException
+     * @throws IOException
+     */
+    HttpURLConnection
+            getAPIResponse(String url) throws MalformedURLException, IOException {
         //Connect to API.
-        URL url = new URL(this.url + CAMPAIGNS_LIST);
-        HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+        HttpURLConnection httpURLConnection
+                = (HttpURLConnection) new URL(url).openConnection();
         httpURLConnection.setRequestProperty("Authorization", this.token);
         httpURLConnection.setRequestProperty("Accept", "application/json");
         httpURLConnection.setRequestMethod("GET");
 
-        //Get API Call response.
-        BufferedReader bufferedReader = new BufferedReader(
-                new InputStreamReader(httpURLConnection.getInputStream()));
-
-        String output;
-        while ((output = bufferedReader.readLine()) != null) {
-            JSONParser jsonParser = new JSONParser();
-            JSONObject jsonObject = (JSONObject) jsonParser.parse(output);
-            JSONArray campaigns = (JSONArray) jsonObject.get("campaigns");
-
-            Logger.getLogger(Campaigns.class.getName()).log(Level.SEVERE, "{0} campaigns found ", new Object[]{campaigns.size()});
-
-            //Fetchs campaigns list.
-            for (Object campaign : campaigns) {
-                JSONObject jsonCampaign = (JSONObject) campaign;
-                
-                Logger.getLogger(Campaigns.class.getName()).log(Level.INFO, "Retrieving data from campaign: {0} of id {1}", new Object[]{jsonCampaign.get("name"), jsonCampaign.get("id")});
-
-            }
-        }
-
-        httpURLConnection.disconnect();
+        return httpURLConnection;
     }
 }
