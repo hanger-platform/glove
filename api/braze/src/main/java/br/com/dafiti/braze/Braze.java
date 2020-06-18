@@ -99,7 +99,7 @@ public class Braze {
             List<String> fields = mitt.getConfiguration().getOriginalFieldsName();
 
             while (nextPage) {
-                String list = cli.getParameter("endpoint_list").replace("${page}", String.valueOf(page));
+                String list = cli.getParameter("endpoint_list").replace("<<page>>", String.valueOf(page));
 
                 Logger.getLogger(Braze.class.getName()).log(Level.INFO, "Retrieving data from URL: {0}", new Object[]{list});
 
@@ -132,7 +132,7 @@ public class Braze {
                                 String detail = cli
                                         .getParameter("endpoint_detail")
                                         .replace(
-                                                "${id}",
+                                                "<<id>>",
                                                 String.valueOf(((JSONObject) object).get("id"))
                                         );
 
