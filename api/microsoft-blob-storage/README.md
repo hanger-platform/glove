@@ -21,7 +21,7 @@ Utilizando o [Maven](https://maven.apache.org/):
 - Digite o comando _**mvn package**_.
 - O arquivo **microsoft-blob-storage.jar** será gerado no subdiretório **_target_**.
 
-##### CONFIGURAÇÂO
+##### CONFIGURAÇÃO
 
 * Crie um arquivo (json) com as seguintes informações sobre seu acesso ao servidor Microsoft Azure, este será o seu **credentials file**:
 
@@ -47,7 +47,8 @@ java -jar microsoft-blob-storage.jar  \
 	--partition=<(optional) partition, divided by + if has more than one field> \
 	--key=<(optional) unique key, divided by + if has more than one field> \
 	--timeout=<(optional) API timeout in minutes; '60' as default> \
-	--encode=<(optional) encode blob file; 'ISO-8859-1' as default>
+	--encode=<(optional) encode file> \
+	--properties=<(optional) reader properties>
 ```
 
 ## Contributing, Bugs, Questions

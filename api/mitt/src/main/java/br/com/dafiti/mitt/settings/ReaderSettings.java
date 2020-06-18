@@ -23,8 +23,6 @@
  */
 package br.com.dafiti.mitt.settings;
 
-import java.io.FileReader;
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -91,6 +89,8 @@ public class ReaderSettings extends Settings<ReaderSettings> {
     }
 
     public ReaderSettings addProperties(String key, String value) {
+        Logger.getLogger(ReaderSettings.class.getName()).log(Level.INFO, "Reader setting parameter: {0} > {1}", new Object[]{key, value});
+
         this.getProperties().setProperty(key, value);
         return this;
     }
