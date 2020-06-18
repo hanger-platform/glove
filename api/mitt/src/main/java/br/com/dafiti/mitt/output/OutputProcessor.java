@@ -96,7 +96,6 @@ public class OutputProcessor implements Runnable {
 
         this.writer = new CsvWriter(
                 new File(writerSettings.getOutputFile().getAbsolutePath() + "/" + FilenameUtils.removeExtension(input.getName()) + ".csv"),
-                this.writerSettings.getEncode(),
                 this.getCSVSettings());
     }
 
@@ -185,7 +184,7 @@ public class OutputProcessor implements Runnable {
         Decoder decoder = FactoryDecoder.getDecoder(input);
 
         if (decoder != null) {
-            this.setInput(decoder.decode(input));
+            this.setInput(decoder.decode(input, readerSettings.getProperties()));
         }
 
         //Identifies if the input file is empty after decode. 
@@ -243,6 +242,13 @@ public class OutputProcessor implements Runnable {
                         header.add(field + "_" + repetitions);
                         repeated.put(field, repetitions);
                     }
+                }
+
+                //Identifies if should log the file header. 
+                if (parser
+                        .getConfiguration()
+                        .isDebug()) {
+                    Logger.getLogger(Output.class.getName()).log(Level.INFO, "Header {0}", header.toString());
                 }
 
                 //Stop the pre parser.

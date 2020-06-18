@@ -28,6 +28,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -43,20 +44,21 @@ public class ZipDecoder implements Decoder {
     /**
      *
      * @param file
+     * @param properties
      * @return
      */
     @Override
-    public File decode(File file) {
-        File decompress = null;
+    public File decode(File file, Properties properties) {
+        File decoded = null;
 
         try {
             ZipEntry zipEntry;
             ZipInputStream zip = new ZipInputStream(new FileInputStream(file));
 
             while ((zipEntry = zip.getNextEntry()) != null) {
-                decompress = new File(file.getParent() + "/" + zipEntry.getName());
+                decoded = new File(file.getParent() + "/" + zipEntry.getName());
 
-                try (OutputStream outputStream = Files.newOutputStream(decompress.toPath())) {
+                try (OutputStream outputStream = Files.newOutputStream(decoded.toPath())) {
                     IOUtils.copy(zip, outputStream);
                 }
             }
@@ -65,6 +67,6 @@ public class ZipDecoder implements Decoder {
         } catch (IOException ex) {
             Logger.getLogger(GZipDecoder.class.getName()).log(Level.SEVERE, "Fail decoding ZIP file " + file.getName(), ex);
         }
-        return decompress;
+        return decoded;
     }
 }

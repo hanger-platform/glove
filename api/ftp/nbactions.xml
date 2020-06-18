@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>run</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-classpath %classpath br.com.dafiti.ftp.FTP --credentials="/home/helio.leal/.ftp/credentials.json" --directory="/DOWNLOAD/CLIENTE" --output="/tmp/ftp/" --start_date="2020-06-11" --end_date="2020-06-12" --field="FECHA+IDLLAMADA+CONTACTO+OPCION+TELEFONO+HORA+USUARIO+ESTADO+DOCUMENTO+IDORDER" --partition="::dateformat(FECHA,yyyyMMdd,yyyyMM)" --key="::checksum()" --pattern="OPCIONES_DISCADAS_*" --delimiter="|"</exec.args>
+                <exec.executable>java</exec.executable>
+            </properties>
+        </action>
+        <action>
+            <actionName>debug</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.ftp.FTP --credentials="/home/helio.leal/.ftp/credentials.json" --directory="/DOWNLOAD/CLIENTE" --output="/tmp/ftp/" --start_date="2020-06-11" --end_date="2020-06-12" --field="FECHA+IDLLAMADA+CONTACTO+OPCION+TELEFONO+HORA+USUARIO+ESTADO+DOCUMENTO+IDORDER" --partition="::dateformat(FECHA,yyyyMMdd,yyyyMM)" --key="::checksum()" --pattern="OPCIONES_DISCADAS_*" --delimiter="|"</exec.args>
+                <exec.executable>java</exec.executable>
+                <jpda.listen>true</jpda.listen>
+            </properties>
+        </action>
+        <action>
+            <actionName>profile</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-classpath %classpath br.com.dafiti.ftp.FTP --credentials="/home/helio.leal/.ftp/credentials.json" --directory="/DOWNLOAD/CLIENTE" --output="/tmp/ftp/" --start_date="2020-06-11" --end_date="2020-06-12" --field="FECHA+IDLLAMADA+CONTACTO+OPCION+TELEFONO+HORA+USUARIO+ESTADO+DOCUMENTO+IDORDER" --partition="::dateformat(FECHA,yyyyMMdd,yyyyMM)" --key="::checksum()" --pattern="OPCIONES_DISCADAS_*" --delimiter="|"</exec.args>
+                <exec.executable>java</exec.executable>
+            </properties>
+        </action>
+    </actions>

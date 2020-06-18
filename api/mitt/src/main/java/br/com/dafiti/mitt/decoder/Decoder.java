@@ -24,6 +24,7 @@
 package br.com.dafiti.mitt.decoder;
 
 import java.io.File;
+import java.util.Properties;
 
 /**
  *
@@ -31,5 +32,5 @@ import java.io.File;
  */
 public interface Decoder {
 
-    File decode(File file);
+    File decode(File file, Properties properties);
 }

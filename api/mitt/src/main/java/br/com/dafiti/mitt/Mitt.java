@@ -40,13 +40,13 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
  */
 public class Mitt {
 
+    private boolean debug = false;
     private Output output;
     private OutputProcessor outputProcessor;
     private Configuration configuration;
     private ReaderSettings readerSettings;
     private WriterSettings writerSettings;
     private CommandLineInterface commandLineInterface;
-    private boolean debug = false;
 
     /**
      *
@@ -113,8 +113,7 @@ public class Mitt {
      */
     public Configuration getConfiguration() {
         if (configuration == null) {
-            configuration = new Configuration();
-            configuration.setDebug(debug);
+            configuration = new Configuration(debug);
         }
 
         return configuration;

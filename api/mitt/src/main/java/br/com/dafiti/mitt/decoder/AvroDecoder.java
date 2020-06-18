@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.avro.Schema;
@@ -74,10 +75,11 @@ public class AvroDecoder implements Decoder {
     /**
      *
      * @param file
+     * @param properties
      * @return
      */
     @Override
-    public File decode(File file) {
+    public File decode(File file, Properties properties) {
         File decompress = new File(file.getParent() + "/" + FilenameUtils.removeExtension(file.getName()) + ".csv");
 
         try {
