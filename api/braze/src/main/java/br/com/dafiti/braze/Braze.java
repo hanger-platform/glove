@@ -66,7 +66,7 @@ public class Braze {
             mitt.getConfiguration()
                     .addParameter("c", "credentials", "Credentials file", "", true, false)
                     .addParameter("o", "output", "Output file", "", true, false)
-                    .addParameter("el", "endpoint", "Identifies the endpoint name", "", true, false)
+                    .addParameter("el", "service", "Identifies the service name", "", true, false)
                     .addParameter("el", "endpoint_list", "Identifies the endpoint that contains a list to extract data from", "", true, false)
                     .addParameter("ed", "endpoint_detail", "Identifies the endpoint that contains the details of each list item", "", true, false)
                     .addParameter("f", "field", "Fields to be extracted from the file", "", true, false)
@@ -119,9 +119,9 @@ public class Braze {
                         JSONArray jsonArray
                                 = (JSONArray) ((JSONObject) new JSONParser()
                                         .parse(output))
-                                        .get(cli.getParameter("endpoint"));
+                                        .get(cli.getParameter("service"));
 
-                        Logger.getLogger(Braze.class.getName()).log(Level.INFO, "{0} {1} found ", new Object[]{jsonArray.size(), cli.getParameter("endpoint")});
+                        Logger.getLogger(Braze.class.getName()).log(Level.INFO, "{0} {1} found ", new Object[]{jsonArray.size(), cli.getParameter("service")});
 
                         //Identify if at least 1 campaign was found on the page.
                         if (jsonArray.size() > 0) {

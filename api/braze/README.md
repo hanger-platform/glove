@@ -39,7 +39,7 @@ Utilizando o [Maven](https://maven.apache.org/):
 java -jar braze.jar  \
 	--credentials=<Arquivo de credenciais>  \
 	--output=<Caminho onde arquivo será salvo> \
-	--endpoint=<Nome do serviço a ser consumido, exemplo: campaigns> \
+	--service=<Nome do serviço a ser consumido, exemplo: campaigns> \
 	--endpoint_list=<URL que retorna a lista a ser percorrida, exemplo:'https://rest.iad-03.braze.com/campaigns/list?include_archived=true&page=<<page>>' > \
 	--endpoint_detail=<URL que retorna o detalhe de cada item da lista, exemplo:'https://rest.iad-03.braze.com/campaigns/details?campaign_id=<<id>>' > \
 	--field=<Campos que serão gerados no arquivo de saída> \
