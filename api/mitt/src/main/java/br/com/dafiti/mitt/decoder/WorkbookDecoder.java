@@ -30,47 +30,24 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.avro.Schema;
-import org.apache.avro.file.DataFileReader;
-import org.apache.avro.generic.GenericData;
-import org.apache.avro.generic.GenericDatumReader;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 /**
  *
  * @author Valdiney V GOMES
  */
-public class AvroDecoder implements Decoder {
-
-    private final GenericData data;
-    private static AvroDecoder avroDecoder;
-
-    /**
-     *
-     */
-    private AvroDecoder() {
-        data = new GenericDatumReader<>().getData();
-    }
-
-    /**
-     *
-     * @return
-     */
-    public static AvroDecoder getInstance() {
-        if (avroDecoder == null) {
-            synchronized (AvroDecoder.class) {
-                if (avroDecoder == null) {
-                    avroDecoder = new AvroDecoder();
-                }
-            }
-        }
-
-        return avroDecoder;
-    }
+public class WorkbookDecoder implements Decoder {
 
     /**
      *
@@ -80,16 +57,11 @@ public class AvroDecoder implements Decoder {
      */
     @Override
     public File decode(File file, Properties properties) {
-        File decompress = new File(file.getParent() + "/" + FilenameUtils.removeExtension(file.getName()) + ".csv");
+        File decoded = new File(file.getParent() + "/" + FilenameUtils.removeExtension(file.getName()) + ".csv");
 
         try {
-            //Defines a generic reader.   
-            DataFileReader<GenericData.Record> reader = new DataFileReader<>(
-                    file,
-                    new GenericDatumReader<>(null, null, this.data));
-
-            //Extracts schema.
-            Schema schema = reader.getSchema();
+            String sheetName = properties.getProperty("sheet");
+            int skip = NumberUtils.toInt(properties.getProperty("skip", "0"));
 
             //Defines the output file write settings.
             WriterSettings writerSettings = new WriterSettings();
@@ -102,33 +74,43 @@ public class AvroDecoder implements Decoder {
             setting.setMaxCharsPerColumn(-1);
             setting.setHeaderWritingEnabled(true);
 
-            //Extracts file header.
-            setting.setHeaders(
-                    schema
-                            .getFields()
-                            .stream()
-                            .map(field -> field.name())
-                            .toArray(String[]::new));
-
             //Defines the writer.
-            CsvWriter csvWriter = new CsvWriter(decompress, setting);
+            CsvWriter csvWriter = new CsvWriter(decoded, setting);
 
-            //Extracts file records.
-            GenericData.Record record = new GenericData.Record(schema);
+            //Reads the workbook. 
+            Workbook workbook = WorkbookFactory.create(file);
+            Sheet sheet = workbook.getSheetAt(workbook.getSheetIndex(sheetName) == -1 ? 0 : workbook.getSheetIndex(sheetName));
+            Iterator<Row> rowIterator = sheet.iterator();
 
-            while (reader.hasNext()) {
-                reader.next(record);
-                List<Object> row = new ArrayList();
+            while (rowIterator.hasNext()) {
+                List<Object> record = new ArrayList();
+                Row row = rowIterator.next();
 
-                for (String header : setting.getHeaders()) {
-                    row.add(record.get(header));
+                if (row.getRowNum() > (skip - 1)) {
+                    Iterator<Cell> cellIterator = row.cellIterator();
+
+                    while (cellIterator.hasNext()) {
+                        Cell cell = cellIterator.next();
+
+                        switch (cell.getCellType()) {
+                            case BOOLEAN:
+                                record.add(cell.getBooleanCellValue());
+                                break;
+                            case NUMERIC:
+                                record.add(cell.getNumericCellValue());
+                                break;
+                            case STRING:
+                                record.add(cell.getStringCellValue());
+                                break;
+                            default:
+                                record.add("");
+                                break;
+                        }
+                    }
+
+                    csvWriter.writeRow(record);
                 }
-
-                csvWriter.writeRow(row);
             }
-
-            //Close the reader. 
-            reader.close();
 
             //Flush and close writer.
             csvWriter.flush();
@@ -137,9 +119,9 @@ public class AvroDecoder implements Decoder {
             //Removes original file.
             Files.delete(file.toPath());
         } catch (IOException ex) {
-            Logger.getLogger(AvroDecoder.class.getName()).log(Level.SEVERE, "Fail decoding AVRO file " + file.getName(), ex);
+            Logger.getLogger(WorkbookDecoder.class.getName()).log(Level.SEVERE, "Fail decoding XLS/XLSX file " + file.getName(), ex);
         }
 
-        return decompress;
+        return decoded;
     }
 }

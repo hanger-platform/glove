@@ -31,7 +31,7 @@ import java.util.List;
  *
  * @author Valdiney V GOMES
  */
-public class WriterSettings extends Settings {
+public class WriterSettings extends Settings<WriterSettings> {
 
     private List<String> header;
     private int threadPool;

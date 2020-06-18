@@ -28,6 +28,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
@@ -43,16 +44,17 @@ public class GZipDecoder implements Decoder {
     /**
      *
      * @param file
+     * @param properties
      * @return
      */
     @Override
-    public File decode(File file) {
-        File decompress = new File(file.getParent() + "/" + FilenameUtils.removeExtension(file.getName()) + ".csv");
+    public File decode(File file, Properties properties) {
+        File decoded = new File(file.getParent() + "/" + FilenameUtils.removeExtension(file.getName()) + ".csv");
 
         try {
             GZIPInputStream gzip = new GZIPInputStream(new FileInputStream(file));
 
-            try (OutputStream outputStream = Files.newOutputStream(decompress.toPath())) {
+            try (OutputStream outputStream = Files.newOutputStream(decoded.toPath())) {
                 IOUtils.copy(gzip, outputStream);
             }
 
@@ -61,6 +63,6 @@ public class GZipDecoder implements Decoder {
             Logger.getLogger(GZipDecoder.class.getName()).log(Level.SEVERE, "Fail decoding GZIP file " + file.getName(), ex);
         }
 
-        return decompress;
+        return decoded;
     }
 }

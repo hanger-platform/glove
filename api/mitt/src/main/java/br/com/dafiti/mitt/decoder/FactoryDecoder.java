@@ -46,6 +46,10 @@ public class FactoryDecoder {
             case "avro":
                 decoder = AvroDecoder.getInstance();
                 break;
+            case "xls":
+            case "xlsx":
+                decoder = new WorkbookDecoder();
+                break;
         }
 
         return decoder;
