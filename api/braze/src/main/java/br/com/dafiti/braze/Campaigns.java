@@ -56,7 +56,7 @@ public class Campaigns {
     private final List field;
     private final int sleep;
 
-    public static final String CAMPAIGNS_LIST = "campaigns/list?page=";
+    public static final String CAMPAIGNS_LIST = "campaigns/list?include_archived=true&page=";
     public static final String CAMPAIGNS_DETAIL = "campaigns/details?campaign_id=";
 
     public Campaigns(
