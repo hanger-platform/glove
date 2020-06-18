@@ -121,7 +121,7 @@ public class Braze {
                                         .parse(output))
                                         .get(cli.getParameter("endpoint"));
 
-                        Logger.getLogger(Braze.class.getName()).log(Level.SEVERE, "{0} {1} found ", new Object[]{jsonArray.size(), cli.getParameter("endpoint")});
+                        Logger.getLogger(Braze.class.getName()).log(Level.INFO, "{0} {1} found ", new Object[]{jsonArray.size(), cli.getParameter("endpoint")});
 
                         //Identify if at least 1 campaign was found on the page.
                         if (jsonArray.size() > 0) {
@@ -151,14 +151,14 @@ public class Braze {
                                         List record = new ArrayList();
                                         JSONObject details = (JSONObject) new JSONParser().parse(line);
 
-                                        for (String field : fields) {
+                                        fields.forEach((field) -> {
                                             //Identifies if the field exists.
                                             if (details.containsKey(field)) {
                                                 record.add(details.get(field));
                                             } else {
                                                 record.add(null);
                                             }
-                                        }
+                                        });
 
                                         mitt.write(record);
                                     }
