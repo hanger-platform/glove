@@ -82,7 +82,8 @@ public class FTP {
                     .addParameter("de", "delimiter", "(Optional) File delimiter; ';' as default", ";")
                     .addParameter("p", "pattern", "(Optional) FTP file pattern; *.csv as default", "*.csv")
                     .addParameter("pa", "partition", "(Optional)  Partition, divided by + if has more than one field")
-                    .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "");
+                    .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "")
+                    .addParameter("ps", "passive", "(Optional) Define the connection mode. Default is true (passive)", "true");
 
             //Reads the command line interface. 
             CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -107,6 +108,13 @@ public class FTP {
 
             //Defines a FTP directory as default. 
             ftpClient.changeWorkingDirectory(cli.getParameter("directory"));
+            
+            //Defines de ftp connection mode.
+            if (cli.getParameterAsBoolean("passive")) {
+                ftpClient.enterLocalPassiveMode();
+            } else {
+                ftpClient.enterLocalActiveMode();
+            }
 
             //Lists all files that satisfies a pattern.
             FTPFile[] ftpFiles = ftpClient.listFiles(cli.getParameter("pattern"));
@@ -126,14 +134,14 @@ public class FTP {
 
                     //Defines output file.
                     File outputFile = new File(outputPath.toString() + "/" + ftpFile.getName());
-                    OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile));
 
                     //Downloads file from FTP.
-                    if (!ftpClient.retrieveFile(ftpFile.getName(), outputStream)) {
-                        Logger.getLogger(FTP.class.getName()).log(Level.SEVERE, "Fail downloading file {0} ", new Object[]{ftpFile.getName()});
+                    try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile))) {
+                        //Downloads file from FTP.
+                        if (!ftpClient.retrieveFile(ftpFile.getName(), outputStream)) {
+                            Logger.getLogger(FTP.class.getName()).log(Level.SEVERE, "Fail downloading file {0} ", new Object[]{ftpFile.getName()});
+                        }
                     }
-
-                    outputStream.close();
                 }
             }
 
