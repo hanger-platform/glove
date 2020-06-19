@@ -108,7 +108,7 @@ public class FTP {
 
             //Defines a FTP directory as default. 
             ftpClient.changeWorkingDirectory(cli.getParameter("directory"));
-            
+
             //Defines de ftp connection mode.
             if (cli.getParameterAsBoolean("passive")) {
                 ftpClient.enterLocalPassiveMode();
