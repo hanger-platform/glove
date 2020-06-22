@@ -66,12 +66,12 @@ public class Braze {
             mitt.getConfiguration()
                     .addParameter("c", "credentials", "Credentials file", "", true, false)
                     .addParameter("o", "output", "Output file", "", true, false)
-                    .addParameter("el", "service", "Identifies the service name", "", true, false)
+                    .addParameter("s", "service", "Identifies the service name", "", true, false)
                     .addParameter("el", "endpoint_list", "Identifies the endpoint that contains a list to extract data from", "", true, false)
                     .addParameter("ed", "endpoint_detail", "Identifies the endpoint that contains the details of each list item", "", true, false)
                     .addParameter("f", "field", "Fields to be extracted from the file", "", true, false)
                     .addParameter("d", "delimiter", "(Optional) File delimiter; ';' as default", ";")
-                    .addParameter("s", "sleep", "(Optional) Sleep time in seconds at one request and another; 0 is default", "0")
+                    .addParameter("sl", "sleep", "(Optional) Sleep time in seconds at one request and another; 0 is default", "0")
                     .addParameter("p", "partition", "(Optional)  Partition, divided by + if has more than one field")
                     .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "");
 
@@ -112,22 +112,22 @@ public class Braze {
                 //Get API Call response.
                 try (BufferedReader bufferedReader = new BufferedReader(
                         new InputStreamReader(httpURLConnection.getInputStream()))) {
-                    String output;
+                    String listJSON;
 
-                    //Get campaign list from API.
-                    while ((output = bufferedReader.readLine()) != null) {
+                    //Get service list from API.
+                    while ((listJSON = bufferedReader.readLine()) != null) {
                         JSONArray jsonArray
                                 = (JSONArray) ((JSONObject) new JSONParser()
-                                        .parse(output))
+                                        .parse(listJSON))
                                         .get(cli.getParameter("service"));
 
                         Logger.getLogger(Braze.class.getName()).log(Level.INFO, "{0} {1} found ", new Object[]{jsonArray.size(), cli.getParameter("service")});
 
-                        //Identify if at least 1 campaign was found on the page.
+                        //Identify if at least 1 service was found on the page.
                         if (jsonArray.size() > 0) {
                             page++;
 
-                            //Fetchs campaigns list.
+                            //Fetchs service list.
                             for (Object object : jsonArray) {
                                 String detail = cli
                                         .getParameter("endpoint_detail")
@@ -136,6 +136,7 @@ public class Braze {
                                                 String.valueOf(((JSONObject) object).get("id"))
                                         );
 
+                                //Connect to API.
                                 HttpURLConnection connectionDetails = (HttpURLConnection) new URL(detail).openConnection();
                                 connectionDetails.setRequestProperty("Authorization", (String) credentials.get("authorization"));
                                 connectionDetails.setRequestProperty("Accept", "application/json");
