@@ -28,7 +28,7 @@ Utilizando o [Maven](https://maven.apache.org/):
 ```
 {
 	"accountName":"<accountName>",
-	"accountKey":"<accountKey>"
+	"sasToken":"<sasToken>"
 }
 ```
 
