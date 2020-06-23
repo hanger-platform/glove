@@ -50,6 +50,7 @@ java -jar ftp.jar  \
 	--key=<(Optional) Unique key, divided by + if has more than one field> \
 	--field=<Fields to extracted from raw file, divided by +> \
 	--passive=<(Optional) Define the connection mode (passive or active). Default is true (passive)>
+	--encode=<(Optional) Define the input file encode. Default is auto detect>
 ```
 
 ## Contributing, Bugs, Questions
