@@ -109,6 +109,9 @@ public class FTP {
 
             //Defines a FTP directory as default. 
             ftpClient.changeWorkingDirectory(cli.getParameter("directory"));
+            
+            //Define the buffer size.
+            ftpClient.setBufferSize(5 * (1024 * 1024));
 
             //Defines de ftp connection mode.
             if (cli.getParameterAsBoolean("passive")) {
