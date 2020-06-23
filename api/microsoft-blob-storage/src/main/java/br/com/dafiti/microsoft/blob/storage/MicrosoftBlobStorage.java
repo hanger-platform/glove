@@ -40,7 +40,6 @@ import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.models.ListBlobsOptions;
-import com.azure.storage.common.StorageSharedKeyCredential;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -99,13 +98,7 @@ public class MicrosoftBlobStorage {
             JSONObject credentials = (JSONObject) parser.parse(new FileReader(cli.getParameter("credentials")));
 
             String accountName = credentials.get("accountName").toString();
-            String accountKey = credentials.get("accountKey").toString();
-
-            //Use your storage account name and key to create a credential object.
-            StorageSharedKeyCredential credential = new StorageSharedKeyCredential(
-                    accountName,
-                    accountKey
-            );
+            String sasToken = credentials.get("sasToken").toString();
 
             //Get your Storage account blob service URL endpoint.
             String endpoint = String.format(
@@ -117,11 +110,12 @@ public class MicrosoftBlobStorage {
             //Create an instance of the client.
             BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
                     .endpoint(endpoint)
-                    .credential(credential)
+                    .sasToken(sasToken)
                     .buildClient();
 
             //Create an instance of the specified container.
-            BlobContainerClient blobContainerClient = blobServiceClient.getBlobContainerClient(cli.getParameter("container"));
+            BlobContainerClient blobContainerClient
+                    = blobServiceClient.getBlobContainerClient(cli.getParameter("container"));
 
             //Get list blobs
             PagedIterable<BlobItem> listBlobs = blobContainerClient.listBlobs(
