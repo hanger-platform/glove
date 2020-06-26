@@ -261,7 +261,7 @@ public class Extractor implements Runnable {
                                 fieldDataType.add(field + " " + "varchar(255)");
                                 break;
                             case "redshift":
-                                fieldDataType.add(field + " " + "varchar(255)");
+                                fieldDataType.add(field + " " + "varchar(255) ENCODE ZSTD");
                                 break;
                             case "bigquery":
                                 fieldSchema.add("{\"name\":\"" + field + "\",\"type\":\"STRING\"}");
@@ -278,7 +278,7 @@ public class Extractor implements Runnable {
                                 fieldDataType.add(field + " " + "varchar(" + (length * 2) + ")");
                                 break;
                             case "redshift":
-                                fieldDataType.add(field + " " + "varchar(" + length + ")");
+                                fieldDataType.add(field + " " + "varchar(" + length + ") ENCODE ZSTD");
                                 break;
                             case "bigquery":
                                 fieldSchema.add("{\"name\":\"" + field + "\",\"type\":\"STRING\"}");
@@ -295,7 +295,7 @@ public class Extractor implements Runnable {
                                 fieldDataType.add(field + " " + "bigint");
                                 break;
                             case "redshift":
-                                fieldDataType.add(field + " " + "bigint");
+                                fieldDataType.add(field + " " + "bigint ENCODE AZ64");
                                 break;
                             case "bigquery":
                                 fieldSchema.add("{\"name\":\"" + field + "\",\"type\":\"INTEGER\"}");
@@ -315,7 +315,7 @@ public class Extractor implements Runnable {
                                 fieldDataType.add(field + " " + "double");
                                 break;
                             case "redshift":
-                                fieldDataType.add(field + " " + "double precision");
+                                fieldDataType.add(field + " " + "double precision ENCODE ZSTD");
                                 break;
                             case "bigquery":
                                 fieldSchema.add("{\"name\":\"" + field + "\",\"type\":\"FLOAT\"}");
@@ -336,7 +336,7 @@ public class Extractor implements Runnable {
                                     fieldDataType.add(field + " " + "varchar(" + length + ")");
                                     break;
                                 case "redshift":
-                                    fieldDataType.add(field + " " + "varchar(" + length + ")");
+                                    fieldDataType.add(field + " " + "varchar(" + length + ")  ENCODE ZSTD");
                                     break;
                                 case "bigquery":
                                     fieldSchema.add("{\"name\":\"" + field + "\",\"type\":\"STRING\"}");
@@ -355,7 +355,7 @@ public class Extractor implements Runnable {
                                     fieldDataType.add(field + " " + "bigint");
                                     break;
                                 case "redshift":
-                                    fieldDataType.add(field + " " + "bigint");
+                                    fieldDataType.add(field + " " + "bigint ENCODE AZ64");
                                     break;
                                 case "bigquery":
                                     fieldSchema.add("{\"name\":\"" + field + "\",\"type\":\"INTEGER\"}");
@@ -377,7 +377,7 @@ public class Extractor implements Runnable {
                                     fieldDataType.add(field + " " + "double");
                                     break;
                                 case "redshift":
-                                    fieldDataType.add(field + " " + "double precision");
+                                    fieldDataType.add(field + " " + "double precision ENCODE ZSTD");
                                     break;
                                 case "bigquery":
                                     fieldSchema.add("{\"name\":\"" + field + "\",\"type\":\"FLOAT\"}");
@@ -396,7 +396,7 @@ public class Extractor implements Runnable {
                                     fieldDataType.add(field + " " + "varchar(19)");
                                     break;
                                 case "redshift":
-                                    fieldDataType.add(field + " " + "varchar(19)");
+                                    fieldDataType.add(field + " " + "varchar(19) ENCODE ZSTD");
                                     break;
                                 case "bigquery":
                                     fieldSchema.add("{\"name\":\"" + field + "\",\"type\":\"STRING\"}");
@@ -414,7 +414,7 @@ public class Extractor implements Runnable {
                                     fieldDataType.add(field + " " + "boolean");
                                     break;
                                 case "redshift":
-                                    fieldDataType.add(field + " " + "boolean");
+                                    fieldDataType.add(field + " " + "boolean ENCODE ZSTD");
                                     break;
                                 case "bigquery":
                                     fieldSchema.add("{\"name\":\"" + field + "\",\"type\":\"BOOLEAN\"}");
@@ -432,7 +432,7 @@ public class Extractor implements Runnable {
                                     fieldDataType.add(field + " " + "varchar(255)");
                                     break;
                                 case "redshift":
-                                    fieldDataType.add(field + " " + "varchar(255)");
+                                    fieldDataType.add(field + " " + "varchar(255) ENCODE ZSTD");
                                     break;
                                 case "bigquery":
                                     fieldSchema.add("{\"name\":\"" + field + "\",\"type\":\"STRING\"}");
