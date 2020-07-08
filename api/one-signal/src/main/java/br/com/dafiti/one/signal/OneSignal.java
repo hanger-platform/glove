@@ -135,7 +135,7 @@ public class OneSignal {
                             ready = true;
 
                             //Defines the output path for temp files.
-                            Path outputPath = Files.createTempDirectory("ftp_");
+                            Path outputPath = Files.createTempDirectory("one_signal_");
 
                             //Download file from URL
                             FileUtils.copyURLToFile(
