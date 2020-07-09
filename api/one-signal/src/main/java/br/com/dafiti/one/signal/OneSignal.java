@@ -103,7 +103,7 @@ public class OneSignal {
             //Connect to API.
             HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(cli.getParameter("endpoint")).openConnection();
             httpURLConnection.setRequestProperty("Authorization", (String) credentials.get("authorization"));
-            //httpURLConnection.setRequestProperty("Accept", "application/json");
+            httpURLConnection.setRequestProperty("Accept", "application/json");
             httpURLConnection.setRequestMethod(cli.getParameter("method"));
 
             //Get API Call response.
