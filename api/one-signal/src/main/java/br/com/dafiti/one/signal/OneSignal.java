@@ -26,22 +26,11 @@ package br.com.dafiti.one.signal;
 import br.com.dafiti.mitt.Mitt;
 import br.com.dafiti.mitt.cli.CommandLineInterface;
 import br.com.dafiti.mitt.exception.DuplicateEntityException;
-import br.com.dafiti.mitt.transformation.embedded.Concat;
-import br.com.dafiti.mitt.transformation.embedded.Now;
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -81,97 +70,27 @@ public class OneSignal {
             //Reads the command line interface. 
             CommandLineInterface cli = mitt.getCommandLineInterface(args);
 
-            //Defines output file.
-            mitt.setOutputFile(cli.getParameter("output"));
-
-            //Defines fields.
-            mitt.getConfiguration()
-                    .addCustomField("partition_field", new Concat((List) cli.getParameterAsList("partition", "\\+")))
-                    .addCustomField("custom_primary_key", new Concat((List) cli.getParameterAsList("key", "\\+")))
-                    .addCustomField("etl_load_date", new Now())
-                    .addField(cli.getParameterAsList("field", "\\+"));
-
             //Reads the credentials file. 
             JSONParser parser = new JSONParser();
             JSONObject credentials = (JSONObject) parser.parse(new FileReader(cli.getParameter("credentials")));
 
-            //Identifies original fields.
-            List<String> fields = mitt.getConfiguration().getOriginalFieldsName();
-
-            Logger.getLogger(OneSignal.class.getName()).log(Level.INFO, "Send {0} request for endpoint: {1}", new Object[]{cli.getParameter("method"), cli.getParameter("endpoint")});
-
-            //Connect to API.
-            HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(cli.getParameter("endpoint")).openConnection();
-            httpURLConnection.setRequestProperty("Authorization", (String) credentials.get("authorization"));
-            httpURLConnection.setRequestProperty("Accept", "application/json");
-            httpURLConnection.setRequestMethod(cli.getParameter("method"));
-
-            //Get API Call response.
-            try (BufferedReader bufferedReader = new BufferedReader(
-                    new InputStreamReader(httpURLConnection.getInputStream()))) {
-                String response;
-
-                //Get endpoint response from API.
-                while ((response = bufferedReader.readLine()) != null) {
-                    String url = (String) ((JSONObject) new JSONParser()
-                            .parse(response))
-                            .get("csv_file_url");
-
-                    //Identify if file is ready
-                    boolean ready = false;
-
-                    while (!ready) {
-                        HttpURLConnection httpConnection = (HttpURLConnection) new URL(url).openConnection();
-                        int responseCode = httpConnection.getResponseCode();
-
-                        //Identifies if file is ready to download.
-                        if (responseCode == HttpURLConnection.HTTP_OK) {
-                            Logger.getLogger(OneSignal.class.getName()).log(Level.INFO, "Downloading file from URL: {0}", new Object[]{url});
-
-                            httpConnection.disconnect();
-                            ready = true;
-
-                            //Defines the output path for temp files.
-                            Path outputPath = Files.createTempDirectory("one_signal_");
-
-                            //Download file from URL
-                            FileUtils.copyURLToFile(
-                                    new URL(url),
-                                    new File(outputPath + "/csv_export.csv.gz")
-                            );
-
-                            Logger.getLogger(OneSignal.class.getName()).log(Level.INFO, "Writing output file to: {0}", cli.getParameter("output"));
-
-                            //Write to the output.
-                            mitt.getReaderSettings().setDelimiter(cli.getParameter("delimiter").charAt(0));
-                            mitt.getReaderSettings().setEncode(cli.getParameter("encode"));
-                            mitt.write(outputPath.toFile(), "*");
-                        } else {
-                            //Response 403 means that file is not ready.
-                            if (responseCode == HttpURLConnection.HTTP_FORBIDDEN) {
-                                Logger.getLogger(OneSignal.class.getName()).log(Level.INFO, "File {0} is not ready to download, error: {1}", new Object[]{url, responseCode});
-
-                                //Identify if has sleep time until next API call.
-                                if (cli.getParameterAsInteger("sleep") > 0) {
-                                    try {
-                                        Logger.getLogger(OneSignal.class.getName())
-                                                .log(Level.INFO, "Sleeping {0} seconds until next try", cli.getParameterAsInteger("sleep"));
-
-                                        Thread.sleep(Long.valueOf(cli.getParameterAsInteger("sleep") * 1000));
-                                    } catch (InterruptedException ex) {
-                                        Logger.getLogger(OneSignal.class.getName()).log(Level.SEVERE, null, ex);
-                                    }
-                                }
-
-                            } else {
-                                ready = true;
-                                Logger.getLogger(OneSignal.class.getName()).log(Level.SEVERE, "GLOVE - One Signal fail: ", responseCode);
-                            }
-                        }
-                    }
-                }
+            //Identifies the approprieted report to extract.
+            switch (cli.getParameter("service").toLowerCase()) {
+                case "users":
+                    new Users(
+                            cli.getParameter("output"),
+                            cli.getParameter("endpoint"),
+                            cli.getParameter("encode"),
+                            cli.getParameterAsList("key", "\\+"),
+                            cli.getParameterAsList("partition", "\\+"),
+                            cli.getParameterAsList("fields", "\\+"),
+                            credentials,
+                            cli.getParameter("delimiter").charAt(0),
+                            cli.getParameterAsInteger("sleep")).extract();
+                    break;
+                default:
+                    Logger.getLogger(OneSignal.class.getName()).log(Level.SEVERE, "Service {0} not yet implemented", cli.getParameter("service"));
             }
-            httpURLConnection.disconnect();
 
         } catch (DuplicateEntityException
                 | FileNotFoundException
