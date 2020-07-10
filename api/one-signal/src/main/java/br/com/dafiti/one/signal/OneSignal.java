@@ -82,7 +82,7 @@ public class OneSignal {
                             cli.getParameterAsList("apps", "\\+"),
                             cli.getParameterAsList("key", "\\+"),
                             cli.getParameterAsList("partition", "\\+"),
-                            cli.getParameterAsList("fields", "\\+"),
+                            cli.getParameterAsList("field", "\\+"),
                             cli.getParameter("delimiter").charAt(0),
                             cli.getParameterAsInteger("sleep"),
                             credentials).extract();
@@ -92,7 +92,7 @@ public class OneSignal {
                             cli.getParameterAsList("apps", "\\+"),
                             cli.getParameterAsList("key", "\\+"),
                             cli.getParameterAsList("partition", "\\+"),
-                            cli.getParameterAsList("fields", "\\+"),
+                            cli.getParameterAsList("field", "\\+"),
                             credentials).extract();
                     break;
                 default:
