@@ -119,7 +119,7 @@ public class Users {
             mitt.getConfiguration().addField(this.fields);
         }
 
-        Logger.getLogger(OneSignal.class.getName()).log(Level.INFO, "Send POST request for endpoint: {1}", new Object[]{this.endPoint});
+        Logger.getLogger(OneSignal.class.getName()).log(Level.INFO, "Send POST request for endpoint: {0}", new Object[]{this.endPoint});
 
         //Connect to API.
         HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(this.endPoint).openConnection();
