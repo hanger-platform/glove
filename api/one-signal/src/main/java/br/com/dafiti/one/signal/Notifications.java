@@ -93,7 +93,6 @@ public class Notifications {
         //Fetchs all apps.
         for (String app : this.apps) {
             String authKey = this.getAuthKey(app);
-
             boolean nextPage = true;
             int offset = 0;
 
@@ -130,7 +129,6 @@ public class Notifications {
 
                             //Fetchs notifications list.
                             for (Object object : jsonArray) {
-
                                 List record = new ArrayList();
                                 JSONObject jsonObject = (JSONObject) new JSONParser().parse((String) object);
 

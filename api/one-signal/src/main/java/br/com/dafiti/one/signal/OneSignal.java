@@ -39,7 +39,7 @@ import org.json.simple.parser.ParseException;
  *
  * @author Helio Leal
  */
-public class OneSignal {   
+public class OneSignal {
 
     /**
      * One signal API data transfer
@@ -88,8 +88,8 @@ public class OneSignal {
                             credentials).extract();
                 case "notifications":
                     new Notifications(
-                            cli.getParameter("output"), 
-                            cli.getParameterAsList("apps", "\\+"), 
+                            cli.getParameter("output"),
+                            cli.getParameterAsList("apps", "\\+"),
                             cli.getParameterAsList("key", "\\+"),
                             cli.getParameterAsList("partition", "\\+"),
                             cli.getParameterAsList("fields", "\\+"),
