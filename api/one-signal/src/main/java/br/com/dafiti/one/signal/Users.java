@@ -50,6 +50,7 @@ import org.json.simple.parser.ParseException;
  * @author Helio Leal
  */
 public class Users {
+
     private final String CSV_EXPORT_URL = "https://onesignal.com/api/v1/players/csv_export?app_id=";
     private final String APP_URL = "https://onesignal.com/api/v1/apps/";
     private final String output;
@@ -120,6 +121,9 @@ public class Users {
             mitt.getConfiguration().addField(this.fields);
         }
 
+        //Defines the output path for temp files.
+        Path outputPath = Files.createTempDirectory("one_signal_");
+
         //Fetchs all apps.
         for (String app : this.apps) {
             String authKey = this.getAuthKey(app);
@@ -157,21 +161,12 @@ public class Users {
                             httpConnection.disconnect();
                             ready = true;
 
-                            //Defines the output path for temp files.
-                            Path outputPath = Files.createTempDirectory("one_signal_");
-
                             //Download file from URL
                             FileUtils.copyURLToFile(
                                     new URL(url),
                                     new File(outputPath + "/" + app + ".csv.gz")
                             );
 
-                            Logger.getLogger(OneSignal.class.getName()).log(Level.INFO, "Writing output file to: {0}", this.output);
-
-                            //Write to the output.
-                            mitt.getReaderSettings().setDelimiter(this.delimiter);
-                            mitt.getReaderSettings().setEncode(this.encode);
-                            mitt.write(outputPath.toFile(), "*");
                         } else {
                             //Response 403 means that file is not ready.
                             if (responseCode == HttpURLConnection.HTTP_FORBIDDEN) {
@@ -199,6 +194,13 @@ public class Users {
             }
             httpURLConnection.disconnect();
         }
+
+        Logger.getLogger(OneSignal.class.getName()).log(Level.INFO, "Writing output file to: {0}", this.output);
+
+        //Write to the output.
+        mitt.getReaderSettings().setDelimiter(this.delimiter);
+        mitt.getReaderSettings().setEncode(this.encode);
+        mitt.write(outputPath.toFile(), "*");
     }
 
     /**
