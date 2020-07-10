@@ -1492,6 +1492,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
 		String generic_parameter = getVariable("GENERIC_PARAMETER", "");
 	
 		//Get variables. 
+		String order = get(Fields.In, "order").getString(r);
 		String schema = get(Fields.In, "schema").getString(r);
 		String table = get(Fields.In, "table").getString(r);
 		String connection = get(Fields.In, "connection").getString(r);
