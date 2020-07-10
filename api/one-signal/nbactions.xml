@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.one.signal.OneSignal --credentials="/home/helio.leal/.one-signal/onesignal.json" --output="/tmp/onesignal/onesignal.csv" --service="csv_file_url" --endpoint="https://onesignal.com/api/v1/players/csv_export?app_id=d6a32c45-c59a-45b8-b6eb-c12c833ac47a" --field="xxxxx" --method="POST"</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.one.signal.OneSignal --credentials="/home/helio.leal/.one-signal/onesignal.json" --output="/tmp/onesignal/onesignal.csv" --service="users" --endpoint="https://onesignal.com/api/v1/players/csv_export?app_id=d6a32c45-c59a-45b8-b6eb-c12c833ac47a" --sleep=90 --delimiter=,</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.one.signal.OneSignal --credentials="/home/helio.leal/.one-signal/onesignal.json" --output="/tmp/onesignal/onesignal.csv" --service="csv_file_url" --endpoint="https://onesignal.com/api/v1/players/csv_export?app_id=d6a32c45-c59a-45b8-b6eb-c12c833ac47a" --field="xxxxx" --method="POST"</exec.args>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.one.signal.OneSignal --credentials="/home/helio.leal/.one-signal/onesignal.json" --output="/tmp/onesignal/onesignal.csv" --service="users" --endpoint="https://onesignal.com/api/v1/players/csv_export?app_id=d6a32c45-c59a-45b8-b6eb-c12c833ac47a" --sleep=90 --delimiter=,</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.one.signal.OneSignal --credentials="/home/helio.leal/.one-signal/onesignal.json" --output="/tmp/onesignal/onesignal.csv" --service="csv_file_url" --endpoint="https://onesignal.com/api/v1/players/csv_export?app_id=d6a32c45-c59a-45b8-b6eb-c12c833ac47a" --field="xxxxx" --method="POST"</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.one.signal.OneSignal --credentials="/home/helio.leal/.one-signal/onesignal.json" --output="/tmp/onesignal/onesignal.csv" --service="users" --endpoint="https://onesignal.com/api/v1/players/csv_export?app_id=d6a32c45-c59a-45b8-b6eb-c12c833ac47a" --sleep=90 --delimiter=,</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>

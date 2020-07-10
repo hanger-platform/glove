@@ -58,13 +58,12 @@ public class OneSignal {
                     .addParameter("c", "credentials", "Credentials file", "", true, false)
                     .addParameter("o", "output", "Output file", "", true, false)
                     .addParameter("s", "service", "Identifies the service name", "", true, false)
-                    .addParameter("e", "endpoint", "Identifies the endpoint that contains a list to extract data from", "", true, false)
-                    .addParameter("f", "field", "Fields to be extracted from the file", "", true, false)
+                    .addParameter("e", "endpoint", "Identifies the endpoint that contains a list to extract data from", "", true, false)                    
                     .addParameter("d", "delimiter", "(Optional) File delimiter; ';' as default", ";")
                     .addParameter("sl", "sleep", "(Optional) Sleep time in seconds at one request and another; 0 is default", "0")
                     .addParameter("p", "partition", "(Optional)  Partition, divided by + if has more than one field")
                     .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "")
-                    .addParameter("m", "method", "(Optional) Request method; GET is default", "GET")
+                    .addParameter("f", "field", "(Optional) Fields to be extracted from the file", "")
                     .addParameter("en", "encode", "(Optional) Encode file.", "auto");
 
             //Reads the command line interface. 
@@ -83,10 +82,10 @@ public class OneSignal {
                             cli.getParameter("encode"),
                             cli.getParameterAsList("key", "\\+"),
                             cli.getParameterAsList("partition", "\\+"),
-                            cli.getParameterAsList("fields", "\\+"),
-                            credentials,
+                            cli.getParameterAsList("fields", "\\+"),                            
                             cli.getParameter("delimiter").charAt(0),
-                            cli.getParameterAsInteger("sleep")).extract();
+                            cli.getParameterAsInteger("sleep"),
+                            credentials).extract();
                     break;
                 default:
                     Logger.getLogger(OneSignal.class.getName()).log(Level.SEVERE, "Service {0} not yet implemented", cli.getParameter("service"));

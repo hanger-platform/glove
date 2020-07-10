@@ -44,6 +44,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 /**
+ * Generate all of your current user data
  *
  * @author Helio Leal
  */
@@ -66,9 +67,9 @@ public class Users {
             List key,
             List partition,
             List fields,
-            JSONObject credentials,
             Character delimiter,
-            int sleep) {
+            int sleep,
+            JSONObject credentials) {
 
         this.output = output;
         this.endPoint = endPoint;
@@ -76,9 +77,9 @@ public class Users {
         this.key = key;
         this.partition = partition;
         this.fields = fields;
-        this.credentials = credentials;
         this.delimiter = delimiter;
         this.sleep = sleep;
+        this.credentials = credentials;
     }
 
     void extract() throws DuplicateEntityException, IOException, ParseException {
@@ -185,7 +186,7 @@ public class Users {
 
                         } else {
                             ready = true;
-                            Logger.getLogger(OneSignal.class.getName()).log(Level.SEVERE, "GLOVE - One Signal fail: ", responseCode);
+                            throw new IOException("GLOVE - One Signal fail: " + responseCode);
                         }
                     }
                 }
