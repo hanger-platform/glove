@@ -93,6 +93,7 @@ public class OneSignal {
                             cli.getParameterAsList("key", "\\+"),
                             cli.getParameterAsList("partition", "\\+"),
                             cli.getParameterAsList("field", "\\+"),
+                            cli.getParameterAsInteger("sleep"),
                             credentials).extract();
                     break;
                 default:

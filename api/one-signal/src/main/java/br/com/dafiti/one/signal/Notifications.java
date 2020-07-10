@@ -57,6 +57,7 @@ public class Notifications {
     private final List partition;
     private final List fields;
     private final JSONObject credentials;
+    private final int sleep;
 
     public Notifications(
             String output,
@@ -64,6 +65,7 @@ public class Notifications {
             List key,
             List partition,
             List fields,
+            int sleep,
             JSONObject credentials) {
         this.output = output;
         this.apps = apps;
@@ -71,6 +73,7 @@ public class Notifications {
         this.partition = partition;
         this.fields = fields;
         this.credentials = credentials;
+        this.sleep = sleep;
     }
 
     void extract() throws DuplicateEntityException, IOException, ParseException {
@@ -148,6 +151,18 @@ public class Notifications {
                     }
                 }
                 httpURLConnection.disconnect();
+                
+                //Identify if has sleep time until next API call.
+                if (this.sleep > 0) {
+                    try {
+                        Logger.getLogger(OneSignal.class.getName())
+                                .log(Level.INFO, "Sleeping {0} seconds until next API call", this.sleep);
+
+                        Thread.sleep(Long.valueOf(this.sleep * 1000));
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(OneSignal.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
             }
         }
     }
