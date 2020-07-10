@@ -1492,7 +1492,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
 		String generic_parameter = getVariable("GENERIC_PARAMETER", "");
 	
 		//Get variables. 
-		String order = get(Fields.In, "order").getString(r);
 		String schema = get(Fields.In, "schema").getString(r);
 		String table = get(Fields.In, "table").getString(r);
 		String connection = get(Fields.In, "connection").getString(r);
@@ -1565,8 +1564,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
 						logBasic( order + ": result of macro ( " + macro + " ) evaluation of " + values[0] + ": " + values[1] );				
 					}
 
-					//Replace element parameters.
-					order = order.replaceAll( "\\$\\{" + values[0].toUpperCase() + "\\}", values[1] );					
+					//Replace element parameters.				
 					schema = schema.replaceAll( "\\$\\{" + values[0].toUpperCase() + "\\}", values[1] );	
 					table = table.replaceAll( "\\$\\{" + values[0].toUpperCase() + "\\}", values[1] );	
 					connection = connection.replaceAll( "\\$\\{" + values[0].toUpperCase() + "\\}", values[1] );	
@@ -1574,7 +1572,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
 
 					sql_in_one_line = sql_in_one_line.replaceAll( "\\$\\{" + values[0].toUpperCase() + "\\}", values[1] );	
 				}else if ( values.length == 1 ){
-					order = order.replaceAll( "\\$\\{" + values[0].toUpperCase() + "\\}", "" );	    
 					schema = schema.replaceAll( "\\$\\{" + values[0].toUpperCase() + "\\}", "" );	    
 					table = table.replaceAll( "\\$\\{" + values[0].toUpperCase() + "\\}", "" );	  
 					connection = connection.replaceAll( "\\$\\{" + values[0].toUpperCase() + "\\}", "" );	
@@ -1586,7 +1583,6 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
 		} 
 
 		//Update output field value. 
-		get(Fields.Out, "order").setValue(r, order);
 		get(Fields.Out, "schema").setValue(r, schema);
 		get(Fields.Out, "table").setValue(r, table);
 		get(Fields.Out, "connection").setValue(r, connection);
