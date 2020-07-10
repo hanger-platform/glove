@@ -130,12 +130,11 @@ public class Notifications {
                             //Fetchs notifications list.
                             for (Object object : jsonArray) {
                                 List record = new ArrayList();
-                                JSONObject jsonObject = (JSONObject) new JSONParser().parse((String) object);
 
                                 fields.forEach((field) -> {
                                     //Identifies if the field exists.
-                                    if (jsonObject.containsKey(field)) {
-                                        record.add(jsonObject.get(field));
+                                    if (((JSONObject) object).containsKey(field)) {
+                                        record.add(((JSONObject) object).get(field));
                                     } else {
                                         record.add(null);
                                     }
