@@ -86,6 +86,14 @@ public class OneSignal {
                             cli.getParameter("delimiter").charAt(0),
                             cli.getParameterAsInteger("sleep"),
                             credentials).extract();
+                case "notifications":
+                    new Notifications(
+                            cli.getParameter("output"), 
+                            cli.getParameterAsList("apps", "\\+"), 
+                            cli.getParameterAsList("key", "\\+"),
+                            cli.getParameterAsList("partition", "\\+"),
+                            cli.getParameterAsList("fields", "\\+"),
+                            credentials).extract();
                     break;
                 default:
                     Logger.getLogger(OneSignal.class.getName()).log(Level.SEVERE, "GLOVE - Service {0} not yet implemented", cli.getParameter("service"));

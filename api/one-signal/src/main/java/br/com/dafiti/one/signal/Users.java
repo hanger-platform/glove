@@ -45,7 +45,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 /**
- * Generate all of your current user data
+ * Extract all of your current user data
  *
  * @author Helio Leal
  */

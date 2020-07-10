@@ -23,10 +23,169 @@
  */
 package br.com.dafiti.one.signal;
 
+import br.com.dafiti.mitt.Mitt;
+import br.com.dafiti.mitt.exception.DuplicateEntityException;
+import br.com.dafiti.mitt.transformation.embedded.Concat;
+import br.com.dafiti.mitt.transformation.embedded.Now;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 /**
+ * Extract the details of multiple notifications
  *
- * @author helio.leal
+ * @author Helio Leal
  */
 public class Notifications {
-    
+
+    private final String NOTIFICATIONS_URL = "https://onesignal.com/api/v1/notifications?app_id=<<app_id>>&offset=<<offset>>";
+    private final String APP_URL = "https://onesignal.com/api/v1/apps/";
+    private final String output;
+    private final List<String> apps;
+    private final List key;
+    private final List partition;
+    private final List fields;
+    private final JSONObject credentials;
+
+    public Notifications(
+            String output,
+            List apps,
+            List key,
+            List partition,
+            List fields,
+            JSONObject credentials) {
+        this.output = output;
+        this.apps = apps;
+        this.key = key;
+        this.partition = partition;
+        this.fields = fields;
+        this.credentials = credentials;
+    }
+
+    void extract() throws DuplicateEntityException, IOException, ParseException {
+        //Defines a MITT instance. 
+        Mitt mitt = new Mitt();
+
+        //Defines output file.
+        mitt.setOutputFile(this.output);
+
+        //Defines fields.
+        mitt.getConfiguration()
+                .addCustomField("partition_field", new Concat(this.partition))
+                .addCustomField("custom_primary_key", new Concat(this.key))
+                .addCustomField("etl_load_date", new Now())
+                .addField(this.fields);
+
+        //Identifies original fields.
+        List<String> fields = mitt.getConfiguration().getOriginalFieldsName();
+
+        //Fetchs all apps.
+        for (String app : this.apps) {
+            String authKey = this.getAuthKey(app);
+
+            boolean nextPage = true;
+            int offset = 0;
+
+            while (nextPage) {
+                String list = NOTIFICATIONS_URL
+                        .replace("<<app_id>>", app)
+                        .replace("<<offset>>", String.valueOf(offset));
+
+                Logger.getLogger(OneSignal.class.getName()).log(Level.INFO, "Retrieving data from URL: {0}", new Object[]{list});
+
+                //Connect to API.
+                HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(list).openConnection();
+                httpURLConnection.setRequestProperty("Authorization", "Basic " + authKey);
+                httpURLConnection.setRequestProperty("Accept", "application/json");
+                httpURLConnection.setRequestMethod("GET");
+
+                //Get API Call response.
+                try (BufferedReader bufferedReader = new BufferedReader(
+                        new InputStreamReader(httpURLConnection.getInputStream()))) {
+                    String response;
+
+                    //Get service list from API.
+                    while ((response = bufferedReader.readLine()) != null) {
+                        JSONArray jsonArray
+                                = (JSONArray) ((JSONObject) new JSONParser()
+                                        .parse(response))
+                                        .get("notifications");
+
+                        Logger.getLogger(OneSignal.class.getName()).log(Level.INFO, "{0} notifications found ", new Object[]{jsonArray.size()});
+
+                        //Identify if at least 1 service was found on the page.
+                        if (jsonArray.size() > 0) {
+                            offset += 50;
+
+                            //Fetchs notifications list.
+                            for (Object object : jsonArray) {
+
+                                List record = new ArrayList();
+                                JSONObject jsonObject = (JSONObject) new JSONParser().parse((String) object);
+
+                                fields.forEach((field) -> {
+                                    //Identifies if the field exists.
+                                    if (jsonObject.containsKey(field)) {
+                                        record.add(jsonObject.get(field));
+                                    } else {
+                                        record.add(null);
+                                    }
+                                });
+
+                                mitt.write(record);
+                            }
+                        } else {
+                            nextPage = false;
+                        }
+                    }
+                }
+                httpURLConnection.disconnect();
+            }
+        }
+    }
+
+    /**
+     * Retrives key for an app.
+     *
+     * @param app_id String App id
+     * @return Basic Auth Key
+     */
+    String getAuthKey(String app_id)
+            throws MalformedURLException, IOException, ParseException {
+        String basicAuthKey = "";
+
+        Logger.getLogger(OneSignal.class.getName()).log(Level.INFO, "Retrieving auth key from: {0}", new Object[]{APP_URL + app_id});
+
+        //Connect to API.
+        HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(APP_URL + app_id).openConnection();
+        httpURLConnection.setRequestProperty("Authorization", (String) credentials.get("authorization"));
+        httpURLConnection.setRequestProperty("Accept", "application/json");
+        httpURLConnection.setRequestMethod("GET");
+
+        //Get API Call response.
+        try (BufferedReader bufferedReader = new BufferedReader(
+                new InputStreamReader(httpURLConnection.getInputStream()))) {
+            String response;
+
+            //Get auth key response from API.
+            while ((response = bufferedReader.readLine()) != null) {
+                basicAuthKey = (String) ((JSONObject) new JSONParser()
+                        .parse(response))
+                        .get("basic_auth_key");
+            }
+        }
+
+        return basicAuthKey;
+    }
 }
