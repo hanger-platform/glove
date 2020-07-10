@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -49,10 +50,11 @@ import org.json.simple.parser.ParseException;
  * @author Helio Leal
  */
 public class Users {
-
+    private final String CSV_EXPORT_URL = "https://onesignal.com/api/v1/players/csv_export?app_id=";
+    private final String APP_URL = "https://onesignal.com/api/v1/apps/";
     private final String output;
-    private final String endPoint;
     private final String encode;
+    private final List<String> apps;
     private final List key;
     private final List partition;
     private final List fields;
@@ -62,17 +64,16 @@ public class Users {
 
     public Users(
             String output,
-            String endPoint,
             String encode,
+            List apps,
             List key,
             List partition,
             List fields,
             Character delimiter,
             int sleep,
             JSONObject credentials) {
-
         this.output = output;
-        this.endPoint = endPoint;
+        this.apps = apps;
         this.encode = encode;
         this.key = key;
         this.partition = partition;
@@ -119,79 +120,118 @@ public class Users {
             mitt.getConfiguration().addField(this.fields);
         }
 
-        Logger.getLogger(OneSignal.class.getName()).log(Level.INFO, "Send POST request for endpoint: {0}", new Object[]{this.endPoint});
+        //Fetchs all apps.
+        for (String app : this.apps) {
+            String authKey = this.getAuthKey(app);
+
+            Logger.getLogger(OneSignal.class.getName()).log(Level.INFO, "POST request for endpoint: {0}", new Object[]{CSV_EXPORT_URL + app});
+
+            //Connect to API.
+            HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(CSV_EXPORT_URL + app).openConnection();
+            httpURLConnection.setRequestProperty("Authorization", "Basic " + authKey);
+            httpURLConnection.setRequestProperty("Accept", "application/json");
+            httpURLConnection.setRequestMethod("POST");
+
+            //Get API Call response.
+            try (BufferedReader bufferedReader = new BufferedReader(
+                    new InputStreamReader(httpURLConnection.getInputStream()))) {
+                String response;
+
+                //Get endpoint response from API.
+                while ((response = bufferedReader.readLine()) != null) {
+                    String url = (String) ((JSONObject) new JSONParser()
+                            .parse(response))
+                            .get("csv_file_url");
+
+                    //Identify if file is ready
+                    boolean ready = false;
+
+                    while (!ready) {
+                        HttpURLConnection httpConnection = (HttpURLConnection) new URL(url).openConnection();
+                        int responseCode = httpConnection.getResponseCode();
+
+                        //Identifies if file is ready to download.
+                        if (responseCode == HttpURLConnection.HTTP_OK) {
+                            Logger.getLogger(OneSignal.class.getName()).log(Level.INFO, "Downloading file from URL: {0}", new Object[]{url});
+
+                            httpConnection.disconnect();
+                            ready = true;
+
+                            //Defines the output path for temp files.
+                            Path outputPath = Files.createTempDirectory("one_signal_");
+
+                            //Download file from URL
+                            FileUtils.copyURLToFile(
+                                    new URL(url),
+                                    new File(outputPath + "/" + app + ".csv.gz")
+                            );
+
+                            Logger.getLogger(OneSignal.class.getName()).log(Level.INFO, "Writing output file to: {0}", this.output);
+
+                            //Write to the output.
+                            mitt.getReaderSettings().setDelimiter(this.delimiter);
+                            mitt.getReaderSettings().setEncode(this.encode);
+                            mitt.write(outputPath.toFile(), "*");
+                        } else {
+                            //Response 403 means that file is not ready.
+                            if (responseCode == HttpURLConnection.HTTP_FORBIDDEN) {
+                                Logger.getLogger(OneSignal.class.getName()).log(Level.INFO, "File {0} is not ready to download, error: {1}", new Object[]{url, responseCode});
+
+                                //Identify if has sleep time until next API call.
+                                if (this.sleep > 0) {
+                                    try {
+                                        Logger.getLogger(OneSignal.class.getName())
+                                                .log(Level.INFO, "Sleeping {0} seconds until next try", this.sleep);
+
+                                        Thread.sleep(Long.valueOf(this.sleep * 1000));
+                                    } catch (InterruptedException ex) {
+                                        Logger.getLogger(OneSignal.class.getName()).log(Level.SEVERE, null, ex);
+                                    }
+                                }
+
+                            } else {
+                                ready = true;
+                                throw new IOException("GLOVE - One Signal fail: " + responseCode);
+                            }
+                        }
+                    }
+                }
+            }
+            httpURLConnection.disconnect();
+        }
+    }
+
+    /**
+     * Retrives key for an app.
+     *
+     * @param app_id String App id
+     * @return Basic Auth Key
+     */
+    String getAuthKey(String app_id)
+            throws MalformedURLException, IOException, ParseException {
+        String basicAuthKey = "";
+
+        Logger.getLogger(OneSignal.class.getName()).log(Level.INFO, "Retrieving auth key from: {0}", new Object[]{APP_URL + app_id});
 
         //Connect to API.
-        HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(this.endPoint).openConnection();
-        httpURLConnection.setRequestProperty("Authorization", (String) this.credentials.get("authorization"));
+        HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(APP_URL + app_id).openConnection();
+        httpURLConnection.setRequestProperty("Authorization", (String) credentials.get("authorization"));
         httpURLConnection.setRequestProperty("Accept", "application/json");
-        httpURLConnection.setRequestMethod("POST");
+        httpURLConnection.setRequestMethod("GET");
 
         //Get API Call response.
         try (BufferedReader bufferedReader = new BufferedReader(
                 new InputStreamReader(httpURLConnection.getInputStream()))) {
             String response;
 
-            //Get endpoint response from API.
+            //Get auth key response from API.
             while ((response = bufferedReader.readLine()) != null) {
-                String url = (String) ((JSONObject) new JSONParser()
+                basicAuthKey = (String) ((JSONObject) new JSONParser()
                         .parse(response))
-                        .get("csv_file_url");
-
-                //Identify if file is ready
-                boolean ready = false;
-
-                while (!ready) {
-                    HttpURLConnection httpConnection = (HttpURLConnection) new URL(url).openConnection();
-                    int responseCode = httpConnection.getResponseCode();
-
-                    //Identifies if file is ready to download.
-                    if (responseCode == HttpURLConnection.HTTP_OK) {
-                        Logger.getLogger(OneSignal.class.getName()).log(Level.INFO, "Downloading file from URL: {0}", new Object[]{url});
-
-                        httpConnection.disconnect();
-                        ready = true;
-
-                        //Defines the output path for temp files.
-                        Path outputPath = Files.createTempDirectory("one_signal_");
-
-                        //Download file from URL
-                        FileUtils.copyURLToFile(
-                                new URL(url),
-                                new File(outputPath + "/csv_export.csv.gz")
-                        );
-
-                        Logger.getLogger(OneSignal.class.getName()).log(Level.INFO, "Writing output file to: {0}", this.output);
-
-                        //Write to the output.
-                        mitt.getReaderSettings().setDelimiter(this.delimiter);
-                        mitt.getReaderSettings().setEncode(this.encode);
-                        mitt.write(outputPath.toFile(), "*");
-                    } else {
-                        //Response 403 means that file is not ready.
-                        if (responseCode == HttpURLConnection.HTTP_FORBIDDEN) {
-                            Logger.getLogger(OneSignal.class.getName()).log(Level.INFO, "File {0} is not ready to download, error: {1}", new Object[]{url, responseCode});
-
-                            //Identify if has sleep time until next API call.
-                            if (sleep > 0) {
-                                try {
-                                    Logger.getLogger(OneSignal.class.getName())
-                                            .log(Level.INFO, "Sleeping {0} seconds until next try", sleep);
-
-                                    Thread.sleep(Long.valueOf(sleep * 1000));
-                                } catch (InterruptedException ex) {
-                                    Logger.getLogger(OneSignal.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-                            }
-
-                        } else {
-                            ready = true;
-                            throw new IOException("GLOVE - One Signal fail: " + responseCode);
-                        }
-                    }
-                }
+                        .get("basic_auth_key");
             }
         }
-        httpURLConnection.disconnect();
+
+        return basicAuthKey;
     }
 }
