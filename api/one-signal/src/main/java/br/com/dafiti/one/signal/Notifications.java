@@ -164,7 +164,8 @@ public class Notifications {
                     }
                 }
             }
-        }
+        }        
+        mitt.close();
     }
 
     /**
