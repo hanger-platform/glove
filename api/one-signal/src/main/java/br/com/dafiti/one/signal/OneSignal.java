@@ -86,6 +86,7 @@ public class OneSignal {
                             cli.getParameter("delimiter").charAt(0),
                             cli.getParameterAsInteger("sleep"),
                             credentials).extract();
+                    break;
                 case "notifications":
                     new Notifications(
                             cli.getParameter("output"),
