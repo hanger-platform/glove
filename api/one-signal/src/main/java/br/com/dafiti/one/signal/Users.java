@@ -101,22 +101,16 @@ public class Users {
         if (this.fields.isEmpty()) {
             mitt.getConfiguration()
                     .addField("id")
-                    .addField("identifier")
                     .addField("session_count")
                     .addField("language")
                     .addField("timezone")
-                    .addField("game_version")
                     .addField("device_os")
                     .addField("device_type")
-                    .addField("device_model")
-                    .addField("ad_id")
                     .addField("tags")
                     .addField("last_active")
-                    .addField("playtime")
-                    .addField("amount_spent")
+                    .addField("playtime")                    
                     .addField("created_at")
-                    .addField("invalid_identifier")
-                    .addField("badge_count");
+                    .addField("invalid_identifier");
         } else {
             mitt.getConfiguration().addField(this.fields);
         }
