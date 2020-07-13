@@ -151,7 +151,7 @@ public class Notifications {
                     }
                 }
                 httpURLConnection.disconnect();
-                
+
                 //Identify if has sleep time until next API call.
                 if (this.sleep > 0) {
                     try {
