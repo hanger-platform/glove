@@ -53,6 +53,6 @@
                 </configuration>
             </plugin>
         </plugins>
-        <finalName>braze</finalName>
+        <finalName>one-signal</finalName>
     </build>
 </project>
