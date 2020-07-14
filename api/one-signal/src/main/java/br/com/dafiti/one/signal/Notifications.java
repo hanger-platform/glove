@@ -49,7 +49,7 @@ import org.json.simple.parser.ParseException;
  */
 public class Notifications {
 
-    private final String NOTIFICATIONS_URL = "https://onesignal.com/api/v1/notifications?app_id=<<app_id>>&offset=<<offset>>";
+    private final String NOTIFICATIONS_URL = "https://onesignal.com/api/v1/notifications?app_id=<<app_id>>&offset=<<offset>>&limit=<<limit>>";
     private final String APP_URL = "https://onesignal.com/api/v1/apps/";
     private final String output;
     private final List<String> apps;
@@ -58,6 +58,7 @@ public class Notifications {
     private final List fields;
     private final JSONObject credentials;
     private final int sleep;
+    private final int limit;
 
     public Notifications(
             String output,
@@ -66,7 +67,8 @@ public class Notifications {
             List partition,
             List fields,
             int sleep,
-            JSONObject credentials) {
+            JSONObject credentials,
+            int limit) {
         this.output = output;
         this.apps = apps;
         this.key = key;
@@ -74,6 +76,7 @@ public class Notifications {
         this.fields = fields;
         this.credentials = credentials;
         this.sleep = sleep;
+        this.limit = limit;
     }
 
     void extract() throws DuplicateEntityException, IOException, ParseException {
@@ -102,7 +105,8 @@ public class Notifications {
             while (nextPage) {
                 String list = NOTIFICATIONS_URL
                         .replace("<<app_id>>", app)
-                        .replace("<<offset>>", String.valueOf(offset));
+                        .replace("<<offset>>", String.valueOf(offset))
+                        .replace("<<limit>>", String.valueOf(this.limit));
 
                 Logger.getLogger(OneSignal.class.getName()).log(Level.INFO, "Retrieving data from URL: {0}", new Object[]{list});
 
@@ -128,7 +132,7 @@ public class Notifications {
 
                         //Identify if at least 1 service was found on the page.
                         if (jsonArray.size() > 0) {
-                            offset += 50;
+                            offset += this.limit;
 
                             //Fetchs notifications list.
                             for (Object object : jsonArray) {
