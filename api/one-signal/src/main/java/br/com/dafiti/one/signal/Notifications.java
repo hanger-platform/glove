@@ -49,7 +49,7 @@ import org.json.simple.parser.ParseException;
  */
 public class Notifications {
 
-    private final String NOTIFICATIONS_URL = "https://onesignal.com/api/v1/notifications?app_id=<<app_id>>&offset=<<offset>>&limit=<<limit>>";
+    private final String NOTIFICATIONS_URL = "https://onesignal.com/api/v1/notifications?app_id=<<app_id>>&offset=<<offset>>";
     private final String APP_URL = "https://onesignal.com/api/v1/apps/";
     private final String output;
     private final List<String> apps;
@@ -101,12 +101,22 @@ public class Notifications {
             String authKey = this.getAuthKey(app);
             boolean nextPage = true;
             int offset = 0;
+            int limit = 50;
+
+            // Check if it is to consider limit parameter.
+            if (this.limit > 0) {  
+                limit = this.limit;
+            }
 
             while (nextPage) {
                 String list = NOTIFICATIONS_URL
                         .replace("<<app_id>>", app)
-                        .replace("<<offset>>", String.valueOf(offset))
-                        .replace("<<limit>>", String.valueOf(this.limit));
+                        .replace("<<offset>>", String.valueOf(offset));
+                        
+                // Check if it is to consider limit parameter.
+                if (this.limit > 0) {                    
+                    list = list +  "&limit=" + String.valueOf(this.limit);
+                }
 
                 Logger.getLogger(OneSignal.class.getName()).log(Level.INFO, "Retrieving data from URL: {0}", new Object[]{list});
 
@@ -132,7 +142,7 @@ public class Notifications {
 
                         //Identify if at least 1 service was found on the page.
                         if (jsonArray.size() > 0) {
-                            offset += this.limit;
+                            offset += limit;
 
                             //Fetchs notifications list.
                             for (Object object : jsonArray) {
