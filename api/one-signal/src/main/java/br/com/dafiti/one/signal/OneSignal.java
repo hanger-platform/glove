@@ -64,7 +64,8 @@ public class OneSignal {
                     .addParameter("p", "partition", "(Optional)  Partition, divided by + if has more than one field")
                     .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "")
                     .addParameter("f", "field", "(Optional) Fields to be extracted from the file", "")
-                    .addParameter("e", "encode", "(Optional) Encode file.", "auto");
+                    .addParameter("e", "encode", "(Optional) Encode file.", "auto")
+                    .addParameter("e", "limit", "(Optional) How many notifications to return. Max is 50. Default is 50.", "50");
 
             //Reads the command line interface. 
             CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -95,7 +96,8 @@ public class OneSignal {
                             cli.getParameterAsList("partition", "\\+"),
                             cli.getParameterAsList("field", "\\+"),
                             cli.getParameterAsInteger("sleep"),
-                            credentials).extract();
+                            credentials,
+                            cli.getParameterAsInteger("limit")).extract();
                     break;
                 default:
                     Logger.getLogger(OneSignal.class.getName()).log(Level.SEVERE, "GLOVE - Service {0} not yet implemented", cli.getParameter("service"));
