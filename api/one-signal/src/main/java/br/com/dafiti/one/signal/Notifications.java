@@ -59,6 +59,7 @@ public class Notifications {
     private final JSONObject credentials;
     private final int sleep;
     private final int limit;
+    private final int retries;
 
     public Notifications(
             String output,
@@ -68,7 +69,8 @@ public class Notifications {
             List fields,
             int sleep,
             JSONObject credentials,
-            int limit) {
+            int limit,
+            int retries) {
         this.output = output;
         this.apps = apps;
         this.key = key;
@@ -77,6 +79,7 @@ public class Notifications {
         this.credentials = credentials;
         this.sleep = sleep;
         this.limit = limit;
+        this.retries = retries;
     }
 
     void extract() throws DuplicateEntityException, IOException, ParseException {
@@ -99,86 +102,100 @@ public class Notifications {
         //Fetchs all apps.
         for (String app : this.apps) {
             String authKey = this.getAuthKey(app);
-            boolean nextPage = true;
+            boolean nextOffset = true;
             int offset = 0;
             int limit = 50;
 
             // Check if it is to consider limit parameter.
-            if (this.limit > 0) {  
+            if (this.limit > 0) {
                 limit = this.limit;
             }
 
-            while (nextPage) {
+            //Will loop throug all offsets.
+            while (nextOffset) {
                 String list = NOTIFICATIONS_URL
                         .replace("<<app_id>>", app)
                         .replace("<<offset>>", String.valueOf(offset));
-                        
+
                 // Check if it is to consider limit parameter.
-                if (this.limit > 0) {                    
-                    list = list +  "&limit=" + String.valueOf(this.limit);
+                if (this.limit > 0) {
+                    list = list + "&limit=" + String.valueOf(this.limit);
                 }
 
-                Logger.getLogger(OneSignal.class.getName()).log(Level.INFO, "Retrieving data from URL: {0}", new Object[]{list});
+                //Retries if some error ocurrs, otherwise, breaks this for.
+                for (int retry = 0; retry < retries; retry++) {
+                    try {
+                        nextOffset = true;
 
-                //Connect to API.
-                HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(list).openConnection();
-                httpURLConnection.setRequestProperty("Authorization", "Basic " + authKey);
-                httpURLConnection.setRequestProperty("Accept", "application/json");
-                httpURLConnection.setRequestMethod("GET");
+                        Logger.getLogger(OneSignal.class.getName()).log(Level.INFO, "Retrieving data from URL: {0}", new Object[]{list});
 
-                //Get API Call response.
-                try (BufferedReader bufferedReader = new BufferedReader(
-                        new InputStreamReader(httpURLConnection.getInputStream()))) {
-                    String response;
+                        //Connect to API.
+                        HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(list).openConnection();
+                        httpURLConnection.setRequestProperty("Authorization", "Basic " + authKey);
+                        httpURLConnection.setRequestProperty("Accept", "application/json");
+                        httpURLConnection.setRequestMethod("GET");
 
-                    //Get service list from API.
-                    while ((response = bufferedReader.readLine()) != null) {
-                        JSONArray jsonArray
-                                = (JSONArray) ((JSONObject) new JSONParser()
-                                        .parse(response))
-                                        .get("notifications");
+                        //Get API Call response.
+                        try (BufferedReader bufferedReader = new BufferedReader(
+                                new InputStreamReader(httpURLConnection.getInputStream()))) {
+                            String response;
 
-                        Logger.getLogger(OneSignal.class.getName()).log(Level.INFO, "{0} notifications found ", new Object[]{jsonArray.size()});
+                            //Get service list from API.
+                            while ((response = bufferedReader.readLine()) != null) {
+                                JSONArray jsonArray
+                                        = (JSONArray) ((JSONObject) new JSONParser()
+                                                .parse(response))
+                                                .get("notifications");
 
-                        //Identify if at least 1 service was found on the page.
-                        if (jsonArray.size() > 0) {
-                            offset += limit;
+                                Logger.getLogger(OneSignal.class.getName()).log(Level.INFO, "{0} notifications found ", new Object[]{jsonArray.size()});
 
-                            //Fetchs notifications list.
-                            for (Object object : jsonArray) {
-                                List record = new ArrayList();
+                                //Identify if at least 1 service was found on the page.
+                                if (jsonArray.size() > 0) {
+                                    offset += limit;
 
-                                fields.forEach((field) -> {
-                                    //Identifies if the field exists.
-                                    if (((JSONObject) object).containsKey(field)) {
-                                        record.add(((JSONObject) object).get(field));
-                                    } else {
-                                        record.add(null);
+                                    //Fetchs notifications list.
+                                    for (Object object : jsonArray) {
+                                        List record = new ArrayList();
+
+                                        fields.forEach((field) -> {
+                                            //Identifies if the field exists.
+                                            if (((JSONObject) object).containsKey(field)) {
+                                                record.add(((JSONObject) object).get(field));
+                                            } else {
+                                                record.add(null);
+                                            }
+                                        });
+
+                                        mitt.write(record);
                                     }
-                                });
-
-                                mitt.write(record);
+                                } else {
+                                    nextOffset = false;
+                                }
                             }
-                        } else {
-                            nextPage = false;
+                        }
+                        httpURLConnection.disconnect();
+
+                        //If no errors ocurred, breaks the retry for.
+                        break;
+                    } catch (IOException ex) {
+                        Logger.getLogger(OneSignal.class.getName()).log(Level.SEVERE, "GLOVE - One Signal fail: ", ex);
+                        nextOffset = false;
+                    }
+
+                    //Identify if has sleep time until next API call.
+                    if (this.sleep > 0) {
+                        try {
+                            Logger.getLogger(OneSignal.class.getName())
+                                    .log(Level.INFO, "Sleeping {0} seconds until next API call", this.sleep);
+
+                            Thread.sleep(Long.valueOf(this.sleep * 1000));
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(OneSignal.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
                 }
-                httpURLConnection.disconnect();
-
-                //Identify if has sleep time until next API call.
-                if (this.sleep > 0) {
-                    try {
-                        Logger.getLogger(OneSignal.class.getName())
-                                .log(Level.INFO, "Sleeping {0} seconds until next API call", this.sleep);
-
-                        Thread.sleep(Long.valueOf(this.sleep * 1000));
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(OneSignal.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
             }
-        }        
+        }
         mitt.close();
     }
 
