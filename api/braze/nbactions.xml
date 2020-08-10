@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>run</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-classpath %classpath br.com.dafiti.braze.Braze --credentials="/home/valdiney/Documentos/braze.json"  --output="/tmp/braze/canvas_data_series.csv"  --service="canvases"  --endpoint_list="https://rest.iad-03.braze.com/canvas/list?include_archived=true&amp;page=&lt;&lt;page&gt;&gt;"  --endpoint_detail="https://rest.iad-03.braze.com/canvas/data_series?canvas_id=&lt;&lt;id&gt;&gt;&amp;ending_at=2020-08-06T00%3A00%3A00&amp;length=10&amp;include_variant_breakdown=true&amp;include_step_breakdown=true&amp;include_deleted_step_data=true"  --field="data+data.name"  --partition="::dateformat(starting_at,yyyy-MM-dd'T'HH:mm:ss,yyyy)"  --key="::checksum()"</exec.args>
+                <exec.executable>java</exec.executable>
+            </properties>
+        </action>
+        <action>
+            <actionName>debug</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.braze.Braze --credentials="/home/valdiney/Documentos/braze.json"  --output="/tmp/braze/canvas_data_series.csv"  --service="canvases"  --endpoint_list="https://rest.iad-03.braze.com/canvas/list?include_archived=true&amp;page=&lt;&lt;page&gt;&gt;"  --endpoint_detail="https://rest.iad-03.braze.com/canvas/data_series?canvas_id=&lt;&lt;id&gt;&gt;&amp;ending_at=2020-08-06T00%3A00%3A00&amp;length=10&amp;include_variant_breakdown=true&amp;include_step_breakdown=true&amp;include_deleted_step_data=true"  --field="data+data.name"  --partition="::dateformat(starting_at,yyyy-MM-dd'T'HH:mm:ss,yyyy)"  --key="::checksum()"</exec.args>
+                <exec.executable>java</exec.executable>
+                <jpda.listen>true</jpda.listen>
+            </properties>
+        </action>
+        <action>
+            <actionName>profile</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-classpath %classpath br.com.dafiti.braze.Braze --credentials="/home/valdiney/Documentos/braze.json"  --output="/tmp/braze/canvas_data_series.csv"  --service="canvases"  --endpoint_list="https://rest.iad-03.braze.com/canvas/list?include_archived=true&amp;page=&lt;&lt;page&gt;&gt;"  --endpoint_detail="https://rest.iad-03.braze.com/canvas/data_series?canvas_id=&lt;&lt;id&gt;&gt;&amp;ending_at=2020-08-06T00%3A00%3A00&amp;length=10&amp;include_variant_breakdown=true&amp;include_step_breakdown=true&amp;include_deleted_step_data=true"  --field="data+data.name"  --partition="::dateformat(starting_at,yyyy-MM-dd'T'HH:mm:ss,yyyy)"  --key="::checksum()"</exec.args>
+                <exec.executable>java</exec.executable>
+            </properties>
+        </action>
+    </actions>

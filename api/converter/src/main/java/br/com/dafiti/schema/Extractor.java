@@ -269,13 +269,17 @@ public class Extractor implements Runnable {
                         }
 
                     } else if (stringField > 0) {
-                        fieldMetadata.add("{\"field\":\"" + field + "\",\"type\":\"string\",\"length\":" + (length * 2) + "}");
+                        int justifiedLength = (length * 2) > 65000 ? 65000 : (length * 2);
+
+                        length = length <= 0 ? 255 : length;
+
+                        fieldMetadata.add("{\"field\":\"" + field + "\",\"type\":\"string\",\"length\":" + justifiedLength + "}");
 
                         switch (dialect) {
                             case "spectrum":
                             case "athena":
                                 fieldSchema.add("{\"name\":\"" + field + "\",\"type\":[\"null\",\"string\"],\"default\":null}");
-                                fieldDataType.add(field + " " + "varchar(" + (length * 2) + ")");
+                                fieldDataType.add(field + " " + "varchar(" + justifiedLength + ")");
                                 break;
                             case "redshift":
                                 fieldDataType.add(field + " " + "varchar(" + length + ") ENCODE ZSTD");
@@ -325,15 +329,17 @@ public class Extractor implements Runnable {
                 } else {
                     switch (type) {
                         case "string":
+                            int justifiedLength = (length * 2) > 65000 ? 65000 : (length * 2);
+
                             length = length <= 0 ? 255 : length;
 
-                            fieldMetadata.add("{\"field\":\"" + field + "\",\"type\":\"string\",\"length\":" + length + "}");
+                            fieldMetadata.add("{\"field\":\"" + field + "\",\"type\":\"string\",\"length\":" + justifiedLength + "}");
 
                             switch (dialect) {
                                 case "spectrum":
                                 case "athena":
                                     fieldSchema.add("{\"name\":\"" + field + "\",\"type\":[\"null\",\"string\"],\"default\":null}");
-                                    fieldDataType.add(field + " " + "varchar(" + length + ")");
+                                    fieldDataType.add(field + " " + "varchar(" + justifiedLength + ")");
                                     break;
                                 case "redshift":
                                     fieldDataType.add(field + " " + "varchar(" + length + ")  ENCODE ZSTD");
