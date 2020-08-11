@@ -38,6 +38,7 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.Sheets.Spreadsheets.BatchUpdate;
 import com.google.api.services.sheets.v4.SheetsScopes;
+import com.google.api.services.sheets.v4.model.AppendValuesResponse;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
 import com.google.api.services.sheets.v4.model.DeleteDimensionRequest;
 import com.google.api.services.sheets.v4.model.DimensionRange;
@@ -97,7 +98,8 @@ public class GoogleSheetsExport {
                 .addParameter("s", "spreadsheet", "Id of the spreadsheet", "", true, false)
                 .addParameter("i", "input", "Input file path and file name", "", true, false)
                 .addParameter("t", "sheet", "Define sheet name", "", true, false)
-                .addParameter("sl", "sleep", "(Optional) Sleep time in seconds at one request and another; 0 is default", "0");
+                .addParameter("sl", "sleep", "(Optional) Sleep time in seconds at one request and another; 0 is default", "0")
+                .addParameter("u", "method", "(Optional) 0 for update or 1 append ; 0 is default", "0");
 
         //Read the command line interface. 
         CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -134,7 +136,7 @@ public class GoogleSheetsExport {
                             .build();
 
             //Instance of sheets service.
-            Sheets sheets = new Sheets.Builder(
+            Sheets service = new Sheets.Builder(
                     netHttpTransport,
                     jsonFactory,
                     new AuthorizationCodeInstalledApp(
@@ -143,39 +145,11 @@ public class GoogleSheetsExport {
                     .setApplicationName("Google Sheets Export API")
                     .build();
 
-            //Define a settings.
-            CsvParserSettings parserSettings = new CsvParserSettings();
-            parserSettings.setNullValue("");
-            parserSettings.setMaxCharsPerColumn(-1);
-
-            //Define format settings.
-            parserSettings.getFormat().setDelimiter(';');
-            parserSettings.getFormat().setQuote('"');
-            parserSettings.getFormat().setQuoteEscape('"');
-
-            //Define the input buffer.
-            parserSettings.setInputBufferSize(2 * (1024 * 1024));
-
-            //Consider that csv file has header.
-            parserSettings.setHeaderExtractionEnabled(true);
-
-            //Define a csv parser.
-            CsvParser csvParser = new CsvParser(parserSettings);
-
             //Define the input file.
             File file = new File(cli.getParameter("input"));
 
-            //Init a parser.
-            csvParser.beginParsing(file);
-
-            //Value being processed.
-            String[] line;
-
-            //Values that will fill spreadsheet.
-            List<List<Object>> values = new ArrayList();
-
             //Get CSV informations.
-            InputDimension inputDimension = new CsvRoutines(parserSettings).getInputDimension(file);
+            InputDimension inputDimension = new CsvRoutines(getSettings(true)).getInputDimension(file);
 
             //Calculate the number of cells that will be written.
             long cells = (inputDimension.columnCount() * inputDimension.rowCount());
@@ -190,10 +164,10 @@ public class GoogleSheetsExport {
                 int sheetColumnCount = 0;
                 String sheetName = null;
 
-                Spreadsheet spreadsheet = sheets.spreadsheets().get(cli.getParameter("spreadsheet")).execute();
+                Spreadsheet spreadsheet = service.spreadsheets().get(cli.getParameter("spreadsheet")).execute();
                 List<Sheet> sheetList = spreadsheet.getSheets();
 
-                //Fetch sheets to get id, name and column count of a sheet.
+                //Read sheets to get id, name and column count of a sheet.
                 for (Sheet sheet : sheetList) {
                     sheetName = sheet.getProperties().getTitle();
 
@@ -206,6 +180,7 @@ public class GoogleSheetsExport {
 
                 //Identify if sheet was found.
                 if (sheetId >= 0) {
+                    Request request = null;
 
                     //Identify if should remove unused columns.
                     if (sheetColumnCount > inputDimension.columnCount()) {
@@ -214,9 +189,7 @@ public class GoogleSheetsExport {
                                         "Deleting columns from {0} to {1} because they won't be used.",
                                         new Object[]{getSpreadSheetColumnName(inputDimension.columnCount() + 1), getSpreadSheetColumnName(sheetColumnCount)});
 
-                        BatchUpdateSpreadsheetRequest content = new BatchUpdateSpreadsheetRequest();
-
-                        Request request = new Request()
+                        request = new Request()
                                 .setDeleteDimension(new DeleteDimensionRequest()
                                         .setRange(new DimensionRange()
                                                 .setSheetId(sheetId)
@@ -224,15 +197,8 @@ public class GoogleSheetsExport {
                                                 .setStartIndex(inputDimension.columnCount())
                                         )
                                 );
-
-                        List<Request> requests = new ArrayList();
-                        requests.add(request);
-                        content.setRequests(requests);
-
-                        BatchUpdate batchUpdate = sheets.spreadsheets().batchUpdate(spreadsheet.getSpreadsheetId(), content);
-                        batchUpdate.execute();
                     }
-                    
+
                     //Identify if should add new columns.
                     if (sheetColumnCount < inputDimension.columnCount()) {
                         Logger.getLogger(GoogleSheetsExport.class.getName())
@@ -240,28 +206,37 @@ public class GoogleSheetsExport {
                                         "Adding columns from {0} to {1} because process need more columns.",
                                         new Object[]{getSpreadSheetColumnName(sheetColumnCount), getSpreadSheetColumnName(inputDimension.columnCount())});
 
-                        BatchUpdateSpreadsheetRequest content = new BatchUpdateSpreadsheetRequest();
-
-                        Request request = new Request()
+                        request = new Request()
                                 .setInsertDimension(new InsertDimensionRequest()
                                         .setRange(new DimensionRange()
                                                 .setSheetId(sheetId)
                                                 .setDimension("COLUMNS")
-                                                .setStartIndex(sheetColumnCount-1)
-                                                .setEndIndex(inputDimension.columnCount()-1)
+                                                .setStartIndex(sheetColumnCount - 1)
+                                                .setEndIndex(inputDimension.columnCount() - 1)
                                         )
                                 );
 
-                        List<Request> requests = new ArrayList();
-                        requests.add(request);
-                        content.setRequests(requests);
+                    }
 
-                        BatchUpdate batchUpdate = sheets.spreadsheets().batchUpdate(spreadsheet.getSpreadsheetId(), content);
-                        batchUpdate.execute();
+                    //Identify if should execute some request.
+                    if (request != null) {
+                        executeRequest(request, service, spreadsheet.getSpreadsheetId());
                     }
 
                     int startIndex = 1;
                     int pool = (inputDimension.rowCount() < POOL) ? (int) inputDimension.rowCount() : POOL;
+
+                    //Define a csv parser.
+                    CsvParser csvParser = new CsvParser(getSettings(false));
+
+                    //Init a parser.
+                    csvParser.beginParsing(file);
+
+                    //Value being processed.
+                    String[] line;
+
+                    //Values that will fill spreadsheet.
+                    List<List<Object>> values = new ArrayList();
 
                     //Process each csv record.
                     while ((line = csvParser.parseNext()) != null) {
@@ -282,23 +257,24 @@ public class GoogleSheetsExport {
                             startIndex = startIndex + values.size();
 
                             ValueRange body = new ValueRange().setValues(values);
-
-                            UpdateValuesResponse result = sheets
-                                    .spreadsheets()
-                                    .values()
-                                    .update(spreadsheet.getSpreadsheetId(), range, body)
-                                    .setValueInputOption("USER_ENTERED")
-                                    .execute();
-                            /*AppendValuesResponse result = sheets
-                                .spreadsheets()
-                                .values()
-                                .append(spreadsheet.getSpreadsheetId(), range, body)
-                                .setValueInputOption("USER_ENTERED")
-                                .execute();*/
-
-                            System.out.printf("%d rows appended.", result.getUpdatedRows());
-
                             values.clear();
+
+                            //Identify if it is update or append.
+                            if (cli.getParameterAsInteger("method") == 0) {
+                                UpdateValuesResponse result = service
+                                        .spreadsheets()
+                                        .values()
+                                        .update(spreadsheet.getSpreadsheetId(), range, body)
+                                        .setValueInputOption("USER_ENTERED")
+                                        .execute();
+                            } else {
+                                AppendValuesResponse result = service
+                                        .spreadsheets()
+                                        .values()
+                                        .append(spreadsheet.getSpreadsheetId(), range, body)
+                                        .setValueInputOption("USER_ENTERED")
+                                        .execute();
+                            }
 
                             //Identify if has sleep time until next API call.
                             if (cli.getParameterAsInteger("sleep") > 0) {
@@ -351,5 +327,52 @@ public class GoogleSheetsExport {
             dividend = (int) ((dividend - modulo) / 26);
         }
         return columnName;
+    }
+
+    /**
+     * Define CSV settings.
+     *
+     * @param headerExtraction extract header from CSV.
+     * @return
+     */
+    public static CsvParserSettings getSettings(boolean headerExtraction) {
+        //Define a settings.
+        CsvParserSettings parserSettings = new CsvParserSettings();
+        parserSettings.setNullValue("");
+        parserSettings.setMaxCharsPerColumn(-1);
+
+        //Define format settings.
+        parserSettings.getFormat().setDelimiter(';');
+        parserSettings.getFormat().setQuote('"');
+        parserSettings.getFormat().setQuoteEscape('"');
+
+        //Define the input buffer.
+        parserSettings.setInputBufferSize(2 * (1024 * 1024));
+        parserSettings.setHeaderExtractionEnabled(headerExtraction);
+
+        return parserSettings;
+    }
+
+    /**
+     * Execute a request on Google sheets API.
+     *
+     * @param request
+     * @param service
+     * @param spreadsheetId
+     * @throws IOException
+     */
+    public static void executeRequest(
+            Request request,
+            Sheets service,
+            String spreadsheetId)
+            throws IOException {
+        List<Request> requests = new ArrayList();
+        requests.add(request);
+
+        BatchUpdateSpreadsheetRequest content = new BatchUpdateSpreadsheetRequest();
+        content.setRequests(requests);
+
+        BatchUpdate batchUpdate = service.spreadsheets().batchUpdate(spreadsheetId, content);
+        batchUpdate.execute();
     }
 }
