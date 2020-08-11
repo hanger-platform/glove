@@ -37,12 +37,11 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.Sheets.Spreadsheets.BatchUpdate;
-import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Get;
 import com.google.api.services.sheets.v4.SheetsScopes;
-import com.google.api.services.sheets.v4.model.AppendValuesResponse;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
 import com.google.api.services.sheets.v4.model.DeleteDimensionRequest;
 import com.google.api.services.sheets.v4.model.DimensionRange;
+import com.google.api.services.sheets.v4.model.InsertDimensionRequest;
 import com.google.api.services.sheets.v4.model.Request;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
@@ -64,6 +63,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Method getSpreadSheetColumnName was taken from:
  * https://stackoverflow.com/questions/181596/how-to-convert-a-column-number-e-g-127-into-an-excel-column-e-g-aa?page=1&tab=votes#tab-top
  *
  * @author Helio Leal
@@ -96,7 +96,7 @@ public class GoogleSheetsExport {
                 .addParameter("c", "credentials", "Credentials file", "", true, false)
                 .addParameter("s", "spreadsheet", "Id of the spreadsheet", "", true, false)
                 .addParameter("i", "input", "Input file path and file name", "", true, false)
-                .addParameter("t", "tab", "Define tab name", "", true, false)
+                .addParameter("t", "sheet", "Define sheet name", "", true, false)
                 .addParameter("sl", "sleep", "(Optional) Sleep time in seconds at one request and another; 0 is default", "0");
 
         //Read the command line interface. 
@@ -193,92 +193,130 @@ public class GoogleSheetsExport {
                 Spreadsheet spreadsheet = sheets.spreadsheets().get(cli.getParameter("spreadsheet")).execute();
                 List<Sheet> sheetList = spreadsheet.getSheets();
 
-                //Fetchs sheets to get id, name and column count of sheet.
+                //Fetch sheets to get id, name and column count of a sheet.
                 for (Sheet sheet : sheetList) {
                     sheetName = sheet.getProperties().getTitle();
 
-                    if (sheetName.equalsIgnoreCase(cli.getParameter("tab"))) {
+                    if (sheetName.equalsIgnoreCase(cli.getParameter("sheet"))) {
                         sheetId = sheet.getProperties().getSheetId();
                         sheetColumnCount = sheet.getProperties().getGridProperties().getColumnCount();
                         break;
                     }
                 }
 
-                //Idenitfy if should remove unused columns.
-                if (sheetColumnCount > inputDimension.columnCount()) {
-                    BatchUpdateSpreadsheetRequest content = new BatchUpdateSpreadsheetRequest();
+                //Identify if sheet was found.
+                if (sheetId >= 0) {
 
-                    Request request = new Request()
-                            .setDeleteDimension(new DeleteDimensionRequest()
-                                    .setRange(new DimensionRange()
-                                            .setSheetId(sheetId)
-                                            .setDimension("COLUMNS")
-                                            .setStartIndex(inputDimension.columnCount())
-                                    )
-                            );
+                    //Identify if should remove unused columns.
+                    if (sheetColumnCount > inputDimension.columnCount()) {
+                        Logger.getLogger(GoogleSheetsExport.class.getName())
+                                .log(Level.INFO,
+                                        "Deleting columns from {0} to {1} because they won't be used.",
+                                        new Object[]{getSpreadSheetColumnName(inputDimension.columnCount() + 1), getSpreadSheetColumnName(sheetColumnCount)});
 
-                    List<Request> requests = new ArrayList();
-                    requests.add(request);
-                    content.setRequests(requests);
+                        BatchUpdateSpreadsheetRequest content = new BatchUpdateSpreadsheetRequest();
 
-                    BatchUpdate batchUpdate = sheets.spreadsheets().batchUpdate(spreadsheet.getSpreadsheetId(), content);
-                    batchUpdate.execute();
-                }
+                        Request request = new Request()
+                                .setDeleteDimension(new DeleteDimensionRequest()
+                                        .setRange(new DimensionRange()
+                                                .setSheetId(sheetId)
+                                                .setDimension("COLUMNS")
+                                                .setStartIndex(inputDimension.columnCount())
+                                        )
+                                );
 
-                int startIndex = 1;
-                int pool = (inputDimension.rowCount() < POOL) ? (int) inputDimension.rowCount() : POOL;
+                        List<Request> requests = new ArrayList();
+                        requests.add(request);
+                        content.setRequests(requests);
 
-                //Process each csv record.
-                while ((line = csvParser.parseNext()) != null) {
-                    List<Object> record = new ArrayList();
-
-                    for (String column : line) {
-                        record.add(column);
+                        BatchUpdate batchUpdate = sheets.spreadsheets().batchUpdate(spreadsheet.getSpreadsheetId(), content);
+                        batchUpdate.execute();
                     }
-                    values.add(record);
+                    
+                    //Identify if should add new columns.
+                    if (sheetColumnCount < inputDimension.columnCount()) {
+                        Logger.getLogger(GoogleSheetsExport.class.getName())
+                                .log(Level.INFO,
+                                        "Adding columns from {0} to {1} because process need more columns.",
+                                        new Object[]{getSpreadSheetColumnName(sheetColumnCount), getSpreadSheetColumnName(inputDimension.columnCount())});
 
-                    if (values.size() == pool) {
+                        BatchUpdateSpreadsheetRequest content = new BatchUpdateSpreadsheetRequest();
 
-                        String rangeInit = sheetName + "!A" + startIndex;
-                        String rangeEnd = getExcelColumnName(inputDimension.columnCount()) + inputDimension.rowCount();
-                        String range = rangeInit + ":" + rangeEnd;
+                        Request request = new Request()
+                                .setInsertDimension(new InsertDimensionRequest()
+                                        .setRange(new DimensionRange()
+                                                .setSheetId(sheetId)
+                                                .setDimension("COLUMNS")
+                                                .setStartIndex(sheetColumnCount-1)
+                                                .setEndIndex(inputDimension.columnCount()-1)
+                                        )
+                                );
 
-                        pool = pool + values.size();
-                        startIndex = startIndex + values.size();
+                        List<Request> requests = new ArrayList();
+                        requests.add(request);
+                        content.setRequests(requests);
 
-                        ValueRange body = new ValueRange().setValues(values);
+                        BatchUpdate batchUpdate = sheets.spreadsheets().batchUpdate(spreadsheet.getSpreadsheetId(), content);
+                        batchUpdate.execute();
+                    }
 
-                        UpdateValuesResponse result = sheets
+                    int startIndex = 1;
+                    int pool = (inputDimension.rowCount() < POOL) ? (int) inputDimension.rowCount() : POOL;
+
+                    //Process each csv record.
+                    while ((line = csvParser.parseNext()) != null) {
+                        List<Object> record = new ArrayList();
+
+                        for (String column : line) {
+                            record.add(column);
+                        }
+                        values.add(record);
+
+                        //Identify if should flush data into google spreadsheet.
+                        if (values.size() == pool) {
+                            String rangeStart = sheetName + "!A" + startIndex;
+                            String rangeEnd = getSpreadSheetColumnName(inputDimension.columnCount()) + inputDimension.rowCount();
+                            String range = rangeStart + ":" + rangeEnd;
+
+                            pool = pool + values.size();
+                            startIndex = startIndex + values.size();
+
+                            ValueRange body = new ValueRange().setValues(values);
+
+                            UpdateValuesResponse result = sheets
+                                    .spreadsheets()
+                                    .values()
+                                    .update(spreadsheet.getSpreadsheetId(), range, body)
+                                    .setValueInputOption("USER_ENTERED")
+                                    .execute();
+                            /*AppendValuesResponse result = sheets
                                 .spreadsheets()
                                 .values()
-                                .update(cli.getParameter("spreadsheet"), range, body)
-                                .setValueInputOption("USER_ENTERED")
-                                .execute();
-                        /*AppendValuesResponse result = sheets
-                                .spreadsheets()
-                                .values()
-                                .append(cli.getParameter("spreadsheet"), range, body)
+                                .append(spreadsheet.getSpreadsheetId(), range, body)
                                 .setValueInputOption("USER_ENTERED")
                                 .execute();*/
 
-                        System.out.printf("%d rows appended.", result.getUpdatedRows());
+                            System.out.printf("%d rows appended.", result.getUpdatedRows());
 
-                        values.clear();
+                            values.clear();
 
-                        //Identify if has sleep time until next API call.
-                        if (cli.getParameterAsInteger("sleep") > 0) {
-                            try {
-                                Logger.getLogger(GoogleSheetsExport.class.getName())
-                                        .log(Level.INFO, "Sleeping {0} seconds until next API call", cli.getParameterAsInteger("sleep"));
+                            //Identify if has sleep time until next API call.
+                            if (cli.getParameterAsInteger("sleep") > 0) {
+                                try {
+                                    Logger.getLogger(GoogleSheetsExport.class.getName())
+                                            .log(Level.INFO, "Sleeping {0} seconds until next API call", cli.getParameterAsInteger("sleep"));
 
-                                Thread.sleep(Long.valueOf(cli.getParameterAsInteger("sleep") * 1000));
-                            } catch (InterruptedException ex) {
-                                Logger.getLogger(GoogleSheetsExport.class.getName()).log(Level.SEVERE, null, ex);
+                                    Thread.sleep(Long.valueOf(cli.getParameterAsInteger("sleep") * 1000));
+                                } catch (InterruptedException ex) {
+                                    Logger.getLogger(GoogleSheetsExport.class.getName()).log(Level.SEVERE, null, ex);
+                                }
                             }
                         }
                     }
+                } else {
+                    Logger.getLogger(GoogleSheetsExport.class.getName())
+                            .log(Level.WARNING, "Sheet {0} was not found on spreadsheet {1}", new Object[]{cli.getParameter("sheet"), spreadsheet.getSpreadsheetId()});
                 }
-
             } else {
                 Logger.getLogger(GoogleSheetsExport.class.getName())
                         .log(Level.WARNING, "Cells count is over the limit of {0}", new Object[]{CELLS_LIMIT});
@@ -294,7 +332,14 @@ public class GoogleSheetsExport {
                 .info("Google sheets export finalized.");
     }
 
-    public static String getExcelColumnName(int columnNumber) {
+    /**
+     * Based on a column count, return the column name to use on Google
+     * Spreadsheet.
+     *
+     * @param columnNumber
+     * @return
+     */
+    public static String getSpreadSheetColumnName(int columnNumber) {
         int dividend = columnNumber;
         int i;
         String columnName = "";
