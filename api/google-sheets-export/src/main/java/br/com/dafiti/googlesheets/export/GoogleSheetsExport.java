@@ -257,7 +257,6 @@ public class GoogleSheetsExport {
                             startIndex = startIndex + values.size();
 
                             ValueRange body = new ValueRange().setValues(values);
-                            values.clear();
 
                             //Identify if it is update or append.
                             if (cli.getParameterAsInteger("method") == 0) {
@@ -275,6 +274,8 @@ public class GoogleSheetsExport {
                                         .setValueInputOption("USER_ENTERED")
                                         .execute();
                             }
+                            
+                            values.clear();
 
                             //Identify if has sleep time until next API call.
                             if (cli.getParameterAsInteger("sleep") > 0) {
