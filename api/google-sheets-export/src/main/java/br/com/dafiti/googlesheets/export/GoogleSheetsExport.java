@@ -47,7 +47,7 @@ import java.util.logging.Logger;
 public class GoogleSheetsExport {
 
     public static final int CELLS_LIMIT = 5000000;
-    public static final int POOL = 5;
+    public static final int POOL = 10000;
 
     /**
      * @param args the command line arguments
