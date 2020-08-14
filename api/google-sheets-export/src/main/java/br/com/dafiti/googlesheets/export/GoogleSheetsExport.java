@@ -37,9 +37,12 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.Sheets.Spreadsheets.BatchUpdate;
+import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Values.Clear;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.AppendValuesResponse;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
+import com.google.api.services.sheets.v4.model.ClearValuesRequest;
+import com.google.api.services.sheets.v4.model.ClearValuesResponse;
 import com.google.api.services.sheets.v4.model.DeleteDimensionRequest;
 import com.google.api.services.sheets.v4.model.DimensionRange;
 import com.google.api.services.sheets.v4.model.InsertDimensionRequest;
@@ -72,7 +75,7 @@ import java.util.logging.Logger;
 public class GoogleSheetsExport {
 
     public static final int CELLS_LIMIT = 5000000;
-    public static final int POOL = 10000;
+    public static final int POOL = 5;
 
     /**
      * @param args the command line arguments
@@ -99,7 +102,8 @@ public class GoogleSheetsExport {
                 .addParameter("i", "input", "Input file path and file name", "", true, false)
                 .addParameter("t", "sheet", "Define sheet name", "", true, false)
                 .addParameter("sl", "sleep", "(Optional) Sleep time in seconds at one request and another; 0 is default", "0")
-                .addParameter("u", "method", "(Optional) 0 for update or 1 append ; 0 is default", "0");
+                .addParameter("m", "method", "(Optional) Update method, 0 for full, 1 append; 0 is default", "0")
+                .addParameter("d", "debug", "(Optional) Identify if it is debug mode; false is default", "false");
 
         //Read the command line interface. 
         CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -162,6 +166,7 @@ public class GoogleSheetsExport {
             if (cells <= CELLS_LIMIT) {
                 int sheetId = -1;
                 int sheetColumnCount = 0;
+                int sheetRowCount = 0;
                 String sheetName = null;
 
                 Spreadsheet spreadsheet = service.spreadsheets().get(cli.getParameter("spreadsheet")).execute();
@@ -174,6 +179,7 @@ public class GoogleSheetsExport {
                     if (sheetName.equalsIgnoreCase(cli.getParameter("sheet"))) {
                         sheetId = sheet.getProperties().getSheetId();
                         sheetColumnCount = sheet.getProperties().getGridProperties().getColumnCount();
+                        sheetRowCount = sheet.getProperties().getGridProperties().getRowCount();
                         break;
                     }
                 }
@@ -215,28 +221,65 @@ public class GoogleSheetsExport {
                                                 .setEndIndex(inputDimension.columnCount() - 1)
                                         )
                                 );
-
                     }
 
                     //Identify if should execute some request.
                     if (request != null) {
                         executeRequest(request, service, spreadsheet.getSpreadsheetId());
-                    }
-
-                    int startIndex = 1;
-                    int pool = (inputDimension.rowCount() < POOL) ? (int) inputDimension.rowCount() : POOL;
-
+                    }                    
+                    
                     //Define a csv parser.
-                    CsvParser csvParser = new CsvParser(getSettings(false));
+                    CsvParser csvParser;
+                    
+                    //Identify update method.                    
+                    switch(cli.getParameterAsInteger("method")) {                        
+                        // Append Method
+                        case 1:                           
+                            csvParser = new CsvParser(getSettings(sheetRowCount > 0));
+                            break;
+                        // Full method
+                        default:
+                            csvParser = new CsvParser(getSettings(false));
+                            break;
+                    }                    
 
                     //Init a parser.
                     csvParser.beginParsing(file);
+                    
+                    //Range init.
+                    int startIndex = 1;
+                    int pool = (inputDimension.rowCount() < POOL) ? (int) inputDimension.rowCount() : POOL;
 
                     //Value being processed.
                     String[] line;
 
                     //Values that will fill spreadsheet.
                     List<List<Object>> values = new ArrayList();
+
+                    //Count records.
+                    int count = 0;
+
+                    // If method is full, clear all cells.
+                    if (cli.getParameterAsInteger("method") == 0) {
+                        String rangeStart = sheetName + "!A" + startIndex;
+                        String rangeEnd = getSpreadSheetColumnName(sheetColumnCount) + sheetRowCount;
+                        String range = rangeStart + ":" + rangeEnd;
+                        
+                        Logger.getLogger(GoogleSheetsExport.class.getName())
+                            .log(Level.INFO,
+                                    "Clearing cells range: {0}",
+                                    new Object[]{spreadsheet.getProperties().getTitle(), spreadsheet.getSpreadsheetUrl()});
+                        
+
+                        Clear request2 = service.spreadsheets().values().clear(spreadsheet.getSpreadsheetId(), range, new ClearValuesRequest());
+
+                        ClearValuesResponse response = request2.execute();
+                    }
+
+                    Logger.getLogger(GoogleSheetsExport.class.getName())
+                            .log(Level.INFO,
+                                    "Updating spreadsheet {0} [{1}]",
+                                    new Object[]{spreadsheet.getProperties().getTitle(), spreadsheet.getSpreadsheetUrl()});
 
                     //Process each csv record.
                     while ((line = csvParser.parseNext()) != null) {
@@ -246,35 +289,17 @@ public class GoogleSheetsExport {
                             record.add(column);
                         }
                         values.add(record);
+                        count++;
 
                         //Identify if should flush data into google spreadsheet.
-                        if (values.size() == pool) {
-                            String rangeStart = sheetName + "!A" + startIndex;
-                            String rangeEnd = getSpreadSheetColumnName(inputDimension.columnCount()) + inputDimension.rowCount();
-                            String range = rangeStart + ":" + rangeEnd;
+                        if (count == pool) {
+                            flush(sheetName, startIndex, inputDimension, pool, values, cli, service, spreadsheet);
 
-                            pool = pool + values.size();
-                            startIndex = startIndex + values.size();
+                            //Increment ranges.
+                            startIndex += values.size();
+                            pool += values.size();
 
-                            ValueRange body = new ValueRange().setValues(values);
-
-                            //Identify if it is update or append.
-                            if (cli.getParameterAsInteger("method") == 0) {
-                                UpdateValuesResponse result = service
-                                        .spreadsheets()
-                                        .values()
-                                        .update(spreadsheet.getSpreadsheetId(), range, body)
-                                        .setValueInputOption("USER_ENTERED")
-                                        .execute();
-                            } else {
-                                AppendValuesResponse result = service
-                                        .spreadsheets()
-                                        .values()
-                                        .append(spreadsheet.getSpreadsheetId(), range, body)
-                                        .setValueInputOption("USER_ENTERED")
-                                        .execute();
-                            }
-                            
+                            //Clears values already saved.
                             values.clear();
 
                             //Identify if has sleep time until next API call.
@@ -290,6 +315,11 @@ public class GoogleSheetsExport {
                             }
                         }
                     }
+
+                    if (values.size() > 0) {
+                        flush(sheetName, startIndex, inputDimension, pool, values, cli, service, spreadsheet);
+                    }
+
                 } else {
                     Logger.getLogger(GoogleSheetsExport.class.getName())
                             .log(Level.WARNING, "Sheet {0} was not found on spreadsheet {1}", new Object[]{cli.getParameter("sheet"), spreadsheet.getSpreadsheetId()});
@@ -307,6 +337,43 @@ public class GoogleSheetsExport {
 
         Logger.getLogger(GoogleSheetsExport.class.getName())
                 .info("Google sheets export finalized.");
+    }
+
+    /**
+     *
+     * @param sheetName
+     * @param startIndex
+     * @param inputDimension
+     * @param pool
+     * @param values
+     * @param cli
+     * @param service
+     * @param spreadsheet
+     * @throws IOException
+     */
+    private static void flush(String sheetName, int startIndex, InputDimension inputDimension, int pool, List<List<Object>> values, CommandLineInterface cli, Sheets service, Spreadsheet spreadsheet) throws IOException {
+        String rangeStart = sheetName + "!A" + startIndex;
+        String rangeEnd = getSpreadSheetColumnName(inputDimension.columnCount()) + pool;
+        String range = rangeStart + ":" + rangeEnd;
+
+        ValueRange body = new ValueRange().setValues(values);
+
+        //Identify if it is update or append.
+        if (cli.getParameterAsInteger("method") == 0) {
+            UpdateValuesResponse result = service
+                    .spreadsheets()
+                    .values()
+                    .update(spreadsheet.getSpreadsheetId(), range, body)
+                    .setValueInputOption("USER_ENTERED")
+                    .execute();
+        } else {
+            AppendValuesResponse result = service
+                    .spreadsheets()
+                    .values()
+                    .append(spreadsheet.getSpreadsheetId(), range, body)
+                    .setValueInputOption("USER_ENTERED")
+                    .execute();
+        }
     }
 
     /**
