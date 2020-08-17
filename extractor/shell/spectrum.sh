@@ -647,6 +647,33 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 				echo "EXPORT_BUCKET was not defined!"
 			fi
 		fi
+		
+		# Identifica se deve exportar o csv intermediário para uma planilha do Google Sheets.
+		if [ ${GOOGLE_SHEETS_EXPORT} = 1 ]; then			
+			if [ ${DEBUG} = 1 ] ; then
+				echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/google-sheets-export.jar \
+					--credentials=/home/etl/.google/google_spreadsheet_writer.json \
+					--spreadsheet='1BEwxK1D84KZ3ZN-py_BCoZ0WL3gPjwqW94j9HcKoAJk' \
+					--input=${RAWFILE_QUEUE_FILE} \
+					--sheet='Base' \
+					--sleep=1"
+			fi
+
+			java -jar ${GLOVE_HOME}/extractor/lib/google-sheets-export.jar \
+				--credentials=/home/etl/credentials/google-sheets-export.json \
+				--spreadsheet='1BEwxK1D84KZ3ZN-py_BCoZ0WL3gPjwqW94j9HcKoAJk' \
+				--input=${RAWFILE_QUEUE_FILE} \
+				--sheet='Base' \
+				--sleep=1 \
+				--method=0
+			error_check
+
+			# Finaliza o processo de exportação.
+			if [ ${ONLY_EXPORT} = 1 ]; then
+				echo "Exporting finished!"
+				exit 0
+			fi
+		fi
     fi
 
 
