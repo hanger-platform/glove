@@ -147,7 +147,7 @@ public class Braze {
                                         new InputStreamReader(connectionDetails.getInputStream()))) {
                                     String line;
 
-                                    //Get a campaign details from API.
+                                    //Get a details from API.
                                     while ((line = bfDetail.readLine()) != null) {
                                         List record = new ArrayList();
                                         JSONObject details = (JSONObject) new JSONParser().parse(line);
@@ -156,6 +156,8 @@ public class Braze {
                                             //Identifies if the field exists.
                                             if (details.containsKey(field)) {
                                                 record.add(details.get(field));
+                                            } else if ("id".equals(field)) {
+                                                record.add(String.valueOf(((JSONObject) object).get("id")));
                                             } else {
                                                 record.add(null);
                                             }
