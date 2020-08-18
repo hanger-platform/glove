@@ -23,7 +23,6 @@
  */
 package br.com.dafiti.googlesheets.export.api;
 
-import br.com.dafiti.googlesheets.export.GoogleSheetsExport;
 import br.com.dafiti.googlesheets.export.model.SheetDetails;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -52,8 +51,6 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Manage google sheets API.
@@ -129,9 +126,7 @@ public class GoogleSheetsApi {
 
         } catch (GeneralSecurityException
                 | IOException ex) {
-            Logger
-                    .getLogger(GoogleSheetsExport.class.getName())
-                    .log(Level.WARNING, "Error on authenticate: {0}", new Object[]{ex.getMessage()});
+            System.err.println("Error on authenticate: " + ex.getMessage());
         }
 
         return this;
@@ -149,10 +144,7 @@ public class GoogleSheetsApi {
             String end = this.getColumnName(sheet.getColumnCount()) + sheet.getRowCount();
             String range = start + ":" + end;
 
-            Logger.getLogger(GoogleSheetsApi.class.getName())
-                    .log(Level.INFO,
-                            "Clearing cells range: {0}.",
-                            new Object[]{range});
+            System.out.println("Clearing cells range: " + range);
 
             //Execute request
             this.service
@@ -162,8 +154,7 @@ public class GoogleSheetsApi {
                     .execute();
 
         } catch (IOException ex) {
-            Logger.getLogger(GoogleSheetsExport.class.getName())
-                    .log(Level.WARNING, "Error cleaning cells: {0}", new Object[]{ex.getMessage()});
+            System.err.println("Error cleaning cells: " + ex.getMessage());
         }
     }
 
@@ -174,10 +165,7 @@ public class GoogleSheetsApi {
      * @param endIndex Add column until index
      */
     public void addColumns(SheetDetails sheet, int endIndex) {
-        Logger.getLogger(GoogleSheetsApi.class.getName())
-                .log(Level.INFO,
-                        "Adding columns from {0} to {1} because process need more columns.",
-                        new Object[]{this.getColumnName(sheet.getColumnCount()), this.getColumnName(endIndex)});
+        System.out.println("Adding columns from " + this.getColumnName(sheet.getColumnCount()) + " to " + this.getColumnName(endIndex) + " because process need more columns.");
 
         try {
             Request request = new Request()
@@ -198,8 +186,7 @@ public class GoogleSheetsApi {
                     .batchUpdate(this.spreadsheet.getSpreadsheetId(), new BatchUpdateSpreadsheetRequest().setRequests(requests));
             batchUpdate.execute();
         } catch (IOException ex) {
-            Logger.getLogger(GoogleSheetsApi.class.getName())
-                    .log(Level.WARNING, "Error addings columns: {0}", new Object[]{ex.getMessage()});
+            System.err.println("Error addings columns: " + ex.getMessage());
         }
     }
 
@@ -211,10 +198,7 @@ public class GoogleSheetsApi {
      */
     public void removeColumns(SheetDetails sheet, int startIndex) {
 
-        Logger.getLogger(GoogleSheetsApi.class.getName())
-                .log(Level.INFO,
-                        "Deleting columns from {0} because they won't be used.",
-                        new Object[]{this.getColumnName(startIndex + 1)});
+        System.out.println("Deleting columns from " + this.getColumnName(startIndex + 1) + " because they won't be used.");
 
         try {
             Request request = new Request()
@@ -234,8 +218,7 @@ public class GoogleSheetsApi {
                     .batchUpdate(this.spreadsheet.getSpreadsheetId(), new BatchUpdateSpreadsheetRequest().setRequests(requests));
             batchUpdate.execute();
         } catch (IOException ex) {
-            Logger.getLogger(GoogleSheetsApi.class.getName())
-                    .log(Level.WARNING, "Error removing columns: {0}", new Object[]{ex.getMessage()});
+            System.err.println("Error removing columns: " + ex.getMessage());
         }
     }
 
@@ -263,8 +246,7 @@ public class GoogleSheetsApi {
                     .execute();
 
         } catch (IOException ex) {
-            Logger.getLogger(GoogleSheetsApi.class.getName())
-                    .log(Level.WARNING, "Error updating data: {0}", new Object[]{ex.getMessage()});
+            System.err.println("Error updating data: " + ex.getMessage());
         }
     }
 
@@ -292,8 +274,7 @@ public class GoogleSheetsApi {
                     .execute();
 
         } catch (IOException ex) {
-            Logger.getLogger(GoogleSheetsApi.class.getName())
-                    .log(Level.WARNING, "Error appending data: {0}", new Object[]{ex.getMessage()});
+            System.err.println("Error appending data: " + ex.getMessage());
         }
     }
 
@@ -366,8 +347,7 @@ public class GoogleSheetsApi {
             return result.getValues() != null;
 
         } catch (IOException ex) {
-            Logger.getLogger(GoogleSheetsApi.class.getName())
-                    .log(Level.WARNING, "Error getting cells values: {0}", new Object[]{ex.getMessage()});
+            System.err.println("Error getting cells values: " + ex.getMessage());
         }
 
         return false;

@@ -37,9 +37,6 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  *
  * @author Helio Leal
@@ -48,7 +45,7 @@ public class GoogleSheetsExport {
 
     public static final int CELLS_LIMIT = 5000000;
     public static final int POOL = 10000;
-
+    
     /**
      * @param args the command line arguments
      *
@@ -61,8 +58,7 @@ public class GoogleSheetsExport {
             GeneralSecurityException,
             IOException {
 
-        Logger.getLogger(GoogleSheetsExport.class.getName())
-                .info("Google sheets export started.");
+        System.out.println("Google sheets export started.");
 
         //Define the mitt.
         Mitt mitt = new Mitt();
@@ -97,9 +93,7 @@ public class GoogleSheetsExport {
             //Calculate the number of cells that will be written.
             long cells = (inputDimension.columnCount() * inputDimension.rowCount());
 
-            Logger.getLogger(GoogleSheetsExport.class.getName())
-                    .log(Level.INFO, "[{0}] rows: {1}, cols: {2} ({3} cells will be written)",
-                            new Object[]{file.getName(), inputDimension.rowCount(), inputDimension.columnCount(), cells});
+            System.out.println("[" + file.getName() + "] rows: " + inputDimension.rowCount() + ", cols: " + inputDimension.columnCount() + " (" + cells + " cells will be written)");
 
             //Identify if cells count is over the suppported on Google Sheets.
             if (cells <= CELLS_LIMIT) {
@@ -131,7 +125,7 @@ public class GoogleSheetsExport {
                     switch (cli.getParameterAsInteger("method")) {
                         // Append Method
                         case 1:
-                            Logger.getLogger(GoogleSheetsExport.class.getName()).log(Level.INFO, "Update method: [APPEND]");
+                            System.out.println("Update method: [APPEND]");
 
                             //If at least one cell is filled, append ignore header.
                             csvParser = new CsvParser(getSettings(api.hasValues(sheet, startIndex)));
@@ -139,7 +133,7 @@ public class GoogleSheetsExport {
 
                         // Full method
                         default:
-                            Logger.getLogger(GoogleSheetsExport.class.getName()).log(Level.INFO, "Update method: [FULL]");
+                            System.out.println("Update method: [FULL]");
 
                             //Full mehotd doesn't extract header.
                             csvParser = new CsvParser(getSettings(false));
@@ -190,12 +184,11 @@ public class GoogleSheetsExport {
                             //Identify if has sleep time until next API call.
                             if (cli.getParameterAsInteger("sleep") > 0) {
                                 try {
-                                    Logger.getLogger(GoogleSheetsExport.class.getName())
-                                            .log(Level.INFO, "Sleeping {0} seconds until next API call", cli.getParameterAsInteger("sleep"));
+                                    System.out.println("Sleeping " + cli.getParameterAsInteger("sleep") + " seconds until next API call");
 
                                     Thread.sleep(Long.valueOf(cli.getParameterAsInteger("sleep") * 1000));
                                 } catch (InterruptedException ex) {
-                                    Logger.getLogger(GoogleSheetsExport.class.getName()).log(Level.SEVERE, null, ex);
+                                    System.err.println(ex.getMessage());
                                 }
                             }
                         }
@@ -211,22 +204,18 @@ public class GoogleSheetsExport {
                     }
 
                 } else {
-                    Logger.getLogger(GoogleSheetsExport.class.getName())
-                            .log(Level.WARNING, "Sheet {0} was not found on spreadsheet {1}", new Object[]{cli.getParameter("sheet"), cli.getParameter("spreadsheet")});
+                    System.err.println("Sheet " + cli.getParameter("sheet") + " was not found on spreadsheet " + cli.getParameter("spreadsheet"));
                 }
             } else {
-                Logger.getLogger(GoogleSheetsExport.class.getName())
-                        .log(Level.WARNING, "Cells count is over the limit of {0}", new Object[]{CELLS_LIMIT});
+                System.err.println("Cells count is over the limit of " + CELLS_LIMIT);
             }
         } else {
-            Logger.getLogger(GoogleSheetsExport.class.getName())
-                    .warning("Parameter spreadsheet is empty, please set it up.");
+            System.err.println("Parameter spreadsheet is empty, please set it up.");
         }
 
         mitt.close();
 
-        Logger.getLogger(GoogleSheetsExport.class.getName())
-                .info("Google sheets export finalized.");
+        System.out.println("Google sheets export finalized.");
     }
 
     /**
