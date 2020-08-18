@@ -658,6 +658,9 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 					--sheet='Base' \
 					--sleep=1"
 			fi
+			
+			pwd
+			cd /home/etl/credentials/google-sheets-export/
 
 			java -jar ${GLOVE_HOME}/extractor/lib/google-sheets-export.jar \
 				--credentials=/home/etl/credentials/google-sheets-export.json \
