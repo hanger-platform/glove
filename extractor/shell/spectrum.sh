@@ -663,7 +663,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 			cd /home/etl/credentials/google-sheets-export/
 
 			java -jar ${GLOVE_HOME}/extractor/lib/google-sheets-export.jar \
-				--credentials=/home/etl/credentials/google-sheets-export.json \
+				--credentials=/home/etl/credentials/google-sheets-export/google-sheets-export.json \
 				--spreadsheet='1BEwxK1D84KZ3ZN-py_BCoZ0WL3gPjwqW94j9HcKoAJk' \
 				--input=${RAWFILE_QUEUE_FILE} \
 				--sheet='Base' \
