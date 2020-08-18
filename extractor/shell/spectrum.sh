@@ -649,31 +649,29 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 		fi
 		
 		# Identifica se deve exportar o csv intermediário para uma planilha do Google Sheets.
-		if [ ${GOOGLE_SHEETS_EXPORT} = 1 ]; then			
+		if [ ${GOOGLE_SHEETS_EXPORT} = 1 ]; then	
+			cd ${GOOGLE_SHEETS_EXPORT_CREDENTIALS_PATH}	
+		
 			if [ ${DEBUG} = 1 ] ; then
 				echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/google-sheets-export.jar \
-					--credentials=/home/etl/.google/google_spreadsheet_writer.json \
-					--spreadsheet='1BEwxK1D84KZ3ZN-py_BCoZ0WL3gPjwqW94j9HcKoAJk' \
-					--input=${RAWFILE_QUEUE_FILE} \
-					--sheet='Base' \
-					--sleep=1"
+				--credentials=${GOOGLE_SHEETS_EXPORT_CREDENTIALS_PATH}${GOOGLE_SHEETS_EXPORT_CREDENTIALS_FILE} \
+				--spreadsheet=${GOOGLE_SHEETS_SPREADSHEET} \
+				--input=${RAWFILE_QUEUE_FILE} \
+				--sheet=${GOOGLE_SHEETS_SHEET} \
+				--method=${GOOGLE_SHEETS_METHOD}"
 			fi
-			
-			pwd
-			cd /home/etl/credentials/google-sheets-export/
 
 			java -jar ${GLOVE_HOME}/extractor/lib/google-sheets-export.jar \
-				--credentials=/home/etl/credentials/google-sheets-export/google-sheets-export.json \
-				--spreadsheet='1BEwxK1D84KZ3ZN-py_BCoZ0WL3gPjwqW94j9HcKoAJk' \
+				--credentials=${GOOGLE_SHEETS_EXPORT_CREDENTIALS_PATH}${GOOGLE_SHEETS_EXPORT_CREDENTIALS_FILE} \
+				--spreadsheet=${GOOGLE_SHEETS_SPREADSHEET} \
 				--input=${RAWFILE_QUEUE_FILE} \
-				--sheet='Base' \
-				--sleep=1 \
-				--method=0
+				--sheet=${GOOGLE_SHEETS_SHEET} \
+				--method=${GOOGLE_SHEETS_METHOD}
 			error_check
 
 			# Finaliza o processo de exportação.
-			if [ ${ONLY_EXPORT} = 1 ]; then
-				echo "Exporting finished!"
+			if [ ${GOOGLE_SHEETS_ONLY_EXPORT} = 1 ]; then
+				echo "Exporting to GOOGLE SHEETS finished!"
 				exit 0
 			fi
 		fi

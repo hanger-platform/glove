@@ -142,6 +142,26 @@
       <description>Identifica se será gerado o export do resultset para o Google Sheets.</description>
     </parameter>
     <parameter>
+      <name>GOOGLE_SHEETS_METHOD</name>
+      <default_value>0</default_value>
+      <description>Identifica o tipo de atualização da planilha [0: FULL, 1:APPEND]</description>
+    </parameter>
+    <parameter>
+      <name>GOOGLE_SHEETS_ONLY_EXPORT</name>
+      <default_value>0</default_value>
+      <description>Identifica se o processo apenas exporta o resultado para o google sheets, sem materializar uma tabela. </description>
+    </parameter>
+    <parameter>
+      <name>GOOGLE_SHEETS_SHEET</name>
+      <default_value />
+      <description>Identifica o nome da página (guia)</description>
+    </parameter>
+    <parameter>
+      <name>GOOGLE_SHEETS_SPREADSHEET</name>
+      <default_value />
+      <description>Identifica o Id da spreadsheet</description>
+    </parameter>
+    <parameter>
       <name>HAS_ATHENA</name>
       <default_value>0</default_value>
       <description>Identifica se o AWS Athena deve ser usado sempre que disponível.</description>
