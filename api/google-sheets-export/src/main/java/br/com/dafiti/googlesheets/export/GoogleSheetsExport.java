@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
+
 /**
  *
  * @author Helio Leal
@@ -45,7 +46,7 @@ public class GoogleSheetsExport {
 
     public static final int CELLS_LIMIT = 5000000;
     public static final int POOL = 10000;
-    
+
     /**
      * @param args the command line arguments
      *
@@ -160,7 +161,12 @@ public class GoogleSheetsExport {
                         List<Object> record = new ArrayList();
 
                         for (String column : line) {
-                            record.add(column);
+                            //Google sheets SDK doesn't accept null values, when null, put empty on the place of it.
+                            if (column != null) {
+                                record.add(column);
+                            } else {
+                                record.add("");
+                            }
                         }
                         values.add(record);
                         count++;
