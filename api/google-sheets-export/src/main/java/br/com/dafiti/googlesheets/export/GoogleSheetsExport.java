@@ -93,7 +93,7 @@ public class GoogleSheetsExport {
             //Calculate the number of cells that will be written.
             long cells = (inputDimension.columnCount() * inputDimension.rowCount());
 
-            System.out.println("[" + file.getName() + "] rows: " + inputDimension.rowCount() + ", cols: " + inputDimension.columnCount() + " (" + cells + " cells will be written)");
+            System.out.println("[" + file.getAbsolutePath() + "] rows: " + inputDimension.rowCount() + ", cols: " + inputDimension.columnCount() + " (" + cells + " cells will be written)");
 
             //Identify if cells count is over the suppported on Google Sheets.
             if (cells <= CELLS_LIMIT) {
