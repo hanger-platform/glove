@@ -621,14 +621,14 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
     # Identifica se é uma named query.
     if [ ${MODULE} == "query" ]; then
 
-		# Identifica se deve exportar o csv intermediário para o storage.
+		# Identifica se deve exportar o resultset intermediário.
 		if [ ${IS_EXPORT} = 1 ]; then
-
-			# Compacta o arquivo csv.
-			pigz -c ${RAWFILE_QUEUE_FILE} > ${RAWFILE_QUEUE_FILE}.gz
 
 			# Define o storage de exportação.
 			if [ "${#EXPORT_BUCKET}" -gt "0" ]; then
+				# Compacta o arquivo csv.
+				pigz -c ${RAWFILE_QUEUE_FILE} > ${RAWFILE_QUEUE_FILE}.gz
+			
 				# Envia o arquivo para o storage.
 				echo "Exporting resultset to ${EXPORT_BUCKET}!"
 				aws s3 rm ${EXPORT_BUCKET}${RAWFILE_QUEUE_FILE}.gz --recursive --only-show-errors
@@ -637,41 +637,32 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 
 				# Remove o arquivo compactado do diretório.
 				rm -rf ${RAWFILE_QUEUE_FILE}.gz
-
-				# Finaliza o processo de exportação.
-				if [ ${ONLY_EXPORT} = 1 ]; then
-					echo "Exporting finished!"
-					exit 0
+			elif [ "${#GOOGLE_SHEETS_SPREADSHEET}" -gt "0" ]; then
+				cd ${GOOGLE_SHEETS_EXPORT_CREDENTIALS_PATH}	
+		
+				if [ ${DEBUG} = 1 ] ; then
+					echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/google-sheets-export.jar \
+					--credentials=${GOOGLE_SHEETS_EXPORT_CREDENTIALS_PATH}${GOOGLE_SHEETS_EXPORT_CREDENTIALS_FILE} \
+					--spreadsheet=${GOOGLE_SHEETS_SPREADSHEET} \
+					--input=${RAWFILE_QUEUE_FILE} \
+					--sheet=${GOOGLE_SHEETS_SHEET} \
+					--method=${GOOGLE_SHEETS_METHOD}"
 				fi
+
+				java -jar ${GLOVE_HOME}/extractor/lib/google-sheets-export.jar \
+					--credentials=${GOOGLE_SHEETS_EXPORT_CREDENTIALS_PATH}${GOOGLE_SHEETS_EXPORT_CREDENTIALS_FILE} \
+					--spreadsheet=${GOOGLE_SHEETS_SPREADSHEET} \
+					--input=${RAWFILE_QUEUE_FILE} \
+					--sheet=${GOOGLE_SHEETS_SHEET} \
+					--method=${GOOGLE_SHEETS_METHOD}
+				error_check	
 			else
 				echo "EXPORT_BUCKET was not defined!"
 			fi
-		fi
-		
-		# Identifica se deve exportar o csv intermediário para uma planilha do Google Sheets.
-		if [ ${GOOGLE_SHEETS_EXPORT} = 1 ]; then	
-			cd ${GOOGLE_SHEETS_EXPORT_CREDENTIALS_PATH}	
-		
-			if [ ${DEBUG} = 1 ] ; then
-				echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/google-sheets-export.jar \
-				--credentials=${GOOGLE_SHEETS_EXPORT_CREDENTIALS_PATH}${GOOGLE_SHEETS_EXPORT_CREDENTIALS_FILE} \
-				--spreadsheet=${GOOGLE_SHEETS_SPREADSHEET} \
-				--input=${RAWFILE_QUEUE_FILE} \
-				--sheet=${GOOGLE_SHEETS_SHEET} \
-				--method=${GOOGLE_SHEETS_METHOD}"
-			fi
-
-			java -jar ${GLOVE_HOME}/extractor/lib/google-sheets-export.jar \
-				--credentials=${GOOGLE_SHEETS_EXPORT_CREDENTIALS_PATH}${GOOGLE_SHEETS_EXPORT_CREDENTIALS_FILE} \
-				--spreadsheet=${GOOGLE_SHEETS_SPREADSHEET} \
-				--input=${RAWFILE_QUEUE_FILE} \
-				--sheet=${GOOGLE_SHEETS_SHEET} \
-				--method=${GOOGLE_SHEETS_METHOD}
-			error_check
-
+			
 			# Finaliza o processo de exportação.
-			if [ ${GOOGLE_SHEETS_ONLY_EXPORT} = 1 ]; then
-				echo "Exporting to GOOGLE SHEETS finished!"
+			if [ ${ONLY_EXPORT} = 1 ]; then
+				echo "Exporting finished!"
 				exit 0
 			fi
 		fi
