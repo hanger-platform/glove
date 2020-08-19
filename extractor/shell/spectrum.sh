@@ -637,27 +637,26 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 
 				# Remove o arquivo compactado do diretório.
 				rm -rf ${RAWFILE_QUEUE_FILE}.gz
-			elif [ "${#GOOGLE_SHEETS_SPREADSHEET}" -gt "0" ]; then
-				cd ${GOOGLE_SHEETS_EXPORT_CREDENTIALS_PATH}	
-		
+			elif [ "${#GOOGLE_SHEETS_SPREADSHEET}" -gt "0" ]; then	
 				if [ ${DEBUG} = 1 ] ; then
 					echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/google-sheets-export.jar \
-					--credentials=${GOOGLE_SHEETS_EXPORT_CREDENTIALS_PATH}${GOOGLE_SHEETS_EXPORT_CREDENTIALS_FILE} \
+					--credentials=GOOGLE_SHEETS_EXPORT_CREDENTIALS \
 					--spreadsheet=${GOOGLE_SHEETS_SPREADSHEET} \
 					--input=${RAWFILE_QUEUE_FILE} \
 					--sheet=${GOOGLE_SHEETS_SHEET} \
 					--method=${GOOGLE_SHEETS_METHOD}"
 				fi
-
+				
+				# Exporta resultset para uma planilha do Google Sheets.
 				java -jar ${GLOVE_HOME}/extractor/lib/google-sheets-export.jar \
-					--credentials=${GOOGLE_SHEETS_EXPORT_CREDENTIALS_PATH}${GOOGLE_SHEETS_EXPORT_CREDENTIALS_FILE} \
+					--credentials=${GOOGLE_SHEETS_EXPORT_CREDENTIALS} \
 					--spreadsheet=${GOOGLE_SHEETS_SPREADSHEET} \
 					--input=${RAWFILE_QUEUE_FILE} \
 					--sheet=${GOOGLE_SHEETS_SHEET} \
 					--method=${GOOGLE_SHEETS_METHOD}
 				error_check	
 			else
-				echo "EXPORT_BUCKET was not defined!"
+				echo "EXPORT_BUCKET or GOOGLE_SHEETS_SPREADSHEET was not defined!"
 			fi
 			
 			# Finaliza o processo de exportação.
