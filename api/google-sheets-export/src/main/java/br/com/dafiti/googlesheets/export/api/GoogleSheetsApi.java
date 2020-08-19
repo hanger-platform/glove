@@ -44,9 +44,11 @@ import com.google.api.services.sheets.v4.model.Request;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
 import com.google.api.services.sheets.v4.model.ValueRange;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -105,7 +107,7 @@ public class GoogleSheetsApi {
                             Collections.singletonList(SheetsScopes.SPREADSHEETS))
                             .setDataStoreFactory(
                                     new FileDataStoreFactory(
-                                            new java.io.File("tokens")))
+                                            new File(Paths.get(credentials).getParent().toString() + "/tokens")))
                             .setAccessType("offline")
                             .build();
 
