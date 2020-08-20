@@ -345,16 +345,6 @@ full_load(){
 		split -l ${PARTITION_LENGTH} -a 4 --numeric-suffixes=1 --additional-suffix=.csv ${RAWFILE_QUEUE_FILE} ${DATA_FILE}_
 		error_check
 
-   		# Remove o header do csv intermediário.
-    	if [ ${MODULE} == "query" ]; then
-			echo "Removing header from ${RAWFILE_QUEUE_FILE}!"
-			tail -n +2 ${DATA_FILE}_0001.csv > ${DATA_FILE}_0001.tmp
-			error_check
-
-			mv -f ${DATA_FILE}_0001.tmp ${DATA_FILE}_0001.csv;
-			error_check
-    	fi
-
 		# Remove o arquivo original.
 		echo "Removing file ${RAWFILE_QUEUE_FILE}!"
 		rm -f ${RAWFILE_QUEUE_FILE}
@@ -676,6 +666,13 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
             if [ "${#DELTA_FIELD_IN_METADATA}" -gt "0" ]; then
 			    delta_load
 		    else
+                # Remove o header do csv intermediário.
+                if [ ${MODULE} == "query" ]; then
+                    echo "Removing header from ${RAWFILE_QUEUE_FILE}!"
+                    tail -n +2 ${RAWFILE_QUEUE_FILE} > ${RAWFILE_QUEUE_FILE}.tmp
+                    mv -f ${RAWFILE_QUEUE_FILE}.tmp ${RAWFILE_QUEUE_FILE};
+                fi
+
 			    full_load
 		    fi
 	    fi
