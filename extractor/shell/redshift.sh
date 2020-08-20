@@ -296,7 +296,10 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
     if [ ${MODULE} == "query" ] || [ ${MODULE} == "file" ]; then
     	echo "Removing header from ${RAWFILE_QUEUE_FILE}!"
     	tail -n +2 ${DATA_FILE}_0001.csv > ${DATA_FILE}_0001.tmp
+		error_check
+
     	mv -f ${DATA_FILE}_0001.tmp ${DATA_FILE}_0001.csv;
+		error_check
     fi
 
 	# Remove o arquivo original.
