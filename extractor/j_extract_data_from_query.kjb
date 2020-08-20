@@ -679,9 +679,9 @@ ALLOW_RECREATE              	== ${ALLOW_RECREATE}
 #-----------------------------------------------------------
 EXPORT                      	== ${IS_EXPORT}
 EXPORT_BUCKET               	== ${EXPORT_BUCKET}
-GOOGLE_SHEETS_METHOD        	== ${GOOGLE_SHEETS_METHOD}
-GOOGLE_SHEETS_SHEET         	== ${GOOGLE_SHEETS_SHEET}
-GOOGLE_SHEETS_SPREADSHEET   	== ${GOOGLE_SHEETS_SPREADSHEET}</logmessage>
+EXPORT_SHEETS_METHOD        	== ${EXPORT_SHEETS_METHOD}
+EXPORT_SHEET_DEFAULT         	== ${EXPORT_SHEET_DEFAULT}
+EXPORT_SPREADSHEET_DEFAULT   	== ${EXPORT_SPREADSHEET_DEFAULT}</logmessage>
       <loglevel>Basic</loglevel>
       <logsubject>LOG</logsubject>
       <parallel>N</parallel>
