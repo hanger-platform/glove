@@ -354,4 +354,30 @@ public class GoogleSheetsApi {
 
         return false;
     }
+
+    /**
+     * Get quantity of cells in all sheets, except target sheet.
+     *
+     * @return
+     */
+    public long getCellsCount() {
+        List<Sheet> sheetList = this.spreadsheet.getSheets();
+        int count = 0;
+
+        for (Sheet sheet : sheetList) {
+            if (!this.sheetName.equalsIgnoreCase(sheet.getProperties().getTitle())) {
+                count = count + (sheet.getProperties().getGridProperties().getRowCount() * sheet.getProperties().getGridProperties().getColumnCount());
+            }
+        }
+        return count;
+    }
+    
+    /**
+     * Gets spreadsheet title.
+     * 
+     * @return 
+     */
+    public String getSpreadsheetTitle() {
+       return this.spreadsheet.getProperties().getTitle();
+    }
 }
