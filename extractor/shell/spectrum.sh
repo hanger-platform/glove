@@ -347,9 +347,12 @@ full_load(){
 
    		# Remove o header do csv intermediário.
     	if [ ${MODULE} == "query" ]; then
-        	echo "Removing header from ${RAWFILE_QUEUE_FILE}!"
-        	tail -n +2 ${DATA_FILE}_0001.csv > ${DATA_FILE}_0001.tmp
-        	mv -f ${DATA_FILE}_0001.tmp ${DATA_FILE}_0001.csv;
+			echo "Removing header from ${RAWFILE_QUEUE_FILE}!"
+			tail -n +2 ${DATA_FILE}_0001.csv > ${DATA_FILE}_0001.tmp
+			error_check
+
+			mv -f ${DATA_FILE}_0001.tmp ${DATA_FILE}_0001.csv;
+			error_check
     	fi
 
 		# Remove o arquivo original.
