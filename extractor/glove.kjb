@@ -77,6 +77,21 @@
       <description>Identifica o bucket default para exportação de dados. </description>
     </parameter>
     <parameter>
+      <name>EXPORT_SHEETS_METHOD</name>
+      <default_value>0</default_value>
+      <description>Identifica o tipo de atualização da planilha [0: FULL, 1:APPEND]</description>
+    </parameter>
+    <parameter>
+      <name>EXPORT_SHEET_DEFAULT</name>
+      <default_value />
+      <description>Identifica o nome da página (guia)</description>
+    </parameter>
+    <parameter>
+      <name>EXPORT_SPREADSHEET_DEFAULT</name>
+      <default_value />
+      <description>Identifica o Id da spreadsheet</description>
+    </parameter>
+    <parameter>
       <name>FIELD_HAS_PREFIX</name>
       <default_value>0</default_value>
       <description>Identifica se o prefixo dos campos das tabelas do HANA devem ser mantidos. </description>
@@ -135,21 +150,6 @@
       <name>GOOGLE_CLOUD_BUCKET</name>
       <default_value />
       <description>Identifica o bucket a ser utilizado no Google Cloud.</description>
-    </parameter>
-    <parameter>
-      <name>GOOGLE_SHEETS_METHOD</name>
-      <default_value>0</default_value>
-      <description>Identifica o tipo de atualização da planilha [0: FULL, 1:APPEND]</description>
-    </parameter>
-    <parameter>
-      <name>GOOGLE_SHEETS_SHEET</name>
-      <default_value />
-      <description>Identifica o nome da página (guia)</description>
-    </parameter>
-    <parameter>
-      <name>GOOGLE_SHEETS_SPREADSHEET</name>
-      <default_value />
-      <description>Identifica o Id da spreadsheet</description>
     </parameter>
     <parameter>
       <name>HAS_ATHENA</name>

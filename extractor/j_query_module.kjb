@@ -377,6 +377,16 @@
           <stream_name>table</stream_name>
           <value />
         </parameter>
+        <parameter>
+          <name>EXPORT_SPREADSHEET</name>
+          <stream_name>export_spreadsheet</stream_name>
+          <value />
+        </parameter>
+        <parameter>
+          <name>EXPORT_SHEET</name>
+          <stream_name>export_sheet</stream_name>
+          <value />
+        </parameter>
       </parameters>
       <set_append_logfile>N</set_append_logfile>
       <parallel>N</parallel>
