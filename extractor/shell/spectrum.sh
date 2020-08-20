@@ -656,7 +656,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 					--method=${EXPORT_SHEETS_METHOD}
 				error_check	
 			else
-				echo "EXPORT_BUCKET or EXPORT_SPREADSHEET was not defined!"
+				echo "EXPORT_BUCKET_DEFAULT or EXPORT_SPREADSHEET_DEFAULT was not defined!"
 			fi
 			
 			# Finaliza o processo de exportação.
