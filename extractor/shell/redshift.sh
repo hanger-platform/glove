@@ -292,9 +292,14 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 	split -l ${PARTITION_LENGTH} -a 4 --numeric-suffixes=1 --additional-suffix=.csv ${RAWFILE_QUEUE_FILE} ${DATA_FILE}_
 	error_check
 	
+	# Remove o arquivo original.
+	echo "Removing file ${RAWFILE_QUEUE_FILE}!"
+	rm -f ${RAWFILE_QUEUE_FILE}
+	error_check	
+
    	# Remove o header do csv intermediário.
     if [ ${MODULE} == "query" ] || [ ${MODULE} == "file" ]; then
-    	echo "Removing header from ${RAWFILE_QUEUE_FILE}!"
+    	echo "Removing header from ${DATA_FILE}_0001.csv!"
     	tail -n +2 ${DATA_FILE}_0001.csv > ${DATA_FILE}_0001.tmp
 		error_check
 
@@ -302,11 +307,6 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 		error_check
     fi
 
-	# Remove o arquivo original.
-	echo "Removing file ${RAWFILE_QUEUE_FILE}!"
-	rm -f ${RAWFILE_QUEUE_FILE}
-	error_check	
-	
 	# Compacta os arquivos particionados.
 	echo "Compacting csv files!"
 	for i in `ls *.csv`
