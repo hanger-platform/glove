@@ -24,11 +24,14 @@
 package br.com.dafiti.googlesheets.export.api;
 
 import br.com.dafiti.googlesheets.export.model.SheetDetails;
+import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -37,6 +40,7 @@ import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
+import com.google.api.services.sheets.v4.model.AppendValuesResponse;
 import com.google.api.services.sheets.v4.model.BatchClearValuesByDataFilterRequest;
 import com.google.api.services.sheets.v4.model.BatchClearValuesRequest;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
@@ -125,13 +129,11 @@ public class GoogleSheetsApi {
                             .setAccessType("offline")
                             .build();
 
+            //Authorize.
+            Credential credential = new AuthorizationCodeInstalledApp(googleAuthorizationCodeFlow, new LocalServerReceiver()).authorize("user");
+
             //Instance of sheets service.
-            this.service = new Sheets.Builder(
-                    netHttpTransport,
-                    jsonFactory,
-                    new AuthorizationCodeInstalledApp(
-                            googleAuthorizationCodeFlow,
-                            new LocalServerReceiver()).authorize("user"))
+            this.service = new Sheets.Builder(netHttpTransport, jsonFactory, setHttpTimeout(credential))
                     .setApplicationName("Google Sheets Export API")
                     .build();
 
@@ -146,6 +148,22 @@ public class GoogleSheetsApi {
         }
 
         return this;
+    }
+
+    /**
+     *
+     * @param requestInitializer
+     * @return
+     */
+    private HttpRequestInitializer setHttpTimeout(final HttpRequestInitializer requestInitializer) {
+        return new HttpRequestInitializer() {
+            @Override
+            public void initialize(HttpRequest httpRequest) throws IOException {
+                requestInitializer.initialize(httpRequest);
+                httpRequest.setConnectTimeout(3 * 60000);  // 3 minutes connect timeout
+                httpRequest.setReadTimeout(3 * 60000);  // 3 minutes read timeout
+            }
+        };
     }
 
     /**
@@ -275,9 +293,9 @@ public class GoogleSheetsApi {
      * @throws java.io.IOException
      * @throws java.lang.InterruptedException
      */
-    public void append(List<List<Object>> values, int start, int columns, int rows) 
+    public void append(List<List<Object>> values, int start, int columns, int rows)
             throws IOException, InterruptedException {
-        
+
         //Defines the exponential backoff for multiples retries.
         boolean retry = true;
         ExponentialBackOff backOff = new ExponentialBackOff.Builder()
