@@ -57,7 +57,8 @@ public class GoogleSheetsExport {
     public static void main(String[] args) throws
             DuplicateEntityException,
             GeneralSecurityException,
-            IOException {
+            IOException,
+            InterruptedException {
 
         System.out.println("Google sheets export started.");
 
@@ -163,8 +164,6 @@ public class GoogleSheetsExport {
 
                     //Count records.
                     int count = 0;
-
-                    System.out.println("Updating sheet cells.");
 
                     //Process each csv record.
                     while ((line = csvParser.parseNext()) != null) {

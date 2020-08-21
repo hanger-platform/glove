@@ -32,6 +32,8 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.BackOff;
+import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
@@ -270,29 +272,49 @@ public class GoogleSheetsApi {
      * @param start
      * @param columns
      * @param rows
+     * @throws java.io.IOException
+     * @throws java.lang.InterruptedException
      */
-    public void append(List<List<Object>> values, int start, int columns, int rows) {
+    public void append(List<List<Object>> values, int start, int columns, int rows) 
+            throws IOException, InterruptedException {
+        
+        //Defines the exponential backoff for multiples retries.
+        boolean retry = true;
+        ExponentialBackOff backOff = new ExponentialBackOff.Builder()
+                .setMaxElapsedTimeMillis(60 * 5 * 1000)
+                .build();
 
-        try {
-            String rangeStart = this.sheetName + "!A" + start;
-            String rangeEnd = getColumnName(columns) + rows;
+        do {
+            try {
+                String rangeStart = this.sheetName + "!A" + start;
+                String rangeEnd = getColumnName(columns) + rows;
 
-            if (this.debug) {
                 System.out.println("Appending cells range: " + rangeStart + ":" + rangeEnd);
+
+                ValueRange body = new ValueRange().setValues(values);
+
+                this.service
+                        .spreadsheets()
+                        .values()
+                        .append(this.spreadsheet.getSpreadsheetId(), rangeStart + ":" + rangeEnd, body)
+                        .setValueInputOption("USER_ENTERED")
+                        .execute();
+
+                retry = false;
+            } catch (IOException ex) {
+                long sleep = backOff.nextBackOffMillis();
+
+                if (sleep == BackOff.STOP) {
+                    retry = false;
+                    System.err.println("Append cells failed after maximum elapsed millis: " + backOff.getMaxElapsedTimeMillis() + ", Error: " + ex.getMessage());
+
+                } else {
+
+                    System.err.println("Trying to recover of: " + ex.getMessage());
+                    Thread.sleep(sleep);
+                }
             }
-
-            ValueRange body = new ValueRange().setValues(values);
-
-            this.service
-                    .spreadsheets()
-                    .values()
-                    .append(this.spreadsheet.getSpreadsheetId(), rangeStart + ":" + rangeEnd, body)
-                    .setValueInputOption("USER_ENTERED")
-                    .execute();
-
-        } catch (IOException ex) {
-            System.err.println("Error appending data: " + ex.getMessage());
-        }
+        } while (retry);
     }
 
     /**
