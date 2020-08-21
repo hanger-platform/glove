@@ -644,7 +644,8 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 					--spreadsheet=${EXPORT_SPREADSHEET} \
 					--input=${RAWFILE_QUEUE_FILE} \
 					--sheet=${EXPORT_SHEET} \
-					--method=${EXPORT_SHEETS_METHOD}"
+					--method=${EXPORT_SHEETS_METHOD} \
+					--debug=${DEBUG}"
 				fi
 				
 				# Exporta resultset para uma planilha do Google Sheets.
@@ -653,7 +654,8 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 					--spreadsheet=${EXPORT_SPREADSHEET} \
 					--input=${RAWFILE_QUEUE_FILE} \
 					--sheet=${EXPORT_SHEET} \
-					--method=${EXPORT_SHEETS_METHOD}
+					--method=${EXPORT_SHEETS_METHOD} \
+					--debug=${DEBUG}
 				error_check	
 			else
 				echo "EXPORT_BUCKET_DEFAULT or EXPORT_SPREADSHEET_DEFAULT was not defined!"

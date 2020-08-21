@@ -64,14 +64,16 @@ public class GoogleSheetsApi {
     private final String sheetName;
     private Sheets service;
     private Spreadsheet spreadsheet;
+    private boolean debug;
 
     /**
      * Credentials file.
      *
      * @param sheetName
      */
-    public GoogleSheetsApi(String sheetName) {
+    public GoogleSheetsApi(String sheetName, boolean debug) {
         this.sheetName = sheetName;
+        this.debug = debug;
     }
 
     /**
@@ -266,6 +268,10 @@ public class GoogleSheetsApi {
             String rangeStart = this.sheetName + "!A" + start;
             String rangeEnd = getColumnName(columns) + rows;
 
+            if (this.debug) {
+                System.out.println("Appending cells range: " + rangeStart + ":" + rangeEnd);
+            }
+
             ValueRange body = new ValueRange().setValues(values);
 
             this.service
@@ -371,13 +377,13 @@ public class GoogleSheetsApi {
         }
         return count;
     }
-    
+
     /**
      * Gets spreadsheet title.
-     * 
-     * @return 
+     *
+     * @return
      */
     public String getSpreadsheetTitle() {
-       return this.spreadsheet.getProperties().getTitle();
+        return this.spreadsheet.getProperties().getTitle();
     }
 }

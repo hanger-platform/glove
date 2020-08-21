@@ -82,7 +82,7 @@ public class GoogleSheetsExport {
 
             //Define spreadsheet API manager.
             GoogleSheetsApi api
-                    = new GoogleSheetsApi(cli.getParameter("sheet"))
+                    = new GoogleSheetsApi(cli.getParameter("sheet"),cli.getParameterAsBoolean("debug"))
                             .authenticate(cli.getParameter("credentials"), cli.getParameter("spreadsheet"));
 
             //Define the input file.
@@ -93,16 +93,16 @@ public class GoogleSheetsExport {
 
             //Calculate the number of cells that will be written.
             long cells = (inputDimension.columnCount() * inputDimension.rowCount());
-            
+
             System.out.println("[" + file.getAbsolutePath() + "] rows: " + inputDimension.rowCount() + ", cols: " + inputDimension.columnCount() + " (" + cells + " cells will be written)");
-            
+
             //Get number of filled cells on spreadsheet.
             long cellsCount = api.getCellsCount();
-            
+
             //Number of cells that spreadsheet will heave.
             cells = cells + cellsCount;
-            
-            System.out.println("[" + api.getSpreadsheetTitle() + "] cells: " + cellsCount + ", after update: " + cells + " (Limit is " + CELLS_LIMIT + ")");            
+
+            System.out.println("[" + api.getSpreadsheetTitle() + "] cells: " + cellsCount + ", after update: " + cells + " (Limit is " + CELLS_LIMIT + ")");
 
             //Identify if cells count is over the suppported on Google Sheets.
             if (cells <= CELLS_LIMIT) {
@@ -181,12 +181,7 @@ public class GoogleSheetsExport {
 
                         //Identify if should flush data into google spreadsheet.
                         if (count == pool) {
-
-                            if (cli.getParameterAsInteger("method") == 0) {
-                                api.update(values, startIndex, inputDimension.columnCount(), pool);
-                            } else {
-                                api.append(values, startIndex, inputDimension.columnCount(), pool);
-                            }
+                            api.append(values, startIndex, inputDimension.columnCount(), pool);
 
                             //Increment ranges.
                             startIndex += values.size();
@@ -210,11 +205,7 @@ public class GoogleSheetsExport {
 
                     //Identify if there is some records left.
                     if (values.size() > 0) {
-                        if (cli.getParameterAsInteger("method") == 0) {
-                            api.update(values, startIndex, inputDimension.columnCount(), pool);
-                        } else {
-                            api.append(values, startIndex, inputDimension.columnCount(), pool);
-                        }
+                        api.append(values, startIndex, inputDimension.columnCount(), pool);
                     }
 
                 } else {
