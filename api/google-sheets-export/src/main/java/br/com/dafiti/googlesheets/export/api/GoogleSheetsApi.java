@@ -35,14 +35,24 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
+import com.google.api.services.sheets.v4.model.BatchClearValuesByDataFilterRequest;
+import com.google.api.services.sheets.v4.model.BatchClearValuesRequest;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
+import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetResponse;
+import com.google.api.services.sheets.v4.model.BatchUpdateValuesRequest;
 import com.google.api.services.sheets.v4.model.ClearValuesRequest;
+import com.google.api.services.sheets.v4.model.DataFilter;
 import com.google.api.services.sheets.v4.model.DeleteDimensionRequest;
 import com.google.api.services.sheets.v4.model.DimensionRange;
+import com.google.api.services.sheets.v4.model.FindReplaceResponse;
+import com.google.api.services.sheets.v4.model.GridRange;
 import com.google.api.services.sheets.v4.model.InsertDimensionRequest;
 import com.google.api.services.sheets.v4.model.Request;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
+import com.google.api.services.sheets.v4.model.SpreadsheetProperties;
+import com.google.api.services.sheets.v4.model.UpdateCellsRequest;
+import com.google.api.services.sheets.v4.model.UpdateSpreadsheetPropertiesRequest;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import java.io.File;
 import java.io.FileInputStream;
@@ -137,28 +147,27 @@ public class GoogleSheetsApi {
     }
 
     /**
-     * Clean cells range.
+     * Clear cells range.
      *
      * @param sheet SheetDetails
-     * @param startIndex Start index
      */
-    public void cleanCells(SheetDetails sheet, int startIndex) {
+    public void cleanCells(SheetDetails sheet) {
         try {
-            String start = this.sheetName + "!A" + startIndex;
-            String end = this.getColumnName(sheet.getColumnCount()) + sheet.getRowCount();
-            String range = start + ":" + end;
+            System.out.println("Clearing cells from sheet: " + sheet.getName() + " (" + sheet.getId() + ")");
 
-            System.out.println("Clearing cells range: " + range);
-
-            //Execute request
+            List<Request> requests = new ArrayList<>();
+            requests.add(
+                    new Request().setUpdateCells(
+                            new UpdateCellsRequest()
+                                    .setRange(new GridRange().setSheetId(sheet.getId()))
+                                    .setFields("userEnteredValue")));
             this.service
                     .spreadsheets()
-                    .values()
-                    .clear(this.spreadsheet.getSpreadsheetId(), range, new ClearValuesRequest())
+                    .batchUpdate(this.spreadsheet.getSpreadsheetId(), new BatchUpdateSpreadsheetRequest().setRequests(requests))
                     .execute();
 
         } catch (IOException ex) {
-            System.err.println("Error cleaning cells: " + ex.getMessage());
+            System.err.println("Error clearing cells: " + ex.getMessage());
         }
     }
 

@@ -72,7 +72,7 @@ public class GoogleSheetsExport {
                 .addParameter("t", "sheet", "Define sheet name", "", true, false)
                 .addParameter("sl", "sleep", "(Optional) Sleep time in seconds at one request and another; 0 is default", "0")
                 .addParameter("m", "method", "(Optional) Update method, 0 for full, 1 append; 0 is default", "0")
-                .addParameter("d", "debug", "(Optional) Identify if it is debug mode; false is default", "false");
+                .addParameter("d", "debug", "(Optional) Identify if it is debug mode; 0 is default", "0");
 
         //Read the command line interface. 
         CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -82,7 +82,7 @@ public class GoogleSheetsExport {
 
             //Define spreadsheet API manager.
             GoogleSheetsApi api
-                    = new GoogleSheetsApi(cli.getParameter("sheet"),cli.getParameterAsBoolean("debug"))
+                    = new GoogleSheetsApi(cli.getParameter("sheet"), cli.getParameterAsInteger("debug") == 1)
                             .authenticate(cli.getParameter("credentials"), cli.getParameter("spreadsheet"));
 
             //Define the input file.
@@ -148,7 +148,7 @@ public class GoogleSheetsExport {
                             csvParser = new CsvParser(getSettings(false));
 
                             //Clear cells from a sheet.
-                            api.cleanCells(sheet, startIndex);
+                            api.cleanCells(sheet);
                             break;
                     }
 
@@ -163,6 +163,8 @@ public class GoogleSheetsExport {
 
                     //Count records.
                     int count = 0;
+
+                    System.out.println("Updating sheet cells.");
 
                     //Process each csv record.
                     while ((line = csvParser.parseNext()) != null) {
