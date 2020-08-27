@@ -541,7 +541,7 @@ export_bucket</note>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Export bucket default</from>
+      <from>Export defaults</from>
       <to>Mode to lower</to>
       <enabled>Y</enabled>
     </hop>
@@ -597,7 +597,7 @@ export_bucket</note>
     </hop>
     <hop>
       <from>Ignored step filter</from>
-      <to>Export bucket default</to>
+      <to>Export defaults</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
@@ -657,7 +657,7 @@ export_bucket</note>
     </GUI>
   </step>
   <step>
-    <name>Export bucket default</name>
+    <name>Export defaults</name>
     <type>IfNull</type>
     <description />
     <distribute>Y</distribute>
@@ -678,6 +678,18 @@ export_bucket</note>
       <field>
         <name>export_bucket</name>
         <value>${EXPORT_BUCKET_DEFAULT}</value>
+        <mask />
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>export_sheet</name>
+        <value>${EXPORT_SHEET_DEFAULT}</value>
+        <mask />
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>export_spreadsheet</name>
+        <value>${EXPORT_SPREADSHEET_DEFAULT}</value>
         <mask />
         <set_empty_string>N</set_empty_string>
       </field>
@@ -948,7 +960,7 @@ export_bucket</note>
       <method>none</method>
       <schema_name />
     </partitioning>
-    <send_true_to>Export bucket default</send_true_to>
+    <send_true_to>Export defaults</send_true_to>
     <send_false_to>Ignored step log</send_false_to>
     <compare>
       <condition>
@@ -1701,6 +1713,32 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
       <field>
         <name>export_bucket</name>
         <path>$..export_bucket</path>
+        <type>String</type>
+        <format />
+        <currency />
+        <decimal />
+        <group />
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>both</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>export_spreadsheet</name>
+        <path>$..export_spreadsheet</path>
+        <type>String</type>
+        <format />
+        <currency />
+        <decimal />
+        <group />
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>both</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>export_sheet</name>
+        <path>$..export_sheet</path>
         <type>String</type>
         <format />
         <currency />

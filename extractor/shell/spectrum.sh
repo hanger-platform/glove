@@ -621,14 +621,14 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
     # Identifica se é uma named query.
     if [ ${MODULE} == "query" ]; then
 
-		# Identifica se deve exportar o csv intermediário para o storage.
+		# Identifica se deve exportar o resultset intermediário.
 		if [ ${IS_EXPORT} = 1 ]; then
-
-			# Compacta o arquivo csv.
-			pigz -c ${RAWFILE_QUEUE_FILE} > ${RAWFILE_QUEUE_FILE}.gz
 
 			# Define o storage de exportação.
 			if [ "${#EXPORT_BUCKET}" -gt "0" ]; then
+				# Compacta o arquivo csv.
+				pigz -c ${RAWFILE_QUEUE_FILE} > ${RAWFILE_QUEUE_FILE}.gz
+			
 				# Envia o arquivo para o storage.
 				echo "Exporting resultset to ${EXPORT_BUCKET}!"
 				aws s3 rm ${EXPORT_BUCKET}${RAWFILE_QUEUE_FILE}.gz --recursive --only-show-errors
@@ -637,14 +637,34 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 
 				# Remove o arquivo compactado do diretório.
 				rm -rf ${RAWFILE_QUEUE_FILE}.gz
-
-				# Finaliza o processo de exportação.
-				if [ ${ONLY_EXPORT} = 1 ]; then
-					echo "Exporting finished!"
-					exit 0
+			elif [ "${#EXPORT_SPREADSHEET}" -gt "0" ]; then	
+				if [ ${DEBUG} = 1 ] ; then
+					echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/google-sheets-export.jar \
+					--credentials=GLOVE_SPREADSHEET_CREDENTIALS \
+					--spreadsheet=${EXPORT_SPREADSHEET} \
+					--input=${RAWFILE_QUEUE_FILE} \
+					--sheet=${EXPORT_SHEET} \
+					--method=${EXPORT_SHEETS_METHOD} \
+					--debug=${DEBUG}"
 				fi
+				
+				# Exporta resultset para uma planilha do Google Sheets.
+				java -jar ${GLOVE_HOME}/extractor/lib/google-sheets-export.jar \
+					--credentials=${GLOVE_SPREADSHEET_CREDENTIALS} \
+					--spreadsheet=${EXPORT_SPREADSHEET} \
+					--input=${RAWFILE_QUEUE_FILE} \
+					--sheet=${EXPORT_SHEET} \
+					--method=${EXPORT_SHEETS_METHOD} \
+					--debug=${DEBUG}
+				error_check	
 			else
-				echo "EXPORT_BUCKET was not defined!"
+				echo "EXPORT_BUCKET_DEFAULT or EXPORT_SPREADSHEET_DEFAULT was not defined!"
+			fi
+			
+			# Finaliza o processo de exportação.
+			if [ ${ONLY_EXPORT} = 1 ]; then
+				echo "Exporting finished!"
+				exit 0
 			fi
 		fi
     fi
