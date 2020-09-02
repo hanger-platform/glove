@@ -1,25 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job>
   <name>j_extract_data_from_query_on_dbms</name>
-  <description/>
-  <extended_description/>
-  <job_version/>
+  <description />
+  <extended_description />
+  <job_version />
+  <job_status>0</job_status>
   <directory>/</directory>
   <created_user>-</created_user>
   <created_date>2018/02/02 16:00:15.665</created_date>
   <modified_user>-</modified_user>
   <modified_date>2018/02/02 16:00:15.665</modified_date>
   <parameters>
-    </parameters>
+    <parameter>
+      <name>METADATA_PARAMETER</name>
+      <default_value />
+      <description />
+    </parameter>
+  </parameters>
   <slaveservers>
     </slaveservers>
   <job-log-table>
-    <connection/>
-    <schema/>
-    <table/>
-    <size_limit_lines/>
-    <interval/>
-    <timeout_days/>
+    <connection />
+    <schema />
+    <table />
+    <size_limit_lines />
+    <interval />
+    <timeout_days />
     <field>
       <id>ID_JOB</id>
       <enabled>Y</enabled>
@@ -127,10 +133,10 @@
     </field>
   </job-log-table>
   <jobentry-log-table>
-    <connection/>
-    <schema/>
-    <table/>
-    <timeout_days/>
+    <connection />
+    <schema />
+    <table />
+    <timeout_days />
     <field>
       <id>ID_BATCH</id>
       <enabled>Y</enabled>
@@ -218,10 +224,10 @@
     </field>
   </jobentry-log-table>
   <channel-log-table>
-    <connection/>
-    <schema/>
-    <table/>
-    <timeout_days/>
+    <connection />
+    <schema />
+    <table />
+    <timeout_days />
     <field>
       <id>ID_BATCH</id>
       <enabled>Y</enabled>
@@ -284,29 +290,29 @@
     </field>
   </channel-log-table>
   <pass_batchid>N</pass_batchid>
-  <shared_objects_file/>
+  <shared_objects_file />
   <entries>
     <entry>
       <name>Extract data</name>
-      <description/>
+      <description />
       <type>TRANS</type>
       <specification_method>filename</specification_method>
-      <trans_object_id/>
+      <trans_object_id />
       <filename>${Internal.Job.Filename.Directory}/m_create_rawfile_from_query.ktr</filename>
-      <transname/>
+      <transname />
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
       <exec_per_row>N</exec_per_row>
       <clear_rows>N</clear_rows>
       <clear_files>N</clear_files>
       <set_logfile>N</set_logfile>
-      <logfile/>
-      <logext/>
+      <logfile />
+      <logext />
       <add_date>N</add_date>
       <add_time>N</add_time>
       <loglevel>Basic</loglevel>
       <cluster>N</cluster>
-      <slave_server_name/>
+      <slave_server_name />
       <set_append_logfile>N</set_append_logfile>
       <wait_until_finished>Y</wait_until_finished>
       <follow_abort_remote>N</follow_abort_remote>
@@ -317,43 +323,48 @@
         <pass_all_parameters>Y</pass_all_parameters>
         <parameter>
           <name>DELTA_FIELD</name>
-          <stream_name/>
+          <stream_name />
           <value>${DELTA_FIELD}</value>
         </parameter>
         <parameter>
           <name>DELTA_VALUE</name>
-          <stream_name/>
+          <stream_name />
           <value>${DELTA_VALUE}</value>
         </parameter>
         <parameter>
           <name>METADATA_QUEUE_METADATA_FILE</name>
-          <stream_name/>
+          <stream_name />
           <value>${METADATA_QUEUE_METADATA_FILE}</value>
         </parameter>
         <parameter>
           <name>PARTITION_FIELD</name>
-          <stream_name/>
+          <stream_name />
           <value>${PARTITION_FIELD}</value>
         </parameter>
         <parameter>
           <name>RAWFILE_QUEUE_FILE</name>
-          <stream_name/>
+          <stream_name />
           <value>${RAWFILE_QUEUE_FILE}</value>
         </parameter>
         <parameter>
           <name>RAW_SRC_NAME</name>
-          <stream_name/>
+          <stream_name />
           <value>${RAW_SRC_NAME}</value>
         </parameter>
         <parameter>
           <name>INPUT_DATA_STATEMENT</name>
-          <stream_name/>
+          <stream_name />
           <value>${INPUT_DATA_STATEMENT}</value>
         </parameter>
         <parameter>
           <name>WHERE_CONDITION_TO_DELTA</name>
-          <stream_name/>
+          <stream_name />
           <value>${WHERE_CONDITION_TO_DELTA}</value>
+        </parameter>
+        <parameter>
+          <name>METADATA_PARAMETER</name>
+          <stream_name />
+          <value>${METADATA_PARAMETER}</value>
         </parameter>
       </parameters>
       <parallel>N</parallel>
@@ -364,7 +375,7 @@
     </entry>
     <entry>
       <name>START</name>
-      <description/>
+      <description />
       <type>SPECIAL</type>
       <start>Y</start>
       <dummy>N</dummy>
@@ -384,7 +395,7 @@
     </entry>
     <entry>
       <name>Success</name>
-      <description/>
+      <description />
       <type>SUCCESS</type>
       <parallel>N</parallel>
       <draw>Y</draw>
@@ -394,9 +405,9 @@
     </entry>
     <entry>
       <name>Fail extracting data from DBMS</name>
-      <description/>
+      <description />
       <type>ABORT</type>
-      <message/>
+      <message />
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
@@ -405,10 +416,10 @@
     </entry>
     <entry>
       <name>Set delimiter to ;</name>
-      <description/>
+      <description />
       <type>SET_VARIABLES</type>
       <replacevars>Y</replacevars>
-      <filename/>
+      <filename />
       <file_variable_type>JVM</file_variable_type>
       <fields>
         <field>

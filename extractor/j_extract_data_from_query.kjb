@@ -1317,6 +1317,11 @@ Check if query returned at least one record or if happened error on the process.
       <run_configuration>Pentaho local</run_configuration>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
+        <parameter>
+          <name>METADATA_PARAMETER</name>
+          <stream_name />
+          <value>${METADATA} </value>
+        </parameter>
       </parameters>
       <set_append_logfile>N</set_append_logfile>
       <parallel>N</parallel>
