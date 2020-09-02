@@ -194,7 +194,7 @@
     <parameter>
       <name>MANIFEST</name>
       <default_value />
-      <description>Identifica se o metadado será passado por parâmetro.</description>
+      <description>Identifica se o manifest será passado por parâmetro.</description>
     </parameter>
     <parameter>
       <name>MODULE</name>
