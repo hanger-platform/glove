@@ -11,12 +11,7 @@
   <modified_user>-</modified_user>
   <modified_date>2018/02/02 16:00:15.665</modified_date>
   <parameters>
-    <parameter>
-      <name>METADATA_PARAMETER</name>
-      <default_value />
-      <description />
-    </parameter>
-  </parameters>
+    </parameters>
   <slaveservers>
     </slaveservers>
   <job-log-table>
@@ -360,11 +355,6 @@
           <name>WHERE_CONDITION_TO_DELTA</name>
           <stream_name />
           <value>${WHERE_CONDITION_TO_DELTA}</value>
-        </parameter>
-        <parameter>
-          <name>METADATA_PARAMETER</name>
-          <stream_name />
-          <value>${METADATA_PARAMETER}</value>
         </parameter>
       </parameters>
       <parallel>N</parallel>
