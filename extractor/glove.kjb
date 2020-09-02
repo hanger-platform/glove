@@ -192,6 +192,11 @@
       <description>Identifica se o AWS Redshift Spectrum está configurado.</description>
     </parameter>
     <parameter>
+      <name>MANIFEST</name>
+      <default_value />
+      <description>Identifica se o metadado será passado por parâmetro.</description>
+    </parameter>
+    <parameter>
       <name>MODULE</name>
       <default_value>database</default_value>
       <description>Identifica o módulo que será executado</description>
