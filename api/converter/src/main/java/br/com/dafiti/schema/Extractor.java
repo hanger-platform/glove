@@ -329,7 +329,7 @@ public class Extractor implements Runnable {
                 } else {
                     switch (type) {
                         case "string":
-                            int justifiedLength = (length * 2) > 65000 ? 65000 : (length * 2);
+                            int justifiedLength = length > 65000 ? 65000 : length;
 
                             length = length <= 0 ? 255 : length;
 
