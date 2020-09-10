@@ -32,11 +32,6 @@
       <description>Identifica o nome de uma conexão contida no arquivo ~/.kettle/connections.properties.</description>
     </parameter>
     <parameter>
-      <name>CUSTOM_FIELD</name>
-      <default_value />
-      <description>Identifica os campos customizados.</description>
-    </parameter>
-    <parameter>
       <name>CUSTOM_PRIMARY_KEY</name>
       <default_value />
       <description>Identifica a chave única de cada registro.</description>
