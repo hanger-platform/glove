@@ -2,47 +2,47 @@
 <transformation>
   <info>
     <name>m_get_parameters</name>
-    <description/>
-    <extended_description/>
-    <trans_version/>
+    <description />
+    <extended_description />
+    <trans_version />
     <trans_type>Normal</trans_type>
     <trans_status>0</trans_status>
     <directory>/</directory>
     <parameters>
       <parameter>
         <name>CONNECTION_NAME</name>
-        <default_value/>
-        <description/>
+        <default_value />
+        <description />
       </parameter>
       <parameter>
         <name>CUSTOM_FIELD</name>
-        <default_value/>
-        <description/>
+        <default_value />
+        <description />
       </parameter>
       <parameter>
         <name>INPUT_TABLE_NAME</name>
-        <default_value/>
-        <description/>
+        <default_value />
+        <description />
       </parameter>
       <parameter>
         <name>INPUT_TABLE_SCHEMA</name>
-        <default_value/>
-        <description/>
+        <default_value />
+        <description />
       </parameter>
       <parameter>
         <name>METADATA_BLACKLIST</name>
-        <default_value/>
-        <description/>
+        <default_value />
+        <description />
       </parameter>
     </parameters>
     <log>
       <trans-log-table>
-        <connection/>
-        <schema/>
-        <table/>
-        <size_limit_lines/>
-        <interval/>
-        <timeout_days/>
+        <connection />
+        <schema />
+        <table />
+        <size_limit_lines />
+        <interval />
+        <timeout_days />
         <field>
           <id>ID_BATCH</id>
           <enabled>Y</enabled>
@@ -67,37 +67,37 @@
           <id>LINES_READ</id>
           <enabled>Y</enabled>
           <name>LINES_READ</name>
-          <subject/>
+          <subject />
         </field>
         <field>
           <id>LINES_WRITTEN</id>
           <enabled>Y</enabled>
           <name>LINES_WRITTEN</name>
-          <subject/>
+          <subject />
         </field>
         <field>
           <id>LINES_UPDATED</id>
           <enabled>Y</enabled>
           <name>LINES_UPDATED</name>
-          <subject/>
+          <subject />
         </field>
         <field>
           <id>LINES_INPUT</id>
           <enabled>Y</enabled>
           <name>LINES_INPUT</name>
-          <subject/>
+          <subject />
         </field>
         <field>
           <id>LINES_OUTPUT</id>
           <enabled>Y</enabled>
           <name>LINES_OUTPUT</name>
-          <subject/>
+          <subject />
         </field>
         <field>
           <id>LINES_REJECTED</id>
           <enabled>Y</enabled>
           <name>LINES_REJECTED</name>
-          <subject/>
+          <subject />
         </field>
         <field>
           <id>ERRORS</id>
@@ -151,11 +151,11 @@
         </field>
       </trans-log-table>
       <perf-log-table>
-        <connection/>
-        <schema/>
-        <table/>
-        <interval/>
-        <timeout_days/>
+        <connection />
+        <schema />
+        <table />
+        <interval />
+        <timeout_days />
         <field>
           <id>ID_BATCH</id>
           <enabled>Y</enabled>
@@ -233,10 +233,10 @@
         </field>
       </perf-log-table>
       <channel-log-table>
-        <connection/>
-        <schema/>
-        <table/>
-        <timeout_days/>
+        <connection />
+        <schema />
+        <table />
+        <timeout_days />
         <field>
           <id>ID_BATCH</id>
           <enabled>Y</enabled>
@@ -299,10 +299,10 @@
         </field>
       </channel-log-table>
       <step-log-table>
-        <connection/>
-        <schema/>
-        <table/>
-        <timeout_days/>
+        <connection />
+        <schema />
+        <table />
+        <timeout_days />
         <field>
           <id>ID_BATCH</id>
           <enabled>Y</enabled>
@@ -375,10 +375,10 @@
         </field>
       </step-log-table>
       <metrics-log-table>
-        <connection/>
-        <schema/>
-        <table/>
-        <timeout_days/>
+        <connection />
+        <schema />
+        <table />
+        <timeout_days />
         <field>
           <id>ID_BATCH</id>
           <enabled>Y</enabled>
@@ -427,9 +427,9 @@
       </metrics-log-table>
     </log>
     <maxdate>
-      <connection/>
-      <table/>
-      <field/>
+      <connection />
+      <table />
+      <field />
       <offset>0.0</offset>
       <maxdiff>0.0</maxdiff>
     </maxdate>
@@ -463,16 +463,16 @@
   </notepads>
   <connection>
     <name>CORE_H2_MEMORY</name>
-    <server/>
+    <server />
     <type>GENERIC</type>
     <access>Native</access>
     <database>MEMORY</database>
     <port>8082</port>
-    <username/>
+    <username />
     <password>Encrypted </password>
-    <servername/>
-    <data_tablespace/>
-    <index_tablespace/>
+    <servername />
+    <data_tablespace />
+    <index_tablespace />
     <attributes>
       <attribute>
         <code>CUSTOM_DRIVER_CLASS</code>
@@ -522,21 +522,21 @@
   </connection>
   <order>
     <hop>
-      <from>METADATA_BLACKLIST</from>
-      <to>Set METADATA_BLACKLIST</to>
+      <from>Get blacklist fields</from>
+      <to>Set fields into variables</to>
       <enabled>Y</enabled>
     </hop>
   </order>
   <step>
-    <name>METADATA_BLACKLIST</name>
+    <name>Get blacklist fields</name>
     <type>TableInput</type>
-    <description/>
+    <description />
     <distribute>Y</distribute>
-    <custom_distribution/>
+    <custom_distribution />
     <copies>1</copies>
     <partitioning>
       <method>none</method>
-      <schema_name/>
+      <schema_name />
     </partitioning>
     <connection>CORE_H2_MEMORY</connection>
     <sql>SELECT  
@@ -558,11 +558,11 @@ FROM
 )
 </sql>
     <limit>0</limit>
-    <lookup/>
+    <lookup />
     <execute_each_row>N</execute_each_row>
     <variables_active>Y</variables_active>
     <lazy_conversion_active>N</lazy_conversion_active>
-    <cluster_schema/>
+    <cluster_schema />
     <remotesteps>
       <input>
       </input>
@@ -576,26 +576,26 @@ FROM
     </GUI>
   </step>
   <step>
-    <name>Set METADATA_BLACKLIST</name>
+    <name>Set fields into variables</name>
     <type>SetVariable</type>
-    <description/>
+    <description />
     <distribute>Y</distribute>
-    <custom_distribution/>
+    <custom_distribution />
     <copies>1</copies>
     <partitioning>
       <method>none</method>
-      <schema_name/>
+      <schema_name />
     </partitioning>
     <fields>
       <field>
         <field_name>METADATA_BLACKLIST</field_name>
         <variable_name>METADATA_BLACKLIST</variable_name>
         <variable_type>ROOT_JOB</variable_type>
-        <default_value/>
+        <default_value />
       </field>
     </fields>
     <use_formatting>Y</use_formatting>
-    <cluster_schema/>
+    <cluster_schema />
     <remotesteps>
       <input>
       </input>
