@@ -474,7 +474,7 @@
         <in_stream_name>OUTPUT_TABLE_SCHEMA_tmp</in_stream_name>
         <out_stream_name />
         <use_regex>yes</use_regex>
-        <replace_string>\/\w{3}\/</replace_string>
+        <replace_string>\/\w{1,}\/</replace_string>
         <replace_by_string />
         <set_empty_string>N</set_empty_string>
         <replace_field_by_string />
@@ -486,7 +486,7 @@
         <in_stream_name>OUTPUT_TABLE_NAME_tmp</in_stream_name>
         <out_stream_name />
         <use_regex>yes</use_regex>
-        <replace_string>\/\w{3}\/</replace_string>
+        <replace_string>\/\w{1,}\/</replace_string>
         <replace_by_string />
         <set_empty_string>N</set_empty_string>
         <replace_field_by_string />
@@ -498,7 +498,7 @@
         <in_stream_name>INPUT_TABLE_SCHEMA</in_stream_name>
         <out_stream_name>INPUT_TABLE_SCHEMA_formated</out_stream_name>
         <use_regex>yes</use_regex>
-        <replace_string>\/\w{3}\/</replace_string>
+        <replace_string>\/\w{1,}\/</replace_string>
         <replace_by_string />
         <set_empty_string>N</set_empty_string>
         <replace_field_by_string />
@@ -510,7 +510,7 @@
         <in_stream_name>INPUT_TABLE_NAME</in_stream_name>
         <out_stream_name>INPUT_TABLE_NAME_formated</out_stream_name>
         <use_regex>yes</use_regex>
-        <replace_string>\/\w{3}\/</replace_string>
+        <replace_string>\/\w{1,}\/</replace_string>
         <replace_by_string />
         <set_empty_string>N</set_empty_string>
         <replace_field_by_string />
@@ -522,7 +522,7 @@
         <in_stream_name>DELTA_FIELD</in_stream_name>
         <out_stream_name>DELTA_FIELD_IN_METADATA</out_stream_name>
         <use_regex>yes</use_regex>
-        <replace_string>\/\w{3}\/</replace_string>
+        <replace_string>\/\w{1,}\/</replace_string>
         <replace_by_string />
         <set_empty_string>N</set_empty_string>
         <replace_field_by_string />
@@ -830,7 +830,7 @@
     </partitioning>
     <formula>
       <field_name>INPUT_TABLE_NAME_tmp</field_name>
-      <formula_string>IF( UPPER( [DATABASE_TYPE] ) = "SAP_HANA";  """" &amp; UPPER( [INPUT_TABLE_NAME] ) &amp; """" ; [INPUT_TABLE_NAME]  ) 
+      <formula_string>IF( UPPER( [DATABASE_TYPE] ) = "SAP_HANA";  """" &amp; UPPER( [INPUT_TABLE_NAME] ) &amp; """" ; IF(UPPER( [DATABASE_TYPE] ) = "SYBASE_ASE";"[" &amp; UPPER( [INPUT_TABLE_NAME] ) &amp; "]" ;[INPUT_TABLE_NAME]  );[INPUT_TABLE_NAME]  ) 
 </formula_string>
       <value_type>String</value_type>
       <value_length>-1</value_length>
@@ -839,7 +839,7 @@
     </formula>
     <formula>
       <field_name>INPUT_TABLE_SCHEMA_tmp</field_name>
-      <formula_string>IF( UPPER( [DATABASE_TYPE] ) = "SAP_HANA";  """" &amp;  UPPER( [INPUT_TABLE_SCHEMA] ) &amp; """" ; [INPUT_TABLE_SCHEMA]  ) </formula_string>
+      <formula_string>IF( UPPER( [DATABASE_TYPE] ) = "SAP_HANA";  """" &amp; UPPER( [INPUT_TABLE_SCHEMA] ) &amp; """" ; IF(UPPER( [DATABASE_TYPE] ) = "SYBASE_ASE";"[" &amp; UPPER( [INPUT_TABLE_SCHEMA] ) &amp; "]" ;[INPUT_TABLE_SCHEMA]  );[INPUT_TABLE_SCHEMA]  ) </formula_string>
       <value_type>String</value_type>
       <value_length>-1</value_length>
       <value_precision>-1</value_precision>
@@ -847,7 +847,7 @@
     </formula>
     <formula>
       <field_name>PARTITION_FIELD_tmp</field_name>
-      <formula_string>IF( UPPER( [DATABASE_TYPE] ) = "SAP_HANA";  IF( [PARTITION_FIELD] = "" ; ""; """" &amp; UPPER( [PARTITION_FIELD]) &amp; """" ) ; [PARTITION_FIELD] ) </formula_string>
+      <formula_string>IF( UPPER( [DATABASE_TYPE] ) = "SAP_HANA"; IF( [PARTITION_FIELD] = "" ; ""; """" &amp; UPPER( [PARTITION_FIELD]) &amp; """" ) ; IF( UPPER( [DATABASE_TYPE] ) = "SYBASE_ASE"; IF( [PARTITION_FIELD] = "" ; ""; "[" &amp; UPPER( [PARTITION_FIELD]) &amp; "]" ) ; [PARTITION_FIELD]);[PARTITION_FIELD] ) </formula_string>
       <value_type>String</value_type>
       <value_length>-1</value_length>
       <value_precision>-1</value_precision>
@@ -855,7 +855,7 @@
     </formula>
     <formula>
       <field_name>DELTA_FIELD_tmp</field_name>
-      <formula_string>IF( UPPER( [DATABASE_TYPE] ) = "SAP_HANA";  IF([DELTA_FIELD]=""  ; "";"""" &amp; UPPER( [DELTA_FIELD]) &amp; """"	) ; [DELTA_FIELD]) </formula_string>
+      <formula_string>IF( UPPER( [DATABASE_TYPE] ) = "SAP_HANA"; IF( [DELTA_FIELD] = "" ; ""; """" &amp; UPPER( [DELTA_FIELD]) &amp; """" ) ; IF( UPPER( [DATABASE_TYPE] ) = "SYBASE_ASE"; IF( [DELTA_FIELD] = "" ; ""; "[" &amp; UPPER( [DELTA_FIELD]) &amp; "]" ) ; [DELTA_FIELD]);[DELTA_FIELD] ) </formula_string>
       <value_type>String</value_type>
       <value_length>-1</value_length>
       <value_precision>-1</value_precision>

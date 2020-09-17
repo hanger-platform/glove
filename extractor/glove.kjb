@@ -197,6 +197,11 @@
       <description>Identifica se o manifest será passado por parâmetro.</description>
     </parameter>
     <parameter>
+      <name>METADATA_BLACKLIST</name>
+      <default_value />
+      <description>Identifica a lista de campos a serem excluídos (apenas para database module)</description>
+    </parameter>
+    <parameter>
       <name>MODULE</name>
       <default_value>database</default_value>
       <description>Identifica o módulo que será executado</description>
@@ -693,7 +698,7 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>224</xloc>
+      <xloc>384</xloc>
       <yloc>480</yloc>
     </entry>
     <entry>
@@ -804,7 +809,7 @@ UUID == ${UUID}
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>80</xloc>
+      <xloc>240</xloc>
       <yloc>480</yloc>
     </entry>
     <entry>
@@ -815,7 +820,7 @@ UUID == ${UUID}
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>496</xloc>
+      <xloc>656</xloc>
       <yloc>592</yloc>
     </entry>
     <entry>
@@ -839,7 +844,7 @@ UUID == ${UUID}
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>224</xloc>
+      <xloc>384</xloc>
       <yloc>592</yloc>
     </entry>
     <entry>
@@ -849,7 +854,7 @@ UUID == ${UUID}
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>496</xloc>
+      <xloc>656</xloc>
       <yloc>480</yloc>
     </entry>
     <entry>
@@ -867,7 +872,7 @@ UUID == ${UUID}
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>496</xloc>
+      <xloc>656</xloc>
       <yloc>368</yloc>
     </entry>
     <entry>
@@ -889,7 +894,7 @@ UUID == ${UUID}
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>368</xloc>
+      <xloc>528</xloc>
       <yloc>368</yloc>
     </entry>
     <entry>
@@ -900,7 +905,43 @@ UUID == ${UUID}
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>368</xloc>
+      <xloc>528</xloc>
+      <yloc>480</yloc>
+    </entry>
+    <entry>
+      <name>Get Parameters</name>
+      <description />
+      <type>TRANS</type>
+      <specification_method>filename</specification_method>
+      <trans_object_id />
+      <filename>${Internal.Entry.Current.Directory}/m_get_parameters.ktr</filename>
+      <transname />
+      <arg_from_previous>N</arg_from_previous>
+      <params_from_previous>N</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>N</clear_files>
+      <set_logfile>N</set_logfile>
+      <logfile />
+      <logext />
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Basic</loglevel>
+      <cluster>N</cluster>
+      <slave_server_name />
+      <set_append_logfile>N</set_append_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <create_parent_folder>N</create_parent_folder>
+      <logging_remote_work>N</logging_remote_work>
+      <run_configuration />
+      <parameters>
+        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>80</xloc>
       <yloc>480</yloc>
     </entry>
   </entries>
@@ -926,15 +967,6 @@ UUID == ${UUID}
     <hop>
       <from>Metadata folder exists?</from>
       <to>Get process information</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>Get process information</from>
-      <to>Process ID</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -1020,6 +1052,24 @@ UUID == ${UUID}
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
       <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Get process information</from>
+      <to>Get Parameters</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Get Parameters</from>
+      <to>Process ID</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
       <unconditional>N</unconditional>
     </hop>
   </hops>
