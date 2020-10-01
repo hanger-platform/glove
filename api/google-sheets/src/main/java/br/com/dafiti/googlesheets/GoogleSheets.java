@@ -221,8 +221,19 @@ public class GoogleSheets {
                                 record.add(sheetName);
                                 mitt.write(record);
                             } else {
-                                values.get(index).add(sheetName);
-                                mitt.write(values.get(index));
+                                List<Object> sheetValues = values.get(index);
+                                List<Object> record = new ArrayList();
+
+                                for (int i = 0; i < header.size(); i++) {
+                                    if (sheetValues.size() > i) {
+                                        record.add(sheetValues.get(i));
+                                    } else {
+                                        record.add("");
+                                    }
+                                }
+
+                                record.add(sheetName);
+                                mitt.write(record);
                             }
                         } else {
                             for (int i = 0; i < values.get(index).size(); i++) {
