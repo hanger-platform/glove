@@ -95,7 +95,7 @@ public class GoogleSheets {
         CommandLineInterface cli = mitt.getCommandLineInterface(args);
 
         //Defines output file.
-        mitt.setOutput(cli.getParameter("output"));
+        mitt.setOutputFile(cli.getParameter("output"));
 
         //Defines fields.
         mitt.getConfiguration()

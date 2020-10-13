@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.ftp.FTP --credentials="/home/helio.leal/.ftp/credentials.json" --directory="/DOWNLOAD/CLIENTE" --output="/tmp/ftp/" --start_date="2020-06-11" --end_date="2020-06-12" --field="FECHA+IDLLAMADA+CONTACTO+OPCION+TELEFONO+HORA+USUARIO+ESTADO+DOCUMENTO+IDORDER" --partition="::dateformat(FECHA,yyyyMMdd,yyyyMM)" --key="::checksum()" --pattern="OPCIONES_DISCADAS_*" --delimiter="|"</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.ftp.FTP --credentials=/home/valdiney.gomes/credentials/ftp_neotel_cl.json --directory=/DOWNLOAD/CLIENTE --output=/tmp/neotel/ftp/cl/ESTADO_TICKETS/ --start_date=2020-10-04 --end_date=2020-10-11 '--field=NROCASO+USUARIOS CREADOR+USUARIO DERIVACION+FECHA CREACION TICKET+CANTIDAD DE DIAS DESDE CREACION TICKET+HORA CREACION TICKET+FECHA ULTIMA GESTION+HORA ULTIMA GESTION+CANTIDAD DE DIAS DESDE ULTIMA GESTION+OP+ESTADO+CATEGORIA+SUBCATEGORIA+CORREO+DESCRIPCION+TIENE_ESCALAMIENTO' '--partition=::regexp(::filename(),**\d{6}(?=\.)**)' '--key=::checksum()' '--pattern=ESTADO_TICKETS_*.csv' '--delimiter=|'</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.ftp.FTP --credentials="/home/helio.leal/.ftp/credentials.json" --directory="/DOWNLOAD/CLIENTE" --output="/tmp/ftp/" --start_date="2020-06-11" --end_date="2020-06-12" --field="FECHA+IDLLAMADA+CONTACTO+OPCION+TELEFONO+HORA+USUARIO+ESTADO+DOCUMENTO+IDORDER" --partition="::dateformat(FECHA,yyyyMMdd,yyyyMM)" --key="::checksum()" --pattern="OPCIONES_DISCADAS_*" --delimiter="|"</exec.args>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.ftp.FTP --credentials=/home/valdiney.gomes/credentials/ftp_neotel_cl.json --directory=/DOWNLOAD/CLIENTE --output=/tmp/neotel/ftp/cl/ESTADO_TICKETS/ --start_date=2020-10-04 --end_date=2020-10-11 '--field=NROCASO+USUARIOS CREADOR+USUARIO DERIVACION+FECHA CREACION TICKET+CANTIDAD DE DIAS DESDE CREACION TICKET+HORA CREACION TICKET+FECHA ULTIMA GESTION+HORA ULTIMA GESTION+CANTIDAD DE DIAS DESDE ULTIMA GESTION+OP+ESTADO+CATEGORIA+SUBCATEGORIA+CORREO+DESCRIPCION+TIENE_ESCALAMIENTO' '--partition=::regexp(::filename(),**\d{6}(?=\.)**)' '--key=::checksum()' '--pattern=ESTADO_TICKETS_*.csv' '--delimiter=|'</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.ftp.FTP --credentials="/home/helio.leal/.ftp/credentials.json" --directory="/DOWNLOAD/CLIENTE" --output="/tmp/ftp/" --start_date="2020-06-11" --end_date="2020-06-12" --field="FECHA+IDLLAMADA+CONTACTO+OPCION+TELEFONO+HORA+USUARIO+ESTADO+DOCUMENTO+IDORDER" --partition="::dateformat(FECHA,yyyyMMdd,yyyyMM)" --key="::checksum()" --pattern="OPCIONES_DISCADAS_*" --delimiter="|"</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.ftp.FTP --credentials=/home/valdiney.gomes/credentials/ftp_neotel_cl.json --directory=/DOWNLOAD/CLIENTE --output=/tmp/neotel/ftp/cl/ESTADO_TICKETS/ --start_date=2020-10-04 --end_date=2020-10-11 '--field=NROCASO+USUARIOS CREADOR+USUARIO DERIVACION+FECHA CREACION TICKET+CANTIDAD DE DIAS DESDE CREACION TICKET+HORA CREACION TICKET+FECHA ULTIMA GESTION+HORA ULTIMA GESTION+CANTIDAD DE DIAS DESDE ULTIMA GESTION+OP+ESTADO+CATEGORIA+SUBCATEGORIA+CORREO+DESCRIPCION+TIENE_ESCALAMIENTO' '--partition=::regexp(::filename(),**\d{6}(?=\.)**)' '--key=::checksum()' '--pattern=ESTADO_TICKETS_*.csv' '--delimiter=|'</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>

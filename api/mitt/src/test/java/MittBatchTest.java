@@ -34,18 +34,12 @@ public class MittBatchTest {
 
     public static void main(String[] args) throws DuplicateEntityException {
         Mitt mitt = new Mitt();
-
-        mitt
-                .getReaderSettings()
-                .setProperties("{\"skip\":\"4\",\"sheet\":\"teste\"}");
-
-        mitt.setDebug(true);
         
         String xxx = "id";
 
         mitt.setOutputFile("/tmp/braze/output/");
         mitt.getConfiguration().addField(Arrays.asList(xxx.split("\\+")));
 
-        mitt.write(new File("/home/valdiney/Downloads/"), "*.xls");
+        mitt.write(new File("/home/valdiney.gomes/Debug/"), "*.csv");
     }
 }

@@ -293,7 +293,12 @@ public class OutputProcessor implements Runnable {
      */
     public void close() {
         if (this.writer != null) {
-            this.writer.flush();
+            if (this.writer.getRecordCount() == 0) {
+                this.writer.writeHeaders();
+            } else {
+                this.writer.flush();
+            }
+
             this.writer.close();
         }
     }
