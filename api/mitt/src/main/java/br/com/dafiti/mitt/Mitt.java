@@ -35,6 +35,7 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -58,20 +59,13 @@ public class Mitt {
     private WriterSettings writerSettings;
     private CommandLineInterface commandLineInterface;
 
-    //TODO - It should be improved (Workaround). 
     public Mitt() {
-        MavenXpp3Reader reader = new MavenXpp3Reader();
-
-        try {
-            Model model = reader.read(new FileReader("pom.xml"));
-            List<Dependency> dependencies = model.getDependencies();
-
-            for (Dependency dependency : dependencies) {
-                if (dependency.getArtifactId().equalsIgnoreCase("mitt")) {
-                    Logger.getLogger(Mitt.class.getName()).log(Level.INFO, "MITT v{0}", dependency.getVersion());
-                    break;
-                }
-            }
+        try (InputStream inputStream = Mitt.class
+                .getClassLoader()
+                .getResourceAsStream("META-INF/maven/br.com.dafiti/mitt/pom.xml")) {
+            
+            Model model = new MavenXpp3Reader().read(inputStream);
+            Logger.getLogger(Mitt.class.getName()).log(Level.INFO, "MITT v{0}", model.getVersion());
         } catch (IOException
                 | XmlPullParserException ex) {
         }
