@@ -29,10 +29,20 @@ import br.com.dafiti.mitt.output.Output;
 import br.com.dafiti.mitt.output.OutputProcessor;
 import br.com.dafiti.mitt.settings.ReaderSettings;
 import br.com.dafiti.mitt.settings.WriterSettings;
+import com.jcabi.manifests.Manifests;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  *
@@ -47,6 +57,25 @@ public class Mitt {
     private ReaderSettings readerSettings;
     private WriterSettings writerSettings;
     private CommandLineInterface commandLineInterface;
+
+    //TODO - It should be improved (Workaround). 
+    public Mitt() {
+        MavenXpp3Reader reader = new MavenXpp3Reader();
+
+        try {
+            Model model = reader.read(new FileReader("pom.xml"));
+            List<Dependency> dependencies = model.getDependencies();
+
+            for (Dependency dependency : dependencies) {
+                if (dependency.getArtifactId().equalsIgnoreCase("mitt")) {
+                    Logger.getLogger(Mitt.class.getName()).log(Level.INFO, "MITT v{0}", dependency.getVersion());
+                    break;
+                }
+            }
+        } catch (IOException
+                | XmlPullParserException ex) {
+        }
+    }
 
     /**
      *
