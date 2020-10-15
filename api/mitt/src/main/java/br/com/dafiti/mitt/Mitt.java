@@ -31,8 +31,15 @@ import br.com.dafiti.mitt.settings.ReaderSettings;
 import br.com.dafiti.mitt.settings.WriterSettings;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  *
@@ -47,6 +54,18 @@ public class Mitt {
     private ReaderSettings readerSettings;
     private WriterSettings writerSettings;
     private CommandLineInterface commandLineInterface;
+
+    public Mitt() {
+        try (InputStream inputStream = Mitt.class
+                .getClassLoader()
+                .getResourceAsStream("META-INF/maven/br.com.dafiti/mitt/pom.xml")) {
+
+            Model model = new MavenXpp3Reader().read(inputStream);
+            Logger.getLogger(Mitt.class.getName()).log(Level.INFO, "MITT v{0}", model.getVersion());
+        } catch (IOException
+                | XmlPullParserException ex) {
+        }
+    }
 
     /**
      *
