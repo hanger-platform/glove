@@ -60,23 +60,23 @@ SELECT * FROM (
             ELSE column_name
         END AS casting,
         CASE data_type
-            WHEN 'smallint'		                 THEN 'int'
-            WHEN 'integer'		                 THEN 'int'
-            WHEN 'bigint' 		                 THEN 'bigint'
-            WHEN '"char"'			             THEN 'varchar'||'(' || COALESCE( character_maximum_length, 255 ) ||')'
-            WHEN 'character varying'             THEN 'varchar'||'(' || COALESCE( character_maximum_length, 255 ) ||')'
-            WHEN 'text'			                 THEN 'varchar(65535)'
- 			WHEN 'json'			                 THEN 'varchar(65535)'
- 			WHEN 'jsonb'			             THEN 'varchar(65535)'
-            WHEN 'date'			                 THEN 'varchar(10)'
-            WHEN 'timestamp with time zone'		 THEN 'varchar(25)'
-            WHEN 'timestamp without time zone'	 THEN 'varchar(19)'
-            WHEN 'time without time zone'	     THEN 'varchar(19)'
-            WHEN 'double precision'	             THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
-            WHEN 'real'	                         THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
-            WHEN 'numeric'		                 THEN 'decimal'||'('|| COALESCE(  numeric_precision, 16 ) ||','|| COALESCE(  numeric_scale, 4 ) ||')'
-            WHEN 'boolean' 		                 THEN 'boolean'
-			ELSE 'varchar(255)'
+            WHEN 'smallint'				THEN 'int'
+            WHEN 'integer'				THEN 'int'
+            WHEN 'bigint'				THEN 'bigint'
+            WHEN '"char"'			   	THEN 'varchar'||'(' || COALESCE( character_maximum_length, 255 ) ||')'
+            WHEN 'character varying'             	THEN 'varchar'||'(' || COALESCE( character_maximum_length, 255 ) ||')'
+            WHEN 'text'					THEN 'varchar(65535)'
+            WHEN 'json'					THEN 'varchar(65535)'
+            WHEN 'jsonb'				THEN 'varchar(65535)'
+            WHEN 'date'					THEN 'varchar(10)'
+            WHEN 'timestamp with time zone'		THEN 'varchar(25)'
+            WHEN 'timestamp without time zone'		THEN 'varchar(19)'
+            WHEN 'time without time zone'		THEN 'varchar(19)'
+            WHEN 'double precision'			THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
+            WHEN 'real'					THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
+            WHEN 'numeric'				THEN 'decimal'||'('|| COALESCE(  numeric_precision, 16 ) ||','|| COALESCE(  numeric_scale, 4 ) ||')'
+            WHEN 'boolean'				THEN 'boolean'
+            ELSE 'varchar(255)'
         END AS field_type,
         ( '{"name": "' || column_name ||  '","type":' ||
             CASE
@@ -87,7 +87,7 @@ SELECT * FROM (
                 WHEN data_type IN ( 'date', 'timestamp with time zone', 'timestamp without time zone', 'time without time zone' ) THEN '["null", "string"]'
                 WHEN data_type IN ( 'numeric' ) THEN '["null", {"type":"fixed", "name": "' || column_name || '", "size":' || round( COALESCE(  numeric_precision, 16 ) / 2, 0 ) || ', "logicalType": "decimal", "precision":' || COALESCE(  numeric_precision, 16 ) || ', "scale":' || COALESCE(  numeric_scale, 4 ) || '}]'
                 WHEN data_type = 'boolean' THEN '["null", "boolean"]'
-				ELSE '["null", "string"]'
+                ELSE '["null", "string"]'
             END ||', "default": null}' ) AS json,
         lower( column_name ) AS column_name,
         0 AS column_key,
