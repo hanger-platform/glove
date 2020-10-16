@@ -66,6 +66,8 @@ SELECT * FROM (
             WHEN '"char"'			             THEN 'varchar'||'(' || COALESCE( character_maximum_length, 255 ) ||')'
             WHEN 'character varying'             THEN 'varchar'||'(' || COALESCE( character_maximum_length, 255 ) ||')'
             WHEN 'text'			                 THEN 'varchar(65535)'
+ 			WHEN 'json'			                 THEN 'varchar(65535)'
+ 			WHEN 'jsonb'			             THEN 'varchar(65535)'
             WHEN 'date'			                 THEN 'varchar(10)'
             WHEN 'timestamp with time zone'		 THEN 'varchar(25)'
             WHEN 'timestamp without time zone'	 THEN 'varchar(19)'
@@ -80,7 +82,7 @@ SELECT * FROM (
             CASE
                 WHEN data_type IN ( 'smallint', 'integer') THEN '["null", "int"]'
                 WHEN data_type IN ( 'bigint' ) THEN '["null", "long"]'
-                WHEN data_type IN ( '"char"', 'character varying', 'text' ) THEN '["null", "string"]'
+                WHEN data_type IN ( '"char"', 'character varying', 'text', 'json', 'jsonb' ) THEN '["null", "string"]'
                 WHEN data_type IN ( 'real', 'double precision' ) THEN '["null", "double"]'
                 WHEN data_type IN ( 'date', 'timestamp with time zone', 'timestamp without time zone', 'time without time zone' ) THEN '["null", "string"]'
                 WHEN data_type IN ( 'numeric' ) THEN '["null", {"type":"fixed", "name": "' || column_name || '", "size":' || round( COALESCE(  numeric_precision, 16 ) / 2, 0 ) || ', "logicalType": "decimal", "precision":' || COALESCE(  numeric_precision, 16 ) || ', "scale":' || COALESCE(  numeric_scale, 4 ) || '}]'
