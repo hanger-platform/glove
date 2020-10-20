@@ -29,6 +29,7 @@ GLOVE_HOME=<Glove home directory>
 GLOVE_TEMP=<Temp files directory>
 GLOVE_METADATA=<Glove metadata directory>
 GLOVE_NAMED_QUERIES=<.sql files>
+GLOVE_CLEANUP_HOUR=<Hora do dia, no formato HH que os arquivos temporários serão analisados e removidos>
   
 # Redshift
 REDSHIFT_JDBC_HOST=<Host>
