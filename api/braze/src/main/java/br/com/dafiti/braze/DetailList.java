@@ -46,7 +46,7 @@ import org.json.simple.parser.ParseException;
  * @author Helio Leal
  * @author Fernando Saga
  */
-public class ListDetail {
+public class DetailList {
 
     private final String endpointList;
     private final String endpointDetail;
@@ -59,7 +59,7 @@ public class ListDetail {
     private final int sleep;
     private final JSONObject credentials;
 
-    public ListDetail(
+    public DetailList(
             String endpointList,
             String endpointDetail,
             String output,

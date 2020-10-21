@@ -57,7 +57,7 @@ public class Braze {
             mitt.getConfiguration()
                     .addParameter("c", "credentials", "Credentials file", "", true, false)
                     .addParameter("o", "output", "Output file", "", true, false)
-                    .addParameter("t", "type", "Extract type", "", true, false)
+                    .addParameter("t", "type", "Extract type. Options: detail_list and detail", "", true, false)
                     .addParameter("s", "service", "Identifies the service name", "", true, false)
                     .addParameter("el", "endpoint_list", "(Optional) Identifies the endpoint that contains a list to extract data from", "")
                     .addParameter("ed", "endpoint_detail", "Identifies the endpoint that contains the details of each list item", "", true, false)
@@ -76,8 +76,8 @@ public class Braze {
 
             //Identifies the approprieted report to extract.
             switch (cli.getParameter("type").toLowerCase()) {
-                case "listdetail":
-                    new ListDetail(cli.getParameter("endpoint_list"),
+                case "detail_list":
+                    new DetailList(cli.getParameter("endpoint_list"),
                             cli.getParameter("endpoint_detail"),
                             cli.getParameter("output"),
                             cli.getParameter("service"),
