@@ -59,8 +59,8 @@ public class Braze {
                     .addParameter("o", "output", "Output file", "", true, false)
                     .addParameter("t", "type", "Extract type", "", true, false)
                     .addParameter("s", "service", "Identifies the service name", "", true, false)
-                    .addParameter("el", "endpoint_list", "Identifies the endpoint that contains a list to extract data from", "")
-                    .addParameter("ed", "endpoint_detail", "Identifies the endpoint that contains the details of each list item", "")
+                    .addParameter("el", "endpoint_list", "(Optional) Identifies the endpoint that contains a list to extract data from", "")
+                    .addParameter("ed", "endpoint_detail", "Identifies the endpoint that contains the details of each list item", "", true, false)
                     .addParameter("f", "field", "Fields to be extracted from the file", "", true, false)
                     .addParameter("d", "delimiter", "(Optional) File delimiter; ';' as default", ";")
                     .addParameter("sl", "sleep", "(Optional) Sleep time in seconds at one request and another; 0 is default", "0")
@@ -88,7 +88,7 @@ public class Braze {
                             cli.getParameterAsInteger("sleep"),
                             credentials).extract();
                     break;
-                    
+
                 case "detail":
                     new Detail(cli.getParameter("endpoint_detail"),
                             cli.getParameter("output"),
@@ -100,7 +100,7 @@ public class Braze {
                             cli.getParameterAsInteger("sleep"),
                             credentials).extract();
                     break;
-                    
+
                 default:
                     Logger.getLogger(Braze.class.getName()).log(Level.SEVERE, "GLOVE - Service {0} not yet implemented", cli.getParameter("service"));
             }

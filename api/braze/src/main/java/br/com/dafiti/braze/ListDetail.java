@@ -43,6 +43,7 @@ import org.json.simple.parser.ParseException;
 
 /**
  *
+ * @author Helio Leal
  * @author Fernando Saga
  */
 public class ListDetail {
@@ -55,7 +56,7 @@ public class ListDetail {
     private final List key;
     private final List partition;
     private final List fields;
-    private final int sleep;    
+    private final int sleep;
     private final JSONObject credentials;
 
     public ListDetail(
@@ -133,11 +134,9 @@ public class ListDetail {
 
                         //Fetchs service list.
                         for (Object object : jsonArray) {
-                            String detail = this.endpointDetail
-                                    .replace(
-                                            "<<id>>",
-                                            String.valueOf(((JSONObject) object).get("id"))
-                                    );
+                            //Assign the id to the endpoint detail
+                            String id = (object instanceof String) ? object.toString() : String.valueOf(((JSONObject) object).get("id"));
+                            String detail = this.endpointDetail.replace("<<id>>", id);
 
                             //Connect to API.
                             HttpURLConnection connectionDetails = (HttpURLConnection) new URL(detail).openConnection();
@@ -155,12 +154,12 @@ public class ListDetail {
                                     java.util.List record = new ArrayList();
                                     JSONObject details = (JSONObject) new JSONParser().parse(line);
 
-                                    listFields.forEach((field) -> {
+                                    listFields.forEach(field -> {
                                         //Identifies if the field exists.
                                         if (details.containsKey(field)) {
                                             record.add(details.get(field));
                                         } else if ("id".equals(field)) {
-                                            record.add(String.valueOf(((JSONObject) object).get("id")));
+                                            record.add(id);
                                         } else {
                                             record.add(null);
                                         }
@@ -190,5 +189,7 @@ public class ListDetail {
                 }
             }
         }
+
+        mitt.close();
     }
 }
