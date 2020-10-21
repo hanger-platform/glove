@@ -68,7 +68,7 @@ public class ECTObjectTracking {
                     .addParameter("r", "result", "(Optional) L: All will be returned the events of the object or U: will be returned only object's last event; L as default", "L")
                     .addParameter("l", "language", "(Optional) 101: Will be returned all events in the Portuguese language 102: Will be returned all events in the English language; 101 as default", "101")
                     .addParameter("p", "partition", "(Optional)  Partition field; event_date as default", "::dateformat(event_date,dd/MM/yyyy HH:mm,yyyyMM)")
-                    .addParameter("k", "key", "(Optional) Unique key; number+event_type+event_code+event_status+event_date as default", "::concat([number,event_type,event_code,event_status,::dateformat(event_date,dd/MM/yyyy HH:mm,yyyyMMddHHmm)],|)")
+                    .addParameter("k", "key", "(Optional) Unique key; number+event_type+event_code+event_status+event_date as default", "::concat([[number,event_type,event_code,event_status,::dateformat(event_date,dd/MM/yyyy HH:mm,yyyyMMddHHmm)]],|)")
                     .addParameter("t", "thread", "(Optional) Threads; 5 as default", "5")
                     .addParameter("ch", "chunk", "(Optional) Objects to be retrieved in each thread; 1000 as default", "1000");
 

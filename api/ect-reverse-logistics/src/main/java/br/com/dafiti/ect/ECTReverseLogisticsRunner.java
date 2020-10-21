@@ -104,15 +104,19 @@ public class ECTReverseLogisticsRunner implements Runnable {
         Mitt mitt = new Mitt();
 
         //Defines output file.
-        mitt.setOutput((output.endsWith("/") ? output : (output + "/")) + "reverse_logistics_" + UUID.randomUUID() + ".csv");
+        mitt.setOutputFile((output.endsWith("/") ? output : (output + "/")) + "reverse_logistics_" + UUID.randomUUID() + ".csv");
 
         //Defines a loteProcessor holder.
         List<String> lote = new ArrayList();
 
         try {
             //Defines fields.
+            if (!partition.isEmpty()) {
+                mitt.getConfiguration()
+                        .addCustomField("partition_field", new Concat(partition));
+            }
+
             mitt.getConfiguration()
-                    .addCustomField("partition_field", new Concat(partition))
                     .addCustomField("custom_primary_key", new Concat(key))
                     .addCustomField("etl_load_date", new Now())
                     .addField("administrative_code")

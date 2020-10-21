@@ -67,7 +67,7 @@ public class ECTReverseLogistics {
                     .addParameter("o", "output", "Output path", "", true, false)
                     .addParameter("ot", "orderType", "(Optional) Order Type: L, A or C; A as default", "A")
                     .addParameter("p", "partition", "(Optional)  Partition field; history_update_date as default", "::dateformat(history_update_date,dd-MM-yyyy,yyyyMM)")
-                    .addParameter("k", "key", "(Optional) Unique key; administrative_code,order_type,order_number,history_status as default", "::concat([administrative_code,order_type,order_number,history_status],|)")
+                    .addParameter("k", "key", "(Optional) Unique key; administrative_code,order_type,order_number,history_status as default", "::concat([[administrative_code,order_type,order_number,history_status]],|)")
                     .addParameter("t", "thread", "(Optional) Threads; 5 as default", "5");
 
             //Reads the command line interface. 
