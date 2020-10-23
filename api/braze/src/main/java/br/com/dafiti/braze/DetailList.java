@@ -52,7 +52,6 @@ public class DetailList {
     private final String endpointDetail;
     private final String output;
     private final String service;
-    private final Character delimiter;
     private final List key;
     private final List partition;
     private final List fields;
@@ -64,7 +63,6 @@ public class DetailList {
             String endpointDetail,
             String output,
             String service,
-            Character delimiter,
             List key,
             List partition,
             List fields,
@@ -75,7 +73,6 @@ public class DetailList {
         this.endpointDetail = endpointDetail;
         this.output = output;
         this.service = service;
-        this.delimiter = delimiter;
         this.key = key;
         this.partition = partition;
         this.fields = fields;
@@ -135,8 +132,7 @@ public class DetailList {
                         //Fetchs service list.
                         for (Object object : jsonArray) {
                             //Assign the id to the endpoint detail
-                            String id = (object instanceof String) ? object.toString() : String.valueOf(((JSONObject) object).get("id"));
-                            String detail = this.endpointDetail.replace("<<id>>", id);
+                            String detail = this.endpointDetail.replace("<<id>>", String.valueOf(((JSONObject) object).get("id")));
 
                             //Connect to API.
                             HttpURLConnection connectionDetails = (HttpURLConnection) new URL(detail).openConnection();
@@ -159,7 +155,7 @@ public class DetailList {
                                         if (details.containsKey(field)) {
                                             record.add(details.get(field));
                                         } else if ("id".equals(field)) {
-                                            record.add(id);
+                                            record.add(String.valueOf(((JSONObject) object).get("id")));
                                         } else {
                                             record.add(null);
                                         }

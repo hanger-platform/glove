@@ -50,7 +50,6 @@ public class Detail {
     private final String endpointDetail;
     private final String output;
     private final String service;
-    private final Character delimiter;
     private final List key;
     private final List partition;
     private final List fields;
@@ -61,7 +60,6 @@ public class Detail {
             String endpointDetail,
             String output,
             String service,
-            Character delimiter,
             List key,
             List partition,
             List fields,
@@ -71,7 +69,6 @@ public class Detail {
         this.endpointDetail = endpointDetail;
         this.output = output;
         this.service = service;
-        this.delimiter = delimiter;
         this.key = key;
         this.partition = partition;
         this.fields = fields;

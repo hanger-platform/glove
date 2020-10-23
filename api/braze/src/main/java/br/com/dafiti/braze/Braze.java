@@ -62,7 +62,6 @@ public class Braze {
                     .addParameter("el", "endpoint_list", "(Optional) Identifies the endpoint that contains a list to extract data from", "")
                     .addParameter("ed", "endpoint_detail", "Identifies the endpoint that contains the details of each list item", "", true, false)
                     .addParameter("f", "field", "Fields to be extracted from the file", "", true, false)
-                    .addParameter("d", "delimiter", "(Optional) File delimiter; ';' as default", ";")
                     .addParameter("sl", "sleep", "(Optional) Sleep time in seconds at one request and another; 0 is default", "0")
                     .addParameter("p", "partition", "(Optional)  Partition, divided by + if has more than one field")
                     .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "");
@@ -81,7 +80,6 @@ public class Braze {
                             cli.getParameter("endpoint_detail"),
                             cli.getParameter("output"),
                             cli.getParameter("service"),
-                            cli.getParameter("delimiter").charAt(0),
                             cli.getParameterAsList("key", "\\+"),
                             cli.getParameterAsList("partition", "\\+"),
                             cli.getParameterAsList("field", "\\+"),
@@ -93,7 +91,6 @@ public class Braze {
                     new Detail(cli.getParameter("endpoint_detail"),
                             cli.getParameter("output"),
                             cli.getParameter("service"),
-                            cli.getParameter("delimiter").charAt(0),
                             cli.getParameterAsList("key", "\\+"),
                             cli.getParameterAsList("partition", "\\+"),
                             cli.getParameterAsList("field", "\\+"),
