@@ -719,7 +719,7 @@
       <script>if [ -d "${GLOVE_METADATA}" ]; then
 	echo "Metadata directory at ${GLOVE_METADATA} : )"	
 else
-	echo "Metadata directory not exists, create folder ${GLOVE_METADATA} or check if your File System service is on :/"	
+	echo "Metadata directory does not exists, create folder ${GLOVE_METADATA} or check if your File System service is on :/"	
 	exit 1
 fi</script>
       <loglevel>Basic</loglevel>
