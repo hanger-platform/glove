@@ -57,7 +57,7 @@ public class Braze {
             mitt.getConfiguration()
                     .addParameter("c", "credentials", "Credentials file", "", true, false)
                     .addParameter("o", "output", "Output file", "", true, false)
-                    .addParameter("t", "type", "Extract type. Options: detail_list and detail", "", true, false)
+                    .addParameter("t", "type", "(Optional) Extract type. Options: detail_list and detail; detail_list is default.", "detail_list")
                     .addParameter("s", "service", "Identifies the service name", "", true, false)
                     .addParameter("el", "endpoint_list", "(Optional) Identifies the endpoint that contains a list to extract data from", "")
                     .addParameter("ed", "endpoint_detail", "Identifies the endpoint that contains the details of each list item", "", true, false)
@@ -76,15 +76,22 @@ public class Braze {
             //Identifies the approprieted report to extract.
             switch (cli.getParameter("type").toLowerCase()) {
                 case "detail_list":
-                    new DetailList(cli.getParameter("endpoint_list"),
-                            cli.getParameter("endpoint_detail"),
-                            cli.getParameter("output"),
-                            cli.getParameter("service"),
-                            cli.getParameterAsList("key", "\\+"),
-                            cli.getParameterAsList("partition", "\\+"),
-                            cli.getParameterAsList("field", "\\+"),
-                            cli.getParameterAsInteger("sleep"),
-                            credentials).extract();
+                    if ((cli.getParameter("endpoint_list") != null) && (!cli.getParameter("endpoint_list").isEmpty())) {
+                        new DetailList(cli.getParameter("endpoint_list"),
+                                cli.getParameter("endpoint_detail"),
+                                cli.getParameter("output"),
+                                cli.getParameter("service"),
+                                cli.getParameterAsList("key", "\\+"),
+                                cli.getParameterAsList("partition", "\\+"),
+                                cli.getParameterAsList("field", "\\+"),
+                                cli.getParameterAsInteger("sleep"),
+                                credentials).extract();
+                    } else {
+                        Logger.getLogger(Braze.class.getName()).log(
+                                Level.SEVERE, "GLOVE - endpoint_list is empty. For type List, it is necessary to define the endpoint_list."
+                        );
+                    }
+
                     break;
 
                 case "detail":
