@@ -953,7 +953,7 @@ UUID == ${UUID}
       <variablename>${DEBUG}</variablename>
       <fieldtype>number</fieldtype>
       <mask />
-      <comparevalue>1</comparevalue>
+      <comparevalue>0</comparevalue>
       <minvalue />
       <maxvalue />
       <successcondition>equal</successcondition>
