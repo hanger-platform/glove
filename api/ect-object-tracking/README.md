@@ -48,5 +48,26 @@ java -jar ect-object-tracking.jar  \
 	--chunk=<(Optional) Objects to be retrieved in each thread; 1000 as default>
 ```
 
+## Metadata
+
+A api sempre retorna um arquivo csv contendo os seguintes campos:
+
+| Field | Description |
+|--|--|
+| partition_field | Campo interno |
+| custom_primary_key | Campo interno |
+| etl_load_date | Data de geração dos dados |
+| number | Número do objeto |
+| event_type | Tipo do evento de retorno |
+| event_code | CEP da unidade ECT |
+| event_status | Status do evento de retorno |
+| event_description | Descrição do evento |
+| event_date | Data e hora do evento |
+| initials | Sigla do objeto solicitado |
+| name | Nome do objeto solicitado |
+| event_city | Cidade onde ocorreu o evento |
+| event_place | Local onde ocorreu o evento |
+| event_state | Unidade da Federação |
+
 ## Contributing, Bugs, Questions
 Contributions are more than welcome! If you want to propose new changes, fix bugs or improve something feel free to fork the repository and send us a Pull Request. You can also open new `Issues` for reporting bugs and general problems.

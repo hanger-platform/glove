@@ -38,7 +38,7 @@ Utilizando o [Maven](https://maven.apache.org/):
 ```bash
 java -jar ect-reverse-logistics.jar  \
 	--credentials=<Credentials file>  \
-	--authorization=<Post authorization numbers divided by + or in a file> \
+	--authorization=<Post authorization numbers divided by + or in a file (should by prefixed with file: and have an object per line)> \
 	--output=<Output path> \
 	--searchType=<(Optional) Search Type: H or U; H as default> \
 	--orderType=<(Optional) Order Type: L, A or C; A as default> \
