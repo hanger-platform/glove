@@ -83,7 +83,8 @@ public class AdSets {
      */
     void extract() throws DuplicateEntityException, APIException {
         //Defines a MITT instance. 
-        Mitt mitt = new Mitt(this.output);
+        Mitt mitt = new Mitt();
+        mitt.setOutputFile(this.output);
 
         //Defines fields.
         mitt.getConfiguration()
@@ -97,34 +98,7 @@ public class AdSets {
                     .addField("id")
                     .addField("campaign_id")
                     .addField("account_id")
-                    .addField("name")
-                    .addField("bid_amount")
-                    .addField("bid_strategy")
-                    .addField("billing_event")
-                    .addField("configured_status")
-                    .addField("created_time", new DateFormat("created_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"))
-                    .addField("daily_budget")
-                    .addField("daily_min_spend_target")
-                    .addField("daily_spend_cap")
-                    .addField("destination_type")
-                    .addField("effective_status")
-                    .addField("end_time")
-                    .addField("instagram_actor_id")
-                    .addField("is_dynamic_creative")
-                    .addField("lifetime_budget")
-                    .addField("lifetime_imps")
-                    .addField("lifetime_min_spend_target")
-                    .addField("lifetime_spend_cap")
-                    .addField("optimization_goal")
-                    .addField("optimization_sub_event")
-                    .addField("recurring_budget_semantics")
-                    .addField("review_feedback")
-                    .addField("rf_prediction_id")
-                    .addField("source_adset_id")
-                    .addField("start_time", new DateFormat("start_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"))
-                    .addField("status")
-                    .addField("updated_time", new DateFormat("updated_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"))
-                    .addField("use_new_app_click");
+                    .addField("name");
         } else {
             mitt.getConfiguration().addField(this.fields);
         }

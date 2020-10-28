@@ -61,7 +61,8 @@ public class FacebookAd {
                     .addParameter("e", "end_date", "End date", new SimpleDateFormat("yyyy-MM-dd").format(new Date()))
                     .addParameter("p", "partition", "Define the partition field or fields, divided by +", "")
                     .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "")
-                    .addParameter("f", "fields", "(Optional) fields of report type, divided by + if has more than one field", "");
+                    .addParameter("f", "fields", "(Optional) fields of report type, divided by + if has more than one field", "")
+                    .addParameter("z", "breakdowns", "(Optional) Breakdowns of report, divided by + if has more than one field", "");
 
             //Reads the command line interface. 
             CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -120,18 +121,8 @@ public class FacebookAd {
                             cli.getParameter("end_date"),
                             cli.getParameterAsList("key", "\\+"),
                             cli.getParameterAsList("partition", "\\+"),
-                            cli.getParameterAsList("fields", "\\+")).extract();
-                    break;
-                case "adsleads":
-                    new AdsLeads(
-                            apiContext,
-                            cli.getParameter("output"),
-                            cli.getParameterAsList("account", "\\+"),
-                            cli.getParameter("start_date"),
-                            cli.getParameter("end_date"),
-                            cli.getParameterAsList("key", "\\+"),
-                            cli.getParameterAsList("partition", "\\+"),
-                            cli.getParameterAsList("fields", "\\+")).extract();
+                            cli.getParameterAsList("fields", "\\+"),
+                            cli.getParameterAsList("breakdowns", "\\+")).extract();
                     break;
                 default:
                     Logger.getLogger(FacebookAd.class.getName()).log(Level.SEVERE, "Extractor {0} not yet implemented", cli.getParameter("report"));

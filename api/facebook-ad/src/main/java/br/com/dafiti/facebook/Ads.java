@@ -84,7 +84,8 @@ public class Ads {
      */
     void extract() throws DuplicateEntityException, APIException {
         //Defines a MITT instance. 
-        Mitt mitt = new Mitt(this.output);
+        Mitt mitt = new Mitt();
+        mitt.setOutputFile(this.output);
 
         //Defines fields.
         mitt.getConfiguration()

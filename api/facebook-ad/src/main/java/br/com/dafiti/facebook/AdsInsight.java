@@ -57,6 +57,7 @@ public class AdsInsight {
     private final List key;
     private final List partition;
     private final List fields;
+    private final List breakdowns;
 
     public AdsInsight(
             APIContext apiContext,
@@ -66,7 +67,8 @@ public class AdsInsight {
             String endDate,
             List key,
             List partition,
-            List fields) {
+            List fields,
+            List breakdowns) {
 
         this.apiContext = apiContext;
         this.adAccount = adAccount;
@@ -76,6 +78,7 @@ public class AdsInsight {
         this.key = key;
         this.partition = partition;
         this.fields = fields;
+        this.breakdowns = breakdowns;
     }
 
     /**
@@ -83,7 +86,8 @@ public class AdsInsight {
      */
     void extract() throws DuplicateEntityException, APIException {
         //Defines a MITT instance. 
-        Mitt mitt = new Mitt(this.output);
+        Mitt mitt = new Mitt();
+        mitt.setOutputFile(this.output);
 
         //Defines fields.
         mitt.getConfiguration()
@@ -98,72 +102,7 @@ public class AdsInsight {
                     .addField("campaign_id")
                     .addField("adset_id")
                     .addField("ad_id")
-                    .addField("ad_bid_type")
-                    .addField("ad_bid_value")
-                    .addField("ad_delivery")
-                    .addField("ad_name")
-                    .addField("adset_bid_type")
-                    .addField("adset_bid_value")
-                    .addField("adset_budget_type")
-                    .addField("adset_budget_value")
-                    .addField("adset_delivery")
-                    .addField("adset_end")
-                    .addField("adset_name")
-                    .addField("adset_start")
-                    .addField("auction_bid")
-                    .addField("auction_competitiveness")
-                    .addField("auction_max_competitor_bid")
-                    .addField("buying_type")
-                    .addField("campaign_name")
-                    .addField("canvas_avg_view_percent")
-                    .addField("canvas_avg_view_time")
-                    .addField("clicks")
-                    .addField("cost_per_estimated_ad_recallers")
-                    .addField("cost_per_inline_post_engagement")
-                    .addField("cost_per_unique_click")
-                    .addField("cost_per_unique_inline_link_click")
-                    .addField("cpc")
-                    .addField("cpm")
-                    .addField("cpp")
-                    .addField("created_time")
-                    .addField("ctr")
-                    .addField("date_start")
-                    .addField("date_stop")
-                    .addField("estimated_ad_recall_rate")
-                    .addField("estimated_ad_recall_rate_lower_bound")
-                    .addField("estimated_ad_recall_rate_upper_bound")
-                    .addField("estimated_ad_recallers")
-                    .addField("estimated_ad_recallers_lower_bound")
-                    .addField("estimated_ad_recallers_upper_bound")
-                    .addField("frequency")
-                    .addField("gender_targeting")
-                    .addField("impressions")
-                    .addField("inline_link_click_ctr")
-                    .addField("inline_link_clicks")
-                    .addField("inline_post_engagement")
-                    .addField("instant_experience_clicks_to_open")
-                    .addField("instant_experience_clicks_to_start")
-                    .addField("instant_experience_outbound_clicks")
-                    .addField("labels")
-                    .addField("location")
-                    .addField("objective")
-                    .addField("place_page_name")
-                    .addField("quality_score_ectr")
-                    .addField("quality_score_ecvr")
-                    .addField("quality_score_enfbr")
-                    .addField("quality_score_organic")
-                    .addField("reach")
-                    .addField("social_spend")
-                    .addField("spend")
-                    .addField("unique_clicks")
-                    .addField("unique_ctr")
-                    .addField("unique_inline_link_click_ctr")
-                    .addField("unique_inline_link_clicks")
-                    .addField("unique_link_clicks_ctr")
-                    .addField("updated_time")
-                    .addField("actions")
-                    .addField("action_values")
-                    .addField("video_avg_time_watched_actions");
+                    .addField("ad_name");
         } else {
             mitt.getConfiguration().addField(this.fields);
         }
@@ -201,9 +140,16 @@ public class AdsInsight {
                         )
                 );
 
+                //Identifies if report has breakdowns.
+                if (!this.breakdowns.isEmpty()) {
+                    adInsightsRequest.setBreakdowns(String.join(",", this.breakdowns));
+                }
+
                 //Define fields to be requested.
                 fields.forEach((field) -> {
-                    adInsightsRequest.requestField(field);
+                    if (!this.breakdowns.contains(field)) {
+                        adInsightsRequest.requestField(field);
+                    }
                 });
 
                 //Request campaign fields.

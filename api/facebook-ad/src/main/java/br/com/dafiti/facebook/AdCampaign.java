@@ -81,7 +81,8 @@ public class AdCampaign {
      */
     void extract() throws DuplicateEntityException, APIException {
         //Defines a MITT instance. 
-        Mitt mitt = new Mitt(this.output);
+        Mitt mitt = new Mitt();
+        mitt.setOutputFile(this.output);
 
         //Defines fields.
         mitt.getConfiguration()
@@ -94,28 +95,7 @@ public class AdCampaign {
             mitt.getConfiguration()
                     .addField("id")
                     .addField("account_id")
-                    .addField("bid_strategy")
-                    .addField("boosted_object_id")
-                    .addField("budget_rebalance_flag")
-                    .addField("budget_remaining")
-                    .addField("buying_type")
-                    .addField("can_create_brand_lift_study")
-                    .addField("can_use_spend_cap")
-                    .addField("configured_status")
-                    .addField("created_time", new DateFormat("created_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"))
-                    .addField("daily_budget")
-                    .addField("effective_status")
-                    .addField("last_budget_toggling_time", new DateFormat("last_budget_toggling_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"))
-                    .addField("lifetime_budget")
-                    .addField("name")
-                    .addField("objective")
-                    .addField("source_campaign_id")
-                    .addField("spend_cap")
-                    .addField("start_time", new DateFormat("start_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"))
-                    .addField("status")
-                    .addField("stop_time", new DateFormat("stop_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"))
-                    .addField("topline_id")
-                    .addField("updated_time", new DateFormat("updated_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"));
+                    .addField("name");
         } else {
             mitt.getConfiguration().addField(this.fields);
         }
