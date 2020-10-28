@@ -37,7 +37,7 @@ Utilizando o [Maven](https://maven.apache.org/):
 ```bash
 java -jar ect-object-tracking.jar  \
 	--credentials=<Credentials file>  \
-	--object=<Post authorization numbers divided by + or in a file> \
+	--object=<Post authorization numbers divided by + or in a file (should by prefixed with file: and have an object per line)> \
 	--output=<Output path> \
 	--type=<(Optional) L: list of objects. O server will make the query individual of each informed identifier or F: range of objects; L as default> \
 	--result=<(Optional) L: All will be returned the events of the object or U: will be returned only object's last event; L as default> \
