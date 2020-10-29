@@ -44,8 +44,10 @@ import org.json.simple.parser.ParseException;
  */
 public class FacebookAd {
 
+    private static final Logger LOG = Logger.getLogger(FacebookAd.class.getName());
+
     public static void main(String[] args) {
-        Logger.getLogger(FacebookAd.class.getName()).info("GLOVE - Facebook Ad Extractor started");
+        LOG.info("GLOVE - Facebook Ad Extractor started");
 
         //Define the mitt.
         Mitt mitt = new Mitt();
@@ -59,8 +61,8 @@ public class FacebookAd {
                     .addParameter("r", "report", "Identifies the report to extract", "", true, false)
                     .addParameter("s", "start_date", "Start date", new SimpleDateFormat("yyyy-MM-dd").format(new Date()))
                     .addParameter("e", "end_date", "End date", new SimpleDateFormat("yyyy-MM-dd").format(new Date()))
-                    .addParameter("a", "attributes", "Facebook Report fields, divided by + if has more than one field", "", true, false)
                     .addParameter("p", "partition", "Define the partition field or fields, divided by +", "")
+                    .addParameter("a", "attributes", "(Optional) Facebook Report fields, divided by + if has more than one field", "")
                     .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "")
                     .addParameter("f", "fields", "(Optional) Output fields, divided by + if has more than one field", "")
                     .addParameter("z", "breakdowns", "(Optional) Breakdowns of report, divided by + if has more than one field", "");
@@ -89,7 +91,8 @@ public class FacebookAd {
                             cli.getParameter("end_date"),
                             cli.getParameterAsList("key", "\\+"),
                             cli.getParameterAsList("partition", "\\+"),
-                            cli.getParameterAsList("fields", "\\+")).extract();
+                            cli.getParameterAsList("fields", "\\+"),
+                            cli.getParameterAsList("attributes", "\\+")).extract();
                     break;
                 case "adsets":
                     new AdSets(
@@ -100,7 +103,8 @@ public class FacebookAd {
                             cli.getParameter("end_date"),
                             cli.getParameterAsList("key", "\\+"),
                             cli.getParameterAsList("partition", "\\+"),
-                            cli.getParameterAsList("fields", "\\+")).extract();
+                            cli.getParameterAsList("fields", "\\+"),
+                            cli.getParameterAsList("attributes", "\\+")).extract();
                     break;
                 case "ads":
                     new Ads(
@@ -111,7 +115,8 @@ public class FacebookAd {
                             cli.getParameter("end_date"),
                             cli.getParameterAsList("key", "\\+"),
                             cli.getParameterAsList("partition", "\\+"),
-                            cli.getParameterAsList("fields", "\\+")).extract();
+                            cli.getParameterAsList("fields", "\\+"),
+                            cli.getParameterAsList("attributes", "\\+")).extract();
                     break;
                 case "adsinsights":
                     new AdsInsight(
@@ -127,19 +132,19 @@ public class FacebookAd {
                             cli.getParameterAsList("attributes", "\\+")).extract();
                     break;
                 default:
-                    Logger.getLogger(FacebookAd.class.getName()).log(Level.SEVERE, "Extractor {0} not yet implemented", cli.getParameter("report"));
+                    LOG.log(Level.SEVERE, "Extractor {0} not yet implemented", cli.getParameter("report"));
             }
         } catch (DuplicateEntityException
                 | IOException
                 | ParseException
                 | APIException ex) {
 
-            Logger.getLogger(FacebookAd.class.getName()).log(Level.SEVERE, "GLOVE - Facebook Ad Export fail: ", ex);
+            LOG.log(Level.SEVERE, "GLOVE - Facebook Ad Export fail: ", ex);
             System.exit(1);
         } finally {
             mitt.close();
         }
 
-        Logger.getLogger(FacebookAd.class.getName()).info("GLOVE - Facebook Ad Extractor finalized");
+        LOG.info("GLOVE - Facebook Ad Extractor finalized");
     }
 }

@@ -60,6 +60,8 @@ public class AdsInsight {
     private final List<String> breakdowns;
     private final List<String> attributes;
 
+    private static final Logger LOG = Logger.getLogger(AdsInsight.class.getName());
+
     public AdsInsight(
             APIContext apiContext,
             String output,
@@ -122,11 +124,11 @@ public class AdsInsight {
         }
 
         //Identifies original fields.
-        List<String> fields = mitt.getConfiguration().getOriginalFieldsName();
+        List<String> originalFields = mitt.getConfiguration().getOriginalFieldsName();
 
         //Iterates for each account.
         for (String account : this.adAccount) {
-            Logger.getLogger(AdsInsight.class.getName()).log(Level.INFO, "Retrieving Campaing from account {0}", account);
+            LOG.log(Level.INFO, "Retrieving campaing from account {0}", account);
 
             AdAccount adAccount = new AdAccount(account, this.apiContext);
             APIRequestGetCampaigns campaignRequest = adAccount.getCampaigns();
@@ -140,7 +142,7 @@ public class AdsInsight {
             campaigns = campaigns.withAutoPaginationIterator(true);
 
             for (Campaign campaign : campaigns) {
-                Logger.getLogger(AdsInsight.class.getName()).log(Level.INFO, "Retrieving AdsInsights from campaign {0}", campaign.getFieldName());
+                LOG.log(Level.INFO, "Retrieving AdsInsights from campaign {0}", new Object[]{campaign.getFieldName()});
 
                 APIRequestGetInsights adInsightsRequest = campaign.getInsights();
 
@@ -175,7 +177,7 @@ public class AdsInsight {
                 for (AdsInsights adsInsight : adsInsights) {
                     List record = new ArrayList();
 
-                    fields.forEach((field) -> {
+                    originalFields.forEach((field) -> {
                         JsonObject jsonObject = adsInsight.getRawResponseAsJsonObject();
 
                         //Identifies if the field exists. 

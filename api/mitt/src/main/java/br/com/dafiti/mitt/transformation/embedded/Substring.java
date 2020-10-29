@@ -29,18 +29,24 @@ import java.util.List;
 
 /**
  *
- * @author Fernando Saga
+ * @author Valdiney V GOMES
  */
-public class Replace implements Transformable {
+public class Substring implements Transformable {
 
     private final String field;
-    private final String from;
-    private final String to;
+    private final String begin;
+    private final String length;
 
-    public Replace(String field, String from, String to) {
+    public Substring(String field, String length) {
         this.field = field;
-        this.from = from;
-        this.to = to;
+        this.begin = "00";
+        this.length = length;
+    }
+
+    public Substring(String field, String begin, String length) {
+        this.field = field;
+        this.begin = begin;
+        this.length = length;
     }
 
     @Override
@@ -52,6 +58,10 @@ public class Replace implements Transformable {
             Parser parser,
             List<Object> record) {
 
-        return ((String) parser.evaluate(record, field)).replaceAll(from, to);
+        return ((String) parser.evaluate(record, field))
+                .substring(
+                        Integer.valueOf(begin),
+                        Integer.valueOf(length)
+                );
     }
 }
