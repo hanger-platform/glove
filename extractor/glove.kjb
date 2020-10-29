@@ -719,7 +719,7 @@
       <script>if [ -d "${GLOVE_METADATA}" ]; then
 	echo "Metadata directory at ${GLOVE_METADATA} : )"	
 else
-	echo "Metadata directory not exists, create folder ${GLOVE_METADATA} or check if your File System service is on :/"	
+	echo "Metadata directory does not exist, create folder ${GLOVE_METADATA} or check if your File System service is on :/"	
 	exit 1
 fi</script>
       <loglevel>Basic</loglevel>
@@ -844,7 +844,7 @@ UUID == ${UUID}
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>384</xloc>
+      <xloc>528</xloc>
       <yloc>592</yloc>
     </entry>
     <entry>
@@ -944,6 +944,28 @@ UUID == ${UUID}
       <xloc>80</xloc>
       <yloc>480</yloc>
     </entry>
+    <entry>
+      <name>Is Debug ?</name>
+      <description />
+      <type>SIMPLE_EVAL</type>
+      <valuetype>variable</valuetype>
+      <fieldname />
+      <variablename>${DEBUG}</variablename>
+      <fieldtype>number</fieldtype>
+      <mask />
+      <comparevalue>0</comparevalue>
+      <minvalue />
+      <maxvalue />
+      <successcondition>equal</successcondition>
+      <successnumbercondition>equal</successnumbercondition>
+      <successbooleancondition>false</successbooleancondition>
+      <successwhenvarset>N</successwhenvarset>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>384</xloc>
+      <yloc>592</yloc>
+    </entry>
   </entries>
   <hops>
     <hop>
@@ -980,15 +1002,6 @@ UUID == ${UUID}
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
       <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>Module selector</from>
-      <to>Delete temp</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>N</evaluation>
       <unconditional>N</unconditional>
     </hop>
     <hop>
@@ -1066,6 +1079,24 @@ UUID == ${UUID}
     <hop>
       <from>Get Parameters</from>
       <to>Process ID</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Module selector</from>
+      <to>Is Debug ?</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Is Debug ?</from>
+      <to>Delete temp</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
