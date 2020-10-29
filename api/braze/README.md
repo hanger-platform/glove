@@ -39,13 +39,13 @@ Utilizando o [Maven](https://maven.apache.org/):
 java -jar braze.jar  \
 	--credentials=<Arquivo de credenciais>  \
 	--output=<Caminho onde arquivo será salvo> \
+	--type=<Tipo de extração conforme o endpoint que será extraído. As opções são: 'detail_list' ou 'detail'> \
 	--service=<Nome do serviço a ser consumido, exemplo: campaigns> \
-	--endpoint_list=<URL que retorna a lista a ser percorrida, exemplo:'https://rest.iad-03.braze.com/campaigns/list?include_archived=true&page=<<page>>' > \
+	--endpoint_list=<(Opcional) URL que retorna a lista a ser percorrida, exemplo:'https://rest.iad-03.braze.com/campaigns/list?include_archived=true&page=<<page>>' > \
 	--endpoint_detail=<URL que retorna o detalhe de cada item da lista, exemplo:'https://rest.iad-03.braze.com/campaigns/details?campaign_id=<<id>>' > \
 	--field=<Campos que serão gerados no arquivo de saída> \
 	--partition=<(Opcional) Partição, dividos por + quando for mais de um> \	
 	--key=<(Opcional) Chave única, dividos por + quando for mais de um> \
-	--delimiter=<(Opcional) Delimitador. ';' é o padrão> \
 	--sleep=<(Opcional) Tempo de espera entre uma chamada de outra. '0' é o padrão> \
 ```
 
