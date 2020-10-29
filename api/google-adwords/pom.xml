@@ -10,7 +10,7 @@
         <dependency>
             <groupId>com.google.api-ads</groupId>
             <artifactId>adwords-axis</artifactId>
-            <version>4.9.1</version>
+            <version>4.11.0</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -26,11 +26,11 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>mitt</artifactId>
-            <version>1.0.1</version>
+            <version>1.0.2</version>
         </dependency>
     </dependencies>
     
-        <build>
+    <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
