@@ -107,11 +107,18 @@ public class AdsInsight {
             this.attributes.add("campaign_name");
         }
 
+        //Defines the output fields.
+        mitt.getConfiguration().addField(this.attributes);
+
+        if (!this.breakdowns.isEmpty()) {
+            mitt.getConfiguration().addField(this.breakdowns);
+        }
+
         //Identifies if fields parameter was filled.
-        if (this.fields.isEmpty()) {
-            mitt.getConfiguration().addField(this.attributes);
-        } else {
-            mitt.getConfiguration().addField(this.fields);
+        if (!this.fields.isEmpty()) {
+            for (String field : this.fields) {
+                mitt.getConfiguration().addCustomField(field);
+            }
         }
 
         //Identifies original fields.
@@ -168,12 +175,12 @@ public class AdsInsight {
                 for (AdsInsights adsInsight : adsInsights) {
                     List record = new ArrayList();
 
-                    this.attributes.forEach((attribute) -> {
+                    fields.forEach((field) -> {
                         JsonObject jsonObject = adsInsight.getRawResponseAsJsonObject();
 
                         //Identifies if the field exists. 
-                        if (jsonObject.has(attribute)) {
-                            JsonElement jsonElement = jsonObject.get(attribute);
+                        if (jsonObject.has(field)) {
+                            JsonElement jsonElement = jsonObject.get(field);
 
                             //Identifies if the fiels is a primitive.
                             if (jsonElement.isJsonPrimitive()) {

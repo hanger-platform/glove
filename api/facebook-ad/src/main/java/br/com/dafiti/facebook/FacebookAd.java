@@ -122,9 +122,9 @@ public class FacebookAd {
                             cli.getParameter("end_date"),
                             cli.getParameterAsList("key", "\\+"),
                             cli.getParameterAsList("partition", "\\+"),
-                            cli.getParameterAsList("attributes", "\\+"),
                             cli.getParameterAsList("fields", "\\+"),
-                            cli.getParameterAsList("breakdowns", "\\+")).extract();
+                            cli.getParameterAsList("breakdowns", "\\+"),
+                            cli.getParameterAsList("attributes", "\\+")).extract();
                     break;
                 default:
                     Logger.getLogger(FacebookAd.class.getName()).log(Level.SEVERE, "Extractor {0} not yet implemented", cli.getParameter("report"));
