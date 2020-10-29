@@ -23,10 +23,6 @@
  */
 package br.com.dafiti.google.adwords;
 
-/**
- *
- * @author Valdiney V GOMES
- */
 import br.com.dafiti.mitt.Mitt;
 import br.com.dafiti.mitt.cli.CommandLineInterface;
 import br.com.dafiti.mitt.exception.DuplicateEntityException;
@@ -79,6 +75,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ *
+ * @author Valdiney V GOMES
+ */
 public class GoogleAdwords {
 
     public static void main(String[] args) {
