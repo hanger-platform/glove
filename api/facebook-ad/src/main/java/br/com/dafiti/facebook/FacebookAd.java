@@ -59,9 +59,10 @@ public class FacebookAd {
                     .addParameter("r", "report", "Identifies the report to extract", "", true, false)
                     .addParameter("s", "start_date", "Start date", new SimpleDateFormat("yyyy-MM-dd").format(new Date()))
                     .addParameter("e", "end_date", "End date", new SimpleDateFormat("yyyy-MM-dd").format(new Date()))
+                    .addParameter("a", "attributes", "Facebook Report fields, divided by + if has more than one field", "", true, false)
                     .addParameter("p", "partition", "Define the partition field or fields, divided by +", "")
                     .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "")
-                    .addParameter("f", "fields", "(Optional) fields of report type, divided by + if has more than one field", "")
+                    .addParameter("f", "fields", "(Optional) Output fields, divided by + if has more than one field", "")
                     .addParameter("z", "breakdowns", "(Optional) Breakdowns of report, divided by + if has more than one field", "");
 
             //Reads the command line interface. 
@@ -121,6 +122,7 @@ public class FacebookAd {
                             cli.getParameter("end_date"),
                             cli.getParameterAsList("key", "\\+"),
                             cli.getParameterAsList("partition", "\\+"),
+                            cli.getParameterAsList("attributes", "\\+"),
                             cli.getParameterAsList("fields", "\\+"),
                             cli.getParameterAsList("breakdowns", "\\+")).extract();
                     break;

@@ -56,8 +56,9 @@ public class AdsInsight {
     private final String endDate;
     private final List key;
     private final List partition;
-    private final List fields;
-    private final List breakdowns;
+    private final List<String> fields;
+    private final List<String> breakdowns;
+    private final List<String> attributes;
 
     public AdsInsight(
             APIContext apiContext,
@@ -68,7 +69,8 @@ public class AdsInsight {
             List key,
             List partition,
             List fields,
-            List breakdowns) {
+            List breakdowns,
+            List attibutes) {
 
         this.apiContext = apiContext;
         this.adAccount = adAccount;
@@ -79,6 +81,7 @@ public class AdsInsight {
         this.partition = partition;
         this.fields = fields;
         this.breakdowns = breakdowns;
+        this.attributes = attibutes;
     }
 
     /**
@@ -95,14 +98,18 @@ public class AdsInsight {
                 .addCustomField("custom_primary_key", new Concat(this.key))
                 .addCustomField("etl_load_date", new Now());
 
+        //Defines the default report attributes
+        if (this.attributes.isEmpty()) {
+            this.attributes.add("account_id");
+            this.attributes.add("campaign_id");
+            this.attributes.add("adset_id");
+            this.attributes.add("ad_id");
+            this.attributes.add("campaign_name");
+        }
+
         //Identifies if fields parameter was filled.
         if (this.fields.isEmpty()) {
-            mitt.getConfiguration()
-                    .addField("account_id")
-                    .addField("campaign_id")
-                    .addField("adset_id")
-                    .addField("ad_id")
-                    .addField("ad_name");
+            mitt.getConfiguration().addField(this.attributes);
         } else {
             mitt.getConfiguration().addField(this.fields);
         }
@@ -145,10 +152,10 @@ public class AdsInsight {
                     adInsightsRequest.setBreakdowns(String.join(",", this.breakdowns));
                 }
 
-                //Define fields to be requested.
-                fields.forEach((field) -> {
-                    if (!this.breakdowns.contains(field)) {
-                        adInsightsRequest.requestField(field);
+                //Define report attributes to be requested.
+                this.attributes.forEach((attribute) -> {
+                    if (!this.breakdowns.contains(attribute)) {
+                        adInsightsRequest.requestField(attribute);
                     }
                 });
 
@@ -161,12 +168,12 @@ public class AdsInsight {
                 for (AdsInsights adsInsight : adsInsights) {
                     List record = new ArrayList();
 
-                    fields.forEach((field) -> {
+                    this.attributes.forEach((attribute) -> {
                         JsonObject jsonObject = adsInsight.getRawResponseAsJsonObject();
 
                         //Identifies if the field exists. 
-                        if (jsonObject.has(field)) {
-                            JsonElement jsonElement = jsonObject.get(field);
+                        if (jsonObject.has(attribute)) {
+                            JsonElement jsonElement = jsonObject.get(attribute);
 
                             //Identifies if the fiels is a primitive.
                             if (jsonElement.isJsonPrimitive()) {
