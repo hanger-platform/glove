@@ -57,7 +57,10 @@ public class Ads {
     private final String endDate;
     private final List key;
     private final List partition;
-    private final List fields;
+    private final List<String> fields;
+    private final List<String> attributes;
+
+    private static final Logger LOG = Logger.getLogger(Ads.class.getName());
 
     public Ads(
             APIContext apiContext,
@@ -67,7 +70,8 @@ public class Ads {
             String endDate,
             List key,
             List partition,
-            List fields) {
+            List fields,
+            List attibutes) {
 
         this.apiContext = apiContext;
         this.adAccount = adAccount;
@@ -77,6 +81,7 @@ public class Ads {
         this.key = key;
         this.partition = partition;
         this.fields = fields;
+        this.attributes = attibutes;
     }
 
     /**
@@ -84,7 +89,8 @@ public class Ads {
      */
     void extract() throws DuplicateEntityException, APIException {
         //Defines a MITT instance. 
-        Mitt mitt = new Mitt(this.output);
+        Mitt mitt = new Mitt();
+        mitt.setOutputFile(this.output);
 
         //Defines fields.
         mitt.getConfiguration()
@@ -92,39 +98,31 @@ public class Ads {
                 .addCustomField("custom_primary_key", new Concat(this.key))
                 .addCustomField("etl_load_date", new Now());
 
+        //Defines the default report attributes
+        if (this.attributes.isEmpty()) {
+            this.attributes.add("account_id");
+            this.attributes.add("campaign_id");
+            this.attributes.add("adset_id");
+            this.attributes.add("id");
+            this.attributes.add("name");
+        }
+
+        //Defines the output fields.
+        mitt.getConfiguration().addField(this.attributes);
+
         //Identifies if fields parameter was filled.
-        if (this.fields.isEmpty()) {
-            mitt.getConfiguration()
-                    .addField("id")
-                    .addField("adset_id")
-                    .addField("campaign_id")
-                    .addField("account_id")
-                    .addField("bid_amount")
-                    .addField("bid_type")
-                    .addField("configured_status")
-                    .addField("created_time", new DateFormat("created_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"))
-                    .addField("demolink_hash")
-                    .addField("display_sequence")
-                    .addField("effective_status")
-                    .addField("engagement_audience")
-                    .addField("is_autobid")
-                    .addField("last_updated_by_app_id")
-                    .addField("name")
-                    .addField("preview_shareable_link")
-                    .addField("priority")
-                    .addField("source_ad_id")
-                    .addField("status")
-                    .addField("updated_time", new DateFormat("updated_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"));
-        } else {
-            mitt.getConfiguration().addField(this.fields);
+        if (!this.fields.isEmpty()) {
+            for (String field : this.fields) {
+                mitt.getConfiguration().addCustomField(field);
+            }
         }
 
         //Identifies original fields.
-        List<String> fields = mitt.getConfiguration().getOriginalFieldsName();
+        List<String> originalFields = mitt.getConfiguration().getOriginalFieldsName();
 
         //Iterates for each account.
         for (String account : this.adAccount) {
-            Logger.getLogger(AdCampaign.class.getName()).log(Level.INFO, "Retrieving campaing from account {0}", account);
+            LOG.log(Level.INFO, "Retrieving campaing from account {0}", account);
 
             AdAccount adAccount = new AdAccount(account, this.apiContext);
             APIRequestGetCampaigns request = adAccount.getCampaigns();
@@ -139,8 +137,6 @@ public class Ads {
 
             //Reads each campaign.
             for (Campaign campaign : campaigns) {
-                Logger.getLogger(AdCampaign.class.getName()).log(Level.INFO, "Retrieving adSets from campaign {0}", campaign.getFieldName());
-
                 APINodeList<AdSet> adSets = campaign.getAdSets()
                         .requestField("name")
                         .requestField("ad").execute();
@@ -150,7 +146,7 @@ public class Ads {
 
                 //Reads each adSets.
                 for (AdSet adSet : adSets) {
-                    Logger.getLogger(AdCampaign.class.getName()).log(Level.INFO, "Retrieving ads from adSets {0}", adSet.getFieldName());
+                    LOG.log(Level.INFO, "Retrieving ads from adSets {0} of campaign {1} ", new Object[]{adSet.getFieldName(), campaign.getFieldName()});
 
                     //Defines the campaign ads edge request.
                     APIRequestGetAds adsRequest = adSet.getAds();
@@ -159,8 +155,8 @@ public class Ads {
                     adsRequest.setTimeRange("{\"since\":\"" + this.startDate + "\",\"until\":\"" + this.endDate + "\"}");
 
                     //Define fields to be requested.
-                    fields.forEach((field) -> {
-                        adsRequest.requestField(field);
+                    this.attributes.forEach((attribute) -> {
+                        adsRequest.requestField(attribute);
                     });
 
                     //Request campaign fields.
@@ -172,7 +168,7 @@ public class Ads {
                     for (Ad ad : ads) {
                         List record = new ArrayList();
 
-                        fields.forEach((field) -> {
+                        originalFields.forEach((field) -> {
                             JsonObject jsonObject = ad.getRawResponseAsJsonObject();
 
                             //Identifies if the field exists. 

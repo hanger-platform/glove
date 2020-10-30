@@ -26,7 +26,6 @@ package br.com.dafiti.facebook;
 import br.com.dafiti.mitt.Mitt;
 import br.com.dafiti.mitt.exception.DuplicateEntityException;
 import br.com.dafiti.mitt.transformation.embedded.Concat;
-import br.com.dafiti.mitt.transformation.embedded.DateFormat;
 import br.com.dafiti.mitt.transformation.embedded.Now;
 import com.facebook.ads.sdk.APIContext;
 import com.facebook.ads.sdk.APIException;
@@ -56,7 +55,10 @@ public class AdSets {
     private final String endDate;
     private final List key;
     private final List partition;
-    private final List fields;
+    private final List<String> fields;
+    private final List<String> attributes;
+
+    private static final Logger LOG = Logger.getLogger(AdSets.class.getName());
 
     public AdSets(
             APIContext apiContext,
@@ -66,7 +68,8 @@ public class AdSets {
             String endDate,
             List key,
             List partition,
-            List fields) {
+            List fields,
+            List attibutes) {
 
         this.apiContext = apiContext;
         this.adAccount = adAccount;
@@ -76,6 +79,7 @@ public class AdSets {
         this.key = key;
         this.partition = partition;
         this.fields = fields;
+        this.attributes = attibutes;
     }
 
     /**
@@ -83,7 +87,8 @@ public class AdSets {
      */
     void extract() throws DuplicateEntityException, APIException {
         //Defines a MITT instance. 
-        Mitt mitt = new Mitt(this.output);
+        Mitt mitt = new Mitt();
+        mitt.setOutputFile(this.output);
 
         //Defines fields.
         mitt.getConfiguration()
@@ -91,50 +96,30 @@ public class AdSets {
                 .addCustomField("custom_primary_key", new Concat(this.key))
                 .addCustomField("etl_load_date", new Now());
 
+        //Defines the default report attributes
+        if (this.attributes.isEmpty()) {
+            this.attributes.add("account_id");
+            this.attributes.add("campaign_id");
+            this.attributes.add("id");
+            this.attributes.add("name");
+        }
+
+        //Defines the output fields.
+        mitt.getConfiguration().addField(this.attributes);
+
         //Identifies if fields parameter was filled.
-        if (this.fields.isEmpty()) {
-            mitt.getConfiguration()
-                    .addField("id")
-                    .addField("campaign_id")
-                    .addField("account_id")
-                    .addField("name")
-                    .addField("bid_amount")
-                    .addField("bid_strategy")
-                    .addField("billing_event")
-                    .addField("configured_status")
-                    .addField("created_time", new DateFormat("created_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"))
-                    .addField("daily_budget")
-                    .addField("daily_min_spend_target")
-                    .addField("daily_spend_cap")
-                    .addField("destination_type")
-                    .addField("effective_status")
-                    .addField("end_time")
-                    .addField("instagram_actor_id")
-                    .addField("is_dynamic_creative")
-                    .addField("lifetime_budget")
-                    .addField("lifetime_imps")
-                    .addField("lifetime_min_spend_target")
-                    .addField("lifetime_spend_cap")
-                    .addField("optimization_goal")
-                    .addField("optimization_sub_event")
-                    .addField("recurring_budget_semantics")
-                    .addField("review_feedback")
-                    .addField("rf_prediction_id")
-                    .addField("source_adset_id")
-                    .addField("start_time", new DateFormat("start_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"))
-                    .addField("status")
-                    .addField("updated_time", new DateFormat("updated_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"))
-                    .addField("use_new_app_click");
-        } else {
-            mitt.getConfiguration().addField(this.fields);
+        if (!this.fields.isEmpty()) {
+            for (String field : this.fields) {
+                mitt.getConfiguration().addCustomField(field);
+            }
         }
 
         //Identifies original fields.
-        List<String> fields = mitt.getConfiguration().getOriginalFieldsName();
+        List<String> originalFields = mitt.getConfiguration().getOriginalFieldsName();
 
         //Iterates for each account.
         for (String account : this.adAccount) {
-            Logger.getLogger(AdCampaign.class.getName()).log(Level.INFO, "Retrieving campaing from account {0}", account);
+            LOG.log(Level.INFO, "Retrieving campaing from account {0}", account);
 
             AdAccount adAccount = new AdAccount(account, this.apiContext);
             APIRequestGetCampaigns campaignRequest = adAccount.getCampaigns();
@@ -149,8 +134,8 @@ public class AdSets {
             campaigns = campaigns.withAutoPaginationIterator(true);
 
             //Reads each campaign.
-            for (Campaign campaign : campaigns) {
-                Logger.getLogger(AdCampaign.class.getName()).log(Level.INFO, "Retrieving adSets from campaign {0}", campaign.getFieldName());
+            for (Campaign campaign : campaigns) {              
+                LOG.log(Level.INFO, "Retrieving adSets from campaign {0}", campaign.getFieldName());
 
                 //Defines the campaign adset edge request.
                 APIRequestGetAdSets adSetsRequest = campaign.getAdSets();
@@ -159,8 +144,8 @@ public class AdSets {
                 adSetsRequest.setTimeRange("{\"since\":\"" + this.startDate + "\",\"until\":\"" + this.endDate + "\"}");
 
                 //Define fields to be requested.
-                fields.forEach((field) -> {
-                    adSetsRequest.requestField(field);
+                this.attributes.forEach((attribute) -> {
+                    adSetsRequest.requestField(attribute);
                 });
 
                 //Request campaign fields.
@@ -172,7 +157,7 @@ public class AdSets {
                 for (AdSet adSet : adSets) {
                     List record = new ArrayList();
 
-                    fields.forEach((field) -> {
+                    originalFields.forEach((field) -> {
                         JsonObject jsonObject = adSet.getRawResponseAsJsonObject();
 
                         //Identifies if the field exists. 

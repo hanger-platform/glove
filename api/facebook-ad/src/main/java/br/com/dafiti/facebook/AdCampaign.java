@@ -26,7 +26,6 @@ package br.com.dafiti.facebook;
 import br.com.dafiti.mitt.Mitt;
 import br.com.dafiti.mitt.exception.DuplicateEntityException;
 import br.com.dafiti.mitt.transformation.embedded.Concat;
-import br.com.dafiti.mitt.transformation.embedded.DateFormat;
 import br.com.dafiti.mitt.transformation.embedded.Now;
 import com.facebook.ads.sdk.APIContext;
 import com.facebook.ads.sdk.APIException;
@@ -54,7 +53,10 @@ public class AdCampaign {
     private final String endDate;
     private final List key;
     private final List partition;
-    private final List fields;
+    private final List<String> fields;
+    private final List<String> attributes;
+
+    private static final Logger LOG = Logger.getLogger(AdCampaign.class.getName());
 
     public AdCampaign(
             APIContext apiContext,
@@ -64,7 +66,8 @@ public class AdCampaign {
             String endDate,
             List key,
             List partition,
-            List fields) {
+            List fields,
+            List attibutes) {
 
         this.apiContext = apiContext;
         this.adAccount = adAccount;
@@ -74,6 +77,7 @@ public class AdCampaign {
         this.key = key;
         this.partition = partition;
         this.fields = fields;
+        this.attributes = attibutes;
     }
 
     /**
@@ -81,7 +85,8 @@ public class AdCampaign {
      */
     void extract() throws DuplicateEntityException, APIException {
         //Defines a MITT instance. 
-        Mitt mitt = new Mitt(this.output);
+        Mitt mitt = new Mitt();
+        mitt.setOutputFile(this.output);
 
         //Defines fields.
         mitt.getConfiguration()
@@ -89,43 +94,29 @@ public class AdCampaign {
                 .addCustomField("custom_primary_key", new Concat(this.key))
                 .addCustomField("etl_load_date", new Now());
 
+        //Defines the default report attributes
+        if (this.attributes.isEmpty()) {
+            this.attributes.add("account_id");
+            this.attributes.add("id");
+            this.attributes.add("name");
+        }
+
+        //Defines the output fields.
+        mitt.getConfiguration().addField(this.attributes);
+
         //Identifies if fields parameter was filled.
-        if (this.fields.isEmpty()) {
-            mitt.getConfiguration()
-                    .addField("id")
-                    .addField("account_id")
-                    .addField("bid_strategy")
-                    .addField("boosted_object_id")
-                    .addField("budget_rebalance_flag")
-                    .addField("budget_remaining")
-                    .addField("buying_type")
-                    .addField("can_create_brand_lift_study")
-                    .addField("can_use_spend_cap")
-                    .addField("configured_status")
-                    .addField("created_time", new DateFormat("created_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"))
-                    .addField("daily_budget")
-                    .addField("effective_status")
-                    .addField("last_budget_toggling_time", new DateFormat("last_budget_toggling_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"))
-                    .addField("lifetime_budget")
-                    .addField("name")
-                    .addField("objective")
-                    .addField("source_campaign_id")
-                    .addField("spend_cap")
-                    .addField("start_time", new DateFormat("start_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"))
-                    .addField("status")
-                    .addField("stop_time", new DateFormat("stop_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"))
-                    .addField("topline_id")
-                    .addField("updated_time", new DateFormat("updated_time", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"));
-        } else {
-            mitt.getConfiguration().addField(this.fields);
+        if (!this.fields.isEmpty()) {
+            for (String field : this.fields) {
+                mitt.getConfiguration().addCustomField(field);
+            }
         }
 
         //Identifies original fields.
-        List<String> fields = mitt.getConfiguration().getOriginalFieldsName();
+        List<String> originalFields = mitt.getConfiguration().getOriginalFieldsName();
 
         //Iterates for each account.
         for (String account : this.adAccount) {
-            Logger.getLogger(AdCampaign.class.getName()).log(Level.INFO, "Retrieving campaing from account {0}", account);
+            LOG.log(Level.INFO, "Retrieving campaing from account {0}", account);
 
             AdAccount adAccount = new AdAccount(account, this.apiContext);
             APIRequestGetCampaigns campaignRequest = adAccount.getCampaigns();
@@ -134,8 +125,8 @@ public class AdCampaign {
             campaignRequest.setTimeRange("{\"since\":\"" + this.startDate + "\",\"until\":\"" + this.endDate + "\"}");
 
             //Define fields to be requested.
-            fields.forEach((field) -> {
-                campaignRequest.requestField(field, true);
+            this.attributes.forEach((attribute) -> {
+                campaignRequest.requestField(attribute);
             });
 
             //Request campaign fields.
@@ -147,7 +138,7 @@ public class AdCampaign {
             for (Campaign campaign : campaigns) {
                 List record = new ArrayList();
 
-                fields.forEach((field) -> {
+                originalFields.forEach((field) -> {
                     JsonObject jsonObject = campaign.getRawResponseAsJsonObject();
 
                     //Identifies if the field exists. 

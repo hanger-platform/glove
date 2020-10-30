@@ -1,3 +1,4 @@
+
 # Facebook Ad Extractor [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ### Extrator de dados de Ad do Facebook (https://developers.facebook.com/docs/marketing-api/reference/ad-campaign-group)
 
@@ -15,15 +16,15 @@ O **Facebook Ad Extractor** possibilita a extração de dados de AdCampaigns, Ad
 
 ##### CONSTRUÇÃO
 
-Utilizando o [Maven](https://maven.apache.org/):
+Utilizando o [Maven](https://maven.apache.org/):
 
-- Acesse o diretório no qual os fontes do **facebook-ad** se localizam.
-- Digite o comando _**mvn package**_.
-- O arquivo **facebook-ad.jar** será gerado no subdiretório **_target_**.
+- Acesse o diretório no qual os fontes do **facebook-ad** se localizam.
+- Digite o comando _**mvn package**_.
+- O arquivo **facebook-ad.jar** será gerado no subdiretório **_target_**.
 
 ##### CONFIGURAÇÂO
 
-* Crie um arquivo com as seguintes informações sobre seu acesso ao serviço de SRO da ECT, este será o seu **credentials file**:
+* Crie um arquivo com as seguintes informações sobre seu acesso à API de Marketing do Facebook, este será o seu **credentials file**:
 
 ```
 {
@@ -35,16 +36,18 @@ Utilizando o [Maven](https://maven.apache.org/):
 ## Utilização
 
 ```bash
-java -jar facebook-ad.jar  \
-	--credentials=<Credentials file>  \
-	--object=<Post authorization numbers divided by + or in a file> \
+java -jar facebook-ad.jar \
+	--credentials=<Credentials file> \
 	--output=<Output full qualified file name> \
-	--account=<Facebook account, divided by + if has more than one> \
+	--account=<Facebook accounts divided by +> \
 	--report=<Identifies the report to extract. Possible values: AdCampaigns, AdSets, Ads e AdsInsights> \
 	--start_date=<Start date, today as default> \
 	--end_date=<End date, today as default> \
 	--partition=<(Optional)  Partition field> \
-	--key=<(Optional) Unique key> 
+	--key=<(Optional) Unique key> \
+	--attribute=<(Optional) Facebook Report fields, divided by + if has more than one field> \
+	--breakdowns=<(Optional) Breakdowns of report, divided by + if has more than one field> \
+	--field=<(Optional) Custom fields where MITT functions are welcome, divided by + if has more than one field>
 ```
 
 ## Contributing, Bugs, Questions
