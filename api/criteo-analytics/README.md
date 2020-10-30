@@ -48,7 +48,7 @@ java -jar facebook-ad.jar \
 	--currency="[(Optional) Currency code.  Default is BRL]" \
 	--partition=[(Optional)  Partition field] \
 	--key=[(Optional) Unique key] \
-	--debug=[(Optional) Identifies if debug mode is enabled]
+	--debug
 ```
 
 > Para saber os campos que são exportados pela API e que podem ser utilizados no parâmetro fields, recomendamos o extrator seja executado em modo de debug inicialmente. 
