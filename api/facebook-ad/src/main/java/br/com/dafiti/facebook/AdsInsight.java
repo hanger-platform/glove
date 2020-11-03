@@ -128,75 +128,80 @@ public class AdsInsight {
 
         //Iterates for each account.
         for (String account : this.adAccount) {
-            LOG.log(Level.INFO, "Retrieving campaing from account {0}", account);
+            try {
+                LOG.log(Level.INFO, "Retrieving campaing from account {0}", account.trim());
 
-            AdAccount adAccount = new AdAccount(account, this.apiContext);
-            APIRequestGetCampaigns campaignRequest = adAccount.getCampaigns();
-
-            //Request campaign fields.
-            APINodeList<Campaign> campaigns = campaignRequest
-                    .requestField("name")
-                    .requestField("insights").execute();
-
-            //Enables auto pagination.
-            campaigns = campaigns.withAutoPaginationIterator(true);
-
-            for (Campaign campaign : campaigns) {
-                LOG.log(Level.INFO, "Retrieving AdsInsights from campaign {0}", new Object[]{campaign.getFieldName()});
-
-                APIRequestGetInsights adInsightsRequest = campaign.getInsights();
-
-                //Defines some filters.
-                adInsightsRequest.setLevel(AdsInsights.EnumLevel.VALUE_AD);
-                adInsightsRequest.setTimeIncrement("1");
-                adInsightsRequest.setTimeRange("{\"since\":\"" + this.startDate + "\",\"until\":\"" + this.endDate + "\"}");
-                adInsightsRequest.setActionAttributionWindows(
-                        Arrays.asList(
-                                AdsInsights.EnumActionAttributionWindows.VALUE_DEFAULT
-                        )
-                );
-
-                //Identifies if report has breakdowns.
-                if (!this.breakdowns.isEmpty()) {
-                    adInsightsRequest.setBreakdowns(String.join(",", this.breakdowns));
-                }
-
-                //Define report attributes to be requested.
-                this.attributes.forEach((attribute) -> {
-                    if (!this.breakdowns.contains(attribute)) {
-                        adInsightsRequest.requestField(attribute);
-                    }
-                });
+                AdAccount adAccount = new AdAccount(account.trim(), this.apiContext);
+                APIRequestGetCampaigns campaignRequest = adAccount.getCampaigns();
 
                 //Request campaign fields.
-                APINodeList<AdsInsights> adsInsights = adInsightsRequest.execute();
+                APINodeList<Campaign> campaigns = campaignRequest
+                        .requestField("name")
+                        .requestField("insights").execute();
 
                 //Enables auto pagination.
-                adsInsights = adsInsights.withAutoPaginationIterator(true);
+                campaigns = campaigns.withAutoPaginationIterator(true);
 
-                for (AdsInsights adsInsight : adsInsights) {
-                    List record = new ArrayList();
+                for (Campaign campaign : campaigns) {
+                    LOG.log(Level.INFO, "Retrieving AdsInsights from campaign {0}", new Object[]{campaign.getFieldName()});
 
-                    originalFields.forEach((field) -> {
-                        JsonObject jsonObject = adsInsight.getRawResponseAsJsonObject();
+                    APIRequestGetInsights adInsightsRequest = campaign.getInsights();
 
-                        //Identifies if the field exists. 
-                        if (jsonObject.has(field)) {
-                            JsonElement jsonElement = jsonObject.get(field);
+                    //Defines some filters.
+                    adInsightsRequest.setLevel(AdsInsights.EnumLevel.VALUE_AD);
+                    adInsightsRequest.setTimeIncrement("1");
+                    adInsightsRequest.setTimeRange("{\"since\":\"" + this.startDate + "\",\"until\":\"" + this.endDate + "\"}");
+                    adInsightsRequest.setActionAttributionWindows(
+                            Arrays.asList(
+                                    AdsInsights.EnumActionAttributionWindows.VALUE_DEFAULT
+                            )
+                    );
 
-                            //Identifies if the fiels is a primitive.
-                            if (jsonElement.isJsonPrimitive()) {
-                                record.add(jsonElement.getAsString());
-                            } else {
-                                record.add(jsonElement);
-                            }
-                        } else {
-                            record.add(null);
+                    //Identifies if report has breakdowns.
+                    if (!this.breakdowns.isEmpty()) {
+                        adInsightsRequest.setBreakdowns(String.join(",", this.breakdowns));
+                    }
+
+                    //Define report attributes to be requested.
+                    this.attributes.forEach((attribute) -> {
+                        if (!this.breakdowns.contains(attribute)) {
+                            adInsightsRequest.requestField(attribute);
                         }
                     });
 
-                    mitt.write(record);
+                    //Request campaign fields.
+                    APINodeList<AdsInsights> adsInsights = adInsightsRequest.execute();
+
+                    //Enables auto pagination.
+                    adsInsights = adsInsights.withAutoPaginationIterator(true);
+
+                    for (AdsInsights adsInsight : adsInsights) {
+                        List record = new ArrayList();
+
+                        originalFields.forEach((field) -> {
+                            JsonObject jsonObject = adsInsight.getRawResponseAsJsonObject();
+
+                            //Identifies if the field exists. 
+                            if (jsonObject.has(field)) {
+                                JsonElement jsonElement = jsonObject.get(field);
+
+                                //Identifies if the fiels is a primitive.
+                                if (jsonElement.isJsonPrimitive()) {
+                                    record.add(jsonElement.getAsString());
+                                } else {
+                                    record.add(jsonElement);
+                                }
+                            } else {
+                                record.add(null);
+                            }
+                        });
+
+                        mitt.write(record);
+                    }
                 }
+            } catch (APIException ex) {
+                LOG.log(Level.SEVERE, "Fail retrieving campaigns from account {0}, perhaps this account doesn't exist.", account.trim());
+                ex.printStackTrace();
             }
         }
 

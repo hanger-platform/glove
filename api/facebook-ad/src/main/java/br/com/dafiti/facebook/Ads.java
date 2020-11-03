@@ -122,73 +122,78 @@ public class Ads {
 
         //Iterates for each account.
         for (String account : this.adAccount) {
-            LOG.log(Level.INFO, "Retrieving campaing from account {0}", account);
+            try {
+                LOG.log(Level.INFO, "Retrieving campaing from account {0}", account.trim());
 
-            AdAccount adAccount = new AdAccount(account, this.apiContext);
-            APIRequestGetCampaigns request = adAccount.getCampaigns();
+                AdAccount adAccount = new AdAccount(account.trim(), this.apiContext);
+                APIRequestGetCampaigns request = adAccount.getCampaigns();
 
-            //Request campaign fields.
-            APINodeList<Campaign> campaigns = request
-                    .requestField("name")
-                    .requestField("adset").execute();
-
-            //Enables auto pagination.
-            campaigns = campaigns.withAutoPaginationIterator(true);
-
-            //Reads each campaign.
-            for (Campaign campaign : campaigns) {
-                APINodeList<AdSet> adSets = campaign.getAdSets()
+                //Request campaign fields.
+                APINodeList<Campaign> campaigns = request
                         .requestField("name")
-                        .requestField("ad").execute();
+                        .requestField("adset").execute();
 
                 //Enables auto pagination.
-                adSets = adSets.withAutoPaginationIterator(true);
+                campaigns = campaigns.withAutoPaginationIterator(true);
 
-                //Reads each adSets.
-                for (AdSet adSet : adSets) {
-                    LOG.log(Level.INFO, "Retrieving ads from adSets {0} of campaign {1} ", new Object[]{adSet.getFieldName(), campaign.getFieldName()});
-
-                    //Defines the campaign ads edge request.
-                    APIRequestGetAds adsRequest = adSet.getAds();
-
-                    //Defines a time range filter
-                    adsRequest.setTimeRange("{\"since\":\"" + this.startDate + "\",\"until\":\"" + this.endDate + "\"}");
-
-                    //Define fields to be requested.
-                    this.attributes.forEach((attribute) -> {
-                        adsRequest.requestField(attribute);
-                    });
-
-                    //Request campaign fields.
-                    APINodeList<Ad> ads = adsRequest.execute();
+                //Reads each campaign.
+                for (Campaign campaign : campaigns) {
+                    APINodeList<AdSet> adSets = campaign.getAdSets()
+                            .requestField("name")
+                            .requestField("ad").execute();
 
                     //Enables auto pagination.
-                    ads = ads.withAutoPaginationIterator(true);
+                    adSets = adSets.withAutoPaginationIterator(true);
 
-                    for (Ad ad : ads) {
-                        List record = new ArrayList();
+                    //Reads each adSets.
+                    for (AdSet adSet : adSets) {
+                        LOG.log(Level.INFO, "Retrieving ads from adSets {0} of campaign {1} ", new Object[]{adSet.getFieldName(), campaign.getFieldName()});
 
-                        originalFields.forEach((field) -> {
-                            JsonObject jsonObject = ad.getRawResponseAsJsonObject();
+                        //Defines the campaign ads edge request.
+                        APIRequestGetAds adsRequest = adSet.getAds();
 
-                            //Identifies if the field exists. 
-                            if (jsonObject.has(field)) {
-                                JsonElement jsonElement = jsonObject.get(field);
+                        //Defines a time range filter
+                        adsRequest.setTimeRange("{\"since\":\"" + this.startDate + "\",\"until\":\"" + this.endDate + "\"}");
 
-                                //Identifies if the fiels is a primitive.
-                                if (jsonElement.isJsonPrimitive()) {
-                                    record.add(jsonElement.getAsString());
-                                } else {
-                                    record.add(jsonElement);
-                                }
-                            } else {
-                                record.add(null);
-                            }
+                        //Define fields to be requested.
+                        this.attributes.forEach((attribute) -> {
+                            adsRequest.requestField(attribute);
                         });
 
-                        mitt.write(record);
+                        //Request campaign fields.
+                        APINodeList<Ad> ads = adsRequest.execute();
+
+                        //Enables auto pagination.
+                        ads = ads.withAutoPaginationIterator(true);
+
+                        for (Ad ad : ads) {
+                            List record = new ArrayList();
+
+                            originalFields.forEach((field) -> {
+                                JsonObject jsonObject = ad.getRawResponseAsJsonObject();
+
+                                //Identifies if the field exists. 
+                                if (jsonObject.has(field)) {
+                                    JsonElement jsonElement = jsonObject.get(field);
+
+                                    //Identifies if the fiels is a primitive.
+                                    if (jsonElement.isJsonPrimitive()) {
+                                        record.add(jsonElement.getAsString());
+                                    } else {
+                                        record.add(jsonElement);
+                                    }
+                                } else {
+                                    record.add(null);
+                                }
+                            });
+
+                            mitt.write(record);
+                        }
                     }
                 }
+            } catch (APIException ex) {
+                LOG.log(Level.SEVERE, "Fail retrieving campaigns from account {0}, perhaps this account doesn't exist.", account.trim());
+                ex.printStackTrace();
             }
         }
 
