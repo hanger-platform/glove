@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>run</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-classpath %classpath br.com.dafiti.rtb.house.RtbHouse --credentials="/home/helio.leal/credentials/rtbhouse.json" --output="/tmp/rtbhouse/dafiti_br/campaign_costs/campaignCost.csv" --url="https://api.panel.rtbhouse.com/v5/advertisers/Unr2K1tuvwHflWaRdLkr/summary-stats?dayFrom=2020-11-05&amp;dayTo=2020-11-05&amp;groupBy=day-advertiser-subcampaign&amp;metrics=campaignCost" --field="subcampaign+advertiser+day+campaignCost+subcampaignHash "</exec.args>
+                <exec.executable>java</exec.executable>
+            </properties>
+        </action>
+        <action>
+            <actionName>debug</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.rtb.house.RtbHouse --credentials="/home/helio.leal/credentials/rtbhouse.json" --output="/tmp/rtbhouse/dafiti_br/campaign_costs/campaignCost.csv" --url="https://api.panel.rtbhouse.com/v5/advertisers/Unr2K1tuvwHflWaRdLkr/summary-stats?dayFrom=2020-11-05&amp;dayTo=2020-11-05&amp;groupBy=day-advertiser-subcampaign&amp;metrics=campaignCost" --field="subcampaign+advertiser+day+campaignCost+subcampaignHash "</exec.args>
+                <exec.executable>java</exec.executable>
+                <jpda.listen>true</jpda.listen>
+            </properties>
+        </action>
+        <action>
+            <actionName>profile</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-classpath %classpath br.com.dafiti.rtb.house.RtbHouse --credentials="/home/helio.leal/credentials/rtbhouse.json" --output="/tmp/rtbhouse/dafiti_br/campaign_costs/campaignCost.csv" --url="https://api.panel.rtbhouse.com/v5/advertisers/Unr2K1tuvwHflWaRdLkr/summary-stats?dayFrom=2020-11-05&amp;dayTo=2020-11-05&amp;groupBy=day-advertiser-subcampaign&amp;metrics=campaignCost" --field="subcampaign+advertiser+day+campaignCost+subcampaignHash "</exec.args>
+                <exec.executable>java</exec.executable>
+            </properties>
+        </action>
+    </actions>
