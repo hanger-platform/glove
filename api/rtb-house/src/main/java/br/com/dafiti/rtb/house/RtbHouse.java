@@ -51,7 +51,7 @@ public class RtbHouse {
 
     private static final Logger LOG = Logger.getLogger(RtbHouse.class.getName());
     private static final String URI_ADVERTISERS = "/advertisers";
-    private static final String URI_SUMMARY_STATS = "/advertisers/<<advertiser>>/summary-stats?dayFrom=<<start_date>>&dayTo=<<end_date>>&groupBy=day-advertiser-subcampaign&metrics=campaignCost";
+    private static final String URI_SUMMARY_STATS = "/advertisers/<<advertiser>>/summary-stats?dayFrom=<<start_date>>&dayTo=<<end_date>>&groupBy=subcampaign&metrics=campaignCost";
 
     /**
      * RTB House API data transfer
