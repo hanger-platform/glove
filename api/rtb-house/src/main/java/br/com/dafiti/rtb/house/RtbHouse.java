@@ -50,6 +50,8 @@ import org.json.simple.parser.ParseException;
 public class RtbHouse {
 
     private static final Logger LOG = Logger.getLogger(RtbHouse.class.getName());
+    private static final String URI_ADVERTISERS = "/advertisers";
+    private static final String URI_SUMMARY_STATS = "/advertisers/<<advertiser>>/summary-stats?dayFrom=<<start_date>>&dayTo=<<end_date>>&groupBy=day-advertiser-subcampaign&metrics=campaignCost";
 
     /**
      * RTB House API data transfer
@@ -67,8 +69,10 @@ public class RtbHouse {
             mitt.getConfiguration()
                     .addParameter("c", "credentials", "Credentials file", "", true, false)
                     .addParameter("o", "output", "Output file", "", true, false)
-                    .addParameter("u", "url", "Request URL", "", true, false)
+                    .addParameter("a", "advertiser", "Advertisers to be extracted, divided by + if has more than one", "", true, false)
                     .addParameter("f", "field", "Fields to be extracted", "", true, false)
+                    .addParameter("s", "start_date", "Start date", "", true, false)
+                    .addParameter("e", "end_date", "End date", "", true, false)
                     .addParameter("p", "partition", "(Optional)  Partition, divided by + if has more than one field")
                     .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "");
 
@@ -92,37 +96,56 @@ public class RtbHouse {
             JSONParser parser = new JSONParser();
             JSONObject credentials = (JSONObject) parser.parse(new FileReader(cli.getParameter("credentials")));
 
-            LOG.log(Level.INFO, "GET request for endpoint: {0}", new Object[]{cli.getParameter("url")});
+            //Get all advertisers.
+            JSONArray advertisers = executeRequest(credentials.get("url").toString() + URI_ADVERTISERS, credentials);
 
-            //Requests report data.
-            HttpResponse<String> response = Unirest
-                    .get(cli.getParameter("url"))
-                    .header("Content-Type", "application/json")
-                    .basicAuth(credentials.get("login").toString(), credentials.get("password").toString())
-                    .asString();
+            if (advertisers.size() > 0) {
+                for (Object advertiser : advertisers) {
 
-            JSONArray data = (JSONArray) ((JSONObject) new JSONParser()
-                    .parse(response.getBody()))
-                    .get("data");
+                    //Identify if advertiser is to be considered.
+                    if (cli.getParameterAsList("advertiser", "\\+")
+                            .stream()
+                            .anyMatch((a) -> (a.toUpperCase()
+                            .equals(((JSONObject) advertiser)
+                                    .get("name").toString().toUpperCase())))) {
 
-            LOG.log(Level.INFO, "{0} elements found ", new Object[]{data.size()});
+                        String url = credentials.get("url").toString() + URI_SUMMARY_STATS
+                                .replace("<<advertiser>>", ((JSONObject) advertiser).get("hash").toString())
+                                .replace("<<start_date>>", cli.getParameter("start_date"))
+                                .replace("<<end_date>>", cli.getParameter("end_date"));
 
-            //Identify if at least 1 element was found.
-            if (data.size() > 0) {
-                for (Object element : data) {
-                    List record = new ArrayList();
+                        //Get all advertisers.
+                        JSONArray data = executeRequest(url, credentials);
 
-                    fields.forEach((field) -> {
-                        //Identifies if the field exists.
-                        if (((JSONObject) element).containsKey(field)) {
-                            record.add(((JSONObject) element).get(field));
+                        //Identify if at least 1 element was found.
+                        if (data.size() > 0) {
+                            for (Object element : data) {
+                                List record = new ArrayList();
+
+                                fields.forEach((field) -> {
+
+                                    //Identifies if the field exists.
+                                    if (((JSONObject) element).containsKey(field)) {
+                                        record.add(((JSONObject) element).get(field));
+
+                                        //Identify if it is to consider currency.
+                                    } else if (fields.contains("currency")) {
+                                        record.add(((JSONObject) advertiser).get("currency"));
+
+                                    } else {
+                                        record.add(null);
+                                    }
+                                });
+
+                                mitt.write(record);
+                            }
                         } else {
-                            record.add(null);
+                            LOG.info("Glove - Any element found for " + ((JSONObject) advertiser).get("name").toString());
                         }
-                    });
-
-                    mitt.write(record);
+                    }
                 }
+            } else {
+                LOG.info("Glove - Any advertiser was found.");
             }
 
         } catch (DuplicateEntityException
@@ -137,5 +160,33 @@ public class RtbHouse {
             LOG.info("Glove - RTB House Extractor finalized.");
             System.exit(0);
         }
+    }
+
+    /**
+     * Execute an API request.
+     *
+     * @param url
+     * @param credentials
+     * @return
+     * @throws org.json.simple.parser.ParseException
+     */
+    public static JSONArray executeRequest(String url, JSONObject credentials)
+            throws ParseException {
+        LOG.log(Level.INFO, "GET request for endpoint: {0}", new Object[]{url});
+
+        //Requests report data.
+        HttpResponse<String> response = Unirest
+                .get(url)
+                .header("Content-Type", "application/json")
+                .basicAuth(credentials.get("login").toString(), credentials.get("password").toString())
+                .asString();
+
+        JSONArray jsonArray = (JSONArray) ((JSONObject) new JSONParser()
+                .parse(response.getBody()))
+                .get("data");
+
+        LOG.log(Level.INFO, "{0} elements found ", new Object[]{jsonArray.size()});
+
+        return jsonArray;
     }
 }
