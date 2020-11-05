@@ -51,7 +51,6 @@ public class RtbHouse {
 
     private static final Logger LOG = Logger.getLogger(RtbHouse.class.getName());
     private static final String URI_ADVERTISERS = "/advertisers";
-    private static final String URI_SUMMARY_STATS = "/advertisers/<<advertiser>>/summary-stats?dayFrom=<<start_date>>&dayTo=<<end_date>>&groupBy=subcampaign&metrics=campaignCost";
 
     /**
      * RTB House API data transfer
@@ -73,6 +72,7 @@ public class RtbHouse {
                     .addParameter("f", "field", "Fields to be extracted", "", true, false)
                     .addParameter("s", "start_date", "Start date", "", true, false)
                     .addParameter("e", "end_date", "End date", "", true, false)
+                    .addParameter("u", "uri_filter", "URI to extract data of", "", true, false)
                     .addParameter("p", "partition", "(Optional)  Partition, divided by + if has more than one field")
                     .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "");
 
@@ -110,7 +110,7 @@ public class RtbHouse {
                                     .get("name").toString().toUpperCase())))) {
 
                         //Replaces dynamic parameters.
-                        String url = credentials.get("url").toString() + URI_SUMMARY_STATS
+                        String url = credentials.get("url").toString() + cli.getParameter("uri_filter")
                                 .replace("<<advertiser>>", ((JSONObject) advertiser).get("hash").toString())
                                 .replace("<<start_date>>", cli.getParameter("start_date"))
                                 .replace("<<end_date>>", cli.getParameter("end_date"));
