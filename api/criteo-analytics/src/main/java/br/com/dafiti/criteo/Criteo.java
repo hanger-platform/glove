@@ -23,10 +23,6 @@
  */
 package br.com.dafiti.criteo;
 
-/**
- *
- * @author Valdiney V GOMES
- */
 import br.com.dafiti.mitt.Mitt;
 import br.com.dafiti.mitt.cli.CommandLineInterface;
 import br.com.dafiti.mitt.exception.DuplicateEntityException;
@@ -59,6 +55,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+/**
+ *
+ * @author Valdiney V GOMES
+ */
 public class Criteo {
 
     private static final Logger LOG = Logger.getLogger(Criteo.class.getName());
