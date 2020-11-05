@@ -109,12 +109,13 @@ public class RtbHouse {
                             .equals(((JSONObject) advertiser)
                                     .get("name").toString().toUpperCase())))) {
 
+                        //Replaces dynamic parameters.
                         String url = credentials.get("url").toString() + URI_SUMMARY_STATS
                                 .replace("<<advertiser>>", ((JSONObject) advertiser).get("hash").toString())
                                 .replace("<<start_date>>", cli.getParameter("start_date"))
                                 .replace("<<end_date>>", cli.getParameter("end_date"));
 
-                        //Get all advertisers.
+                        //Get all data.
                         JSONArray data = executeRequest(url, credentials);
 
                         //Identify if at least 1 element was found.
@@ -124,11 +125,11 @@ public class RtbHouse {
 
                                 fields.forEach((field) -> {
 
-                                    //Identifies if the field exists.
+                                    //Identify if the field exists.
                                     if (((JSONObject) element).containsKey(field)) {
                                         record.add(((JSONObject) element).get(field));
 
-                                        //Identify if it is to consider currency.
+                                        //Identify if consider currency.
                                     } else if (fields.contains("currency")) {
                                         record.add(((JSONObject) advertiser).get("currency"));
 
@@ -139,8 +140,6 @@ public class RtbHouse {
 
                                 mitt.write(record);
                             }
-                        } else {
-                            LOG.info("Glove - Any element found for " + ((JSONObject) advertiser).get("name").toString());
                         }
                     }
                 }
@@ -165,9 +164,9 @@ public class RtbHouse {
     /**
      * Execute an API request.
      *
-     * @param url
-     * @param credentials
-     * @return
+     * @param url Request URL
+     * @param credentials needs to have user and password
+     * @return JSONArray
      * @throws org.json.simple.parser.ParseException
      */
     public static JSONArray executeRequest(String url, JSONObject credentials)
