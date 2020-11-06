@@ -44,22 +44,18 @@ public class MittTest {
         fields.add(new Field("id"));
         fields.add(new Field("nome"));
         fields.add(new Field("data", new Now()));
-        fields.add(new Field("saga"));
 
         //Fields.
         mitt.getConfiguration().addField("id");
         mitt.getConfiguration().addField("nome");
         mitt.getConfiguration().addField("data");
-        mitt.getConfiguration().addField("saga");
 
-//        mitt.getConfiguration().addCustomField("custom_primary_key::farmfingerprint([[nome]])");
-//        mitt.getConfiguration().addCustomField("scanner::concat([[id,nome,::now(),::Dateformat(data,YYYYMM),::eval(**nome.replace('A','xxx')**)]])");
-//        mitt.getConfiguration().addCustomField("fixed::concat([[id,nome,::eval(**nome.replace('A','xxx')**)]])");
-//        mitt.getConfiguration().addCustomField("bola::eval(**nome.replace(/[^0-9.]/g,'xxx')**)");
-//        mitt.getConfiguration().addCustomField("regex::regexp(nome,[9])");
-//        mitt.getConfiguration().addCustomField("checksum::checksum()");
-        mitt.getConfiguration().addCustomField("xxx::dateformat(saga,yyyy-MM-dd'T'HH:mm:ss,yyyy)");
-        //mitt.getConfiguration().addCustomField("::dateformat(data,dd-MMM-yyyy hh:mm:ss,yyyyMM,pt,BR)");
+        mitt.getConfiguration().addCustomField("custom_primary_key::farmfingerprint([[nome]])");
+        mitt.getConfiguration().addCustomField("scanner::concat([[id,nome,::now(),::Dateformat(data,YYYYMM),::eval(**nome.replace('A','xxx')**)]])");
+        mitt.getConfiguration().addCustomField("fixed::concat([[id,nome,::eval(**nome.replace('A','xxx')**)]])");
+        mitt.getConfiguration().addCustomField("bola::eval(**nome.replace(/[^0-9.]/g,'xxx')**)");
+        mitt.getConfiguration().addCustomField("regex::regexp(nome,[9])");
+        mitt.getConfiguration().addCustomField("checksum::checksum()");
 
         //Parameters. 
         mitt.getConfiguration().addParameter("a", "primeiro", "Primeiro parâmetro", "xxx");
@@ -80,7 +76,6 @@ public class MittTest {
             data.add(i);
             data.add("A" + i);
             data.add("2019-01-01 00:00:00");
-            data.add("2020-03-27T20:29:11+00:00");
 
             mitt.write(data);
         }
