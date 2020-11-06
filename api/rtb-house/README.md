@@ -48,7 +48,7 @@ java -jar rtb-house.jar  \
 	--end_date=<Data fim>  \
 	--partition=<(Opcional) Partição, dividos por + quando for mais de um> \
 	--key=<(Opcional) Chave única, dividos por + quando for mais de um> \
-	--uri_filter=<URI do endpoint que deseja que  os dados sejam extraídos, as nomenclaturas <<>>, <<>>, <<>> serão macro substituídas pelo advertiser informado no parâmetro acima 'advertiser', data início pelo 'start_date' e data fim pelo 'end_date' respectivamente. As opções <<>> não são obrigatórias. Exemplo: '/advertisers/<<advertiser>>/summary-stats?dayFrom=<<start_date>>&dayTo=<<end_date>>&groupBy=subcampaign&metrics=campaignCost'">
+	--uri_filter=<URI do endpoint que deseja que  os dados sejam extraídos, as nomenclaturas <<advertiser>>, <<start_date>> e <<end_date>> serão macro substituídas pelo advertiser informado no parâmetro acima 'advertiser', data início pelo 'start_date' e data fim pelo 'end_date' respectivamente. As opções <<>> não são obrigatórias. Exemplo: '/advertisers/<<advertiser>>/summary-stats?dayFrom=<<start_date>>&dayTo=<<end_date>>&groupBy=subcampaign&metrics=campaignCost'">
 ```
 
 
