@@ -36,6 +36,7 @@ import br.com.dafiti.mitt.transformation.embedded.Now;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -54,6 +55,8 @@ public class ECTObjectTrackingRunner implements Runnable {
     private final List key;
     private final List partition;
     private final List<String> objects;
+
+    private final int API_DEFAULT_RETRY = 3;
 
     public ECTObjectTrackingRunner(
             String user,
@@ -83,12 +86,16 @@ public class ECTObjectTrackingRunner implements Runnable {
         Mitt mitt = new Mitt();
 
         //Defines output file.
-        mitt.setOutput((output.endsWith("/") ? output : (output + "/")) + "tracking_" + UUID.randomUUID() + ".csv");
+        mitt.setOutputFile((output.endsWith("/") ? output : (output + "/")) + "tracking_" + UUID.randomUUID() + ".csv");
 
         try {
             //Defines fields.
+            if (!partition.isEmpty()) {
+                mitt.getConfiguration()
+                        .addCustomField("partition_field", new Concat(partition));
+            }
+
             mitt.getConfiguration()
-                    .addCustomField("partition_field", new Concat(partition))
                     .addCustomField("custom_primary_key", new Concat(key))
                     .addCustomField("etl_load_date", new Now())
                     .addField("number")
@@ -104,11 +111,37 @@ public class ECTObjectTrackingRunner implements Runnable {
                     .addField("event_place")
                     .addField("event_state");
 
+            this.loteProcessor(mitt);
+        } catch (DuplicateEntityException ex) {
+            Logger.getLogger(ECTObjectTrackingRunner.class.getName()).log(Level.SEVERE, "Object tracking runner: ", ex);
+            System.exit(1);
+        } finally {
+            mitt.close();
+        }
+    }
+
+    /**
+     *
+     * @param mitt
+     */
+    public void loteProcessor(Mitt mitt) {
+        this.loteProcessor(mitt, 1);
+    }
+
+    /**
+     *
+     * @param mitt
+     */
+    private void loteProcessor(Mitt mitt, int retry) {
+        Sroxml sroxml = new Sroxml();
+        List record;
+
+        try {
             //Defines the service port.
             Service service = new Rastro().getServicePort();
 
             //Search for objects. 
-            Sroxml sroxml = service.buscaEventosLista(
+            sroxml = service.buscaEventosLista(
                     user,
                     password,
                     type,
@@ -116,48 +149,56 @@ public class ECTObjectTrackingRunner implements Runnable {
                     language,
                     objects
             );
-
-            List record;
-
-            //Retrives all objects.
-            for (Objeto object : sroxml.getObjeto()) {
-                if (object.getErro() == null) {
-                    for (Eventos event : object.getEvento()) {
-                        record = new ArrayList();
-
-                        record.add(object.getNumero());
-                        record.add(event.getTipo());
-                        record.add(event.getCodigo());
-                        record.add(event.getStatus());
-                        record.add(event.getDescricao());
-                        record.add(event.getData() + " " + event.getHora());
-                        record.add(object.getSigla());
-                        record.add(object.getNome());
-                        record.add(object.getCategoria());
-                        record.add(event.getCidade());
-                        record.add(event.getLocal());
-                        record.add(event.getUf());
-
-                        mitt.write(record);
-                    }
+        } catch (Exception ex) {
+            try {
+                if (retry < API_DEFAULT_RETRY) {
+                    Logger.getLogger(ECTObjectTrackingRunner.class.getName()).log(Level.INFO, "Tracking retry {0} for objects: {1}, caused by {2}", new Object[]{retry, String.join(",", objects), ex});
+                    TimeUnit.MINUTES.sleep(1);
+                    retry = retry + 1;
+                    this.loteProcessor(mitt, retry);
                 } else {
+                    Logger.getLogger(ECTObjectTrackingRunner.class.getName()).log(Level.SEVERE, "Tracking retrying limit exceeded!");
+                    System.exit(1);
+                }
+            } catch (InterruptedException e) {
+                Logger.getLogger(ECTObjectTrackingRunner.class.getName()).log(Level.SEVERE, "Tracking runner retry error: ", e);
+                System.exit(1);
+            }
+        }
+
+        //Retrives all objects.
+        for (Objeto object : sroxml.getObjeto()) {
+            if (object.getErro() == null) {
+                for (Eventos event : object.getEvento()) {
                     record = new ArrayList();
 
                     record.add(object.getNumero());
-                    record.add("ERR");
-                    record.add("");
-                    record.add("");
-                    record.add(object.getErro());
-                    record.add("01/01/1900 00:00:00");
+                    record.add(event.getTipo());
+                    record.add(event.getCodigo());
+                    record.add(event.getStatus());
+                    record.add(event.getDescricao());
+                    record.add(event.getData() + " " + event.getHora());
+                    record.add(object.getSigla());
+                    record.add(object.getNome());
+                    record.add(object.getCategoria());
+                    record.add(event.getCidade());
+                    record.add(event.getLocal());
+                    record.add(event.getUf());
 
                     mitt.write(record);
                 }
+            } else {
+                record = new ArrayList();
+
+                record.add(object.getNumero());
+                record.add("ERR");
+                record.add("");
+                record.add("");
+                record.add(object.getErro());
+                record.add("01/01/1900 00:00:00");
+
+                mitt.write(record);
             }
-        } catch (DuplicateEntityException ex) {
-            Logger.getLogger(ECTObjectTrackingRunner.class.getName()).log(Level.SEVERE, "Object tracking runner: ", ex);
-            System.exit(1);
-        } finally {
-            mitt.close();
         }
     }
 }

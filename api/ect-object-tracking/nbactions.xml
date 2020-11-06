@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.ect.ECTObjectTracking --credentials=/home/valdiney/tracking.json --output=/tmp/tracking/ --object=PL536091497BR+FF0000000000FF</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.ect.ECTObjectTracking --credentials=/home/valdiney.gomes/credentials/tracking.json --output=/tmp/tracking/ --partition="" --object=PL536091497BR+OJ880724078BR</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.ect.ECTObjectTracking --credentials=/home/valdiney/tracking.json --output=/tmp/tracking/ --object=PL536091497BR+FF0000000000FF</exec.args>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.ect.ECTObjectTracking --credentials=/home/valdiney.gomes/credentials/tracking.json --output=/tmp/tracking/ --partition="" --object=PL536091497BR+OJ880724078BR</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.ect.ECTObjectTracking --credentials=/home/valdiney/tracking.json --output=/tmp/tracking/ --object=PL536091497BR+FF0000000000FF</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.ect.ECTObjectTracking --credentials=/home/valdiney.gomes/credentials/tracking.json --output=/tmp/tracking/ --partition="" --object=PL536091497BR+OJ880724078BR</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>

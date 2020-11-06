@@ -37,7 +37,7 @@ Utilizando o [Maven](https://maven.apache.org/):
 ```bash
 java -jar ect-object-tracking.jar  \
 	--credentials=<Credentials file>  \
-	--object=<Post authorization numbers divided by + or in a file> \
+	--object=<Post authorization numbers divided by + or in a file (should by prefixed with file: and have an object per line)> \
 	--output=<Output path> \
 	--type=<(Optional) L: list of objects. O server will make the query individual of each informed identifier or F: range of objects; L as default> \
 	--result=<(Optional) L: All will be returned the events of the object or U: will be returned only object's last event; L as default> \
@@ -47,6 +47,27 @@ java -jar ect-object-tracking.jar  \
 	--thread=<(Optional) Threads; 5 as default> \
 	--chunk=<(Optional) Objects to be retrieved in each thread; 1000 as default>
 ```
+
+## Metadata
+
+A api sempre retorna um arquivo csv contendo os seguintes campos:
+
+| Field | Description |
+|--|--|
+| partition_field | Campo interno |
+| custom_primary_key | Campo interno |
+| etl_load_date | Data de geração dos dados |
+| number | Número do objeto |
+| event_type | Tipo do evento de retorno |
+| event_code | CEP da unidade ECT |
+| event_status | Status do evento de retorno |
+| event_description | Descrição do evento |
+| event_date | Data e hora do evento |
+| initials | Sigla do objeto solicitado |
+| name | Nome do objeto solicitado |
+| event_city | Cidade onde ocorreu o evento |
+| event_place | Local onde ocorreu o evento |
+| event_state | Unidade da Federação |
 
 ## Contributing, Bugs, Questions
 Contributions are more than welcome! If you want to propose new changes, fix bugs or improve something feel free to fork the repository and send us a Pull Request. You can also open new `Issues` for reporting bugs and general problems.

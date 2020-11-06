@@ -56,7 +56,6 @@ public class MittTest {
         mitt.getConfiguration().addCustomField("bola::eval(**nome.replace(/[^0-9.]/g,'xxx')**)");
         mitt.getConfiguration().addCustomField("regex::regexp(nome,[9])");
         mitt.getConfiguration().addCustomField("checksum::checksum()");
-        //mitt.getConfiguration().addCustomField("::dateformat(data,dd-MMM-yyyy hh:mm:ss,yyyyMM,pt,BR)");
 
         //Parameters. 
         mitt.getConfiguration().addParameter("a", "primeiro", "Primeiro parâmetro", "xxx");
