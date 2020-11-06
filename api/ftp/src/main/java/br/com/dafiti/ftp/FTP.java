@@ -39,6 +39,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.joda.time.LocalDate;
@@ -109,7 +110,7 @@ public class FTP {
 
             //Defines a FTP directory as default. 
             ftpClient.changeWorkingDirectory(cli.getParameter("directory"));
-            
+
             //Define the buffer size.
             ftpClient.setBufferSize(5 * (1024 * 1024));
 
@@ -157,7 +158,7 @@ public class FTP {
             mitt.getReaderSettings().setDelimiter(cli.getParameter("delimiter").charAt(0));
             mitt.getReaderSettings().setEncode(cli.getParameter("encode"));
             mitt.write(outputPath.toFile(), "*");
-
+            FileUtils.deleteDirectory(outputPath.toFile());
         } catch (DuplicateEntityException
                 | IOException
                 | ParseException ex) {
