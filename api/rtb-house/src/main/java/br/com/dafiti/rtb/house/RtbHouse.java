@@ -72,7 +72,7 @@ public class RtbHouse {
                     .addParameter("f", "field", "Fields to be extracted", "", true, false)
                     .addParameter("s", "start_date", "Start date", "", true, false)
                     .addParameter("e", "end_date", "End date", "", true, false)
-                    .addParameter("u", "uri_filter", "URI to extract data of", "", true, false)
+                    .addParameter("u", "uri_filter", "URI to extract data of, <<advertiser>>, <<start_date>> and <<end_date>> will be replaced.", "", true, false)
                     .addParameter("p", "partition", "(Optional)  Partition, divided by + if has more than one field")
                     .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "");
 
