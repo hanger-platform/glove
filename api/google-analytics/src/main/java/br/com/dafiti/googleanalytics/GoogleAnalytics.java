@@ -31,10 +31,10 @@ import br.com.dafiti.mitt.transformation.embedded.Now;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
-
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -79,12 +79,14 @@ public class GoogleAnalytics {
     private static final String APPLICATION_NAME = "Google Analytics Reporting (V4)";
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
 
+    private static final Logger LOG = Logger.getLogger(GoogleAnalytics.class.getName());
+
     public static void main(String[] args) {
         //Defines a MITT instance. 
         Mitt mitt = new Mitt();
 
         try {
-            Logger.getLogger(GoogleAnalytics.class.getName()).log(Level.INFO, "GLOVE - Google Analytics Extractor started");
+            LOG.log(Level.INFO, "GLOVE - Google Analytics Extractor started");
 
             //Defines parameters.
             mitt.getConfiguration()
@@ -103,7 +105,7 @@ public class GoogleAnalytics {
             CommandLineInterface cli = mitt.getCommandLineInterface(args);
 
             //Defines output file.
-            mitt.setOutput(cli.getParameter("output"));
+            mitt.setOutputFile(cli.getParameter("output"));
 
             //Defines fields.
             mitt.getConfiguration()
@@ -159,7 +161,7 @@ public class GoogleAnalytics {
             for (int i = 0; i <= daysBetween; i++) {
                 String date = startDate.plusDays(i).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-                Logger.getLogger(GoogleAnalytics.class.getName()).log(Level.INFO, "GLOVE - Receiving data of {0}", date);
+                LOG.log(Level.INFO, "Receiving data of {0}", date);
 
                 //Create the DateRange object.
                 DateRange dateRange = new DateRange();
@@ -172,6 +174,8 @@ public class GoogleAnalytics {
                 for (String viewId : viewIdList) {
                     String token = null;
 
+                    LOG.log(Level.INFO, "Receiving data of view {0}", viewId);
+
                     do {
                         //Create the ReportRequest object.
                         ReportRequest request = new ReportRequest()
@@ -180,7 +184,8 @@ public class GoogleAnalytics {
                                 .setDimensions(dimensions)
                                 .setMetrics(metrics)
                                 .setFiltersExpression(cli.getParameter("filter"))
-                                .setPageToken(token);
+                                .setPageToken(token)
+                                .setPageSize(1000);
 
                         ArrayList<ReportRequest> requests = new ArrayList();
                         requests.add(request);
@@ -196,19 +201,25 @@ public class GoogleAnalytics {
 
                         //Call the batchGet method.
                         GetReportsResponse response = null;
+
                         do {
                             try {
                                 response = service.reports().batchGet(getReport).execute();
                                 retry = false;
-                            } catch (IOException ex) {
-                                long sleep = backOff.nextBackOffMillis();
-
-                                if (sleep == BackOff.STOP) {
+                            } catch (GoogleJsonResponseException ex) {
+                                if (ex.getStatusCode() >= 400) {
+                                    LOG.log(Level.SEVERE, "Google Analytics Reporting fail: ", ex);
                                     retry = false;
-                                    Logger.getLogger(GoogleAnalytics.class.getName()).log(Level.SEVERE, "Report request failed after maximum elapsed millis: " + backOff.getMaxElapsedTimeMillis(), ex);
                                 } else {
-                                    Logger.getLogger(GoogleAnalytics.class.getName()).log(Level.SEVERE, "Trying to recover of: ", ex);
-                                    Thread.sleep(sleep);
+                                    long sleep = backOff.nextBackOffMillis();
+
+                                    if (sleep == BackOff.STOP) {
+                                        retry = false;
+                                        LOG.log(Level.SEVERE, "Report request failed after maximum elapsed millis: " + backOff.getMaxElapsedTimeMillis(), ex);
+                                    } else {
+                                        LOG.log(Level.SEVERE, "Trying to recover of: ", ex);
+                                        Thread.sleep(sleep);
+                                    }
                                 }
                             }
                         } while (retry);
@@ -221,7 +232,7 @@ public class GoogleAnalytics {
                                 List<ReportRow> rows = report.getData().getRows();
 
                                 if (rows == null) {
-                                    Logger.getLogger(GoogleAnalytics.class.getName()).log(Level.INFO, "No data found for {0} in interval {1} and {2}", new Object[]{viewId, dateRange.getStartDate(), dateRange.getEndDate()});
+                                    LOG.log(Level.INFO, "No data found for {0} in interval {1} and {2}", new Object[]{viewId, dateRange.getStartDate(), dateRange.getEndDate()});
                                     return;
                                 }
 
@@ -261,11 +272,11 @@ public class GoogleAnalytics {
                 | GeneralSecurityException
                 | InterruptedException ex) {
 
-            Logger.getLogger(GoogleAnalytics.class.getName()).log(Level.SEVERE, "Google Analytics Reporting fail: ", ex);
+            LOG.log(Level.SEVERE, "Google Analytics Reporting fail: ", ex);
             System.exit(1);
         } finally {
             mitt.close();
-            Logger.getLogger(GoogleAnalytics.class.getName()).log(Level.INFO, "GLOVE - Google Analytics Extractor finished");
+            LOG.log(Level.INFO, "GLOVE - Google Analytics Extractor finished");
         }
     }
 
