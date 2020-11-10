@@ -207,9 +207,7 @@ public class GoogleAnalytics {
                                 response = service.reports().batchGet(getReport).execute();
                                 retry = false;
                             } catch (GoogleJsonResponseException ex) {
-                                int code = ex.getDetails().getCode();
-
-                                if (code >= 400) {
+                                if (ex.getStatusCode() >= 400) {
                                     LOG.log(Level.SEVERE, "Google Analytics Reporting fail: ", ex);
                                     retry = false;
                                 } else {
