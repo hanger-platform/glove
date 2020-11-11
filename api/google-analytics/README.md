@@ -36,6 +36,8 @@ java -jar google-analytics.jar  \
 	--dimensions=<Dimensions, divided by + if has more than one> \
 	--metrics=<Metrics, divided by + if has more than one> \
 	--output=<Output file> \
+	--sampling=<(Optional) Report data sample size (SMALL, DEFAULT, LARGE). Default: DEFAULT> \
+	--chunck=<(Optional) Report page size. Default: 10000> \
 	--partition=<(Optional)  Partition field, divided by + if has more than one> \
 	--key=<(Optional) Unique key, divided by + if has more than one> 
 	--filter=<(Optional) Filter expression> 
@@ -51,6 +53,7 @@ java -jar google-analytics.jar  \
 	--end_date=2019-08-25 \
 	--dimensions=ga:userType \
 	--metrics=ga:users+ga:sessionsPerUser \
+	--sampling=SMALL \
 	--output=/tmp/V4.csv
 ```
 

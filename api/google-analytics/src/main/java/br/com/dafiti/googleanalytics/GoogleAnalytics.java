@@ -75,16 +75,16 @@ import java.util.logging.Logger;
  * @author Valdiney V GOMES
  */
 public class GoogleAnalytics {
-
+    
     private static final String APPLICATION_NAME = "Google Analytics Reporting (V4)";
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-
+    
     private static final Logger LOG = Logger.getLogger(GoogleAnalytics.class.getName());
-
+    
     public static void main(String[] args) {
         //Defines a MITT instance. 
         Mitt mitt = new Mitt();
-
+        
         try {
             LOG.log(Level.INFO, "GLOVE - Google Analytics Extractor started");
 
@@ -98,6 +98,8 @@ public class GoogleAnalytics {
                     .addParameter("m", "metrics", "Metrics, divided by + if has more than one", "", true, false)
                     .addParameter("o", "output", "Output file", "", true, false)
                     .addParameter("f", "filter", "(Optional) Filter expression", "")
+                    .addParameter("l", "sampling", "(Optional) Report data sample size (SMALL, DEFAULT, LARGE). Default: DEFAULT", "DEFAULT")
+                    .addParameter("z", "chunck", "(Optional) Report page size. Default: 10000", "10000")
                     .addParameter("p", "partition", "(Optional)  Partition, divided by + if has more than one")
                     .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one", "");
 
@@ -138,21 +140,21 @@ public class GoogleAnalytics {
             //Create the Dimensions and Metrics objects.
             List<Dimension> dimensions = new ArrayList();
             List<Metric> metrics = new ArrayList();
-
+            
             mitt.getConfiguration().getOriginalFieldsName().forEach((field) -> {
                 if (cli.getParameterAsList("dimensions", "\\+")
                         .stream()
                         .anyMatch(dimension -> dimension.contains(field))) {
                     dimensions.add(new Dimension().setName(field));
                 }
-
+                
                 if (cli.getParameterAsList("metrics", "\\+")
                         .stream()
                         .anyMatch(metric -> metric.contains(field))) {
                     metrics.add(new Metric().setExpression(field));
                 }
             });
-
+            
             LocalDate startDate = LocalDate.parse(cli.getParameter("start_date"), DateTimeFormatter.ofPattern("yyyyMMdd"));
             LocalDate endDate = LocalDate.parse(cli.getParameter("end_date"), DateTimeFormatter.ofPattern("yyyyMMdd"));
             long daysBetween = ChronoUnit.DAYS.between(startDate, endDate);
@@ -160,7 +162,7 @@ public class GoogleAnalytics {
             //Extract the report for each date.
             for (int i = 0; i <= daysBetween; i++) {
                 String date = startDate.plusDays(i).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-
+                
                 LOG.log(Level.INFO, "Receiving data of {0}", date);
 
                 //Create the DateRange object.
@@ -170,13 +172,13 @@ public class GoogleAnalytics {
 
                 //Get list of view ids.
                 List<String> viewIdList = cli.getParameterAsList("view_id", "\\+");
-
+                
                 for (String viewId : viewIdList) {
                     String token = null;
-
-                    LOG.log(Level.INFO, "Receiving data of view {0}", viewId);
-
+                    
                     do {
+                        LOG.log(Level.INFO, "Receiving data of view {0} (PageToken: {1})", new Object[]{viewId, token});
+
                         //Create the ReportRequest object.
                         ReportRequest request = new ReportRequest()
                                 .setViewId(viewId)
@@ -185,8 +187,9 @@ public class GoogleAnalytics {
                                 .setMetrics(metrics)
                                 .setFiltersExpression(cli.getParameter("filter"))
                                 .setPageToken(token)
-                                .setPageSize(1000);
-
+                                .setPageSize(cli.getParameterAsInteger("chunck"))
+                                .setSamplingLevel(cli.getParameter("sampling"));
+                        
                         ArrayList<ReportRequest> requests = new ArrayList();
                         requests.add(request);
 
@@ -201,10 +204,12 @@ public class GoogleAnalytics {
 
                         //Call the batchGet method.
                         GetReportsResponse response = null;
-
+                        
                         do {
                             try {
-                                response = service.reports().batchGet(getReport).execute();
+                                response = service.reports()
+                                        .batchGet(getReport).setQuotaUser(viewId).execute();
+                                
                                 retry = false;
                             } catch (GoogleJsonResponseException ex) {
                                 if (ex.getStatusCode() >= 400) {
@@ -212,7 +217,7 @@ public class GoogleAnalytics {
                                     retry = false;
                                 } else {
                                     long sleep = backOff.nextBackOffMillis();
-
+                                    
                                     if (sleep == BackOff.STOP) {
                                         retry = false;
                                         LOG.log(Level.SEVERE, "Report request failed after maximum elapsed millis: " + backOff.getMaxElapsedTimeMillis(), ex);
@@ -223,14 +228,14 @@ public class GoogleAnalytics {
                                 }
                             }
                         } while (retry);
-
+                        
                         if (response != null) {
                             //Reads the response.
                             for (Report report : response.getReports()) {
                                 ColumnHeader header = report.getColumnHeader();
                                 List<MetricHeaderEntry> metricHeaders = header.getMetricHeader().getMetricHeaderEntries();
                                 List<ReportRow> rows = report.getData().getRows();
-
+                                
                                 if (rows == null) {
                                     LOG.log(Level.INFO, "No data found for {0} in interval {1} and {2}", new Object[]{viewId, dateRange.getStartDate(), dateRange.getEndDate()});
                                     return;
@@ -250,17 +255,17 @@ public class GoogleAnalytics {
 
                                     //Writes metrics.
                                     List<DateRangeValues> reportMetrics = row.getMetrics();
-
+                                    
                                     for (int j = 0; j < reportMetrics.size(); j++) {
                                         DateRangeValues values = reportMetrics.get(j);
                                         for (int k = 0; k < values.getValues().size() && k < metricHeaders.size(); k++) {
                                             record.add(values.getValues().get(k));
                                         }
                                     }
-
+                                    
                                     mitt.write(record);
                                 });
-
+                                
                                 token = report.getNextPageToken();
                             }
                         }
@@ -271,7 +276,7 @@ public class GoogleAnalytics {
                 | IOException
                 | GeneralSecurityException
                 | InterruptedException ex) {
-
+            
             LOG.log(Level.SEVERE, "Google Analytics Reporting fail: ", ex);
             System.exit(1);
         } finally {
