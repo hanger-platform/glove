@@ -19,7 +19,7 @@ import org.json.simple.parser.ParseException;
 public class Sisense {
 
     private static final Logger LOG = Logger.getLogger(Sisense.class.getName());
-    
+
     public static void main(String[] args) throws IOException, ParseException {
         LOG.info("GLOVE - Sisense tools started");
 
