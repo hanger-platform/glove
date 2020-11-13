@@ -18,8 +18,10 @@ import org.json.simple.parser.ParseException;
  */
 public class Sisense {
 
+    private static final Logger LOG = Logger.getLogger(Sisense.class.getName());
+    
     public static void main(String[] args) throws IOException, ParseException {
-        Logger.getLogger(Sisense.class.getName()).info("GLOVE - Sisense tools started");
+        LOG.info("GLOVE - Sisense tools started");
 
         //Define the mitt.
         Mitt mitt = new Mitt();
@@ -51,11 +53,11 @@ public class Sisense {
                         cli.getParameter("type")).startBuild();
             }
         } catch (DuplicateEntityException ex) {
-            Logger.getLogger(Sisense.class.getName()).log(Level.SEVERE, "Fail on Sisense API", ex);
+            LOG.log(Level.SEVERE, "Fail on Sisense API", ex);
         } finally {
             mitt.close();
         }
 
-        Logger.getLogger(Sisense.class.getName()).info("GLOVE - Sisense tools finished");
+        LOG.info("GLOVE - Sisense tools finished");
     }
 }

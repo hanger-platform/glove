@@ -42,6 +42,8 @@ public class ElastiCubeStartBuild {
     private final String cube;
     private final String type;
 
+    private static final Logger LOG = Logger.getLogger(ElastiCubeStartBuild.class.getName());
+    
     /**
      *
      * @param token
@@ -88,10 +90,10 @@ public class ElastiCubeStartBuild {
                 if (httpStatus == 200) {
                     monitor = true;
                 } else {
-                    Logger.getLogger(ElastiCubeStartBuild.class.getName()).log(Level.INFO, "{0}: {1}", new Object[]{this.cube, httpStatus});
+                    LOG.log(Level.INFO, "{0}: {1}", new Object[]{this.cube, httpStatus});
                 }
             } catch (IOException ex) {
-                Logger.getLogger(ElastiCubeStartBuild.class.getName()).log(Level.INFO, "Fail building cube " + this.cube, ex);
+                LOG.log(Level.INFO, "Fail building cube " + this.cube, ex);
             }
         }
 
@@ -101,11 +103,11 @@ public class ElastiCubeStartBuild {
                 try {
                     TimeUnit.SECONDS.sleep(30);
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(ElastiCubeStartBuild.class.getName()).log(Level.SEVERE, "Fail waiting for cube status", ex);
+                    LOG.log(Level.SEVERE, "Fail waiting for cube status", ex);
                 }
 
                 status = elastiCubesStatus.getStatus();
-                Logger.getLogger(ElastiCubeStartBuild.class.getName()).log(Level.INFO, "{0}: {1}", new Object[]{this.cube, elastiCubesStatus.getStatusMessage(status)});
+                LOG.log(Level.INFO, "{0}: {1}", new Object[]{this.cube, elastiCubesStatus.getStatusMessage(status)});
 
                 //Identifies cube is building (514).
                 if (status != 514) {
@@ -113,7 +115,7 @@ public class ElastiCubeStartBuild {
                     if (status != 2) {
                         System.exit(1);
                     } else {
-                        Logger.getLogger(ElastiCubeStartBuild.class.getName()).log(Level.INFO, "{0} built successfully", this.cube);
+                        LOG.log(Level.INFO, "{0} built successfully", this.cube);
                     }
 
                     break;
