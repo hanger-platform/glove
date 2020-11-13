@@ -23,7 +23,7 @@ Utilizando o [Maven](https://maven.apache.org/):
 
 ##### CONFIGURAÇÂO
 
-* Crie um arquivo com as seguintes informações sobre seu acesso ao servidor SFTP, este será o seu **credentials file**:
+* Crie um arquivo com as seguintes informações sobre seu acesso ao sisense, este será o seu **credentials file**:
 
 ```
 {
@@ -38,7 +38,8 @@ java -jar sisense.jar  \
 	--credentials=<Credentials file>  \
 	--server=<Sisense server> \
 	--cube=<Output path> \
-	--action=<Sisense API Action, accepted values: startBuild> 
+	--action=<Sisense API Action, accepted values: startBuild> \
+	--Type=<Build Type, accepted values:: Full> 
 ```
 
 ## Contributing, Bugs, Questions

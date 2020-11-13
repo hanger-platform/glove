@@ -40,21 +40,25 @@ public class ElastiCubeStartBuild {
     private final String token;
     private final String server;
     private final String cube;
+    private final String type;
 
     /**
      *
      * @param token
      * @param server
      * @param cube
+     * @param type
      */
     public ElastiCubeStartBuild(
             String token,
             String server,
-            String cube) {
+            String cube,
+            String type) {
 
         this.token = token;
         this.server = server;
         this.cube = cube;
+        this.type = type;
     }
 
     /**
@@ -76,7 +80,7 @@ public class ElastiCubeStartBuild {
         } else {
             try {
                 HttpClient httpClient = new HttpClient();
-                PostMethod method = new PostMethod("https://" + this.server + "/api/elasticubes/localhost/" + this.cube + "/startBuild?type=Full");
+                PostMethod method = new PostMethod("https://" + this.server + "/api/elasticubes/localhost/" + this.cube + "/startBuild?type=" + this.type);
                 method.setRequestHeader("Authorization", "Bearer " + this.token);
                 int httpStatus = httpClient.executeMethod(method);
 

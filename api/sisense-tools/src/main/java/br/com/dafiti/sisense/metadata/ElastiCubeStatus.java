@@ -105,7 +105,7 @@ public class ElastiCubeStatus {
         try {
             status = CubeStatus.valueOf("_" + statusNumber);
         } catch (Exception ex) {
-            Logger.getLogger(ElastiCubeStatus.class.getName()).log(Level.SEVERE, "Fail getting status descroption of ", statusNumber);
+            Logger.getLogger(ElastiCubeStatus.class.getName()).log(Level.SEVERE, "Fail getting status description of ", statusNumber);
         }
 
         if (status != null) {

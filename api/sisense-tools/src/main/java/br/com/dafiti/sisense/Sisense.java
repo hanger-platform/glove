@@ -30,7 +30,8 @@ public class Sisense {
                     .addParameter("c", "credentials", "Credentials file", "", true, false)
                     .addParameter("s", "server", "Sisense server", "", true, false)
                     .addParameter("e", "cube", "ElastCube", "", true, false)
-                    .addParameter("a", "action", "Sisense API Action", "startBuild", true, false);
+                    .addParameter("a", "action", "Sisense API Action", "startBuild", true, false)
+                    .addParameter("t", "type", "Build type", "Full");
 
             //Read the command line interface.
             CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -46,7 +47,8 @@ public class Sisense {
                 new ElastiCubeStartBuild(
                         (String) credentials.get("token"),
                         cli.getParameter("server"),
-                        cli.getParameter("cube")).startBuild();
+                        cli.getParameter("cube"),
+                        cli.getParameter("type")).startBuild();
             }
         } catch (DuplicateEntityException ex) {
             Logger.getLogger(Sisense.class.getName()).log(Level.SEVERE, "Fail on Sisense API", ex);
