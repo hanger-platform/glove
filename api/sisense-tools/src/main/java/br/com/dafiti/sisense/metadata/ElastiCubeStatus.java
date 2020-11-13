@@ -113,7 +113,7 @@ public class ElastiCubeStatus {
         if (status != null) {
             statusMessage = status.status;
         } else {
-            statusMessage = "Undefined";
+            statusMessage = "Undefined status: " + statusNumber;
         }
 
         return statusMessage;

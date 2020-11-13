@@ -90,7 +90,7 @@ public class ElastiCubeStartBuild {
                 if (httpStatus == 200) {
                     monitor = true;
                 } else {
-                    LOG.log(Level.INFO, "{0}: {1}", new Object[]{this.cube, httpStatus});
+                    LOG.log(Level.INFO, "{0}: {1}", new Object[]{this.cube, elastiCubesStatus.getStatusMessage(httpStatus)});
                 }
             } catch (IOException ex) {
                 LOG.log(Level.INFO, "Fail building cube " + this.cube, ex);
