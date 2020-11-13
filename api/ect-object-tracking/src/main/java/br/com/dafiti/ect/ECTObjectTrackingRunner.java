@@ -83,7 +83,7 @@ public class ECTObjectTrackingRunner implements Runnable {
     @Override
     public void run() {
         //Defines a MITT instance. 
-        Mitt mitt = new Mitt();
+        Mitt mitt = new Mitt(true);
 
         //Defines output file.
         mitt.setOutputFile((output.endsWith("/") ? output : (output + "/")) + "tracking_" + UUID.randomUUID() + ".csv");
