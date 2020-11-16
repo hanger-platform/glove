@@ -44,6 +44,8 @@ public class ElastiCubeStatus {
     private final String server;
     private final String cube;
 
+    private static final Logger LOG = Logger.getLogger(ElastiCubeStatus.class.getName());
+
     /**
      *
      * @param token
@@ -87,7 +89,7 @@ public class ElastiCubeStatus {
         } catch (IOException
                 | ParseException ex) {
 
-            Logger.getLogger(ElastiCubeStatus.class.getName()).log(Level.SEVERE, "Fail getting cube status", ex);
+            LOG.log(Level.SEVERE, "Fail getting cube status", ex);
         }
 
         return status;
@@ -105,13 +107,13 @@ public class ElastiCubeStatus {
         try {
             status = CubeStatus.valueOf("_" + statusNumber);
         } catch (Exception ex) {
-            Logger.getLogger(ElastiCubeStatus.class.getName()).log(Level.SEVERE, "Fail getting status descroption of ", statusNumber);
+            LOG.log(Level.SEVERE, "Fail getting status description of ", statusNumber);
         }
 
         if (status != null) {
             statusMessage = status.status;
         } else {
-            statusMessage = "Undefined";
+            statusMessage = "Undefined status: " + statusNumber;
         }
 
         return statusMessage;

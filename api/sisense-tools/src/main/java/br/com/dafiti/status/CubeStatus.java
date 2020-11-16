@@ -37,6 +37,7 @@ public enum CubeStatus {
     _64("the ElastiCube is down because it is 32 bit data on a 64 bit codebase"),
     _128("the ElastiCube is down because it is 64 bit data on a 32 bit codebase"),
     _256("locked"),
+    _400("bad request, check if the provided cube parameter is exactly equals to sisense elasticube name (Case sensitive)"),
     _514("the ElastiCube or its child is currently in a build process"),
     _1024("the ElastiCube is starting, but not yet running"),
     _2048("the ElastiCube is in a build process"),
