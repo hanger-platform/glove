@@ -55,6 +55,9 @@ public class Mitt {
     private WriterSettings writerSettings;
     private CommandLineInterface commandLineInterface;
 
+    public Mitt(boolean silent) {
+    }
+
     public Mitt() {
         try (InputStream inputStream = Mitt.class
                 .getClassLoader()

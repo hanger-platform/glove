@@ -271,8 +271,6 @@ public class Extractor implements Runnable {
                     } else if (stringField > 0) {
                         int justifiedLength = (length * 2) > 65000 ? 65000 : (length * 2);
 
-                        length = length <= 0 ? 255 : length;
-
                         fieldMetadata.add("{\"field\":\"" + field + "\",\"type\":\"string\",\"length\":" + justifiedLength + "}");
 
                         switch (dialect) {
@@ -282,7 +280,7 @@ public class Extractor implements Runnable {
                                 fieldDataType.add(field + " " + "varchar(" + justifiedLength + ")");
                                 break;
                             case "redshift":
-                                fieldDataType.add(field + " " + "varchar(" + length + ") ENCODE ZSTD");
+                                fieldDataType.add(field + " " + "varchar(" + justifiedLength + ") ENCODE ZSTD");
                                 break;
                             case "bigquery":
                                 fieldSchema.add("{\"name\":\"" + field + "\",\"type\":\"STRING\"}");
@@ -331,8 +329,6 @@ public class Extractor implements Runnable {
                         case "string":
                             int justifiedLength = length > 65000 ? 65000 : length;
 
-                            length = length <= 0 ? 255 : length;
-
                             fieldMetadata.add("{\"field\":\"" + field + "\",\"type\":\"string\",\"length\":" + justifiedLength + "}");
 
                             switch (dialect) {
@@ -342,7 +338,7 @@ public class Extractor implements Runnable {
                                     fieldDataType.add(field + " " + "varchar(" + justifiedLength + ")");
                                     break;
                                 case "redshift":
-                                    fieldDataType.add(field + " " + "varchar(" + length + ")  ENCODE ZSTD");
+                                    fieldDataType.add(field + " " + "varchar(" + justifiedLength + ")  ENCODE ZSTD");
                                     break;
                                 case "bigquery":
                                     fieldSchema.add("{\"name\":\"" + field + "\",\"type\":\"STRING\"}");
