@@ -58,9 +58,9 @@ A api sempre retorna um arquivo csv contendo os seguintes campos:
 | custom_primary_key | Campo interno |
 | etl_load_date | Data de geração dos dados |
 | number | Número do objeto |
-| event_type | Tipo do evento de retorno |
+| event_type | Tipo do evento |
 | event_code | CEP da unidade ECT |
-| event_status | Status do evento de retorno |
+| event_status | Status do evento |
 | event_description | Descrição do evento |
 | event_date | Data e hora do evento |
 | initials | Sigla do objeto solicitado |
