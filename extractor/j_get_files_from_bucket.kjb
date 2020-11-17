@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job>
   <name>j_get_files_from_bucket</name>
-  <description/>
-  <extended_description/>
-  <job_version/>
+  <description />
+  <extended_description />
+  <job_version />
   <job_status>0</job_status>
   <directory>/</directory>
   <created_user>-</created_user>
@@ -15,12 +15,12 @@
   <slaveservers>
     </slaveservers>
   <job-log-table>
-    <connection/>
-    <schema/>
-    <table/>
-    <size_limit_lines/>
-    <interval/>
-    <timeout_days/>
+    <connection />
+    <schema />
+    <table />
+    <size_limit_lines />
+    <interval />
+    <timeout_days />
     <field>
       <id>ID_JOB</id>
       <enabled>Y</enabled>
@@ -128,10 +128,10 @@
     </field>
   </job-log-table>
   <jobentry-log-table>
-    <connection/>
-    <schema/>
-    <table/>
-    <timeout_days/>
+    <connection />
+    <schema />
+    <table />
+    <timeout_days />
     <field>
       <id>ID_BATCH</id>
       <enabled>Y</enabled>
@@ -219,10 +219,10 @@
     </field>
   </jobentry-log-table>
   <channel-log-table>
-    <connection/>
-    <schema/>
-    <table/>
-    <timeout_days/>
+    <connection />
+    <schema />
+    <table />
+    <timeout_days />
     <field>
       <id>ID_BATCH</id>
       <enabled>Y</enabled>
@@ -285,13 +285,12 @@
     </field>
   </channel-log-table>
   <pass_batchid>N</pass_batchid>
-  <shared_objects_file/>
+  <shared_objects_file />
   <entries>
     <entry>
       <name>START</name>
-      <description/>
+      <description />
       <type>SPECIAL</type>
-      <attributes/>
       <start>Y</start>
       <dummy>N</dummy>
       <repeat>N</repeat>
@@ -307,21 +306,19 @@
       <nr>0</nr>
       <xloc>64</xloc>
       <yloc>48</yloc>
-      <attributes_kjc/>
     </entry>
     <entry>
       <name>Get and merge files</name>
-      <description/>
+      <description />
       <type>SHELL</type>
-      <attributes/>
-      <filename/>
-      <work_directory/>
+      <filename />
+      <work_directory />
       <arg_from_previous>N</arg_from_previous>
       <exec_per_row>N</exec_per_row>
       <set_logfile>N</set_logfile>
-      <logfile/>
+      <logfile />
       <set_append_logfile>N</set_append_logfile>
-      <logext/>
+      <logext />
       <add_date>N</add_date>
       <add_time>N</add_time>
       <insertScript>Y</insertScript>
@@ -384,12 +381,7 @@ if [ "${FILE_INPUT_BUCKET}" != "" ]; then
 	
 		for i in `ls ${RAWFILE_QUEUE_STAGING_PATH}*`
 		do
-			if [ -f "${i}" ]; then
-				if [[ ${FILE_OUTPUT_MODE} == "append" &amp;&amp; ${FILE_INPUT_PARTITONED} -eq 0 &amp;&amp; ${MERGE_REQUIRED} -eq 0  ]]; then	
-					echo "Copying file ${i} to ${RAWFILE_QUEUE_PATH}"
-					mv ${i}	${RAWFILE_QUEUE_PATH}${SCHEMA_NAME}_${TABLE_NAME}_$(basename "${i}")
-					error_check			
-				else
+			if [ -f "${i}" ]; then				
 					if [ ${FILE_INDEX} = 0 ]; then	
 						cat ${i} >>	${RAWFILE_QUEUE_FILE}
 						error_check
@@ -404,8 +396,7 @@ if [ "${FILE_INPUT_BUCKET}" != "" ]; then
 						fi
 					fi
 
-					FILE_INDEX=$(( $FILE_INDEX + 1 ))
-				fi
+					FILE_INDEX=$(( $FILE_INDEX + 1 ))				
 			fi
 		done	
 	else
@@ -423,32 +414,27 @@ fi</script>
       <nr>0</nr>
       <xloc>176</xloc>
       <yloc>48</yloc>
-      <attributes_kjc/>
     </entry>
     <entry>
       <name>Success</name>
-      <description/>
+      <description />
       <type>SUCCESS</type>
-      <attributes/>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>288</xloc>
       <yloc>48</yloc>
-      <attributes_kjc/>
     </entry>
     <entry>
       <name>Abort job</name>
-      <description/>
+      <description />
       <type>ABORT</type>
-      <attributes/>
-      <message/>
+      <message />
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>176</xloc>
       <yloc>160</yloc>
-      <attributes_kjc/>
     </entry>
   </entries>
   <hops>
@@ -482,5 +468,4 @@ fi</script>
   </hops>
   <notepads>
   </notepads>
-  <attributes/>
 </job>
