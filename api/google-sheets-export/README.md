@@ -1,9 +1,9 @@
 # Google Sheets Export [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-### Extrator de dados do Google Sheets. 
+### Exportação de dados para Google Sheets. 
 
 ## How it works
 
-O **Google Sheets Export** é uma ferramenta que possibilita efetuar a exportação de dados para uma planilha do Google Sheets.
+O **Google Sheets Export** é uma ferramenta que possibilita efetuar a exportação de dados para uma planilha do Google Sheets. Somente é aceito arquivos de entrada do tipo csv.
 
 ## Instalação
 
@@ -27,7 +27,7 @@ O **Google Sheets Export** é uma ferramenta que possibilita efetuar a exportaç
     - Clique em criar **ID do cliente do OAuth**.
     - Selecione a opção **Outros**
     - Defina um **nome** e clique em **criar**.
-    - Faça downloado do arquivo JSON relacionado com a credencial.     
+    - Faça download do arquivo JSON relacionado com a credencial.     
 
 ##### CONSTRUÇÃO
 
