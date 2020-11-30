@@ -73,7 +73,10 @@ public class GoogleSheetsExport {
                 .addParameter("t", "sheet", "Define sheet name", "", true, false)
                 .addParameter("sl", "sleep", "(Optional) Sleep time in seconds at one request and another; 0 is default", "0")
                 .addParameter("m", "method", "(Optional) Update method, 0 for full, 1 append; 0 is default", "0")
-                .addParameter("d", "debug", "(Optional) Identify if it is debug mode; 0 is default", "0");
+                .addParameter("d", "debug", "(Optional) Identify if it is debug mode; 0 is default", "0")
+                .addParameter("de", "delimiter", "(Optional) Delimiter, default is semicolon(;) ", ";")
+                .addParameter("q", "quote", "(Optional) Quote, default is double quotes(\") ", "\"")
+                .addParameter("qe", "quote_escape", "(Optional) Quote Escaoe, default is double quotes(\") ", "\"");
 
         //Read the command line interface. 
         CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -90,7 +93,7 @@ public class GoogleSheetsExport {
             File file = new File(cli.getParameter("input"));
 
             //Get CSV informations.
-            InputDimension inputDimension = new CsvRoutines(getSettings(true)).getInputDimension(file);
+            InputDimension inputDimension = new CsvRoutines(getSettings(true, cli)).getInputDimension(file);
 
             //Calculate the number of cells that will be written.
             long cells = (inputDimension.columnCount() * inputDimension.rowCount());
@@ -100,7 +103,7 @@ public class GoogleSheetsExport {
             //Get number of filled cells on spreadsheet.
             long cellsCount = api.getCellsCount();
 
-            //Number of cells that spreadsheet will heave.
+            //Number of cells that spreadsheet will have.
             cells = cells + cellsCount;
 
             System.out.println("[" + api.getSpreadsheetTitle() + "] cells: " + cellsCount + ", after update: " + cells + " (Limit is " + CELLS_LIMIT + ")");
@@ -138,7 +141,7 @@ public class GoogleSheetsExport {
                             System.out.println("Update method: [APPEND]");
 
                             //If at least one cell is filled, append ignore header.
-                            csvParser = new CsvParser(getSettings(api.hasValues(sheet, startIndex)));
+                            csvParser = new CsvParser(getSettings(api.hasValues(sheet, startIndex), cli));
                             break;
 
                         // Full method
@@ -146,7 +149,7 @@ public class GoogleSheetsExport {
                             System.out.println("Update method: [FULL]");
 
                             //Full mehotd doesn't extract header.
-                            csvParser = new CsvParser(getSettings(false));
+                            csvParser = new CsvParser(getSettings(false, cli));
 
                             //Clear cells from a sheet.
                             api.cleanCells(sheet);
@@ -230,16 +233,16 @@ public class GoogleSheetsExport {
      * @param headerExtraction extract header from CSV.
      * @return
      */
-    public static CsvParserSettings getSettings(boolean headerExtraction) {
+    public static CsvParserSettings getSettings(boolean headerExtraction, CommandLineInterface cli) {
         //Define a settings.
         CsvParserSettings parserSettings = new CsvParserSettings();
         parserSettings.setNullValue("");
         parserSettings.setMaxCharsPerColumn(-1);
 
         //Define format settings.
-        parserSettings.getFormat().setDelimiter(';');
-        parserSettings.getFormat().setQuote('"');
-        parserSettings.getFormat().setQuoteEscape('"');
+        parserSettings.getFormat().setDelimiter(cli.getParameter("delimiter"));
+        parserSettings.getFormat().setQuote(cli.getParameter("quote").charAt(0));
+        parserSettings.getFormat().setQuoteEscape(cli.getParameter("quote_escape").charAt(0));
 
         //Define the input buffer.
         parserSettings.setInputBufferSize(2 * (1024 * 1024));
