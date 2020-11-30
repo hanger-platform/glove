@@ -3,7 +3,7 @@
 
 ## How it works
 
-O **Google Sheets Export** é uma ferramenta que possibilita efetuar a exportação de dados para uma planilha do Google Sheets. Somente é aceito arquivos de entrada do tipo csv.
+O **Google Sheets Export** é uma ferramenta que possibilita efetuar a exportação de dados para uma planilha do Google Sheets. Somente é aceito arquivo de entrada do tipo csv.
 
 ## Instalação
 
