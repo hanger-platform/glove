@@ -3,7 +3,7 @@
 
 ## How it works
 
-O **Google Sheets Export** é uma ferramenta que possibilita efetuar a exportação de dados para uma planilha do Google Sheets. Somente é aceito arquivos de entrada do tipo csv.
+O **Google Sheets Export** é uma ferramenta que possibilita efetuar a exportação de dados para uma planilha do Google Sheets. Somente é aceito arquivo de entrada do tipo csv.
 
 ## Instalação
 
@@ -46,6 +46,9 @@ java -jar google-sheets-export.jar \
 	--sheet=<Identifica qual a aba que os dados serão exportados> \
 	--debug=<Identifica se o extrator deve rodar em modo debug>
 ```
+## Limitações
+
+- A APi do Googele Spreadsheets possuir algumas limitações, como quantidade de linhas e quantidade de células, o ideal é que consulte a documentação oficial da Google Para esse tipo de informação (https://support.google.com/drive/answer/37603)
 
 ## Contributing, Bugs, Questions
 Contributions are more than welcome! If you want to propose new changes, fix bugs or improve something feel free to fork the repository and send us a Pull Request. You can also open new `Issues` for reporting bugs and general problems.
