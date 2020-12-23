@@ -55,6 +55,7 @@ public class AdCampaign {
     private final List partition;
     private final List<String> fields;
     private final List<String> attributes;
+    private final String filtering;
 
     private static final Logger LOG = Logger.getLogger(AdCampaign.class.getName());
 
@@ -67,7 +68,8 @@ public class AdCampaign {
             List key,
             List partition,
             List fields,
-            List attibutes) {
+            List attibutes,
+            String filtering) {
 
         this.apiContext = apiContext;
         this.adAccount = adAccount;
@@ -78,6 +80,7 @@ public class AdCampaign {
         this.partition = partition;
         this.fields = fields;
         this.attributes = attibutes;
+        this.filtering = filtering;
     }
 
     /**
@@ -99,6 +102,7 @@ public class AdCampaign {
             this.attributes.add("account_id");
             this.attributes.add("id");
             this.attributes.add("name");
+            this.attributes.add("status");
         }
 
         //Defines the output fields.
@@ -115,7 +119,7 @@ public class AdCampaign {
         List<String> originalFields = mitt.getConfiguration().getOriginalFieldsName();
 
         //Iterates for each account.
-        for (String account : this.adAccount) {
+        this.adAccount.forEach(account -> {
             try {
                 LOG.log(Level.INFO, "Retrieving campaing from account {0}", account.trim());
 
@@ -124,6 +128,12 @@ public class AdCampaign {
 
                 //Define a time range filter.
                 campaignRequest.setTimeRange("{\"since\":\"" + this.startDate + "\",\"until\":\"" + this.endDate + "\"}");
+
+                //Define the filters.
+                if (this.filtering != null) {
+                    LOG.log(Level.INFO, "Filter: {0}", this.filtering);
+                    campaignRequest.setParam("filtering", this.filtering);
+                }
 
                 //Define fields to be requested.
                 this.attributes.forEach((attribute) -> {
@@ -163,7 +173,7 @@ public class AdCampaign {
                 LOG.log(Level.SEVERE, "Fail retrieving campaigns from account {0}, perhaps this account doesn't exist.", account.trim());
                 ex.printStackTrace();
             }
-        }
+        });
 
         mitt.close();
     }
