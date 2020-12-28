@@ -144,6 +144,12 @@ public class AdsInsight {
                         )
                 );
 
+                //Define the filters.
+                if (this.filtering != null) {
+                    LOG.log(Level.INFO, "Filter: {0}", this.filtering);
+                    adInsightsRequest.setParam("filtering", this.filtering);
+                }
+
                 //Identifies if report has breakdowns.
                 if (!this.breakdowns.isEmpty()) {
                     adInsightsRequest.setBreakdowns(String.join(",", this.breakdowns));
