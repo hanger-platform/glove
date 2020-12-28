@@ -31,7 +31,6 @@ import com.facebook.ads.sdk.APIContext;
 import com.facebook.ads.sdk.APIException;
 import com.facebook.ads.sdk.APINodeList;
 import com.facebook.ads.sdk.AdAccount;
-import com.facebook.ads.sdk.AdAccount.APIRequestGetCampaigns;
 import com.facebook.ads.sdk.Campaign;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -124,7 +123,7 @@ public class AdCampaign {
                 LOG.log(Level.INFO, "Retrieving campaing from account {0}", account.trim());
 
                 AdAccount adAccount = new AdAccount(account.trim(), this.apiContext);
-                APIRequestGetCampaigns campaignRequest = adAccount.getCampaigns();
+                 AdAccount.APIRequestGetCampaigns campaignRequest = adAccount.getCampaigns();
 
                 //Define a time range filter.
                 campaignRequest.setTimeRange("{\"since\":\"" + this.startDate + "\",\"until\":\"" + this.endDate + "\"}");
@@ -170,8 +169,7 @@ public class AdCampaign {
                     mitt.write(record);
                 }
             } catch (APIException ex) {
-                LOG.log(Level.SEVERE, "Fail retrieving campaigns from account {0}, perhaps this account doesn't exist.", account.trim());
-                ex.printStackTrace();
+                LOG.log(Level.SEVERE, "Fail retrieving campaigns from account {0}, perhaps this account doesn't exist. Error: {1}", new Object[]{account.trim(), ex});
             }
         });
 

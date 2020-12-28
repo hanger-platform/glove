@@ -121,7 +121,7 @@ public class AdsCreative {
         List<String> originalFields = mitt.getConfiguration().getOriginalFieldsName();
 
         //Iterates for each account.
-        this.adAccount.forEach(account -> {
+        this.adAccount.forEach((String account) -> {
             try {
                 LOG.log(Level.INFO, "Retrieving adCreatives from account {0}", account.trim());
 
@@ -169,8 +169,7 @@ public class AdsCreative {
                     mitt.write(record);
                 }
             } catch (APIException ex) {
-                LOG.log(Level.SEVERE, "Fail retrieving adsCreative from account {0}, perhaps this account doesn't exist.", account.trim());
-                ex.printStackTrace();
+                LOG.log(Level.SEVERE, "Fail retrieving adsCreative from account {0}, perhaps this account doesn't exist. Error: {1}", new Object[]{account.trim(), ex});
             }
         });
 

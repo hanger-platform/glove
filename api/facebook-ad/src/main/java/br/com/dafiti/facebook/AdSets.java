@@ -121,7 +121,7 @@ public class AdSets {
         //Iterates for each account.
         this.adAccount.forEach(account -> {
             try {
-                LOG.log(Level.INFO, "Retrieving campaing from account {0}", account.trim());
+                LOG.log(Level.INFO, "Retrieving adSets from account {0}", account.trim());
 
                 AdAccount adAccount = new AdAccount(account.trim(), this.apiContext);
                 AdAccount.APIRequestGetAdSets adSetsRequest = adAccount.getAdSets();
@@ -170,8 +170,7 @@ public class AdSets {
                     mitt.write(record);
                 }
             } catch (APIException ex) {
-                LOG.log(Level.SEVERE, "Fail retrieving campaigns from account {0}, perhaps this account doesn't exist.", account.trim());
-                ex.printStackTrace();
+                LOG.log(Level.SEVERE, "Fail retrieving adSets from account {0}, perhaps this account doesn't exist. Error: {1}", new Object[]{account.trim(), ex});
             }
         });
 
