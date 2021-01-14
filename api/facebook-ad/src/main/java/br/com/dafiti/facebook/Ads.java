@@ -26,17 +26,12 @@ package br.com.dafiti.facebook;
 import br.com.dafiti.mitt.Mitt;
 import br.com.dafiti.mitt.exception.DuplicateEntityException;
 import br.com.dafiti.mitt.transformation.embedded.Concat;
-import br.com.dafiti.mitt.transformation.embedded.DateFormat;
 import br.com.dafiti.mitt.transformation.embedded.Now;
 import com.facebook.ads.sdk.APIContext;
 import com.facebook.ads.sdk.APIException;
 import com.facebook.ads.sdk.APINodeList;
 import com.facebook.ads.sdk.Ad;
 import com.facebook.ads.sdk.AdAccount;
-import com.facebook.ads.sdk.AdAccount.APIRequestGetCampaigns;
-import com.facebook.ads.sdk.AdSet;
-import com.facebook.ads.sdk.AdSet.APIRequestGetAds;
-import com.facebook.ads.sdk.Campaign;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import java.util.ArrayList;
@@ -59,6 +54,7 @@ public class Ads {
     private final List partition;
     private final List<String> fields;
     private final List<String> attributes;
+    private final String filtering;
 
     private static final Logger LOG = Logger.getLogger(Ads.class.getName());
 
@@ -71,7 +67,8 @@ public class Ads {
             List key,
             List partition,
             List fields,
-            List attibutes) {
+            List attibutes,
+            String filtering) {
 
         this.apiContext = apiContext;
         this.adAccount = adAccount;
@@ -82,6 +79,7 @@ public class Ads {
         this.partition = partition;
         this.fields = fields;
         this.attributes = attibutes;
+        this.filtering = filtering;
     }
 
     /**
@@ -105,6 +103,8 @@ public class Ads {
             this.attributes.add("adset_id");
             this.attributes.add("id");
             this.attributes.add("name");
+            this.attributes.add("creative");
+            this.attributes.add("status");
         }
 
         //Defines the output fields.
@@ -121,81 +121,59 @@ public class Ads {
         List<String> originalFields = mitt.getConfiguration().getOriginalFieldsName();
 
         //Iterates for each account.
-        for (String account : this.adAccount) {
+        this.adAccount.forEach(account -> {
             try {
-                LOG.log(Level.INFO, "Retrieving campaing from account {0}", account.trim());
+                LOG.log(Level.INFO, "Retrieving ads from account {0}", account.trim());
 
                 AdAccount adAccount = new AdAccount(account.trim(), this.apiContext);
-                APIRequestGetCampaigns request = adAccount.getCampaigns();
+                AdAccount.APIRequestGetAds adsRequest = adAccount.getAds();
+
+                //Defines a time range filter
+                adsRequest.setTimeRange("{\"since\":\"" + this.startDate + "\",\"until\":\"" + this.endDate + "\"}");
+
+                if (this.filtering != null) {
+                    LOG.log(Level.INFO, "Filter: {0}", this.filtering);
+                    adsRequest.setParam("filtering", this.filtering);
+                }
+
+                //Define fields to be requested.
+                this.attributes.forEach((attribute) -> {
+                    adsRequest.requestField(attribute);
+                });
 
                 //Request campaign fields.
-                APINodeList<Campaign> campaigns = request
-                        .requestField("name")
-                        .requestField("adset").execute();
+                APINodeList<Ad> ads = adsRequest.execute();
 
                 //Enables auto pagination.
-                campaigns = campaigns.withAutoPaginationIterator(true);
+                ads = ads.withAutoPaginationIterator(true);
 
-                //Reads each campaign.
-                for (Campaign campaign : campaigns) {
-                    APINodeList<AdSet> adSets = campaign.getAdSets()
-                            .requestField("name")
-                            .requestField("ad").execute();
+                for (Ad ad : ads) {
+                    List record = new ArrayList();
 
-                    //Enables auto pagination.
-                    adSets = adSets.withAutoPaginationIterator(true);
+                    originalFields.forEach((field) -> {
+                        JsonObject jsonObject = ad.getRawResponseAsJsonObject();
 
-                    //Reads each adSets.
-                    for (AdSet adSet : adSets) {
-                        LOG.log(Level.INFO, "Retrieving ads from adSets {0} of campaign {1} ", new Object[]{adSet.getFieldName(), campaign.getFieldName()});
+                        //Identifies if the field exists. 
+                        if (jsonObject.has(field)) {
+                            JsonElement jsonElement = jsonObject.get(field);
 
-                        //Defines the campaign ads edge request.
-                        APIRequestGetAds adsRequest = adSet.getAds();
-
-                        //Defines a time range filter
-                        adsRequest.setTimeRange("{\"since\":\"" + this.startDate + "\",\"until\":\"" + this.endDate + "\"}");
-
-                        //Define fields to be requested.
-                        this.attributes.forEach((attribute) -> {
-                            adsRequest.requestField(attribute);
-                        });
-
-                        //Request campaign fields.
-                        APINodeList<Ad> ads = adsRequest.execute();
-
-                        //Enables auto pagination.
-                        ads = ads.withAutoPaginationIterator(true);
-
-                        for (Ad ad : ads) {
-                            List record = new ArrayList();
-
-                            originalFields.forEach((field) -> {
-                                JsonObject jsonObject = ad.getRawResponseAsJsonObject();
-
-                                //Identifies if the field exists. 
-                                if (jsonObject.has(field)) {
-                                    JsonElement jsonElement = jsonObject.get(field);
-
-                                    //Identifies if the fiels is a primitive.
-                                    if (jsonElement.isJsonPrimitive()) {
-                                        record.add(jsonElement.getAsString());
-                                    } else {
-                                        record.add(jsonElement);
-                                    }
-                                } else {
-                                    record.add(null);
-                                }
-                            });
-
-                            mitt.write(record);
+                            //Identifies if the fiels is a primitive.
+                            if (jsonElement.isJsonPrimitive()) {
+                                record.add(jsonElement.getAsString());
+                            } else {
+                                record.add(jsonElement);
+                            }
+                        } else {
+                            record.add(null);
                         }
-                    }
+                    });
+
+                    mitt.write(record);
                 }
             } catch (APIException ex) {
-                LOG.log(Level.SEVERE, "Fail retrieving campaigns from account {0}, perhaps this account doesn't exist.", account.trim());
-                ex.printStackTrace();
+                LOG.log(Level.SEVERE, "Fail retrieving ads from account {0}, perhaps this account doesn't exist. Error: {1}", new Object[]{account.trim(), ex});
             }
-        }
+        });
 
         mitt.close();
     }

@@ -65,7 +65,8 @@ public class FacebookAd {
                     .addParameter("a", "attributes", "(Optional) Facebook Report fields, divided by + if has more than one field", "")
                     .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "")
                     .addParameter("f", "fields", "(Optional) Output fields, divided by + if has more than one field", "")
-                    .addParameter("z", "breakdowns", "(Optional) Breakdowns of report, divided by + if has more than one field", "");
+                    .addParameter("z", "breakdowns", "(Optional) Breakdowns of report, divided by + if has more than one field", "")
+                    .addParameter("f", "filtering", "(Optional) Ad Rule Filter expression", "");
 
             //Reads the command line interface. 
             CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -92,7 +93,9 @@ public class FacebookAd {
                             cli.getParameterAsList("key", "\\+"),
                             cli.getParameterAsList("partition", "\\+"),
                             cli.getParameterAsList("fields", "\\+"),
-                            cli.getParameterAsList("attributes", "\\+")).extract();
+                            cli.getParameterAsList("attributes", "\\+"),
+                            cli.getParameter("filtering")
+                    ).extract();
                     break;
                 case "adsets":
                     new AdSets(
@@ -104,7 +107,9 @@ public class FacebookAd {
                             cli.getParameterAsList("key", "\\+"),
                             cli.getParameterAsList("partition", "\\+"),
                             cli.getParameterAsList("fields", "\\+"),
-                            cli.getParameterAsList("attributes", "\\+")).extract();
+                            cli.getParameterAsList("attributes", "\\+"),
+                            cli.getParameter("filtering")
+                    ).extract();
                     break;
                 case "ads":
                     new Ads(
@@ -116,7 +121,23 @@ public class FacebookAd {
                             cli.getParameterAsList("key", "\\+"),
                             cli.getParameterAsList("partition", "\\+"),
                             cli.getParameterAsList("fields", "\\+"),
-                            cli.getParameterAsList("attributes", "\\+")).extract();
+                            cli.getParameterAsList("attributes", "\\+"),
+                            cli.getParameter("filtering")
+                    ).extract();
+                    break;
+                case "adscreative":
+                    new AdsCreative(
+                            apiContext,
+                            cli.getParameter("output"),
+                            cli.getParameterAsList("account", "\\+"),
+                            cli.getParameter("start_date"),
+                            cli.getParameter("end_date"),
+                            cli.getParameterAsList("key", "\\+"),
+                            cli.getParameterAsList("partition", "\\+"),
+                            cli.getParameterAsList("fields", "\\+"),
+                            cli.getParameterAsList("attributes", "\\+"),
+                            cli.getParameter("filtering")
+                    ).extract();
                     break;
                 case "adsinsights":
                     new AdsInsight(
@@ -129,7 +150,9 @@ public class FacebookAd {
                             cli.getParameterAsList("partition", "\\+"),
                             cli.getParameterAsList("fields", "\\+"),
                             cli.getParameterAsList("breakdowns", "\\+"),
-                            cli.getParameterAsList("attributes", "\\+")).extract();
+                            cli.getParameterAsList("attributes", "\\+"),
+                            cli.getParameter("filtering")
+                    ).extract();
                     break;
                 default:
                     LOG.log(Level.SEVERE, "Extractor {0} not yet implemented", cli.getParameter("report"));

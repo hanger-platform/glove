@@ -31,10 +31,7 @@ import com.facebook.ads.sdk.APIContext;
 import com.facebook.ads.sdk.APIException;
 import com.facebook.ads.sdk.APINodeList;
 import com.facebook.ads.sdk.AdAccount;
-import com.facebook.ads.sdk.AdAccount.APIRequestGetCampaigns;
 import com.facebook.ads.sdk.AdsInsights;
-import com.facebook.ads.sdk.Campaign;
-import com.facebook.ads.sdk.Campaign.APIRequestGetInsights;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import java.util.ArrayList;
@@ -59,6 +56,7 @@ public class AdsInsight {
     private final List<String> fields;
     private final List<String> breakdowns;
     private final List<String> attributes;
+    private final String filtering;
 
     private static final Logger LOG = Logger.getLogger(AdsInsight.class.getName());
 
@@ -72,7 +70,8 @@ public class AdsInsight {
             List partition,
             List fields,
             List breakdowns,
-            List attibutes) {
+            List attibutes,
+            String filtering) {
 
         this.apiContext = apiContext;
         this.adAccount = adAccount;
@@ -84,6 +83,7 @@ public class AdsInsight {
         this.fields = fields;
         this.breakdowns = breakdowns;
         this.attributes = attibutes;
+        this.filtering = filtering;
     }
 
     /**
@@ -127,83 +127,74 @@ public class AdsInsight {
         List<String> originalFields = mitt.getConfiguration().getOriginalFieldsName();
 
         //Iterates for each account.
-        for (String account : this.adAccount) {
+        this.adAccount.forEach(account -> {
             try {
-                LOG.log(Level.INFO, "Retrieving campaing from account {0}", account.trim());
+                LOG.log(Level.INFO, "Retrieving adInsights from account {0}", account.trim());
 
                 AdAccount adAccount = new AdAccount(account.trim(), this.apiContext);
-                APIRequestGetCampaigns campaignRequest = adAccount.getCampaigns();
+                AdAccount.APIRequestGetInsights adInsightsRequest = adAccount.getInsights();
+
+                //Defines some filters.
+                adInsightsRequest.setLevel(AdsInsights.EnumLevel.VALUE_AD);
+                adInsightsRequest.setTimeIncrement("1");
+                adInsightsRequest.setTimeRange("{\"since\":\"" + this.startDate + "\",\"until\":\"" + this.endDate + "\"}");
+                adInsightsRequest.setActionAttributionWindows(
+                        Arrays.asList(
+                                AdsInsights.EnumActionAttributionWindows.VALUE_DEFAULT
+                        )
+                );
+
+                //Define the filters.
+                if (this.filtering != null) {
+                    LOG.log(Level.INFO, "Filter: {0}", this.filtering);
+                    adInsightsRequest.setParam("filtering", this.filtering);
+                }
+
+                //Identifies if report has breakdowns.
+                if (!this.breakdowns.isEmpty()) {
+                    adInsightsRequest.setBreakdowns(String.join(",", this.breakdowns));
+                }
+
+                //Define report attributes to be requested.
+                this.attributes.forEach((attribute) -> {
+                    if (!this.breakdowns.contains(attribute)) {
+                        adInsightsRequest.requestField(attribute);
+                    }
+                });
 
                 //Request campaign fields.
-                APINodeList<Campaign> campaigns = campaignRequest
-                        .requestField("name")
-                        .requestField("insights").execute();
+                APINodeList<AdsInsights> adsInsights = adInsightsRequest.execute();
 
                 //Enables auto pagination.
-                campaigns = campaigns.withAutoPaginationIterator(true);
+                adsInsights = adsInsights.withAutoPaginationIterator(true);
 
-                for (Campaign campaign : campaigns) {
-                    LOG.log(Level.INFO, "Retrieving AdsInsights from campaign {0}", new Object[]{campaign.getFieldName()});
+                for (AdsInsights adsInsight : adsInsights) {
+                    List record = new ArrayList();
 
-                    APIRequestGetInsights adInsightsRequest = campaign.getInsights();
+                    originalFields.forEach((field) -> {
+                        JsonObject jsonObject = adsInsight.getRawResponseAsJsonObject();
 
-                    //Defines some filters.
-                    adInsightsRequest.setLevel(AdsInsights.EnumLevel.VALUE_AD);
-                    adInsightsRequest.setTimeIncrement("1");
-                    adInsightsRequest.setTimeRange("{\"since\":\"" + this.startDate + "\",\"until\":\"" + this.endDate + "\"}");
-                    adInsightsRequest.setActionAttributionWindows(
-                            Arrays.asList(
-                                    AdsInsights.EnumActionAttributionWindows.VALUE_DEFAULT
-                            )
-                    );
+                        //Identifies if the field exists. 
+                        if (jsonObject.has(field)) {
+                            JsonElement jsonElement = jsonObject.get(field);
 
-                    //Identifies if report has breakdowns.
-                    if (!this.breakdowns.isEmpty()) {
-                        adInsightsRequest.setBreakdowns(String.join(",", this.breakdowns));
-                    }
-
-                    //Define report attributes to be requested.
-                    this.attributes.forEach((attribute) -> {
-                        if (!this.breakdowns.contains(attribute)) {
-                            adInsightsRequest.requestField(attribute);
+                            //Identifies if the fiels is a primitive.
+                            if (jsonElement.isJsonPrimitive()) {
+                                record.add(jsonElement.getAsString());
+                            } else {
+                                record.add(jsonElement);
+                            }
+                        } else {
+                            record.add(null);
                         }
                     });
 
-                    //Request campaign fields.
-                    APINodeList<AdsInsights> adsInsights = adInsightsRequest.execute();
-
-                    //Enables auto pagination.
-                    adsInsights = adsInsights.withAutoPaginationIterator(true);
-
-                    for (AdsInsights adsInsight : adsInsights) {
-                        List record = new ArrayList();
-
-                        originalFields.forEach((field) -> {
-                            JsonObject jsonObject = adsInsight.getRawResponseAsJsonObject();
-
-                            //Identifies if the field exists. 
-                            if (jsonObject.has(field)) {
-                                JsonElement jsonElement = jsonObject.get(field);
-
-                                //Identifies if the fiels is a primitive.
-                                if (jsonElement.isJsonPrimitive()) {
-                                    record.add(jsonElement.getAsString());
-                                } else {
-                                    record.add(jsonElement);
-                                }
-                            } else {
-                                record.add(null);
-                            }
-                        });
-
-                        mitt.write(record);
-                    }
+                    mitt.write(record);
                 }
             } catch (APIException ex) {
-                LOG.log(Level.SEVERE, "Fail retrieving campaigns from account {0}, perhaps this account doesn't exist.", account.trim());
-                ex.printStackTrace();
+                LOG.log(Level.SEVERE, "Fail retrieving AdsInsights from account {0}, perhaps this account doesn't exist. Error: {1}", new Object[]{account.trim(), ex});
             }
-        }
+        });
 
         mitt.close();
     }

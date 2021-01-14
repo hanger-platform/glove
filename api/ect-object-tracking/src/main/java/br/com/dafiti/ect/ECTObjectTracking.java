@@ -93,7 +93,7 @@ public class ECTObjectTracking {
                         String number = record.replaceAll("\\P{Alnum}", "");
 
                         if (!number.isEmpty()) {
-                            objects.add(number);
+                            objects.add(number.trim());
                         }
                     }
                 }

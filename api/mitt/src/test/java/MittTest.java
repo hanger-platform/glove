@@ -56,7 +56,8 @@ public class MittTest {
         mitt.getConfiguration().addCustomField("bola::eval(**nome.replace(/[^0-9.]/g,'xxx')**)");
         mitt.getConfiguration().addCustomField("regex::regexp(nome,[9])");
         mitt.getConfiguration().addCustomField("checksum::checksum()");
-
+        mitt.getConfiguration().addCustomField("renamed::rename(nome)");
+        
         //Parameters. 
         mitt.getConfiguration().addParameter("a", "primeiro", "Primeiro parâmetro", "xxx");
         mitt.getConfiguration().addParameter("b", "segundo", "Segundo parâmetro");
