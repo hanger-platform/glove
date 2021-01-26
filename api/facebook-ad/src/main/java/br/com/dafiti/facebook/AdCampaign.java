@@ -169,7 +169,7 @@ public class AdCampaign {
                     mitt.write(record);
                 }
             } catch (APIException ex) {
-                LOG.log(Level.SEVERE, "Fail retrieving campaigns from account {0}, perhaps this account doesn't exist. Error: {1}", new Object[]{account.trim(), ex});
+                LOG.log(Level.SEVERE, "Fail retrieving campaigns from account {0}. Exception: {1}", new Object[]{account.trim(), ex});
             }
         });
 
