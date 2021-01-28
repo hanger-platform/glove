@@ -99,11 +99,11 @@ public class Export {
                 .addCustomField("etl_load_date", new Now());
 
         //Defines the standart field who has JSON content.
-        mitt.getConfiguration().addField("content");        
-        
+        mitt.getConfiguration().addField("content");
+
         //Defines fields.
         mitt.getConfiguration().addField(this.fields);
-        
+
         //Defines the input file don't has header. 
         mitt.getWriterSettings().setHeader(mitt
                 .getConfiguration()
@@ -198,8 +198,9 @@ public class Export {
             );
         }
 
-        //Remove temporary path. 
-        //Files.delete(outputPath);
         mitt.close();
+
+        //Remove temporary path. 
+        Files.delete(outputPath);
     }
 }
