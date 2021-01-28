@@ -121,9 +121,8 @@ public class Export {
         HttpResponse<String> response = Unirest.post(this.endpointDetail)
                 .header("Content-Type", "application/json")
                 .header("Authorization", (String) credentials.get("authorization"))
-                .header("cache-control", "no-cache")
-                .body("{\n  \"segment_id\": \"c458898b-4593-4fe8-afa6-7fcb8421330f\",\n  \"callback_endpoint\" : \"https://rest.iad-03.braze.com/users/export/segment/callback/\",\n  \"fields_to_export\" : [\"country\",\"external_id\",\"braze_id\",\"random_bucket\"]\n}")
-                //.body(this.requestBody)
+                .header("cache-control", "no-cache")                
+                .body(this.requestBody)
                 .asString();
 
         Logger.getLogger(Export.class.getName()).log(Level.INFO, "POST response: Status {0} - {1}", new Object[]{response.getStatus(), response.getBody()});
