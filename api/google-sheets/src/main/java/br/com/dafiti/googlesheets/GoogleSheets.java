@@ -28,11 +28,14 @@ import br.com.dafiti.mitt.cli.CommandLineInterface;
 import br.com.dafiti.mitt.exception.DuplicateEntityException;
 import br.com.dafiti.mitt.transformation.embedded.Concat;
 import br.com.dafiti.mitt.transformation.embedded.Now;
+import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -143,13 +146,15 @@ public class GoogleSheets {
                         .setAccessType("offline")
                         .build();
 
+        //Authorize.
+        Credential credential = new AuthorizationCodeInstalledApp(googleAuthorizationCodeFlow, new LocalServerReceiver()).authorize("user");
+
         //Instance of sheets service.
         Sheets sheets = new Sheets.Builder(
                 netHttpTransport,
                 jsonFactory,
-                new AuthorizationCodeInstalledApp(
-                        googleAuthorizationCodeFlow,
-                        new LocalServerReceiver()).authorize("user"))
+                setHttpTimeout(credential)
+        )
                 .setApplicationName("Google Sheets API extractor")
                 .build();
 
@@ -250,5 +255,18 @@ public class GoogleSheets {
 
         Logger.getLogger(GoogleSheets.class.getName())
                 .info("Google Sheets API extration finalized.");
+    }
+
+    /**
+     *
+     * @param requestInitializer
+     * @return
+     */
+    private static HttpRequestInitializer setHttpTimeout(final HttpRequestInitializer requestInitializer) {
+        return (HttpRequest httpRequest) -> {
+            requestInitializer.initialize(httpRequest);
+            httpRequest.setConnectTimeout(3 * 60000);  // 3 minutes connect timeout
+            httpRequest.setReadTimeout(3 * 60000);  // 3 minutes read timeout
+        };
     }
 }
