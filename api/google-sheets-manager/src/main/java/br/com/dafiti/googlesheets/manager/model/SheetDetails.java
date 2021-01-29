@@ -9,18 +9,18 @@ package br.com.dafiti.googlesheets.manager.model;
  *
  * @author flavialima
  */
-public class SpreadsheetDetails {
+public class SheetDetails {
     
     private int id;
     private int columnCount;
     private int rowCount;
     private String name;
 
-    public SpreadsheetDetails(int id, int columnCount, int rowCount, String name) {
-        this.id = id;
-        this.columnCount = columnCount;
-        this.rowCount = rowCount;
-        this.name = name;
+    public SheetDetails() {
+        this.id = -1;
+        this.columnCount = 0;
+        this.rowCount = 0;
+        this.name = null;
     }
 
     public int getId() {

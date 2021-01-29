@@ -2,10 +2,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>br.com.dafiti</groupId>
-  <artifactId>google-sheets-manager</artifactId>
+  <artifactId>google-sheets-export</artifactId>
+  <name>google-sheets-export</name>
   <version>1.0</version>
   <build>
-    <finalName>google-sheets-manager</finalName>
+    <finalName>google-sheets-export</finalName>
     <plugins>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
@@ -25,7 +26,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>br.com.dafiti.googlesheets.manager.GoogleSheetsManager</mainClass>
+              <mainClass>br.com.dafiti.googlesheets.export.GoogleSheetsExport</mainClass>
             </manifest>
           </archive>
         </configuration>
@@ -33,8 +34,8 @@
     </plugins>
   </build>
   <properties>
+    <maven.compiler.target>1.8</maven.compiler.target>
     <maven.compiler.source>1.8</maven.compiler.source>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 </project>
