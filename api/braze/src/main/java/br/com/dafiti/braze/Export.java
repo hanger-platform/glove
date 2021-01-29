@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Dafiti Group
+ * Copyright (c) 2021 Dafiti Group
  * 
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -48,7 +48,13 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 /**
- *
+ * This class flow is:
+ *  1 - Request export file to download 
+ *  2 - Wait file be ready to download 
+ *  3 - Download the file to temporary folder 
+ *  4 - Unzip the downloaded file
+ *  5 - Write output file with mitt transformations
+ * 
  * @author Helio Leal
  */
 public class Export {
@@ -121,7 +127,7 @@ public class Export {
         HttpResponse<String> response = Unirest.post(this.endpointDetail)
                 .header("Content-Type", "application/json")
                 .header("Authorization", (String) credentials.get("authorization"))
-                .header("cache-control", "no-cache")                
+                .header("cache-control", "no-cache")
                 .body(this.requestBody)
                 .asString();
 
