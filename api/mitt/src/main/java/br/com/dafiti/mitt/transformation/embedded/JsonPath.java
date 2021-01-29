@@ -38,10 +38,18 @@ public class JsonPath implements Transformable {
 
     private final String field;
     private final String path;
+    private final boolean displayException;
 
     public JsonPath(String field, String path) {
         this.field = field;
         this.path = path;
+        this.displayException = true;
+    }
+
+    public JsonPath(String field, String path, String displayException) {
+        this.field = field;
+        this.path = path;
+        this.displayException = Boolean.valueOf(displayException);
     }
 
     @Override
@@ -67,7 +75,9 @@ public class JsonPath implements Transformable {
                         .read(this.path, String.class);
             }
         } catch (Exception ex) {
-            Logger.getLogger(JsonPath.class.getName()).log(Level.SEVERE, "Error parsing json {0}", json);
+            if (this.displayException) {
+                Logger.getLogger(JsonPath.class.getName()).log(Level.SEVERE, "Error parsing json {0}", json);
+            }
         }
 
         return value;
