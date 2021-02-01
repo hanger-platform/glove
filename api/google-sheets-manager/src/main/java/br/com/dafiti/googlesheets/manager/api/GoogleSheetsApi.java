@@ -1,7 +1,25 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (c) 2021 Dafiti Group
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * 
  */
 package br.com.dafiti.googlesheets.manager.api;
 
@@ -20,19 +38,10 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.BackOff;
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.client.util.store.FileDataStoreFactory;
-import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
-import com.google.api.services.sheets.v4.model.AppendValuesResponse;
-import com.google.api.services.sheets.v4.model.BatchClearValuesByDataFilterRequest;
-import com.google.api.services.sheets.v4.model.BatchClearValuesRequest;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
-import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetResponse;
-import com.google.api.services.sheets.v4.model.BatchUpdateValuesRequest;
-import com.google.api.services.sheets.v4.model.ClearValuesRequest;
-import com.google.api.services.sheets.v4.model.DataFilter;
 import com.google.api.services.sheets.v4.model.DeleteDimensionRequest;
 import com.google.api.services.sheets.v4.model.DimensionRange;
-import com.google.api.services.sheets.v4.model.FindReplaceResponse;
 import com.google.api.services.sheets.v4.model.GridRange;
 import com.google.api.services.sheets.v4.model.InsertDimensionRequest;
 import com.google.api.services.sheets.v4.model.Request;
@@ -40,12 +49,9 @@ import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
 import com.google.api.services.sheets.v4.model.SpreadsheetProperties;
 import com.google.api.services.sheets.v4.model.UpdateCellsRequest;
-import com.google.api.services.sheets.v4.model.UpdateSpreadsheetPropertiesRequest;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
 import com.google.api.services.sheets.v4.Sheets;
-import com.google.api.services.sheets.v4.model.*;
-import com.google.common.collect.Lists;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -60,9 +66,10 @@ import java.util.List;
 /**
  *
  * @author flavialima
+ * @author Helio Leal
  */
 public class GoogleSheetsApi {
-    
+
     private final String sheetName;
     private Sheets service;
     private Spreadsheet spreadsheet;
@@ -77,7 +84,7 @@ public class GoogleSheetsApi {
         this.sheetName = sheetName;
         this.debug = debug;
     }
-    
+
     /**
      * Authenticate on Google Spreadsheet API.
      *
@@ -85,7 +92,7 @@ public class GoogleSheetsApi {
      * @param spreadSheetId
      * @return GoogleSheetsApi
      */
-    public GoogleSheetsApi authenticate(String credentials, String spreadSheetId){
+    public GoogleSheetsApi authenticate(String credentials, String spreadSheetId) {
         try {
             //Build a new authorized API client service.
             NetHttpTransport netHttpTransport
@@ -142,7 +149,7 @@ public class GoogleSheetsApi {
      * @return
      */
     private HttpRequestInitializer setHttpTimeout(final HttpRequestInitializer requestInitializer) {
-       return new HttpRequestInitializer() {
+        return new HttpRequestInitializer() {
             @Override
             public void initialize(HttpRequest httpRequest) throws IOException {
                 requestInitializer.initialize(httpRequest);
@@ -151,7 +158,7 @@ public class GoogleSheetsApi {
             }
         };
     }
-    
+
     /**
      * Clear cells range.
      *
@@ -176,7 +183,7 @@ public class GoogleSheetsApi {
             System.err.println("Error clearing cells: " + ex.getMessage());
         }
     }
-    
+
     /**
      * Add new columns.
      *
@@ -421,21 +428,20 @@ public class GoogleSheetsApi {
     public String getSpreadsheetTitle() {
         return this.spreadsheet.getProperties().getTitle();
     }
-    
+
     /**
      * Create a new spreadsheet.
      *
-     * @param sheetName
-     * Logic taken from:
+     * @param sheetName Logic taken from:
      * https://github.com/googleworkspace/java-samples/blob/master/sheets/snippets/src/main/java/SpreadsheetSnippets.java
-     * @return 
-     * @throws java.io.IOException 
+     * @return
+     * @throws java.io.IOException
      */
-    public String createSpreadsheet(String sheetName) throws IOException{
+    public String createSpreadsheet(String sheetName) throws IOException {
         Sheets service = this.service;
-        
+
         Spreadsheet spreadsheet = new Spreadsheet().setProperties(new SpreadsheetProperties()
-                    .setTitle(sheetName));
+                .setTitle(sheetName));
         spreadsheet = service.spreadsheets().create(spreadsheet)
                 .setFields("spreadsheetID").execute();
         System.out.println("Spreadsheet ID: " + spreadsheet.getSpreadsheetId());
