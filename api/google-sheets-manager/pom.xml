@@ -33,6 +33,33 @@
             <version>1.30.10</version>
             <type>jar</type>
         </dependency>
+        
+        
+        <!--  ABAIXO NOVAS LIBS -->
+        <dependency>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client</artifactId>
+            <version>1.31.2</version>
+            <type>jar</type>
+        </dependency>        
+        <dependency>
+            <groupId>com.google.oauth-client</groupId>
+            <artifactId>google-oauth-client-jetty</artifactId>
+            <version>1.31.4</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.google.apis</groupId>
+            <artifactId>google-api-services-drive</artifactId>
+            <version>v3-rev20200813-1.30.10</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.google.http-client</groupId>
+            <artifactId>google-http-client-jackson2</artifactId>
+            <version>1.36.0</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
     
     <build>
