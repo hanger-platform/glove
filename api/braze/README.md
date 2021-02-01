@@ -52,7 +52,35 @@ java -jar braze.jar  \
 
 ## Exemplos
 
-### Exemplo de tipo 'export'
+##### Exemplo de tipo 'list detail' (Padrão)
+
+```bash
+java -jar /<path>/braze.jar \
+  --credentials="<path>/<credentials.json>" \
+  --output="<output_path>/<file_name.csv>" \
+  --service="campaigns" \
+  --endpoint_list="https://rest.iad-03.braze.com/campaigns/list?include_archived=true&page=<<page>>" \
+  --endpoint_detail="https://rest.iad-03.braze.com/campaigns/details?campaign_id=<<id>>" \
+  --field="created_at+updated_at+id+name+archived+draft+schedule_type+channels+first_sent+last_sent+tags+messages+conversion_behaviors" \
+  --partition="::fixed(FULL)" \
+  --key="id"
+```
+
+##### Exemplo de tipo 'detail'
+
+```bash
+java -jar /<path>/braze.jar \
+  --credentials="<path>/<credentials.json>" \
+  --output="<output_path>/<file_name.csv>" \
+  --service="data" \
+  --type="detail" \
+  --endpoint_detail="https://rest.iad-03.braze.com/kpi/uninstalls/data_series?length=30&ending_at=${ENDDATE}T00%3A00%3A00" \
+  --field="time+uninstalls" \
+  --partition="::dateformat(time,yyyy-MM-dd,yyyy)" \
+  --key="::md5([[time]])"
+```
+
+##### Exemplo de tipo 'export'
 
 ```bash
 java -jar /<path>/braze.jar \
