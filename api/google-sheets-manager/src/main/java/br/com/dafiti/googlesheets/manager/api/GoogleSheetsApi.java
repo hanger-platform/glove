@@ -65,7 +65,7 @@ import java.util.List;
 
 /**
  *
- * @author flavialima
+ * @author Flávia Lima
  * @author Helio Leal
  */
 public class GoogleSheetsApi {

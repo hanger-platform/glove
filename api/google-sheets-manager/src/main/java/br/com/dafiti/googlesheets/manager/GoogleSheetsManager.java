@@ -55,7 +55,7 @@ import java.util.List;
 
 /**
  *
- * @author flavialima
+ * @author Flávia Lima
  * @author Helio Leal
  */
 public class GoogleSheetsManager {
@@ -73,6 +73,7 @@ public class GoogleSheetsManager {
         mitt.getConfiguration()
                 .addParameter("c", "credentials", "Credentials file", "", true, true)
                 .addParameter("s", "spreadsheet", "Spreadsheet ID", "", true, false)
+                .addParameter("t", "title", "Spreadsheet Title", "", true, false)
                 .addParameter("a", "action", "Action on Google Spreadsheet", "", true, false)
                 .addParameter("d", "debug", "(Optional) Identify if it is debug mode; 0 is default", "0");
 
@@ -99,7 +100,8 @@ public class GoogleSheetsManager {
                 .setApplicationName("GLOVE - Google Drive API")
                 .build();
 
-        File copyMetadata = new File().setName("SOU UMA COPIA DE PLANILHA VIA JAVA E TENHO VARIAS ABAS");
+        File copyMetadata;
+        copyMetadata = new File().setName(cli.getParameter("title"));
 
         File presentationCopyFile
                 = service.files().copy(cli.getParameter("spreadsheet"), copyMetadata).execute();
