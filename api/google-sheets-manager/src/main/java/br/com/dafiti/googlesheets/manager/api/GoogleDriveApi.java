@@ -191,4 +191,35 @@ public class GoogleDriveApi {
         }
 
     }
+
+    /**
+     * Move a file to a folder.
+     * 
+     * @param id File id.
+     * @param folder  Folder id.
+     */
+    public void move(String id, String folder) {
+        try {
+            // Retrieve the existing parents to remove
+            File file = service.files().get(id)
+                    .setFields("parents")
+                    .execute();
+            
+            StringBuilder previousParents = new StringBuilder();
+            for (String parent : file.getParents()) {
+                previousParents.append(parent);
+                previousParents.append(',');
+            }
+            // Move the file to the new folder
+            service.files().update(id, null)
+                    .setAddParents(folder)
+                    .setRemoveParents(previousParents.toString())
+                    .setFields("id, parents")
+                    .execute();
+
+        } catch (IOException ex) {
+            System.err.println("Error on move: " + ex.getMessage());
+        }
+
+    }
 }
