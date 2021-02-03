@@ -47,7 +47,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -64,7 +63,6 @@ public class GoogleDriveApi {
      * Authenticate on Google Drive API.
      *
      * @param credentials
-     * @param spreadSheetId
      * @return GoogleDriveApi
      */
     public GoogleDriveApi authenticate(String credentials) {
@@ -137,8 +135,7 @@ public class GoogleDriveApi {
      * Copy permissions from one file to another
      *
      * @param from Origin file id.
-     * @param newTitle Target file id.
-     * @return
+     * @param to Target file id.
      */
     public void copyPermissions(String from, String to) {
         try {
