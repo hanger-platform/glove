@@ -28,7 +28,11 @@ import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInsta
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
+import com.google.api.client.googleapis.batch.BatchRequest;
+import com.google.api.client.googleapis.batch.json.JsonBatchCallback;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.googleapis.json.GoogleJsonError;
+import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -137,27 +141,53 @@ public class GoogleDriveApi {
      * @return
      */
     public void copyPermissions(String from, String to) {
-        File metadata = null;
-
         try {
-
-            List<Permission> permissions = service
+            //Get permissions of the source file.
+            List<Permission> permissions = this.service
                     .permissions()
                     .list(from)
-                    .setFields("permissions/id,permissions/role,permissions/kind,permissions/type,permissions/emailAddress")
+                    .setFields("permissions/role,permissions/type,permissions/emailAddress")
                     .execute()
                     .getPermissions();
 
+            //Handles the return.
+            JsonBatchCallback<Permission> callback = new JsonBatchCallback<Permission>() {
+                @Override
+                public void onFailure(GoogleJsonError e,
+                        HttpHeaders responseHeaders)
+                        throws IOException {
+                    // Handle error
+                    System.err.println(e.getMessage());
+                }
+
+                @Override
+                public void onSuccess(Permission permission,
+                        HttpHeaders responseHeaders)
+                        throws IOException {
+                }
+            };
+
+            //Starts batch operation.
+            BatchRequest batch = this.service.batch();
+
+            //Fetchs source file permissions to copy them.
             for (Permission permission : permissions) {
 
-                System.out.println("p: " + permission.getId());
+                //Build permission object.
+                Permission userPermission = new Permission()
+                        .setType(permission.getType())
+                        .setRole(permission.getRole())
+                        .setEmailAddress(permission.getEmailAddress());
+
+                //Put copy permission request to batch queue.
+                this.service.permissions()
+                        .create(to, userPermission)
+                        .queue(batch, callback);
 
             }
-            
-            /**
-             *  BLOCO PARA EFETUAR A COPIA DE PERMISSOES
-             */
-            
+
+            //Execute all operations.
+            batch.execute();
 
         } catch (IOException ex) {
             System.err.println("Error on copy: " + ex.getMessage());

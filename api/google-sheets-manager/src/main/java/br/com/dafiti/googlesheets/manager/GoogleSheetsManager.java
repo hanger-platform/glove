@@ -60,12 +60,12 @@ public class GoogleSheetsManager {
         //Copy a file by its ID.
         File copyMetadata = api.copy(cli.getParameter("id"), cli.getParameter("title"));
 
-        System.out.println("file " + cli.getParameter("id") + " copied successfully, new file id: " + copyMetadata.getId());
+        System.out.println("file copied successfully, new file id: " + copyMetadata.getId());
 
         //Copy original file permissions to new file.        
         api.copyPermissions(cli.getParameter("id"), copyMetadata.getId());
         
-        
+        System.out.println("Permissions copied successfully to: " + copyMetadata.getName());
 
         System.out.println("Google sheets manager finalized.");
     }
