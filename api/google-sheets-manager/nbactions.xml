@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.googlesheets.manager.GoogleSheetsManager --credentials="/home/flavialima/.google/credentials.json" --spreadsheet="1Xwaa65wWzK_3z7XuE9AwEwg5jLrWoTVBIIQcdJlSOHg" --action="copy"</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.googlesheets.manager.GoogleSheetsManager --credentials=/home/helio.leal/.google/google_drive_api/credentials.json --id="181AQH0p8dzB76fRocfnPuOdIoscNXZRgK5Bf0B7-qqk" --title="Helio - Novo Clone de planilha teste"</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.googlesheets.manager.GoogleSheetsManager --credentials="/home/flavialima/.google/credentials.json" --spreadsheet="1Xwaa65wWzK_3z7XuE9AwEwg5jLrWoTVBIIQcdJlSOHg" --action="copy"</exec.args>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.googlesheets.manager.GoogleSheetsManager --credentials=/home/helio.leal/.google/google_drive_api/credentials.json --id="181AQH0p8dzB76fRocfnPuOdIoscNXZRgK5Bf0B7-qqk" --title="Helio - Novo Clone de planilha teste"</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.googlesheets.manager.GoogleSheetsManager --credentials="/home/flavialima/.google/credentials.json" --spreadsheet="1Xwaa65wWzK_3z7XuE9AwEwg5jLrWoTVBIIQcdJlSOHg" --action="copy"</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.googlesheets.manager.GoogleSheetsManager --credentials=/home/helio.leal/.google/google_drive_api/credentials.json --id="181AQH0p8dzB76fRocfnPuOdIoscNXZRgK5Bf0B7-qqk" --title="Helio - Novo Clone de planilha teste"</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>

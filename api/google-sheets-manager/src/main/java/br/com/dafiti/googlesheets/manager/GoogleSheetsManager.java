@@ -23,35 +23,13 @@
  */
 package br.com.dafiti.googlesheets.manager;
 
+import br.com.dafiti.googlesheets.manager.api.GoogleDriveApi;
 import br.com.dafiti.mitt.Mitt;
 import br.com.dafiti.mitt.cli.CommandLineInterface;
 import br.com.dafiti.mitt.exception.DuplicateEntityException;
-
-import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
-import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestInitializer;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.store.FileDataStoreFactory;
-import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
-import com.google.api.services.drive.model.FileList;
-import java.io.FileInputStream;
-
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
-import java.util.Collections;
-import java.util.List;
 
 /**
  *
@@ -60,10 +38,7 @@ import java.util.List;
  */
 public class GoogleSheetsManager {
 
-    private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-
     public static void main(String[] args) throws DuplicateEntityException, IOException, GeneralSecurityException {
-
         System.out.println("Google sheets manager started.");
 
         //Define the mitt.
@@ -72,58 +47,27 @@ public class GoogleSheetsManager {
         //Define parameters. 
         mitt.getConfiguration()
                 .addParameter("c", "credentials", "Credentials file", "", true, true)
-                .addParameter("s", "spreadsheet", "Spreadsheet ID", "", true, false)
-                .addParameter("t", "title", "Spreadsheet Title", "", true, false)
-                .addParameter("a", "action", "Action on Google Spreadsheet", "", true, false)
-                .addParameter("d", "debug", "(Optional) Identify if it is debug mode; 0 is default", "0");
+                .addParameter("s", "id", "file id (can use google spreadsheet id)", "", true, false)
+                .addParameter("t", "title", "New file title", "", true, false)
+                .addParameter("a", "action", "Action on Google Drive; COPY is default", "COPY");
 
         //Command Line.
         CommandLineInterface cli = mitt.getCommandLineInterface(args);
 
-        //Define the transport.
-        NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+        //Define google drive API manager.
+        GoogleDriveApi api = new GoogleDriveApi().authenticate(cli.getParameter("credentials"));
 
-        //Load client secrets.
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(new FileInputStream((String) cli.getParameter("credentials"))));
+        //Copy a file by its ID.
+        File copyMetadata = api.copy(cli.getParameter("id"), cli.getParameter("title"));
 
-        //Set up authorization code flow for all authorization scopes.
-        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY, clientSecrets, DriveScopes.all())
-                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(System.getProperty("user.home"), ".store/google_drive")))
-                .setAccessType("offline")
-                .build();
+        System.out.println("file " + cli.getParameter("id") + " copied successfully, new file id: " + copyMetadata.getId());
 
-        //Authorize.
-        Credential credential = new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
+        //Copy original file permissions to new file.        
+        api.copyPermissions(cli.getParameter("id"), copyMetadata.getId());
+        
+        
 
-        //Build the service object.
-        Drive service = new Drive.Builder(httpTransport, JSON_FACTORY, setHttpTimeout(credential))
-                .setApplicationName("GLOVE - Google Drive API")
-                .build();
-
-        File copyMetadata;
-        copyMetadata = new File().setName(cli.getParameter("title"));
-
-        File presentationCopyFile
-                = service.files().copy(cli.getParameter("spreadsheet"), copyMetadata).execute();
-
-        String presentationCopyId = presentationCopyFile.getId();
-
-        System.out.println("nova planilha criada: " + presentationCopyId);
-
-    }
-
-    /**
-     * Set the Google Drive API timeout.
-     *
-     * @param requestInitializer
-     * @return
-     */
-    private static HttpRequestInitializer setHttpTimeout(final HttpRequestInitializer requestInitializer) {
-        return (HttpRequest httpRequest) -> {
-            requestInitializer.initialize(httpRequest);
-            httpRequest.setConnectTimeout(5 * 60000);
-            httpRequest.setReadTimeout(5 * 60000);
-        };
+        System.out.println("Google sheets manager finalized.");
     }
 
 }

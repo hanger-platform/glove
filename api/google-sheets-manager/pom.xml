@@ -51,13 +51,12 @@
         <dependency>
             <groupId>com.google.apis</groupId>
             <artifactId>google-api-services-drive</artifactId>
-            <version>v3-rev20200813-1.30.10</version>
-            <type>jar</type>
+            <version>v3-rev20201130-1.31.0</version>
         </dependency>
         <dependency>
             <groupId>com.google.http-client</groupId>
             <artifactId>google-http-client-jackson2</artifactId>
-            <version>1.36.0</version>
+            <version>1.38.1</version>
             <type>jar</type>
         </dependency>
     </dependencies>
