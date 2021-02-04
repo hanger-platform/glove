@@ -47,6 +47,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -117,11 +118,18 @@ public class GoogleDriveApi {
      * @param newTitle New file title
      * @return Metadata of new file
      */
-    public File copy(String id, String newTitle) {
+    public File copy(String id, String newTitle, List<String> folder) {
         File metadata = null;
 
         try {
             File copyMetadata = new File().setName(newTitle);
+
+            //Identifies if the cloned file should be in a specific folder.
+            if (folder != null) {
+                List<String> parents = folder;                
+                copyMetadata.setParents(parents);
+            }
+
             metadata = this.service.files().copy(id, copyMetadata).execute();
 
         } catch (IOException ex) {
@@ -189,37 +197,5 @@ public class GoogleDriveApi {
         } catch (IOException ex) {
             System.err.println("Error on copy: " + ex.getMessage());
         }
-
-    }
-
-    /**
-     * Move a file to a folder.
-     * 
-     * @param id File id.
-     * @param folder  Folder id.
-     */
-    public void move(String id, String folder) {
-        try {
-            // Retrieve the existing parents to remove
-            File file = service.files().get(id)
-                    .setFields("parents")
-                    .execute();
-            
-            StringBuilder previousParents = new StringBuilder();
-            for (String parent : file.getParents()) {
-                previousParents.append(parent);
-                previousParents.append(',');
-            }
-            // Move the file to the new folder
-            service.files().update(id, null)
-                    .setAddParents(folder)
-                    .setRemoveParents(previousParents.toString())
-                    .setFields("id, parents")
-                    .execute();
-
-        } catch (IOException ex) {
-            System.err.println("Error on move: " + ex.getMessage());
-        }
-
     }
 }

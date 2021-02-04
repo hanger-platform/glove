@@ -30,7 +30,6 @@ import br.com.dafiti.mitt.exception.DuplicateEntityException;
 import com.google.api.services.drive.model.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import com.google.api.services.drive.Drive;
 
 /**
  *
@@ -50,8 +49,8 @@ public class GoogleSheetsManager {
                 .addParameter("c", "credentials", "Credentials file", "", true, true)
                 .addParameter("s", "id", "file id (can use google spreadsheet id)", "", true, false)
                 .addParameter("t", "title", "New file title", "", true, false)
-                .addParameter("f", "folder", "(Optional) Folder ID to save the Spreadsheet", "")
-                .addParameter("a", "action", "Action on Google Drive; COPY is default", "COPY");
+                .addParameter("f", "folder", "(Optional) List of folder IDS divided by +", "")
+                .addParameter("a", "action", "(Optional) Action on Google Drive; COPY is default", "COPY");
 
         //Command Line.
         CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -60,7 +59,7 @@ public class GoogleSheetsManager {
         GoogleDriveApi api = new GoogleDriveApi().authenticate(cli.getParameter("credentials"));
 
         //Copy a file by its ID.
-        File copyMetadata = api.copy(cli.getParameter("id"), cli.getParameter("title"));
+        File copyMetadata = api.copy(cli.getParameter("id"), cli.getParameter("title"), cli.getParameterAsList("folder", "\\+"));
 
         System.out.println("File copied successfully, new file id: " + copyMetadata.getId());
 
@@ -68,12 +67,6 @@ public class GoogleSheetsManager {
         api.copyPermissions(cli.getParameter("id"), copyMetadata.getId());
 
         System.out.println("Permissions copied successfully to: " + copyMetadata.getName());
-
-        //Move file to a folder.
-        if (cli.getParameter("folder") != null) {
-            api.move(copyMetadata.getId(), cli.getParameter("folder"));
-            System.out.println("File moved to folder:" + cli.getParameter("folder"));
-        }
 
         System.out.println("Google sheets manager finalized.");
     }
