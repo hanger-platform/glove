@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>run</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-classpath %classpath br.com.dafiti.google.drive.manager.GoogleDriveManager --credentials=/home/flavialima/.google/credentials.json --id="1Xwaa65wWzK_3z7XuE9AwEwg5jLrWoTVBIIQcdJlSOHg" --title="D 8 FEV" --folder="1NxgBBl7YHkq912pASBFAYA6tYxuURQwM"</exec.args>
+                <exec.executable>java</exec.executable>
+            </properties>
+        </action>
+        <action>
+            <actionName>debug</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.google.drive.manager.GoogleDriveManager --credentials=/home/flavialima/.google/credentials.json --id="1Xwaa65wWzK_3z7XuE9AwEwg5jLrWoTVBIIQcdJlSOHg" --title="D 8 FEV" --folder="1NxgBBl7YHkq912pASBFAYA6tYxuURQwM"</exec.args>
+                <exec.executable>java</exec.executable>
+                <jpda.listen>true</jpda.listen>
+            </properties>
+        </action>
+        <action>
+            <actionName>profile</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-classpath %classpath br.com.dafiti.google.drive.manager.GoogleDriveManager --credentials=/home/flavialima/.google/credentials.json --id="1Xwaa65wWzK_3z7XuE9AwEwg5jLrWoTVBIIQcdJlSOHg" --title="D 8 FEV" --folder="1NxgBBl7YHkq912pASBFAYA6tYxuURQwM"</exec.args>
+                <exec.executable>java</exec.executable>
+            </properties>
+        </action>
+    </actions>
