@@ -57,17 +57,27 @@ public class GoogleDriveManager {
 
         //Define google drive API manager.
         GoogleDriveApi api = new GoogleDriveApi().authenticate(cli.getParameter("credentials"));
+        
+        //Defines the action.
+        switch(cli.getParameter("action")){
+            case "COPY":
+                //Copy a file by its ID.
+                File copyMetadata = api.copy(cli.getParameter("id"), cli.getParameter("title"), cli.getParameterAsList("folder", "\\+"));
 
-        //Copy a file by its ID.
-        File copyMetadata = api.copy(cli.getParameter("id"), cli.getParameter("title"), cli.getParameterAsList("folder", "\\+"));
+                System.out.println("File copied successfully, new file id: " + copyMetadata.getId());
 
-        System.out.println("File copied successfully, new file id: " + copyMetadata.getId());
+                //Copy original file permissions to new file.        
+                api.copyPermissions(cli.getParameter("id"), copyMetadata.getId());
 
-        //Copy original file permissions to new file.        
-        api.copyPermissions(cli.getParameter("id"), copyMetadata.getId());
-
-        System.out.println("Permissions copied successfully to: " + copyMetadata.getName());
-
+                System.out.println("Permissions copied successfully to: " + copyMetadata.getName());
+                break;
+            case "EXPORT":
+                System.out.println("Export is not available yet.");
+                break;
+            default: System.out.println("Not available yet.");
+                
+        }
+        
         System.out.println("Google Drive manager finalized.");
     }
     
