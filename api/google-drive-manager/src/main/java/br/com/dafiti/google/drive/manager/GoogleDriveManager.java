@@ -30,6 +30,8 @@ import br.com.dafiti.mitt.exception.DuplicateEntityException;
 import com.google.api.services.drive.model.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -37,9 +39,9 @@ import java.security.GeneralSecurityException;
  * @author Helio Leal
  */
 public class GoogleDriveManager {
-    
+
     public static void main(String[] args) throws DuplicateEntityException, IOException, GeneralSecurityException {
-        System.out.println("Google Drive manager started.");
+        Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.INFO, "GLOVE - Google Drive manager started");
 
         //Define the mitt.
         Mitt mitt = new Mitt();
@@ -57,28 +59,24 @@ public class GoogleDriveManager {
 
         //Define google drive API manager.
         GoogleDriveApi api = new GoogleDriveApi().authenticate(cli.getParameter("credentials"));
-        
+
         //Defines the action.
-        switch(cli.getParameter("action")){
+        switch (cli.getParameter("action")) {
             case "COPY":
                 //Copy a file by its ID.
                 File copyMetadata = api.copy(cli.getParameter("id"), cli.getParameter("title"), cli.getParameterAsList("folder", "\\+"));
 
-                System.out.println("File copied successfully, new file id: " + copyMetadata.getId());
+                Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.INFO, "File copied successfully, new file id: {0}", copyMetadata.getId());
 
                 //Copy original file permissions to new file.        
                 api.copyPermissions(cli.getParameter("id"), copyMetadata.getId());
 
-                System.out.println("Permissions copied successfully to: " + copyMetadata.getName());
+                Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.INFO, "Permissions copied successfully to: {0}", copyMetadata.getName());
                 break;
-            case "EXPORT":
-                System.out.println("Export is not available yet.");
-                break;
-            default: System.out.println("Not available yet.");
-                
+            default:
+                Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.WARNING, "Service is not available.");
         }
-        
-        System.out.println("Google Drive manager finalized.");
+
+        Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.INFO, "Google Drive manager finalized.");
     }
-    
 }

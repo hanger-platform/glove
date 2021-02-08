@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.google.drive.manager.GoogleDriveManager --credentials=/home/flavialima/.google/credentials.json --id="1Xwaa65wWzK_3z7XuE9AwEwg5jLrWoTVBIIQcdJlSOHg" --title="D 8 FEV" --folder="1NxgBBl7YHkq912pASBFAYA6tYxuURQwM"</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.google.drive.manager.GoogleDriveManager --credentials=/home/helio.leal/.google/google_drive_api/credentials.json --id="1Jsi0M4dV87h2OsoqsJ3x9M3lFHq3xngwweFkyGQxFIs" --title="Helio - Clone de DT teste" --folder="1uLD4vW8BzLC3hus6iC8azBaFtyfQzVLZ"</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.google.drive.manager.GoogleDriveManager --credentials=/home/flavialima/.google/credentials.json --id="1Xwaa65wWzK_3z7XuE9AwEwg5jLrWoTVBIIQcdJlSOHg" --title="D 8 FEV" --folder="1NxgBBl7YHkq912pASBFAYA6tYxuURQwM"</exec.args>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.google.drive.manager.GoogleDriveManager --credentials=/home/helio.leal/.google/google_drive_api/credentials.json --id="1Jsi0M4dV87h2OsoqsJ3x9M3lFHq3xngwweFkyGQxFIs" --title="Helio - Clone de DT teste" --folder="1uLD4vW8BzLC3hus6iC8azBaFtyfQzVLZ"</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.google.drive.manager.GoogleDriveManager --credentials=/home/flavialima/.google/credentials.json --id="1Xwaa65wWzK_3z7XuE9AwEwg5jLrWoTVBIIQcdJlSOHg" --title="D 8 FEV" --folder="1NxgBBl7YHkq912pASBFAYA6tYxuURQwM"</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.google.drive.manager.GoogleDriveManager --credentials=/home/helio.leal/.google/google_drive_api/credentials.json --id="1Jsi0M4dV87h2OsoqsJ3x9M3lFHq3xngwweFkyGQxFIs" --title="Helio - Clone de DT teste" --folder="1uLD4vW8BzLC3hus6iC8azBaFtyfQzVLZ"</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
