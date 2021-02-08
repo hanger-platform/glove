@@ -39,7 +39,7 @@ import java.security.GeneralSecurityException;
 public class GoogleSheetsManager {
 
     public static void main(String[] args) throws DuplicateEntityException, IOException, GeneralSecurityException {
-        System.out.println("Google sheets manager started.");
+        System.out.println("Google Drive manager started.");
 
         //Define the mitt.
         Mitt mitt = new Mitt();
@@ -49,7 +49,7 @@ public class GoogleSheetsManager {
                 .addParameter("c", "credentials", "Credentials file", "", true, true)
                 .addParameter("s", "id", "file id (can use google spreadsheet id)", "", true, false)
                 .addParameter("t", "title", "New file title", "", true, false)
-                .addParameter("f", "folder", "(Optional) List of folder IDS divided by +", "")
+                .addParameter("f", "folder", "(Optional) Folder id, if null save file in my drive.", "")
                 .addParameter("a", "action", "(Optional) Action on Google Drive; COPY is default", "COPY");
 
         //Command Line.

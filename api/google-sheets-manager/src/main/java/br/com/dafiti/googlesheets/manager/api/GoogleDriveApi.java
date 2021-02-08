@@ -123,7 +123,8 @@ public class GoogleDriveApi {
 
         try {
             File copyMetadata = new File().setName(newTitle);
-
+            
+            
             //Identifies if the cloned file should be in a specific folder.
             if (folder != null) {
                 List<String> parents = folder;                
