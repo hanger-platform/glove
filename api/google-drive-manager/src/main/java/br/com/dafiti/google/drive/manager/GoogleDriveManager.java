@@ -77,7 +77,7 @@ public class GoogleDriveManager {
 
                     Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.INFO, "Permissions copied successfully to: {0}", copyMetadata.getName());
                 } else {
-                    Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.SEVERE, "Parameter output is empty. For IMPORT, it is required.");
+                    Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.SEVERE, "Parameter title is empty. For COPY, it is required.");
                 }
 
                 break;
