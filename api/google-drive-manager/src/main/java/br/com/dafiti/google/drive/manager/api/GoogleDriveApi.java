@@ -207,13 +207,23 @@ public class GoogleDriveApi {
      * This method downloads google Drive file by its ID.
      *
      * @param fileId Google Drive file
-     * @param output output file path (exampla: /tmp/teste/arquivo.xls)
      */
-    public void download(String fileId, String output) {
-        try {
-            java.io.File file = new java.io.File(output);
+    public java.nio.file.Path download(String fileId) {
+        java.nio.file.Path outputPath = null;
 
-            //OutputStream outputStream = new FileOutputStream
+        try {
+            //Gets the name of the google drive file with extension.            
+            File fileMetadata = this.service.files().get(fileId)
+                    .setFields("name")
+                    .execute();
+
+            //Defines the temporary output path. 
+            outputPath = java.nio.file.Files.createTempDirectory("google_drive_manager_");
+
+            //Defines the temporary file name.
+            java.io.File file = new java.io.File(outputPath.toString() + "/" + fileMetadata.getName());
+
+            //Download file to local station.
             try (final OutputStream outputStream = java.nio.file.Files.newOutputStream(file.toPath())) {
                 this.service.files().get(fileId)
                         .executeMediaAndDownloadTo(outputStream);
@@ -222,5 +232,7 @@ public class GoogleDriveApi {
         } catch (IOException ex) {
             System.err.println("Error on download: " + ex.getMessage());
         }
+
+        return outputPath;
     }
 }
