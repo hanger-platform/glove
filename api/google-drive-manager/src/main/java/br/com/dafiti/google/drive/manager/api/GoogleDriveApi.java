@@ -119,6 +119,7 @@ public class GoogleDriveApi {
      *
      * @param id File id
      * @param newTitle New file title
+     * @param folder String list that contain one parent folder id.
      * @return Metadata of new file
      */
     public File copy(String id, String newTitle, List<String> folder) {
