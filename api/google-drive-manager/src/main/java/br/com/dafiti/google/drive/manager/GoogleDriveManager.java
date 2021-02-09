@@ -52,7 +52,8 @@ public class GoogleDriveManager {
                 .addParameter("s", "id", "file id (can use google spreadsheet id)", "", true, false)
                 .addParameter("t", "title", "New file title", "", true, false)
                 .addParameter("f", "folder", "(Optional) Folder id, if null save file in my drive.", "")
-                .addParameter("a", "action", "(Optional) Action on Google Drive; COPY is default", "COPY");
+                .addParameter("a", "action", "(Optional) Action on Google Drive; COPY is default", "COPY")
+                .addParameter("o", "output", "(Optional) Output file; Required for import action", "");
 
         //Command Line.
         CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -61,7 +62,7 @@ public class GoogleDriveManager {
         GoogleDriveApi api = new GoogleDriveApi().authenticate(cli.getParameter("credentials"));
 
         //Defines the action.
-        switch (cli.getParameter("action")) {
+        switch (cli.getParameter("action").toUpperCase()) {
             case "COPY":
                 //Copy a file by its ID.
                 File copyMetadata = api.copy(cli.getParameter("id"), cli.getParameter("title"), cli.getParameterAsList("folder", "\\+"));
@@ -73,8 +74,18 @@ public class GoogleDriveManager {
 
                 Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.INFO, "Permissions copied successfully to: {0}", copyMetadata.getName());
                 break;
+            case "IMPORT":
+                if ((cli.getParameter("output") != null) && (!cli.getParameter("output").isEmpty())) {
+                    api.download(cli.getParameter("id"), cli.getParameter("output"));
+
+                } else {
+                    Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.SEVERE, "Parameter output is empty. For IMPORT, it is required.");
+                }
+
+                break;
             default:
                 Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.WARNING, "Service is not available.");
+                break;
         }
 
         Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.INFO, "Google Drive manager finalized.");

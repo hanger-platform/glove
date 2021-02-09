@@ -43,9 +43,13 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.Permission;
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.util.List;
 
@@ -122,11 +126,10 @@ public class GoogleDriveApi {
 
         try {
             File copyMetadata = new File().setName(newTitle);
-            
-            
+
             //Identifies if the cloned file should be in a specific folder.
             if (folder != null) {
-                List<String> parents = folder;                
+                List<String> parents = folder;
                 copyMetadata.setParents(parents);
             }
 
@@ -196,6 +199,27 @@ public class GoogleDriveApi {
 
         } catch (IOException ex) {
             System.err.println("Error on copy: " + ex.getMessage());
+        }
+    }
+
+    /**
+     * This method downloads google Drive file by its ID.
+     *
+     * @param fileId Google Drive file
+     * @param output output file path (exampla: /tmp/teste/arquivo.xls)
+     */
+    public void download(String fileId, String output) {
+        try {
+            java.io.File file = new java.io.File(output);
+
+            //OutputStream outputStream = new FileOutputStream
+            try (final OutputStream outputStream = java.nio.file.Files.newOutputStream(file.toPath())) {
+                this.service.files().get(fileId)
+                        .executeMediaAndDownloadTo(outputStream);
+            }
+
+        } catch (IOException ex) {
+            System.err.println("Error on download: " + ex.getMessage());
         }
     }
 }
