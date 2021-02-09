@@ -33,11 +33,11 @@ By default, you can copy a file to a new folder.
 ##### CONSTRUCTION
 
 - Using [Maven](https://maven.apache.org/): 
-    - Access the directory where the **_Google Drive Manager_ ** sources are located.
+    - Access the directory where the ***Google Drive Manager*** sources are located.
     - Type the _**mvn package**_ command.
     - The **google-drive-manager.jar** file will be generated on **_target_** subdirectory.
 
-## Utilização
+## Utilization
 
 ```bash
 java -jar google-drive-manager.jar \
@@ -46,7 +46,7 @@ java -jar google-drive-manager.jar \
 	--title=<Identifies the new file name> \
 	--folder=<Identifies the folder ID where the file will be copied> \
 	--action=<Identifies the syste action. By default, the action is COPY> \
-	--output=<Identifies the output file. It is required for IMPORT action>
+	--output=<Identifies the output file. It is required to use IMPORT action> \
 ```
 
 ## Contributing, Bugs, Questions
