@@ -27,11 +27,15 @@ import br.com.dafiti.google.drive.manager.api.GoogleDriveApi;
 import br.com.dafiti.mitt.Mitt;
 import br.com.dafiti.mitt.cli.CommandLineInterface;
 import br.com.dafiti.mitt.exception.DuplicateEntityException;
+import br.com.dafiti.mitt.transformation.embedded.Concat;
+import br.com.dafiti.mitt.transformation.embedded.Now;
 import com.google.api.services.drive.model.File;
+import com.google.common.base.Strings;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,10 +56,14 @@ public class GoogleDriveManager {
         mitt.getConfiguration()
                 .addParameter("c", "credentials", "Credentials file", "", true, true)
                 .addParameter("s", "id", "file id (can use google spreadsheet id)", "", true, false)
-                .addParameter("t", "title", "(Optional)  New file title, Required for COPY action", "")
+                .addParameter("t", "title", "(Optional)  New file title, Required for COPY", "")
                 .addParameter("f", "folder", "(Optional) Folder id, if null save file in my drive.", "")
                 .addParameter("a", "action", "(Optional) Action on Google Drive; COPY is default", "COPY")
-                .addParameter("o", "output", "(Optional) Output file; Required for import action", "");
+                .addParameter("o", "output", "(Optional) Output file; Required for IMPORT", "")
+                .addParameter("p", "properties", "(Optional) Reader properties.", "")
+                .addParameter("f", "field", "(Optional) Fields to be extracted from the file, Required for IMPORT", "")
+                .addParameter("pa", "partition", "(Optional)  Partition, divided by + if has more than one field")
+                .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "");
 
         //Command Line.
         CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -82,20 +90,42 @@ public class GoogleDriveManager {
 
                 break;
             case "IMPORT":
-                if ((cli.getParameter("output") != null) && (!cli.getParameter("output").isEmpty())) {
-                    //Defines output file.
-                    mitt.setOutputFile(cli.getParameter("output"));
-
-                    //Download file from Google Drive.
-                    Path outputPath = api.download(cli.getParameter("id"));
-
-                    Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.INFO, "File downloaded successfully to {0}", outputPath.toString());
-
-                    //Remove temporary path. 
-                    Files.delete(outputPath);
-                } else {
+                if (Strings.isNullOrEmpty((cli.getParameter("output")))) {
                     Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.SEVERE, "Parameter output is empty. For IMPORT, it is required.");
+                    break;
                 }
+
+                if (Strings.isNullOrEmpty((cli.getParameter("field")))) {
+                    Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.SEVERE, "Parameter field is empty. For IMPORT, it is required.");
+                    break;
+                }
+
+                //Defines output file.
+                mitt.setOutputFile(cli.getParameter("output"));
+
+                //Defines fields.
+                mitt.getConfiguration()
+                        .addCustomField("partition_field", new Concat((List) cli.getParameterAsList("partition", "\\+")))
+                        .addCustomField("custom_primary_key", new Concat((List) cli.getParameterAsList("key", "\\+")))
+                        .addCustomField("etl_load_date", new Now())
+                        .addField(cli.getParameterAsList("field", "\\+"));
+
+                //Download file from Google Drive.
+                Path outputPath = api.download(cli.getParameter("id"));
+
+                Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.INFO, "File downloaded successfully to {0}", outputPath.toString());
+
+                //Defines the file properties.
+                if (cli.getParameter("properties") != null) {
+                    mitt.getReaderSettings().setProperties(cli.getParameter("properties"));
+                }
+
+                mitt.write(outputPath.toFile());
+
+                Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.INFO, "File successfully written to {0}", cli.getParameter("output"));
+
+                //Remove temporary path. 
+                Files.delete(outputPath);
 
                 break;
             default:
