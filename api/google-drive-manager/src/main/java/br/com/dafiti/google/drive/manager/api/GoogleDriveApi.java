@@ -43,13 +43,10 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.Permission;
-import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.util.List;
 
@@ -207,6 +204,7 @@ public class GoogleDriveApi {
      * This method downloads google Drive file by its ID.
      *
      * @param fileId Google Drive file
+     * @return Path of downloaded file
      */
     public java.nio.file.Path download(String fileId) {
         java.nio.file.Path outputPath = null;
