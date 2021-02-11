@@ -81,7 +81,7 @@ java -jar /home/user_name/glove/extractor/lib/google-drive-manager.jar \
   --field="field1+field2+field3+fieldN" \
   --partition="::fixed(2019)" \
   --key="::md5([[field1,field2]])" \
-  --properties="{\"skip\":\"1\",\"sheet\":\"Eshare\"}"
+  --properties="{\"skip\":\"1\",\"sheet\":\"sheet_name\"}"
 ```
 
 * **Properties** parameter is used for xls files when you need to skip some lines or need to specify the sheet to be extracted.
