@@ -57,7 +57,7 @@ java -jar google-drive-manager.jar \
 	--key=<(Optional) Unique key, divided by + if has more than one field>
 ```
 
-##### COPY action
+##### COPY
 This action will copy the whole file from google drive to another, you can use this action to make a backup of your file.
 
 ```bash
@@ -69,7 +69,7 @@ java -jar /home/user_name/glove/extractor/lib/google-drive-manager.jar \
   --folder="if_you_want_to_copy_the_file_to_a_folder_put_the_folder_id_here"  
 ```
 
-##### IMPORT action
+##### IMPORT
 This action will download one file from Google Drive and will turn it into a csv file, the gain here is that the file is processed on mitt framework, then, you can user it's transformations (https://github.com/dafiti-group/glove/tree/master/api/mitt)
 
 ```bash
