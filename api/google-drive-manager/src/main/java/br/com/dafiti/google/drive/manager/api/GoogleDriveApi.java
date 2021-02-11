@@ -32,6 +32,7 @@ import com.google.api.client.googleapis.batch.BatchRequest;
 import com.google.api.client.googleapis.batch.json.JsonBatchCallback;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.googleapis.json.GoogleJsonError;
+import com.google.api.client.http.FileContent;
 import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
@@ -232,5 +233,40 @@ public class GoogleDriveApi {
         }
 
         return outputPath;
+    }
+
+    /***
+     * This method uploads a file on google Drive by its local path.
+     * 
+     * @param newTitle New file title
+     * @param path File's local path
+     * @param folder String list that contain one parent folder id.
+     * @return
+     * @throws IOException 
+     */
+    public java.nio.file.Path upload(String newTitle, String path, List<String> folder) throws IOException {
+
+        try {
+            File fileMetadata = new File();
+            fileMetadata.setName(newTitle); 
+            fileMetadata.setMimeType("application/vnd.google-apps.spreadsheet");
+
+            //Identifies if the uploaded file should be in a specific folder.
+            if (folder != null) {
+                List<String> parents = folder;
+                fileMetadata.setParents(parents);
+            }
+
+            java.io.File filePath = new java.io.File(path); //param path
+            FileContent mediaContent = new FileContent("text/csv", filePath);
+            File file = this.service.files().create(fileMetadata, mediaContent)
+                    .setFields("id")
+                    .execute();
+            System.out.println("File ID: " + file.getId());
+        } catch (IOException ex) {
+            System.err.println("Error on upload: " + ex.getMessage());
+        }
+
+        return null;
     }
 }
