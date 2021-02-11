@@ -1,10 +1,12 @@
 # Google Drive Manager [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-### Manager files in Google Drive. 
+### Manages and extracts files from Google Drive. 
 
 ## How it works
 
-The **Google Drive Manager** is a tool that allows to manager files from Google Drive. 
-By default, you can copy a file to a new folder.
+The **Google Drive Manager** is a tool that allows the user to manage and extract files from Google Drive. There are 3 actions available in this tool, they are:
+- **Copy**: Copy one file to another, if source file is shared with some people, this permissions will be copied either.
+- **Import**: Import files from google drive and turn them into a csv file processed by mitt.
+- **Upload**: in progress.
 
 ## Install
 
@@ -39,15 +41,51 @@ By default, you can copy a file to a new folder.
 
 ## Utilization
 
+##### Parameters
+
 ```bash
 java -jar google-drive-manager.jar \
-	--credentials=<Identifica o caminho onde o arquivo secreto com as credenciais está localizado> \
-	--id=<Identifies the file ID that will be copied> \
-	--title=<Identifies the new file name> \
-	--folder=<Identifies the folder ID where the file will be copied> \
-	--action=<Identifies the syste action. By default, the action is COPY> \
-	--output=<Identifies the output file. It is required to use IMPORT action> \
+	--credentials=<Path where secret file with credentials are stored> \
+	--id=<file ID> \
+	--title=<(Optional)  New file title, Required for COPY> \
+	--folder=<(Optional) Folder id, if null save file in my drive> \
+	--action=<(Optional) Action on Google Drive; COPY is default> \
+	--output=<(Optional) Output file; Required for IMPORT> \
+	--properties=<(Optional) Reader properties.> \
+	--field=<(Optional) Fields to be extracted from the file, Required for IMPORT> \
+	--partition=<(Optional)  Partition, divided by + if has more than one field> \
+	--key=<(Optional) Unique key, divided by + if has more than one field>
 ```
+
+##### COPY
+This action will copy the whole file from google drive to another, you can use this action to make a backup of your file.
+
+```bash
+java -jar /home/user_name/glove/extractor/lib/google-drive-manager.jar \
+  --credentials=/home/user_name/credentials/google_drive.json \
+  --action="COPY" \
+  --id="<id of the google drive file to be copied>" \
+  --title="this_title_will_be_the_name_of_copied_file" \
+  --folder="if_you_want_to_copy_the_file_to_a_folder_put_the_folder_id_here"  
+```
+
+##### IMPORT
+This action will download one file from Google Drive and will turn it into a csv file, the gain here is that the file is processed on mitt framework, then, you can use it's transformations (https://github.com/dafiti-group/glove/tree/master/api/mitt)
+
+```bash
+java -jar /home/user_name/glove/extractor/lib/google-drive-manager.jar \
+  --credentials=/home/user_name/credentials/google_drive.json \
+  --id="<id of the google drive file to be copied, it can be a xls, csv or txt file.>" \
+  --action="IMPORT" \
+  --output="/tmp/anything/file_name.csv" \
+  --field="field1+field2+field3+fieldN" \
+  --partition="::fixed(2019)" \
+  --key="::md5([[field1,field2]])" \
+  --properties="{\"skip\":\"1\",\"sheet\":\"sheet_name\"}"
+```
+
+* **Properties** parameter is used for xls files when you need to skip some lines or need to specify the sheet to be extracted.
+* **Field** parameter is used to specify the fields of the output csv file.
 
 ## Contributing, Bugs, Questions
 Contributions are more than welcome! If you want to propose new changes, fix bugs or improve something feel free to fork the repository and send us a Pull Request. You can also open new `Issues` for reporting bugs and general problems.
