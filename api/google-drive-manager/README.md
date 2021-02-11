@@ -4,9 +4,9 @@
 ## How it works
 
 The **Google Drive Manager** is a tool that allows the user to manage and extract files from Google Drive. There are 3 actions available in this tool, they are:
-- Copy: Copy one file to another, if source file is shared with some people, this permissions will be copied either.
-- Import: Import files from google drive and turn them into a csv file processed by mitt.
-- Upload: in progress.
+- **Copy**: Copy one file to another, if source file is shared with some people, this permissions will be copied either.
+- **Import**: Import files from google drive and turn them into a csv file processed by mitt.
+- **Upload**: in progress.
 
 ## Install
 
