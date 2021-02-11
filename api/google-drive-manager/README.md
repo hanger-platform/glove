@@ -70,7 +70,7 @@ java -jar /home/user_name/glove/extractor/lib/google-drive-manager.jar \
 ```
 
 ##### IMPORT
-This action will download one file from Google Drive and will turn it into a csv file, the gain here is that the file is processed on mitt framework, then, you can user it's transformations (https://github.com/dafiti-group/glove/tree/master/api/mitt)
+This action will download one file from Google Drive and will turn it into a csv file, the gain here is that the file is processed on mitt framework, then, you can use it's transformations (https://github.com/dafiti-group/glove/tree/master/api/mitt)
 
 ```bash
 java -jar /home/user_name/glove/extractor/lib/google-drive-manager.jar \
@@ -85,7 +85,7 @@ java -jar /home/user_name/glove/extractor/lib/google-drive-manager.jar \
 ```
 
 * **Properties** parameter is used for xls files when you need to skip some lines or need to specify the sheet to be extracted.
-* **field** parameter is used to specify the fields of the output csv file.
+* **Field** parameter is used to specify the fields of the output csv file.
 
 ## Contributing, Bugs, Questions
 Contributions are more than welcome! If you want to propose new changes, fix bugs or improve something feel free to fork the repository and send us a Pull Request. You can also open new `Issues` for reporting bugs and general problems.
