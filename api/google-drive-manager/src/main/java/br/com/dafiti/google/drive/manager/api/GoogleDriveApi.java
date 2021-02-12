@@ -245,7 +245,7 @@ public class GoogleDriveApi {
      * @return
      * @throws IOException 
      */
-    public java.nio.file.Path upload(String newTitle, String path, String type, List<String> folder) throws IOException {
+    public java.nio.file.Path upload(String newTitle, String path, List<String> folder) throws IOException {
 
         try {
             File fileMetadata = new File();

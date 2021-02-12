@@ -65,8 +65,7 @@ public class GoogleDriveManager {
                 .addParameter("f", "field", "(Optional) Fields to be extracted from the file, Required for IMPORT", "")
                 .addParameter("pa", "partition", "(Optional)  Partition, divided by + if has more than one field")
                 .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "")
-                .addParameter("h", "path", "(Optional) File path, Rquired for UPLOAD", "")
-                .addParameter("y", "type", "(Optional) File extension, Rquired for UPLOAD", "");
+                .addParameter("h", "path", "(Optional) File path, Rquired for UPLOAD", "");
 
         //Command Line.
         CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -137,7 +136,7 @@ public class GoogleDriveManager {
                     if ((cli.getParameter("path") != null) && (!cli.getParameter("path").isEmpty())){
                         
                         //Upload a file by its path.
-                        Path fileMetadata = api.upload(cli.getParameter("title"), cli.getParameter("path"), cli.getParameter("type"), cli.getParameterAsList("folder", "\\+"));
+                        Path fileMetadata = api.upload(cli.getParameter("title"), cli.getParameter("path"), cli.getParameterAsList("folder", "\\+"));
 
                         Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.INFO, "File successfully uploaded.");
                     }
