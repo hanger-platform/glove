@@ -133,15 +133,19 @@ public class GoogleDriveManager {
                 break;
             case "UPLOAD":
                 if ((cli.getParameter("title") != null) && (!cli.getParameter("title").isEmpty())){
+                    
                     if ((cli.getParameter("path") != null) && (!cli.getParameter("path").isEmpty())){
+                        
                         //Upload a file by its path.
                         Path fileMetadata = api.upload(cli.getParameter("title"), cli.getParameter("path"), cli.getParameter("type"), cli.getParameterAsList("folder", "\\+"));
 
                         Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.INFO, "File successfully uploaded.");
                     }
+                    
                 } else {
-                    Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.SEVERE, "Parameters file or and empty. For UPLOAD, they are required.");
+                    Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.SEVERE, "Parameters title or/and path are empty. For UPLOAD, they are required.");
                 }
+                
                 break;
             default:
                 Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.WARNING, "Service is not available.");

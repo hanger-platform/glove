@@ -250,7 +250,6 @@ public class GoogleDriveApi {
         try {
             File fileMetadata = new File();
             fileMetadata.setName(newTitle); 
-            fileMetadata.setMimeType("application/vnd.google-apps.file");
 
             //Identifies if the uploaded file should be in a specific folder.
             if (folder != null) {
