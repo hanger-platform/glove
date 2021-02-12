@@ -116,15 +116,15 @@ public class GoogleDriveApi {
      * Clone a google drive file by its ID.
      *
      * @param id File id
-     * @param newTitle New file title
+     * @param title New file title
      * @param folder String list that contain one parent folder id.
      * @return Metadata of new file
      */
-    public File copy(String id, String newTitle, List<String> folder) {
+    public File copy(String id, String title, List<String> folder) {
         File metadata = null;
 
         try {
-            File copyMetadata = new File().setName(newTitle);
+            File copyMetadata = new File().setName(title);
 
             //Identifies if the cloned file should be in a specific folder.
             if (folder != null) {
@@ -202,7 +202,7 @@ public class GoogleDriveApi {
     }
 
     /**
-     * This method downloads google Drive file by its ID.
+     * Downloads google Drive file by its ID.
      *
      * @param fileId Google Drive file
      * @return Path of downloaded file
@@ -235,38 +235,35 @@ public class GoogleDriveApi {
         return outputPath;
     }
 
-    /***
-     * This method uploads a file on google Drive by its local path.
-     * 
-     * @param newTitle New file title
-     * @param path File's local path
-     * @param type File's extension
+    /**
+     * *
+     * Uploads a file on google Drive by its local path.
+     *
+     * @param title New file title
+     * @param input File's local path
      * @param folder String list that contain one parent folder id.
-     * @return
-     * @throws IOException 
      */
-    public java.nio.file.Path upload(String newTitle, String path, List<String> folder) throws IOException {
+    public File upload(String title, String input, List<String> folder) {
+        File response = null;
 
         try {
-            File fileMetadata = new File();
-            fileMetadata.setName(newTitle); 
+            File metadata = new File().setName(title);
 
             //Identifies if the uploaded file should be in a specific folder.
             if (folder != null) {
                 List<String> parents = folder;
-                fileMetadata.setParents(parents);
+                metadata.setParents(parents);
             }
 
-            java.io.File filePath = new java.io.File(path);
+            java.io.File filePath = new java.io.File(input);
             FileContent mediaContent = new FileContent("", filePath);
-            File file = this.service.files().create(fileMetadata, mediaContent)
+            response = this.service.files().create(metadata, mediaContent)
                     .setFields("id")
                     .execute();
-            System.out.println("File ID: " + file.getId());
         } catch (IOException ex) {
             System.err.println("Error on upload: " + ex.getMessage());
         }
 
-        return null;
+        return response;
     }
 }

@@ -141,10 +141,10 @@ public class GoogleDriveManager {
                     break;
                 }
 
-                //Upload a file by its path.
-                Path fileMetadata = api.upload(cli.getParameter("title"), cli.getParameter("input"), cli.getParameterAsList("folder", "\\+"));
+                //Upload a file to Google Drive.
+                File metadata = api.upload(cli.getParameter("title"), cli.getParameter("input"), cli.getParameterAsList("folder", "\\+"));
 
-                Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.INFO, "File successfully uploaded.");
+                Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.INFO, "File successfully uploaded, new file id: {0}", metadata.getId());
 
                 break;
             default:
