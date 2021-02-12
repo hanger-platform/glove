@@ -29,7 +29,6 @@ import br.com.dafiti.mitt.cli.CommandLineInterface;
 import br.com.dafiti.mitt.exception.DuplicateEntityException;
 import br.com.dafiti.mitt.transformation.embedded.Concat;
 import br.com.dafiti.mitt.transformation.embedded.Now;
-import com.google.api.client.http.FileContent;
 import com.google.api.services.drive.model.File;
 import com.google.common.base.Strings;
 import java.io.IOException;

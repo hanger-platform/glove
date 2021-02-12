@@ -242,6 +242,7 @@ public class GoogleDriveApi {
      * @param title New file title
      * @param input File's local path
      * @param folder String list that contain one parent folder id.
+     * @return File uploaded metadata
      */
     public File upload(String title, String input, List<String> folder) {
         File response = null;
