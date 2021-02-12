@@ -6,7 +6,7 @@
 The **Google Drive Manager** is a tool that allows the user to manage and extract files from Google Drive. There are 3 actions available in this tool, they are:
 - **Copy**: Copy one file to another, if source file is shared with some people, this permissions will be copied either.
 - **Import**: Import files from google drive and turn them into a csv file processed by mitt.
-- **Upload**: in progress.
+- **Upload**: Upload a local file into Google Drive.
 
 ## Install
 
@@ -54,7 +54,8 @@ java -jar google-drive-manager.jar \
 	--properties=<(Optional) Reader properties.> \
 	--field=<(Optional) Fields to be extracted from the file, Required for IMPORT> \
 	--partition=<(Optional)  Partition, divided by + if has more than one field> \
-	--key=<(Optional) Unique key, divided by + if has more than one field>
+	--key=<(Optional) Unique key, divided by + if has more than one field> \
+	--input=<(Optional) Input file; Required for UPLOAD>
 ```
 
 ##### COPY
@@ -86,6 +87,18 @@ java -jar /home/user_name/glove/extractor/lib/google-drive-manager.jar \
 
 * **Properties** parameter is used for xls files when you need to skip some lines or need to specify the sheet to be extracted.
 * **Field** parameter is used to specify the fields of the output csv file.
+
+##### UPLOAD
+This action will upload one local file to Google Drive, if folder parameter is empty, upload to My drive directory.
+
+```bash
+java -jar /home/user_name/glove/extractor/lib/google-drive-manager.jar \
+  --credentials=/home/user_name/credentials/google_drive.json \
+  --action="UPLOAD" \
+  --folder="if_you_want_to_upload_the_file_to_a_folder_put_the_folder_id_here" \
+  --input="/tmp/anything/input_file_name.any_extesion" \
+  --title="title_of_uploaded_file.any_extension"
+```
 
 ## Contributing, Bugs, Questions
 Contributions are more than welcome! If you want to propose new changes, fix bugs or improve something feel free to fork the repository and send us a Pull Request. You can also open new `Issues` for reporting bugs and general problems.
