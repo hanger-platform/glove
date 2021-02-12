@@ -56,7 +56,7 @@ public class GoogleDriveManager {
         //Define parameters. 
         mitt.getConfiguration()
                 .addParameter("c", "credentials", "Credentials file", "", true, true)
-                .addParameter("s", "id", "file id (can use google spreadsheet id)", "", true, false)
+                .addParameter("s", "id", "(Optional) file id (can use google spreadsheet id); Required for COPY and IMPORT", "")
                 .addParameter("t", "title", "(Optional)  New file title, Required for COPY and UPLOAD", "")
                 .addParameter("f", "folder", "(Optional) Folder id, if null save file in my drive.", "")
                 .addParameter("a", "action", "(Optional) Action on Google Drive; COPY is default", "COPY")

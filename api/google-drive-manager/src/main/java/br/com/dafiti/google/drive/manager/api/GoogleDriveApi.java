@@ -258,7 +258,7 @@ public class GoogleDriveApi {
             }
 
             java.io.File filePath = new java.io.File(path);
-            FileContent mediaContent = new FileContent(type, filePath);
+            FileContent mediaContent = new FileContent("", filePath);
             File file = this.service.files().create(fileMetadata, mediaContent)
                     .setFields("id")
                     .execute();
