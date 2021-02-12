@@ -240,16 +240,17 @@ public class GoogleDriveApi {
      * 
      * @param newTitle New file title
      * @param path File's local path
+     * @param type File's extension
      * @param folder String list that contain one parent folder id.
      * @return
      * @throws IOException 
      */
-    public java.nio.file.Path upload(String newTitle, String path, List<String> folder) throws IOException {
+    public java.nio.file.Path upload(String newTitle, String path, String type, List<String> folder) throws IOException {
 
         try {
             File fileMetadata = new File();
             fileMetadata.setName(newTitle); 
-            fileMetadata.setMimeType("application/vnd.google-apps.spreadsheet");
+            fileMetadata.setMimeType("application/vnd.google-apps.file");
 
             //Identifies if the uploaded file should be in a specific folder.
             if (folder != null) {
@@ -257,8 +258,8 @@ public class GoogleDriveApi {
                 fileMetadata.setParents(parents);
             }
 
-            java.io.File filePath = new java.io.File(path); //param path
-            FileContent mediaContent = new FileContent("text/csv", filePath);
+            java.io.File filePath = new java.io.File(path);
+            FileContent mediaContent = new FileContent(type, filePath);
             File file = this.service.files().create(fileMetadata, mediaContent)
                     .setFields("id")
                     .execute();
