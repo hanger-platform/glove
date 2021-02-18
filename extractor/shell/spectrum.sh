@@ -631,18 +631,18 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 
 				# Identifica se deve compactar o arquivo a ser exportado. 
 				if [ ${EXPORT_TYPE} == "gz" ]; then
-					# Compacta o arquivo csv.
-					pigz -c ${RAWFILE_QUEUE_FILE} > ${RAWFILE_QUEUE_FILE}.gz
+					# Compacta o arquivo csv e mantém o arquivo original.
+					pigz -k ${RAWFILE_QUEUE_PATH}*${DATA_FILE}*
 
 					# Envia o arquivo compactado para o bucket de destino.
-					aws s3 cp ${RAWFILE_QUEUE_FILE}.gz ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --only-show-errors --acl bucket-owner-full-control
+					aws s3 cp ${RAWFILE_QUEUE_PATH} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive --exclude "*" --include "*.gz" --only-show-errors --acl bucket-owner-full-control
 					error_check
 
 					# Remove o arquivo compactado do diretório.
-					rm -rf ${RAWFILE_QUEUE_FILE}.gz
+					rm -rf *.gz
 				else
 					# Envia o arquivo para o bucket de destino.
-					aws s3 cp ${RAWFILE_QUEUE_FILE} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --only-show-errors --acl bucket-owner-full-control
+					aws s3 cp ${RAWFILE_QUEUE_PATH} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive --exclude "*" --include "${DATA_FILE}.*" --only-show-errors --acl bucket-owner-full-control
 					error_check
 				fi			
 			elif [ "${#EXPORT_SPREADSHEET}" -gt "0" ]; then	
