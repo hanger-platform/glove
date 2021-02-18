@@ -626,17 +626,25 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 
 			# Define o storage de exportação.
 			if [ "${#EXPORT_BUCKET}" -gt "0" ]; then
-				# Compacta o arquivo csv.
-				pigz -c ${RAWFILE_QUEUE_FILE} > ${RAWFILE_QUEUE_FILE}.gz
-			
 				# Envia o arquivo para o storage.
-				echo "Exporting resultset to ${EXPORT_BUCKET}!"
-				aws s3 rm ${EXPORT_BUCKET}${RAWFILE_QUEUE_FILE}.gz --recursive --only-show-errors
-				aws s3 cp ${RAWFILE_QUEUE_FILE}.gz ${EXPORT_BUCKET} --only-show-errors --acl bucket-owner-full-control
-				error_check
+				echo "Exporting resultset to ${EXPORT_BUCKET} using profile ${EXPORT_PROFILE}!"				
 
-				# Remove o arquivo compactado do diretório.
-				rm -rf ${RAWFILE_QUEUE_FILE}.gz
+				# Identifica se deve compactar o arquivo a ser exportado. 
+				if [ ${EXPORT_TYPE} == "gz" ]; then
+					# Compacta o arquivo csv.
+					pigz -c ${RAWFILE_QUEUE_FILE} > ${RAWFILE_QUEUE_FILE}.gz
+
+					# Envia o arquivo compactado para o bucket de destino.
+					aws s3 cp ${RAWFILE_QUEUE_FILE}.gz ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --only-show-errors --acl bucket-owner-full-control
+					error_check
+
+					# Remove o arquivo compactado do diretório.
+					rm -rf ${RAWFILE_QUEUE_FILE}.gz
+				else
+					# Envia o arquivo para o bucket de destino.
+					aws s3 cp ${RAWFILE_QUEUE_FILE} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --only-show-errors --acl bucket-owner-full-control
+					error_check
+				fi			
 			elif [ "${#EXPORT_SPREADSHEET}" -gt "0" ]; then	
 				if [ ${DEBUG} = 1 ] ; then
 					echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/google-sheets-export.jar \
