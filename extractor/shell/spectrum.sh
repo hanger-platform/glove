@@ -639,7 +639,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 					error_check
 
 					# Remove o arquivo compactado do diretório.
-					rm -rf *.gz
+					rm -f *.gz
 				else
 					# Envia o arquivo para o bucket de destino.
 					aws s3 cp ${RAWFILE_QUEUE_PATH} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive --exclude "*" --include "${DATA_FILE}.*" --only-show-errors --acl bucket-owner-full-control
