@@ -698,7 +698,7 @@ ALLOW_RECREATE              	== ${ALLOW_RECREATE}
 #-----------------------------------------------------------
 EXPORT                      	== ${IS_EXPORT}
 EXPORT_BUCKET               	== ${EXPORT_BUCKET}
-EXPORT_TYPE               	== ${EXPORT_TYPE}
+EXPORT_TYPE                	== ${EXPORT_TYPE}
 EXPORT_PROFILE               	== ${EXPORT_PROFILE}
 EXPORT_SHEETS_METHOD        	== ${EXPORT_SHEETS_METHOD}
 EXPORT_SHEET                	== ${EXPORT_SHEET}
