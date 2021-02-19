@@ -601,6 +601,7 @@ fi
 if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 	echo "Work area:"
 	echo "${RAWFILE_QUEUE_PATH}"
+	echo "${STORAGE_QUEUE_PATH}"
 
     if [ ${IS_SPECTRUM} = 1 ] ; then
         echo "Credentials:"
