@@ -648,7 +648,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 				else
 					# Envia o arquivo para o bucket de destino.
 					if [ "${#PARTITION_FIELD}" -gt "0" ]; then
-						aws s3 cp ${RAWFILE_QUEUE_PATH} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive --exclude "*" --include "${DATA_FILE}.*" --only-show-errors --acl bucket-owner-full-control
+						aws s3 cp ${RAWFILE_QUEUE_PATH} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive --exclude "*" --include "${DATA_FILE}*" --only-show-errors --acl bucket-owner-full-control
 					else
 						aws s3 cp ${RAWFILE_QUEUE_FILE} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --only-show-errors --acl bucket-owner-full-control
 					fi
