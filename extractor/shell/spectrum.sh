@@ -21,14 +21,14 @@ STORAGE_QUEUE_PATH="s3://${STORAGE_BUCKET}/${SCHEMA_HASH}_${SCHEMA}/${ENTITY_HAS
 STORAGE_DISASTER_RECOVERY_QUEUE_PATH="s3://${GLOVE_STORARE_BUCKET_DISASTER_RECOVERY}/disaster_recovery/${SCHEMA_HASH}_${SCHEMA}/${ENTITY_HASH}_${TABLE}/rawfile/queue/"
 STORAGE_STAGING_QUEUE_PATH="s3://${GLOVE_STORARE_BUCKET_STAGING}/staging"
 
-# Arquivo de dados. 
+# Arquivo de dados.
 DATA_FILE="${SCHEMA}_${TABLE}"
 
 # Cria um schema.
 schema_check(){
     if [ ${IS_SPECTRUM} = 1 ] ; then
         echo "Running database check at ${SCHEMA}"
-    
+
         # Cria o schema.
         psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} << EOF
             CREATE EXTERNAL SCHEMA IF NOT EXISTS ${SCHEMA}
@@ -40,7 +40,7 @@ EOF
         error_check
     else
     	echo "Running database check at ${SCHEMA}"
-        
+
         # Cria o database.
         run_on_athena "CREATE DATABASE IF NOT EXISTS ${SCHEMA};"
     fi
@@ -50,7 +50,7 @@ EOF
 table_check(){
     echo "Preparing table to store ${OUTPUT_FORMAT} files!"
 
-    if [ ${IS_SPECTRUM} = 1 ] && [ ${HAS_ATHENA} = 0 ]; then    
+    if [ ${IS_SPECTRUM} = 1 ] && [ ${HAS_ATHENA} = 0 ]; then
         # Verifica se a tabela existe.
         TABLE_EXISTS=`psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} -c "SELECT SUM(N) FROM ( SELECT DISTINCT 1 AS N FROM SVV_EXTERNAL_TABLES WHERE SCHEMANAME='${SCHEMA}' AND TABLENAME='${TABLE}' UNION ALL SELECT 0 AS N);" | sed '1,2d' | head -n 1`
 
@@ -65,13 +65,13 @@ table_check(){
                 LOCATION '${STORAGE_QUEUE_PATH}';
 EOF
         fi
-        error_check    
+        error_check
     else
         # Cria o database.
         schema_check
-        
+
         # Cria a tabela.
-        run_on_athena "CREATE EXTERNAL TABLE IF NOT EXISTS ${SCHEMA}.${TABLE} (${FIELD_NAME_AND_TYPE_LIST}) STORED AS ${OUTPUT_FORMAT} LOCATION '${STORAGE_QUEUE_PATH}';"  
+        run_on_athena "CREATE EXTERNAL TABLE IF NOT EXISTS ${SCHEMA}.${TABLE} (${FIELD_NAME_AND_TYPE_LIST}) STORED AS ${OUTPUT_FORMAT} LOCATION '${STORAGE_QUEUE_PATH}';"
     fi
 }
 
@@ -79,7 +79,7 @@ EOF
 partitioned_table_check(){
     echo "Preparing partitioned table to store ${OUTPUT_FORMAT} files!"
 
-    if [ ${IS_SPECTRUM} = 1 ] && [ ${HAS_ATHENA} = 0 ]; then        
+    if [ ${IS_SPECTRUM} = 1 ] && [ ${HAS_ATHENA} = 0 ]; then
         # Verifica se a tabela existe.
         TABLE_EXISTS=`psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} -c "SELECT SUM(N)FROM (SELECT DISTINCT 1 AS N FROM SVV_EXTERNAL_TABLES WHERE SCHEMANAME='${SCHEMA}' AND TABLENAME='${TABLE}' UNION ALL SELECT 0 AS N);"|sed '1,2d'| head -n 1`
 
@@ -95,13 +95,13 @@ partitioned_table_check(){
                 LOCATION '${STORAGE_QUEUE_PATH}';
 EOF
         fi
-        error_check    
+        error_check
     else
         # Cria o database.
         schema_check
-        
+
         # Cria a tabela.
-        run_on_athena "CREATE EXTERNAL TABLE IF NOT EXISTS ${SCHEMA}.${TABLE} (${FIELD_NAME_AND_TYPE_LIST}) PARTITIONED BY ( partition_value int ) STORED AS ${OUTPUT_FORMAT} LOCATION '${STORAGE_QUEUE_PATH}';"       
+        run_on_athena "CREATE EXTERNAL TABLE IF NOT EXISTS ${SCHEMA}.${TABLE} (${FIELD_NAME_AND_TYPE_LIST}) PARTITIONED BY ( partition_value int ) STORED AS ${OUTPUT_FORMAT} LOCATION '${STORAGE_QUEUE_PATH}';"
     fi
 }
 
@@ -122,13 +122,13 @@ partition_load(){
 				--target=csv \
 				--splitStrategy=${SPLIT_STRATEGY} \
 				--partition=0 \
-				--thread=${THREAD} \	
-				--escape=${QUOTE_ESCAPE} \			
+				--thread=${THREAD} \
+				--escape=${QUOTE_ESCAPE} \
 				--header \
 				--replace \
 				--debug=${DEBUG}"
 		fi
-    
+
         java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
 			--folder=${RAWFILE_QUEUE_PATH} \
 			--filename=*.csv \
@@ -140,7 +140,7 @@ partition_load(){
 			--escape=${QUOTE_ESCAPE} \
 			--header \
 			--replace \
-			--debug=${DEBUG}			
+			--debug=${DEBUG}
 		error_check
     else
 		if [ ${DEBUG} = 1 ] ; then
@@ -175,7 +175,7 @@ partition_load(){
 	if [ ${PARTITION_MERGE} -gt 0 ]; then
 		echo "PARTITION_MERGE ACTIVED!"
     else
-        echo "PARTITION_MERGE DISABLED!"    
+        echo "PARTITION_MERGE DISABLED!"
 	fi
 
     # Converte os arquivos das partições para formato colunar.
@@ -230,7 +230,7 @@ partition_load(){
         done
     fi
 
-    # Remove os arquivos utilizados no merge.	
+    # Remove os arquivos utilizados no merge.
     rm -f *.original.${OUTPUT_FORMAT}
 
 	# Envia os arquivo para o storage.
@@ -312,8 +312,8 @@ delta_load(){
     # Remove os arquivos antigos.
     aws s3 rm ${STORAGE_QUEUE_PATH} --recursive --exclude "*" --include "${DATA_FILE}.*" --only-show-errors
 
-    # Remove os arquivos utilizados no merge.	
-    rm -f *.original.${OUTPUT_FORMAT}	
+    # Remove os arquivos utilizados no merge.
+    rm -f *.original.${OUTPUT_FORMAT}
 
     # Envia o arquivo para o storage.
     echo "Uploading ${OUTPUT_FORMAT} files to S3 "
@@ -434,12 +434,12 @@ full_load(){
     error_check
 
     # Remove os arquivos temporários.
-    if [ ${DEBUG} = 0 ] ; then        
+    if [ ${DEBUG} = 0 ] ; then
         clean_up
     fi
 }
 
-#Executa uma query no Athena. 
+#Executa uma query no Athena.
 run_on_athena()
 {
     QUERY=$1
@@ -447,7 +447,7 @@ run_on_athena()
     if [ ${DEBUG} = 1 ] ; then
         echo ${QUERY}
     fi
-    
+
     # Cria o database.
     ATHENA_QUERY_ID=`aws athena start-query-execution \
             --query-string "${QUERY}" \
@@ -470,7 +470,7 @@ run_on_athena()
             sleep 1
         fi
     done
-	
+
 	# Remove os arquivos antigos.
 	if [ ${DEBUG} = 0 ] ; then
 		echo "Removing staging files of ${STORAGE_STAGING_QUEUE_PATH}/${ATHENA_QUERY_ID}*"
@@ -498,7 +498,7 @@ backup()
     HOUR=`date '+%H'`
     MINUTE=`date '+%M'`
 
-    #Identifica o bucket que receberá os dados do backup. 
+    #Identifica o bucket que receberá os dados do backup.
     STORAGE_BACKUP_METADATA_PATH="s3://${STORAGE_BUCKET_BACKUP}/backup/${SCHEMA}/${TABLE}/metadata/year=${YEAR}/month=${MONTH}/day=${DAY}/hour=${HOUR}/minute=${MINUTE}/"
     STORAGE_BACKUP_QUEUE_PATH="s3://${STORAGE_BUCKET_BACKUP}/backup/${SCHEMA}/${TABLE}/rawfile/year=${YEAR}/month=${MONTH}/day=${DAY}/hour=${HOUR}/minute=${MINUTE}/"
 
@@ -506,14 +506,14 @@ backup()
     echo "Backing up metadata files to ${STORAGE_BACKUP_METADATA_PATH}"
     aws s3 cp ${METADATA_PATH} ${STORAGE_BACKUP_METADATA_PATH} --recursive --only-show-errors
     error_check
-    
+
     # Envia o arquivo de dados para o storage.
     echo "Backing up data files to ${STORAGE_BACKUP_QUEUE_PATH}"
     cd ${RAWFILE_QUEUE_PATH}
-    pigz -c ${RAWFILE_QUEUE_FILE} > ${RAWFILE_QUEUE_FILE}.gz 
+    pigz -c ${RAWFILE_QUEUE_FILE} > ${RAWFILE_QUEUE_FILE}.gz
     aws s3 cp ${RAWFILE_QUEUE_PATH} ${STORAGE_BACKUP_QUEUE_PATH} --recursive --exclude "*" --include "*.gz" --only-show-errors
-    rm -f ${RAWFILE_QUEUE_FILE}.gz 
-    error_check 
+    rm -f ${RAWFILE_QUEUE_FILE}.gz
+    error_check
 }
 
 # Identifica a ocorrência de erros e interrompe processo.
@@ -561,7 +561,7 @@ if [ ${IS_RECREATE} = 1 -o ${IS_RELOAD} = 1 ]; then
 	fi
 
 	if [ ${IS_RELOAD} = 0 ]; then
-		# Dropa a tabela para que possa ser recriada.         
+		# Dropa a tabela para que possa ser recriada.
         if [ ${IS_SPECTRUM} = 1 ] && [ ${HAS_ATHENA} = 0 ]; then
             echo "Dropping table ${SCHEMA}.${TABLE} from Spectrum!"
             psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} << EOF
@@ -569,7 +569,7 @@ if [ ${IS_RECREATE} = 1 -o ${IS_RELOAD} = 1 ]; then
 EOF
         else
             echo "Dropping table ${SCHEMA}.${TABLE} from Athena!"
-            run_on_athena "DROP TABLE IF EXISTS ${SCHEMA}.${TABLE};"    
+            run_on_athena "DROP TABLE IF EXISTS ${SCHEMA}.${TABLE};"
         fi
 
 		# Realiza a verificação da estrutura das tabelas.
@@ -612,7 +612,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
         echo "Password provided by kettle.properties parameter"
     fi
 
-    # Identifica se será feito bachup dos arquivos de dados. 
+    # Identifica se será feito bachup dos arquivos de dados.
     if [ "${#STORAGE_BUCKET_BACKUP}" -gt "0" ]; then
         backup
     fi
@@ -628,9 +628,9 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 			# Define o storage de exportação.
 			if [ "${#EXPORT_BUCKET}" -gt "0" ]; then
 				# Envia o arquivo para o storage.
-				echo "Exporting resultset to ${EXPORT_BUCKET} using profile ${EXPORT_PROFILE}!"				
+				echo "Exporting resultset to ${EXPORT_BUCKET} using profile ${EXPORT_PROFILE}!"
 
-				# Identifica se deve compactar o arquivo a ser exportado. 
+				# Identifica se deve compactar o arquivo a ser exportado.
 				if [ ${EXPORT_TYPE} == "gz" ]; then
 					# Compacta o arquivo csv e mantém o arquivo original.
 					pigz -k ${RAWFILE_QUEUE_PATH}*${DATA_FILE}*
@@ -640,13 +640,13 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 					error_check
 
 					# Remove o arquivo compactado do diretório.
-					rm -f *.gz
+					rm -f ${RAWFILE_QUEUE_PATH}*.gz
 				else
 					# Envia o arquivo para o bucket de destino.
 					aws s3 cp ${RAWFILE_QUEUE_PATH} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive --exclude "*" --include "${DATA_FILE}.*" --only-show-errors --acl bucket-owner-full-control
 					error_check
-				fi			
-			elif [ "${#EXPORT_SPREADSHEET}" -gt "0" ]; then	
+				fi
+			elif [ "${#EXPORT_SPREADSHEET}" -gt "0" ]; then
 				if [ ${DEBUG} = 1 ] ; then
 					echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/google-sheets-export.jar \
 					--credentials=GLOVE_SPREADSHEET_CREDENTIALS \
@@ -657,7 +657,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 					--debug=${DEBUG} \
 					--delimiter=${DELIMITER}"
 				fi
-				
+
 				# Exporta resultset para uma planilha do Google Sheets.
 				java -jar ${GLOVE_HOME}/extractor/lib/google-sheets-export.jar \
 					--credentials=${GLOVE_SPREADSHEET_CREDENTIALS} \
@@ -667,11 +667,11 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 					--method=${EXPORT_SHEETS_METHOD} \
 					--debug=${DEBUG} \
 					--delimiter=${DELIMITER}
-				error_check	
+				error_check
 			else
 				echo "EXPORT_BUCKET_DEFAULT or EXPORT_SPREADSHEET_DEFAULT was not defined!"
 			fi
-			
+
 			# Finaliza o processo de exportação.
 			if [ ${ONLY_EXPORT} = 1 ]; then
 				echo "Exporting finished!"
@@ -731,14 +731,14 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
                       ALTER TABLE "${SCHEMA}"."${TABLE}" SET TABLE PROPERTIES ('numRows'='${ROW_COUNT}');
 EOF
                 fi
-                
+
                 echo "Removing old table versions from glue!"
                 TABLE_VERSION=`aws glue get-table-versions --max-items=100 --database-name ${SCHEMA} --table-name ${TABLE} | jq --compact-output "[.TableVersions[].VersionId]" | sed -e 's/\,/ /g;s/\[/ /g;s/\]/ /g;s/\"//g'`
-                aws glue batch-delete-table-version --database-name ${SCHEMA} --table-name ${TABLE} --version-ids $TABLE_VERSION               
+                aws glue batch-delete-table-version --database-name ${SCHEMA} --table-name ${TABLE} --version-ids $TABLE_VERSION
             else
-                echo "${ROW_COUNT} records in the table \"${SCHEMA}\".\"${TABLE}\""   
+                echo "${ROW_COUNT} records in the table \"${SCHEMA}\".\"${TABLE}\""
             fi
-			
+
 			# Remove os arquivos antigos.
 			if [ ${DEBUG} = 0 ] ; then
 				echo "Removing staging files of ${STORAGE_STAGING_QUEUE_PATH}/${ATHENA_QUERY_ID}*"
@@ -752,7 +752,7 @@ EOF
         else
             sleep 5
         fi
-    done   
+    done
 else
 	echo "Nothing to load from ${RAWFILE_QUEUE_PATH} :/"
 fi
