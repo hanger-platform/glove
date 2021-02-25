@@ -25,7 +25,6 @@ package br.com.dafiti.sisense.action;
  */
 import br.com.dafiti.sisense.metadata.ElastiCubeStatus;
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,7 +43,7 @@ public class ElastiCubeStartBuild {
     private final String type;
 
     private static final Logger LOG = Logger.getLogger(ElastiCubeStartBuild.class.getName());
-
+    
     /**
      *
      * @param token
@@ -83,7 +82,7 @@ public class ElastiCubeStartBuild {
         } else {
             try {
                 HttpClient httpClient = new HttpClient();
-                PostMethod method = new PostMethod("https://" + this.server + "/api/elasticubes/localhost/" + URLEncoder.encode(this.cube) + "/startBuild?type=" + this.type);
+                PostMethod method = new PostMethod("https://" + this.server + "/api/elasticubes/localhost/" + this.cube + "/startBuild?type=" + this.type);
                 method.setRequestHeader("Authorization", "Bearer " + this.token);
                 int httpStatus = httpClient.executeMethod(method);
 
@@ -109,8 +108,6 @@ public class ElastiCubeStartBuild {
 
                 status = elastiCubesStatus.getStatus();
                 LOG.log(Level.INFO, "{0}: {1}", new Object[]{this.cube, elastiCubesStatus.getStatusMessage(status)});
-
-                System.out.println(status);
 
                 //Identifies cube is building (514).
                 if (status != 514) {

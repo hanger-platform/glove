@@ -25,7 +25,6 @@ package br.com.dafiti.sisense.metadata;
 
 import br.com.dafiti.status.CubeStatus;
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.httpclient.HttpClient;
@@ -70,7 +69,7 @@ public class ElastiCubeStatus {
     public int getStatus() {
         int status = 0;
         HttpClient httpClient = new HttpClient();
-        GetMethod method = new GetMethod("https://" + this.server + "/api/elasticubes/servers/localhost/status?q=" + URLEncoder.encode(this.cube));
+        GetMethod method = new GetMethod("https://" + this.server + "/api/elasticubes/servers/localhost/status");
         method.setRequestHeader("Authorization", "Bearer " + this.token);
 
         try {
@@ -80,8 +79,11 @@ public class ElastiCubeStatus {
 
                 for (Object cubeInformation : elastCubes) {
                     JSONObject cubeStatus = (JSONObject) cubeInformation;
-                    status = Integer.valueOf(cubeStatus.get("status").toString());
-                    break;
+
+                    if (((String) cubeStatus.get("title")).equalsIgnoreCase(this.cube)) {
+                        status = Integer.valueOf(cubeStatus.get("status").toString());
+                        break;
+                    }
                 }
             }
         } catch (IOException
