@@ -1,10 +1,10 @@
 
 # Facebook Ad Extractor [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-### Extrator de dados de Ad do Facebook (https://developers.facebook.com/docs/marketing-api/reference/ad-campaign-group)
+### Extrator de dados de Ad do Facebook (https://developers.facebook.com/docs/marketing-api/reference/v9.0)
 
 ## How it works
 
-O **Facebook Ad Extractor** possibilita a extração de dados de AdCampaigns, AdSets, Ads e AdsInsights.
+O **Facebook Ad Extractor** possibilita a extração de dados de AdCampaigns, AdSets, Ads, AdsCreative e AdsInsights.
 
 ## Instalação
 
@@ -47,6 +47,7 @@ java -jar facebook-ad.jar \
 	--key=<(Optional) Unique key> \
 	--attribute=<(Optional) Facebook Report fields, divided by + if has more than one field> \
 	--breakdowns=<(Optional) Breakdowns of report, divided by + if has more than one field> \
+	--filtering=<(Optional) Report filters in the format: [{'field':'<field>','operator':'<operator>','value':<value>}]> \
 	--field=<(Optional) Custom fields where MITT functions are welcome, divided by + if has more than one field>
 ```
 
