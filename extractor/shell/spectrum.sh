@@ -636,14 +636,22 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 					pigz -k ${RAWFILE_QUEUE_PATH}*${DATA_FILE}*
 
 					# Envia o arquivo compactado para o bucket de destino.
-					aws s3 cp ${RAWFILE_QUEUE_PATH} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive --exclude "*" --include "*.gz" --only-show-errors --acl bucket-owner-full-control
+					if [ "${#PARTITION_FIELD}" -gt "0" ]; then
+						aws s3 cp ${RAWFILE_QUEUE_PATH} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive --exclude "*" --include "*.gz" --only-show-errors --acl bucket-owner-full-control
+					else
+						aws s3 cp ${RAWFILE_QUEUE_FILE}.gz ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --exclude "*" --include "*.gz" --only-show-errors --acl bucket-owner-full-control
+					fi
 					error_check
 
 					# Remove o arquivo compactado do diretório.
 					rm -f ${RAWFILE_QUEUE_PATH}*.gz
 				else
 					# Envia o arquivo para o bucket de destino.
-					aws s3 cp ${RAWFILE_QUEUE_PATH} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive --exclude "*" --include "${DATA_FILE}.*" --only-show-errors --acl bucket-owner-full-control
+					if [ "${#PARTITION_FIELD}" -gt "0" ]; then
+						aws s3 cp ${RAWFILE_QUEUE_PATH} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive --exclude "*" --include "${DATA_FILE}.*" --only-show-errors --acl bucket-owner-full-control
+					else
+						aws s3 cp ${RAWFILE_QUEUE_FILE} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --exclude "*" --include "${DATA_FILE}.*" --only-show-errors --acl bucket-owner-full-control
+					fi
 					error_check
 				fi
 			elif [ "${#EXPORT_SPREADSHEET}" -gt "0" ]; then
