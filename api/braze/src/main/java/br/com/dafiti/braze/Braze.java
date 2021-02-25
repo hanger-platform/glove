@@ -64,7 +64,8 @@ public class Braze {
                     .addParameter("f", "field", "Fields to be extracted from the file", "", true, false)
                     .addParameter("sl", "sleep", "(Optional) Sleep time in seconds at one request and another; 0 is default", "0")
                     .addParameter("p", "partition", "(Optional)  Partition, divided by + if has more than one field")
-                    .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "");
+                    .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "")
+                    .addParameter("r", "request_body", "(Optional) body to send in http POST request", "");
 
             //Reads the command line interface. 
             CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -103,6 +104,26 @@ public class Braze {
                             cli.getParameterAsList("field", "\\+"),
                             cli.getParameterAsInteger("sleep"),
                             credentials).extract();
+                    break;
+
+                case "export":
+
+                    if ((cli.getParameter("request_body") != null) && (!cli.getParameter("request_body").isEmpty())) {
+                        new Export(cli.getParameter("endpoint_detail"),
+                                cli.getParameter("output"),
+                                cli.getParameter("service"),
+                                cli.getParameterAsList("key", "\\+"),
+                                cli.getParameterAsList("partition", "\\+"),
+                                cli.getParameterAsList("field", "\\+"),
+                                cli.getParameterAsInteger("sleep"),
+                                credentials,
+                                cli.getParameter("request_body")).extract();
+                    } else {
+                        Logger.getLogger(Braze.class.getName()).log(
+                                Level.SEVERE, "GLOVE - Parameter request_body is empty."
+                        );
+                    }
+
                     break;
 
                 default:

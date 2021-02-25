@@ -39,7 +39,7 @@ Utilizando o [Maven](https://maven.apache.org/):
 java -jar braze.jar  \
 	--credentials=<Arquivo de credenciais>  \
 	--output=<Caminho onde arquivo será salvo> \
-	--type=<Tipo de extração conforme o endpoint que será extraído. As opções são: 'detail_list' ou 'detail'> \
+	--type=<Tipo de extração conforme o endpoint que será extraído. As opções são: 'detail_list', 'detail' ou 'export'> \
 	--service=<Nome do serviço a ser consumido, exemplo: campaigns> \
 	--endpoint_list=<(Opcional) URL que retorna a lista a ser percorrida, exemplo:'https://rest.iad-03.braze.com/campaigns/list?include_archived=true&page=<<page>>' > \
 	--endpoint_detail=<URL que retorna o detalhe de cada item da lista, exemplo:'https://rest.iad-03.braze.com/campaigns/details?campaign_id=<<id>>' > \
@@ -47,6 +47,53 @@ java -jar braze.jar  \
 	--partition=<(Opcional) Partição, dividos por + quando for mais de um> \	
 	--key=<(Opcional) Chave única, dividos por + quando for mais de um> \
 	--sleep=<(Opcional) Tempo de espera entre uma chamada de outra. '0' é o padrão> \
+	--request_body=<(Opcional) Parâmetro JSON que deve ser utilizado com o type 'export'>
+```
+
+## Exemplos
+
+##### Exemplo de tipo 'list detail' (Padrão)
+
+```bash
+java -jar /<path>/braze.jar \
+  --credentials="<path>/<credentials.json>" \
+  --output="<output_path>/<file_name.csv>" \
+  --service="campaigns" \
+  --endpoint_list="https://rest.iad-03.braze.com/campaigns/list?include_archived=true&page=<<page>>" \
+  --endpoint_detail="https://rest.iad-03.braze.com/campaigns/details?campaign_id=<<id>>" \
+  --field="created_at+updated_at+id+name+archived+draft+schedule_type+channels+first_sent+last_sent+tags+messages+conversion_behaviors" \
+  --partition="::fixed(FULL)" \
+  --key="id"
+```
+
+##### Exemplo de tipo 'detail'
+
+```bash
+java -jar /<path>/braze.jar \
+  --credentials="<path>/<credentials.json>" \
+  --output="<output_path>/<file_name.csv>" \
+  --service="data" \
+  --type="detail" \
+  --endpoint_detail="https://rest.iad-03.braze.com/kpi/uninstalls/data_series?length=30&ending_at=${ENDDATE}T00%3A00%3A00" \
+  --field="time+uninstalls" \
+  --partition="::dateformat(time,yyyy-MM-dd,yyyy)" \
+  --key="::md5([[time]])"
+```
+
+##### Exemplo de tipo 'export'
+
+```bash
+java -jar /<path>/braze.jar \
+  --credentials="<path>/<credentials.json>" \
+  --output="<output_path>/<file_name.csv>" \
+  --service="users" \
+  --type="export" \
+  --endpoint_detail="https://rest.iad-03.braze.com/users/export/segment" \
+  --field="country::jsonpath(content, $.country, false)+braze_id::jsonpath(content, $.braze_id, false)+external_id::jsonpath(content, $.external_id, false)+random_bucket::jsonpath(content, $.random_bucket, false)" \
+  --partition="::fixed(FULL)" \
+  --key="::checksum()" \
+  --request_body='{"segment_id":"<segment_id>","callback_endpoint":"https://rest.iad-03.braze.com/users/export/segment/callback/","fields_to_export":["country","external_id","braze_id","random_bucket"]}' \
+  --sleep=25
 ```
 
 ## Contributing, Bugs, Questions
