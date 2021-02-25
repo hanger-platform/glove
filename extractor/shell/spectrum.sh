@@ -639,7 +639,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 					if [ "${#PARTITION_FIELD}" -gt "0" ]; then
 						aws s3 cp ${RAWFILE_QUEUE_PATH} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive --exclude "*" --include "*.gz" --only-show-errors --acl bucket-owner-full-control
 					else
-						aws s3 cp ${RAWFILE_QUEUE_FILE}.gz ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --exclude "*" --include "*.gz" --only-show-errors --acl bucket-owner-full-control
+						aws s3 cp ${RAWFILE_QUEUE_FILE}.gz ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --only-show-errors --acl bucket-owner-full-control
 					fi
 					error_check
 
@@ -650,7 +650,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 					if [ "${#PARTITION_FIELD}" -gt "0" ]; then
 						aws s3 cp ${RAWFILE_QUEUE_PATH} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive --exclude "*" --include "${DATA_FILE}.*" --only-show-errors --acl bucket-owner-full-control
 					else
-						aws s3 cp ${RAWFILE_QUEUE_FILE} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --exclude "*" --include "${DATA_FILE}.*" --only-show-errors --acl bucket-owner-full-control
+						aws s3 cp ${RAWFILE_QUEUE_FILE} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --only-show-errors --acl bucket-owner-full-control
 					fi
 					error_check
 				fi
