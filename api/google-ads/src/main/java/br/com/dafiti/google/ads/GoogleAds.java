@@ -134,8 +134,6 @@ public class GoogleAds {
                 Logger.getLogger(GoogleAds.class.getName()).log(Level.INFO, "Retrieving data from {0} accounts", accounts.size());
 
                 for (String account : accounts) {
-                    Logger.getLogger(GoogleAds.class.getName()).log(Level.INFO, "Retrieving data from account {0}", account);
-
                     //Builds the query to be executed.
                     StringBuilder query = new StringBuilder();
                     query.append("SELECT ");
@@ -162,6 +160,8 @@ public class GoogleAds {
 
                     // Iterates through the results in the stream response.
                     for (SearchGoogleAdsStreamResponse response : stream) {
+                        Logger.getLogger(GoogleAds.class.getName()).log(Level.INFO, "Retrieving data from account {0} ({1} rows)", new Object[]{account, response.getResultsList().size()});
+                        
                         for (GoogleAdsRow googleAdsRow : response.getResultsList()) {
                             ArrayList<Object> record = new ArrayList();
 
