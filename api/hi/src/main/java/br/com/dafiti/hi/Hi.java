@@ -156,7 +156,9 @@ public class Hi {
                     CloseableHttpResponse response = client.execute(httpGet);
 
                     //Identifies the response status code. 
-                    if (response.getStatusLine().getStatusCode() == 200) {
+                    int statusCode = response.getStatusLine().getStatusCode();
+
+                    if (statusCode == 200) {
                         JSONObject payload = (JSONObject) new JSONParser()
                                 .parse(
                                         EntityUtils.toString(response.getEntity(), "UTF-8")
@@ -182,13 +184,12 @@ public class Hi {
                                 mitt.write(record);
                             });
                         }
+                    } else {
+                        throw new Exception("HTTP Exception " + statusCode);
                     }
                 }
             } while (paginate && process);
-        } catch (DuplicateEntityException
-                | IOException
-                | ParseException
-                | URISyntaxException ex) {
+        } catch (Exception ex) {
 
             LOG.log(Level.SEVERE, "GLOVE - Hi Platform API extractor fail: ", ex);
             System.exit(1);
