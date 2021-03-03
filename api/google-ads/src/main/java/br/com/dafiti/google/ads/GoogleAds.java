@@ -35,9 +35,6 @@ import com.google.ads.googleads.v6.services.SearchGoogleAdsStreamRequest;
 import com.google.ads.googleads.v6.services.SearchGoogleAdsStreamResponse;
 import com.google.api.gax.rpc.ServerStream;
 import com.google.api.pathtemplate.ValidationException;
-//import com.google.protobuf.Descriptors;
-//import com.google.protobuf.Descriptors.FieldDescriptor;
-//import com.google.protobuf;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -70,6 +67,7 @@ public class GoogleAds {
                     .addParameter("o", "output", "Output file", "", true, false)
                     .addParameter("o", "field", "Fields", "", true, false)
                     .addParameter("m", "manager", "Manager account ID", "")
+                    .addParameter("z", "customer", "The ID of the customer being queried", "")
                     .addParameter("f", "filter", "(Optional) Filter of query")
                     .addParameter("p", "partition", "(Optional)  Partition, divided by + if has more than one")
                     .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one", "")
@@ -108,7 +106,7 @@ public class GoogleAds {
                 // Constructs the SearchGoogleAdsStreamRequest.
                 SearchGoogleAdsStreamRequest searchGoogleAdsStreamRequest
                         = SearchGoogleAdsStreamRequest.newBuilder()
-                                .setCustomerId("7626550557")
+                                .setCustomerId(cli.getParameter("customer"))
                                 .setQuery(queryAccounts)
                                 .build();
 
@@ -134,6 +132,7 @@ public class GoogleAds {
                 Logger.getLogger(GoogleAds.class.getName()).log(Level.INFO, "Retrieving data from {0} accounts", accounts.size());
 
                 for (String account : accounts) {
+
                     //Builds the query to be executed.
                     StringBuilder query = new StringBuilder();
                     query.append("SELECT ");
@@ -158,7 +157,7 @@ public class GoogleAds {
                     ServerStream<SearchGoogleAdsStreamResponse> stream
                             = googleAdsServiceClient.searchStreamCallable().call(request);
 
-                    //Count of rows of account.
+                    //Count of rows of an account.
                     int count = 0;
 
                     // Iterates through the results in the stream response.
@@ -193,11 +192,9 @@ public class GoogleAds {
                             mitt.write(record);
                         }
                     }
-
                     Logger.getLogger(GoogleAds.class.getName()).log(Level.INFO, "Retrievied data from account {0} ({1} rows)", new Object[]{account, count});
                 }
             }
-
         } catch (FileNotFoundException ex) {
             Logger.getLogger(GoogleAds.class.getName()).log(Level.SEVERE, "Google Ads failed to load GoogleAdsClient configuration from file", ex);
             System.exit(1);

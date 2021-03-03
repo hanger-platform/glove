@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.google.ads.GoogleAds --credentials="/home/helio.leal/.google/google_ads_api/ads.properties" --output="/tmp/google_ads/campaign/" --manager="8520958123" --field="campaign.id,campaign.name,campaign.status,segments.device,metrics.impressions,metrics.clicks,metrics.ctr,metrics.average_cpc,metrics.cost_micros" --key="::checksum()" --partition="::fixed(FULL)" --debug="false" --type="campaign" --filter="segments.date DURING LAST_30_DAYS"</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.google.ads.GoogleAds --credentials="/home/helio.leal/.google/google_ads_api/ads.properties" --output="/tmp/google_ads/campaign/" --manager="8520958123" --field="campaign.id,campaign.name,campaign.status,segments.date,segments.device,metrics.impressions,metrics.clicks,metrics.ctr,metrics.average_cpc,metrics.cost_micros" --key="::checksum()" --partition="::fixed(FULL)" --debug="false" --type="campaign" --filter="segments.date DURING LAST_14_DAYS" --customer="7626550557"</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.google.ads.GoogleAds --credentials="/home/helio.leal/.google/google_ads_api/ads.properties" --output="/tmp/google_ads/campaign/" --manager="8520958123" --field="campaign.id,campaign.name,campaign.status,segments.device,metrics.impressions,metrics.clicks,metrics.ctr,metrics.average_cpc,metrics.cost_micros" --key="::checksum()" --partition="::fixed(FULL)" --debug="false" --type="campaign" --filter="segments.date DURING LAST_30_DAYS"</exec.args>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.google.ads.GoogleAds --credentials="/home/helio.leal/.google/google_ads_api/ads.properties" --output="/tmp/google_ads/campaign/" --manager="8520958123" --field="campaign.id,campaign.name,campaign.status,segments.date,segments.device,metrics.impressions,metrics.clicks,metrics.ctr,metrics.average_cpc,metrics.cost_micros" --key="::checksum()" --partition="::fixed(FULL)" --debug="false" --type="campaign" --filter="segments.date DURING LAST_14_DAYS" --customer="7626550557"</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.google.ads.GoogleAds --credentials="/home/helio.leal/.google/google_ads_api/ads.properties" --output="/tmp/google_ads/campaign/" --manager="8520958123" --field="campaign.id,campaign.name,campaign.status,segments.device,metrics.impressions,metrics.clicks,metrics.ctr,metrics.average_cpc,metrics.cost_micros" --key="::checksum()" --partition="::fixed(FULL)" --debug="false" --type="campaign" --filter="segments.date DURING LAST_30_DAYS"</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.google.ads.GoogleAds --credentials="/home/helio.leal/.google/google_ads_api/ads.properties" --output="/tmp/google_ads/campaign/" --manager="8520958123" --field="campaign.id,campaign.name,campaign.status,segments.date,segments.device,metrics.impressions,metrics.clicks,metrics.ctr,metrics.average_cpc,metrics.cost_micros" --key="::checksum()" --partition="::fixed(FULL)" --debug="false" --type="campaign" --filter="segments.date DURING LAST_14_DAYS" --customer="7626550557"</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
