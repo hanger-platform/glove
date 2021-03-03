@@ -158,10 +158,13 @@ public class GoogleAds {
                     ServerStream<SearchGoogleAdsStreamResponse> stream
                             = googleAdsServiceClient.searchStreamCallable().call(request);
 
+                    //Count of rows of account.
+                    int count = 0;
+
                     // Iterates through the results in the stream response.
                     for (SearchGoogleAdsStreamResponse response : stream) {
-                        Logger.getLogger(GoogleAds.class.getName()).log(Level.INFO, "Retrieving data from account {0} ({1} rows)", new Object[]{account, response.getResultsList().size()});
-                        
+                        count = response.getResultsList().size();
+
                         for (GoogleAdsRow googleAdsRow : response.getResultsList()) {
                             ArrayList<Object> record = new ArrayList();
 
@@ -190,6 +193,8 @@ public class GoogleAds {
                             mitt.write(record);
                         }
                     }
+
+                    Logger.getLogger(GoogleAds.class.getName()).log(Level.INFO, "Retrievied data from account {0} ({1} rows)", new Object[]{account, count});
                 }
             }
 
