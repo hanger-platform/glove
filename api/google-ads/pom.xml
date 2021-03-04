@@ -5,12 +5,8 @@
     <artifactId>google-ads</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
+    
     <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>mitt</artifactId>
-            <version>1.0.2</version>
-        </dependency>
         <dependency>
             <groupId>com.google.api-ads</groupId>
             <artifactId>google-ads</artifactId>
@@ -23,17 +19,55 @@
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>com.google.api-ads</groupId>
-            <artifactId>ads-lib</artifactId>
-            <version>4.11.0</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20200518</version>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mitt</artifactId>
+            <version>1.0.3</version>
         </dependency>
     </dependencies>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>                        
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>br.com.dafiti.google.ads.GoogleAds</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+        <finalName>google-ads</finalName>
+    </build>
+    
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
