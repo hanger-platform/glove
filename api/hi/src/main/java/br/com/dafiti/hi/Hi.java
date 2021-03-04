@@ -124,7 +124,7 @@ public class Hi {
                 page++;
 
                 if (paginate) {
-                    LOG.log(Level.INFO, "Page: {0}", page);
+                    LOG.log(Level.INFO, "Page: {0} (50 per page)", page);
                 }
 
                 //Defines the credential parameter values. 
@@ -141,7 +141,7 @@ public class Hi {
                             .addParameter("ts", ts)
                             .addParameter("hash", hash)
                             .addParameter("page", String.valueOf(page))
-                            .addParameter("per_page", String.valueOf(20));
+                            .addParameter("per_page", String.valueOf(50));
 
                     //Sets endpoint URI parameters. 
                     if (parameters != null && !parameters.isEmpty()) {
