@@ -12,7 +12,6 @@
     </properties>
     
     <dependencies>
-        <!--JSON-->
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>
             <artifactId>json-simple</artifactId>
@@ -21,9 +20,14 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5.12</version>
+            <version>4.5.13</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+            <version>2.5.0</version>
+        </dependency>        
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>mitt</artifactId>
@@ -53,13 +57,13 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>br.com.starksi.kestraa.HowMuch</mainClass>
+                            <mainClass>br.com.dafiti.hi.Hi</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
             </plugin>
         </plugins>
-        <finalName>kestraa</finalName>
+        <finalName>hi</finalName>
     </build>
     <name>hi</name>
 </project>

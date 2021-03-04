@@ -6,7 +6,7 @@
   <name>hi</name>
   <version>1.0</version>
   <build>
-    <finalName>kestraa</finalName>
+    <finalName>hi</finalName>
     <plugins>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
@@ -26,7 +26,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>br.com.starksi.kestraa.HowMuch</mainClass>
+              <mainClass>br.com.dafiti.hi.Hi</mainClass>
             </manifest>
           </archive>
         </configuration>

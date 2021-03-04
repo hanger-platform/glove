@@ -25,15 +25,11 @@ package br.com.dafiti.hi;
 
 import br.com.dafiti.mitt.Mitt;
 import br.com.dafiti.mitt.cli.CommandLineInterface;
-import br.com.dafiti.mitt.exception.DuplicateEntityException;
-import br.com.dafiti.mitt.settings.ReaderSettings;
 import br.com.dafiti.mitt.transformation.embedded.Concat;
 import br.com.dafiti.mitt.transformation.embedded.Now;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -57,7 +53,7 @@ import org.json.simple.parser.ParseException;
 public class Hi {
 
     private static final Logger LOG = Logger.getLogger(Hi.class.getName());
-    private static final String HI_PLAFTORM_ENDPOINT = "http://plataforma1.seekr.com.br";
+    private static final String HI_PLAFTORM_ENDPOINT = "http://plataforma1.seekr.com.br/api/v3/";
 
     /**
      * Kestraa File transfer
@@ -70,6 +66,7 @@ public class Hi {
         int page = 0;
         boolean process = true;
         boolean paginate = false;
+        JSONObject parameters = null;
 
         //Define the mitt.
         Mitt mitt = new Mitt();
@@ -82,6 +79,7 @@ public class Hi {
                     .addParameter("f", "field", "Fields to be extracted from input file", "", true, false)
                     .addParameter("e", "endpoint", "API Endpoint name", "", true, false)
                     .addParameter("p", "parameters", "Endpoint parameters", "", true, false)
+                    .addParameter("b", "object", "Payload object", "", true, true)
                     .addParameter("g", "paginate", "Identifies if the endpoint has pagination", false)
                     .addParameter("a", "partition", "(Optional)  Partition, divided by + if has more than one field")
                     .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "");
@@ -108,17 +106,16 @@ public class Hi {
             String secretKey = credentials.get("secretKey").toString();
 
             //Identifies if the endpoint has pagination. 
-            paginate = cli.getParameterAsBoolean("paginate");
+            paginate = cli.hasParameter("paginate");
 
             //Identifies endpoint parameters. 
-            JSONObject parameters = null;
             String endpointParameter = cli.getParameter("parameters");
 
             if (!endpointParameter.isEmpty()) {
                 try {
                     parameters = (JSONObject) parser.parse(endpointParameter);
                 } catch (ParseException ex) {
-                    Logger.getLogger(ReaderSettings.class.getName()).log(Level.SEVERE, "Fail parsing endpoint parameters : " + endpointParameter, ex);
+                    LOG.log(Level.INFO, "Fail parsing endpoint parameters: {0}", endpointParameter);
                 }
             }
 
@@ -126,13 +123,17 @@ public class Hi {
                 //Identifies the page number. 
                 page++;
 
+                if (paginate) {
+                    LOG.log(Level.INFO, "Page: {0}", page);
+                }
+
                 //Defines the credential parameter values. 
                 String ts = String.valueOf(System.currentTimeMillis() / 1000);
                 String hash = DigestUtils.sha1Hex(secretKey.concat(ts));
 
                 //Connect to the API. 
                 try (CloseableHttpClient client = HttpClients.createDefault()) {
-                    HttpGet httpGet = new HttpGet(HI_PLAFTORM_ENDPOINT + "/api/v3/" + cli.getParameter("endpoint") + ".json");
+                    HttpGet httpGet = new HttpGet(HI_PLAFTORM_ENDPOINT + cli.getParameter("endpoint") + ".json");
 
                     //Sets default URI parameters. 
                     URIBuilder uriBuilder = new URIBuilder(httpGet.getURI())
@@ -152,45 +153,84 @@ public class Hi {
                     //Sets URI parameters. 
                     httpGet.setURI(uriBuilder.build());
 
-                    //Execute a request. 
+                    //Executes a request. 
                     CloseableHttpResponse response = client.execute(httpGet);
 
-                    //Identifies the response status code. 
-                    int statusCode = response.getStatusLine().getStatusCode();
+                    //Gets a reponse entity. 
+                    String entity = EntityUtils.toString(response.getEntity(), "UTF-8");
 
-                    if (statusCode == 200) {
-                        JSONObject payload = (JSONObject) new JSONParser()
-                                .parse(
-                                        EntityUtils.toString(response.getEntity(), "UTF-8")
-                                );
+                    if (!entity.isEmpty()) {
+                        JSONObject json = (JSONObject) new JSONParser().parse(entity);
 
                         //Identifies if there are payload to process. 
-                        if (!payload.isEmpty()) {
-                            JSONArray content = (JSONArray) payload.get(cli.getParameter("endpoint"));
+                        if (!json.isEmpty()) {
+                            long statusCode = JsonPath.read(json, "$.response.code");
 
-                            content.forEach(object -> {
-                                List record = new ArrayList();
+                            //Identifies the response status code.
+                            if (statusCode == 200) {
+                                Object object;
 
-                                mitt.getConfiguration()
-                                        .getOriginalFieldsName()
-                                        .forEach(field -> {
-                                            try {
-                                                record.add(JsonPath.read(object, "$." + field));
-                                            } catch (PathNotFoundException ex) {
-                                                record.add("");
-                                            }
+                                //Identifies which object should be picked up from the payload.
+                                if (cli.getParameter("object") == null || cli.getParameter("object").isEmpty()) {
+                                    object = json.get(cli.getParameter("endpoint"));
+                                } else {
+                                    if ("*".equals(cli.getParameter("object"))) {
+                                        object = json;
+                                    } else {
+                                        object = json.get(cli.getParameter("object"));
+                                    }
+                                }
+
+                                //Identifies if the payload is an array or an object.
+                                if (object instanceof JSONArray) {
+                                    if (((JSONArray) object).isEmpty()) {
+                                        process = false;
+                                    } else {
+                                        ((JSONArray) object).forEach(item -> {
+                                            List record = new ArrayList();
+
+                                            mitt.getConfiguration()
+                                                    .getOriginalFieldsName()
+                                                    .forEach(field -> {
+                                                        try {
+                                                            record.add(JsonPath.read(item, "$." + field));
+                                                        } catch (PathNotFoundException ex) {
+                                                            record.add("");
+                                                        }
+                                                    });
+
+                                            mitt.write(record);
                                         });
+                                    }
+                                } else if (object instanceof JSONObject) {
+                                    if (((JSONObject) object).isEmpty()) {
+                                        process = false;
+                                    } else {
+                                        List record = new ArrayList();
 
-                                mitt.write(record);
-                            });
+                                        mitt.getConfiguration()
+                                                .getOriginalFieldsName()
+                                                .forEach(field -> {
+                                                    try {
+                                                        record.add(JsonPath.read(object, "$." + field));
+                                                    } catch (PathNotFoundException ex) {
+                                                        record.add("");
+                                                    }
+                                                });
+
+                                        mitt.write(record);
+                                    }
+                                }
+                            } else {
+                                throw new Exception("HTTP Exception " + statusCode);
+                            }
                         }
                     } else {
-                        throw new Exception("HTTP Exception " + statusCode);
+                        throw new Exception("Empty response entity for request " + httpGet.getURI());
                     }
                 }
             } while (paginate && process);
         } catch (Exception ex) {
-
             LOG.log(Level.SEVERE, "GLOVE - Hi Platform API extractor fail: ", ex);
             System.exit(1);
         } finally {
