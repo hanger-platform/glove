@@ -25,7 +25,7 @@ Utilizando o [Maven](https://maven.apache.org/):
 
 ##### CONFIGURAÇÂO
 
-* Crie um arquivo as chaves fornecidas pela HI Platform, este será o seu **credentials file**:
+* Crie um arquivo com as chaves fornecidas pela HI Platform, este será o seu **credentials file**:
 
 ```
 {
@@ -46,11 +46,11 @@ java -jar hi.jar  \
 	--parameters=<(Optional) Endpoint parameters>
 	--object=<(Optional) Json object>
 	--paginate <Identifies if the endpoint has pagination>
-	--partition=<(Optional)  Partition, divided by + if has more than one field>
+	--partition=<(Optional) Partition, divided by + if has more than one field>
 	--key=<(Optional) Unique key, divided by + if has more than one field>
 ```
 
-Em algumas situações é necessário utilizar configurações  avançadas para extrair os dados corretamente. Considerando o endpoint **search_results**, é necessário que sejam passados parâmetros para o endpoint e, posteriormente, selecionados valores aninhados no JSON retornado pela API, como é o caso dos dados de **locale**:
+Em algumas situações é necessário utilizar configurações avançadas para extrair os dados corretamente. Considerando o endpoint **search_results**, é necessário que sejam passados parâmetros para o endpoint e, posteriormente, selecionados valores aninhados no JSON retornado pela API, como é o caso dos dados de **locale**:
 
 ```javascript
   {
