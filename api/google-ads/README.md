@@ -1,4 +1,4 @@
-# Google Adwords Extractor [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+# Google Ads Extractor [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ### Extrator de dados da api do Google Ads
 
 ## How it works
