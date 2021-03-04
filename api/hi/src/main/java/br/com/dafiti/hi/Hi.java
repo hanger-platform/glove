@@ -79,7 +79,7 @@ public class Hi {
                     .addParameter("o", "output", "Output file", "", true, false)
                     .addParameter("f", "field", "Fields to be retrieved from an endpoint in a JsonPath fashion", "", true, false)
                     .addParameter("e", "endpoint", "Endpoint name", "", true, false)
-                    .addParameter("p", "parameters", "Endpoint parameters", "", true, false)
+                    .addParameter("p", "parameters", "(Optional) Endpoint parameters", "", true, true)
                     .addParameter("b", "object", "(Optional) Json object", "", true, true)
                     .addParameter("g", "paginate", "(Optional) Identifies if the endpoint has pagination", false)
                     .addParameter("a", "partition", "(Optional)  Partition, divided by + if has more than one field", "")
@@ -122,7 +122,7 @@ public class Hi {
             //Identifies endpoint parameters. 
             String endpointParameter = cli.getParameter("parameters");
 
-            if (!endpointParameter.isEmpty()) {
+            if (endpointParameter != null && !endpointParameter.isEmpty()) {
                 try {
                     parameters = (JSONObject) parser.parse(endpointParameter);
                 } catch (ParseException ex) {
