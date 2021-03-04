@@ -47,9 +47,9 @@ java -jar google-adwords.jar  \
 	--manager=<Manager account> \	
 	--customer=<Customer ID of the customer being queried> \
 	--filter=<(Optional) Filter of query> \
-	--partition=<(Optional)  Partition, divided by + if has more than one> \
+	--partition=<(Optional) Partition, divided by + if has more than one> \
 	--key=<(Optional) Unique key, divided by + if has more than one> \	
-	--debug=<(Optional)  Debug mode. false as default> \
+	--debug=<(Optional) Debug mode. false as default> \
 ```
 
 - Para saber os resources disponíveis, consulte (https://developers.google.com/google-ads/api/fields/v6/overview)
