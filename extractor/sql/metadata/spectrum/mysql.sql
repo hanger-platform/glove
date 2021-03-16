@@ -1,26 +1,28 @@
 SELECT * FROM (
-
+	
+	-- Identifica o campo o particionamento. 
+	
 	 SELECT DISTINCT
 	    -1 AS ordinal_position,
 	    CASE
 	        WHEN '${PARTITION_TYPE}' = 'date' OR '${PARTITION_TYPE}' = 'timestamp' THEN 
 				CONCAT('COALESCE( DATE_FORMAT( IF( WEEKDAY(',column_name,') IS NULL, ', 
 					CASE '${PARTITION_FORMAT}' 
-						WHEN 'YYYY' THEN '''1900''' 
-						WHEN 'YYYYMM' THEN '''190001''' 
-						WHEN 'YYYYWW' THEN '''190001''' 
+						WHEN 'YYYY' 	THEN '''1900''' 
+						WHEN 'YYYYMM' 	THEN '''190001''' 
+						WHEN 'YYYYWW' 	THEN '''190001''' 
 						WHEN 'YYYYMMDD' THEN '''19000101''' 
 					END, ', ',column_name,' ),', 
 					CASE '${PARTITION_FORMAT}' 
-						WHEN 'YYYY' THEN '''%Y''' 
-						WHEN 'YYYYMM' THEN '''%Y%m''' 
-						WHEN 'YYYYWW' THEN '''%Y%v''' 
+						WHEN 'YYYY' 	THEN '''%Y''' 
+						WHEN 'YYYYMM' 	THEN '''%Y%m''' 
+						WHEN 'YYYYWW' 	THEN '''%Y%v''' 
 						WHEN 'YYYYMMDD' THEN '''%Y%m%d''' 
 					END,'), ',
 					CASE '${PARTITION_FORMAT}' 
-						WHEN 'YYYY' THEN '''1900''' 
-						WHEN 'YYYYMM' THEN '''190001''' 
-						WHEN 'YYYYWW' THEN '''190001''' 
+						WHEN 'YYYY' 	THEN '''1900''' 
+						WHEN 'YYYYMM' 	THEN '''190001''' 
+						WHEN 'YYYYWW' 	THEN '''190001''' 
 						WHEN 'YYYYMMDD' THEN '''19000101'''
 						ELSE '''190001''' 
 				END,') AS partition_field')
@@ -30,21 +32,21 @@ SELECT * FROM (
 	        WHEN '${PARTITION_TYPE}' = 'date' OR '${PARTITION_TYPE}' = 'timestamp' THEN 
 				CONCAT('COALESCE( DATE_FORMAT( IF( WEEKDAY(',column_name,') IS NULL, ', 
 					CASE '${PARTITION_FORMAT}' 
-						WHEN 'YYYY' THEN '''1900''' 
-						WHEN 'YYYYMM' THEN '''190001''' 
-						WHEN 'YYYYWW' THEN '''190001''' 
+						WHEN 'YYYY' 	THEN '''1900''' 
+						WHEN 'YYYYMM' 	THEN '''190001''' 
+						WHEN 'YYYYWW' 	THEN '''190001''' 
 						WHEN 'YYYYMMDD' THEN '''19000101''' 
 					END, ', ',column_name,' ),', 
 					CASE '${PARTITION_FORMAT}' 
-						WHEN 'YYYY' THEN '''%Y''' 
-						WHEN 'YYYYMM' THEN '''%Y%m''' 
-						WHEN 'YYYYWW' THEN '''%Y%v''' 
+						WHEN 'YYYY' 	THEN '''%Y''' 
+						WHEN 'YYYYMM' 	THEN '''%Y%m''' 
+						WHEN 'YYYYWW' 	THEN '''%Y%v''' 
 						WHEN 'YYYYMMDD' THEN '''%Y%m%d''' 
 					END,'), ',
 					CASE '${PARTITION_FORMAT}' 
-						WHEN 'YYYY' THEN '''1900''' 
-						WHEN 'YYYYMM' THEN '''190001''' 
-						WHEN 'YYYYWW' THEN '''190001''' 
+						WHEN 'YYYY' 	THEN '''1900''' 
+						WHEN 'YYYYMM' 	THEN '''190001''' 
+						WHEN 'YYYYWW' 	THEN '''190001''' 
 						WHEN 'YYYYMMDD' THEN '''19000101'''
 						ELSE '''190001''' 
 				END,')')
@@ -65,6 +67,8 @@ SELECT * FROM (
 		LOWER( c.column_name ) = LOWER('${PARTITION_FIELD}')
 
     UNION ALL
+
+	-- Identifica a chave primária da tabela. 
 
 	SELECT * FROM (
 		SELECT DISTINCT
@@ -90,6 +94,8 @@ SELECT * FROM (
 
 	UNION ALL
 
+	-- Identifica os campos da tabela e schema de cada um deles. 
+
     SELECT DISTINCT
         ordinal_position,
         CASE
@@ -111,7 +117,7 @@ SELECT * FROM (
 			WHEN 'tinyint'      THEN 'int'
 			WHEN 'smallint'     THEN 'int'
 			WHEN 'mediumint'    THEN 'int'
-          	WHEN 'int'          THEN 'int'
+          	WHEN 'int'          THEN IF(column_type LIKE '%unsigned%', 'bigint', 'int') 
             WHEN 'bigint'       THEN 'bigint'
            	WHEN 'tinytext'     THEN 'varchar(65535)'
            	WHEN 'mediumtext'   THEN 'varchar(65535)'
@@ -119,7 +125,7 @@ SELECT * FROM (
            	WHEN 'longtext'     THEN 'varchar(65535)'
             WHEN 'blob'         THEN 'varchar(65535)'
             WHEN 'mediumblob'   THEN 'varchar(65535)'
-	        WHEN 'longblob'   THEN 'varchar(65535)'	
+	        WHEN 'longblob'   	THEN 'varchar(65535)'	
             WHEN 'date'         THEN 'varchar(10)'
             WHEN 'datetime'     THEN 'varchar(19)'
             WHEN 'time'         THEN 'varchar(17)'
@@ -134,14 +140,17 @@ SELECT * FROM (
 			WHEN 'boolean' 		THEN 'boolean'
         END AS field_type,
 		CONCAT('{"name": "', LOWER( REPLACE(column_name,' ','_') ), '","type":', 
-			IF( data_type IN ("tinyint","smallint","mediumint", "int", "bit"), '["null", "int"]', 
+			IF( data_type IN ("tinyint","smallint","mediumint", "bit"), '["null", "int"]', 
+			IF( data_type IN ("int") AND column_type LIKE '%unsigned%', '["null", "long"]', 
+			IF( data_type IN ("int") AND column_type NOT LIKE '%unsigned%', '["null", "int"]', 
 			IF( data_type IN ("bigint"), '["null", "long"]', 
 			IF( data_type IN ("float","double"), '["null", "double"]', 
 			IF( data_type IN ("decimal"), CONCAT( '["null", {"type":"fixed", "name": "', LOWER( REPLACE(column_name,' ','_') ) , '", "size":' , CAST( ROUND( IF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ) / 2 AS SIGNED ) , ', "logicalType": "decimal", "precision":' , ROUND( IF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ) , ', "scale":' , NUMERIC_SCALE , '}]' ), 
 			IF( data_type = "timestamp",'["null", "string"]', IF( data_type="datetime",'["null", "string"]', 
 			IF( data_type = "boolean",'["null", "boolean"]', 
 			IF( data_type = "date",'["null", "string"]', 
-			IF( data_type = "time",'["null", "string"]','["null", "string"]' ))))))))), ' , "default": null}'
+			IF( data_type = "time",'["null", "string"]','["null", "string"]' ))))))))))
+			), ' , "default": null}'
 		) AS json,
 		LOWER( REPLACE(column_name,' ','_') ) AS column_name,
         0 AS column_key,
@@ -155,6 +164,8 @@ SELECT * FROM (
 		AND UPPER(COLUMN_NAME) NOT IN (${METADATA_BLACKLIST})
 
     UNION ALL
+
+	-- Identifica o campo de data de atualização da tabela. 
 
     SELECT
         999 AS ordinal_position,
