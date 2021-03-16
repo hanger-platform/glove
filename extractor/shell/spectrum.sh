@@ -650,31 +650,30 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 
 				# Identifica se deve compactar o arquivo a ser exportado.
 				if [ ${EXPORT_TYPE} == "gz" ]; then
-					# Compacta o arquivo csv e mantém o arquivo original.
-					pigz -k ${RAWFILE_QUEUE_PATH}*
-
 					# Envia o arquivo compactado para o bucket de destino.
 					if [ "${#PARTITION_FIELD}" -gt "0" ]; then
-						aws s3 cp ${RAWFILE_QUEUE_PATH} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive --exclude "${DATA_FILE}*" --only-show-errors --acl bucket-owner-full-control
+						pigz -r -k ${RAWFILE_QUEUE_PATH}*
+						
+						aws s3 rm ${EXPORT_BUCKET} --recursive
+						aws s3 cp ${RAWFILE_QUEUE_PATH} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive --exclude "${DATA_FILE}*" --exclude "*.csv" --only-show-errors --acl bucket-owner-full-control
 					else
+						pigz -k ${RAWFILE_QUEUE_PATH}*
 						aws s3 cp ${RAWFILE_QUEUE_FILE}.gz ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --only-show-errors --acl bucket-owner-full-control
 					fi
 					error_check
-
-					# Remove o arquivo compactado do diretório.
-					rm -f ${RAWFILE_QUEUE_PATH}*.gz
 				else
 					# Envia o arquivo para o bucket de destino.
 					if [ "${#PARTITION_FIELD}" -gt "0" ]; then
+						aws s3 rm ${EXPORT_BUCKET} --recursive
 						aws s3 cp ${RAWFILE_QUEUE_PATH} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive --exclude "${DATA_FILE}*" --only-show-errors --acl bucket-owner-full-control
-						
-						# Remove os arquivos de cada partição. 						
-						find ${RAWFILE_QUEUE_PATH} -not -name '${DATA_FILE}*' -delete
 					else
 						aws s3 cp ${RAWFILE_QUEUE_FILE} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --only-show-errors --acl bucket-owner-full-control
 					fi
 					error_check
 				fi
+
+				# Remove os arquivos temporários. 						
+				find ${RAWFILE_QUEUE_PATH} -not -name '${DATA_FILE}*.csv' -delete
 			elif [ "${#EXPORT_SPREADSHEET}" -gt "0" ]; then
 				if [ ${DEBUG} = 1 ] ; then
 					echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/google-sheets-export.jar \
