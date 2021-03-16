@@ -166,8 +166,8 @@ SELECT * FROM (
         999 AS ordinal_position,
         CONCAT('CONCAT(','DATE_FORMAT(now(),','''','%Y-%m-%d %T', '''','),', '''' ,' ${TIMEZONE_OFFSET}', '''',') AS etl_load_date') AS fields,
 		CONCAT('CONCAT(','DATE_FORMAT(now(),','''','%Y-%m-%d %T', '''','),', '''' ,' ${TIMEZONE_OFFSET}', '''',')') AS casting,
-        'varchar(19)' AS field_type,
-  		'{"name": "etl_load_date","type":["null", "string"], "default": null}' AS json,
+        'timestamp' AS field_type,
+  		'{"name": "etl_load_date","type":["null", { "type": "int", "logicalType": "timestamp-millis"}], "default": null}' AS json,
         'etl_load_date' AS column_name,
         0 AS column_key,
 		'' AS encoding
