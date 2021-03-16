@@ -53,6 +53,7 @@ public class CSVSplitter implements Runnable {
     private final Character quoteEscape;
     private final boolean header;
     private final boolean replace;
+    private final boolean readable;
     private final String splitStrategy;
 
     /**
@@ -65,6 +66,8 @@ public class CSVSplitter implements Runnable {
      * @param quoteEscape File escape.
      * @param header Identify if the file has header.
      * @param replace Identify if should replace the orignal file.
+     * @param readable Identifies if partition name should be readable at
+     * runtime.
      * @param splitStrategy Identify if should use the fastest strategy to
      * partitioning.
      */
@@ -76,6 +79,7 @@ public class CSVSplitter implements Runnable {
             Character quoteEscape,
             boolean header,
             boolean replace,
+            boolean readable,
             String splitStrategy) {
 
         this.csvFile = csvFile;
@@ -85,7 +89,9 @@ public class CSVSplitter implements Runnable {
         this.quoteEscape = quoteEscape;
         this.replace = replace;
         this.header = header;
+        this.readable = readable;
         this.splitStrategy = splitStrategy;
+
     }
 
     /**
@@ -144,10 +150,22 @@ public class CSVSplitter implements Runnable {
                         if (part.isEmpty()) {
                             String partition = split[partitionColumn].replaceAll("\\W", "");
 
+                            if (partition.isEmpty()) {
+                                partition = "NULL";
+                            }
+
                             if (!partitions.containsKey(partition)) {
-                                String partitionPath = csvFile.getParent() + "/" + partition;
-                                Files.createDirectories(Paths.get(partitionPath));
-                                BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(partitionPath + "/" + UUID.randomUUID() + ".csv"));
+                                String partitionPath;
+                                BufferedWriter bufferedWriter;
+
+                                if (readable) {
+                                    partitionPath = csvFile.getParent();
+                                    bufferedWriter = new BufferedWriter(new FileWriter(partitionPath + "/" + partition + ".csv"));
+                                } else {
+                                    partitionPath = csvFile.getParent() + "/" + partition;
+                                    Files.createDirectories(Paths.get(partitionPath));
+                                    bufferedWriter = new BufferedWriter(new FileWriter(partitionPath + "/" + UUID.randomUUID() + ".csv"));
+                                }
 
                                 partitions.put(partition, bufferedWriter);
                             }
@@ -210,10 +228,21 @@ public class CSVSplitter implements Runnable {
             if (!(lineNumber == 0 && header)) {
                 String partition = record[partitionColumn].replaceAll("\\W", "");
 
+                if (partition.isEmpty()) {
+                    partition = "NULL";
+                }
+
                 if (!partitions.containsKey(partition)) {
-                    String partitionPath = csvFile.getParent() + "/" + partition;
-                    Files.createDirectories(Paths.get(partitionPath));
-                    partitions.put(partition, new CsvWriter(new FileWriter(partitionPath + "/" + UUID.randomUUID() + ".csv"), writerSettings));
+                    String partitionPath;
+
+                    if (readable) {
+                        partitionPath = csvFile.getParent();
+                        partitions.put(partition, new CsvWriter(new FileWriter(partitionPath + "/" + partition + ".csv"), writerSettings));
+                    } else {
+                        partitionPath = csvFile.getParent() + "/" + partition;
+                        Files.createDirectories(Paths.get(partitionPath));
+                        partitions.put(partition, new CsvWriter(new FileWriter(partitionPath + "/" + UUID.randomUUID() + ".csv"), writerSettings));
+                    }
                 }
 
                 partitions.get(partition).writeRow(record);

@@ -73,28 +73,29 @@ public class Converter {
         options.addOption("f", "filename", true, "Filename, with wildcard if necessary, to be converted");
         options.addOption("s", "schema", true, "Avro schema to be used on conversion");
         options.addOption("D", "delimiter", true, "Delimiter ofd csv files");
-        options.addOption("T", "target", true, "Identify the target format");
-        options.addOption("r", "replace", false, "Identify if csv files will be replaced to parquet files");
+        options.addOption("T", "target", true, "Identifies the target format");
+        options.addOption("r", "replace", false, "Identifies if csv files will be replaced to parquet files");
         options.addOption("d", "debug", true, "Show full log messages");
         options.addOption("t", "thread", true, "Limit of thread");
-        options.addOption("o", "output", true, "Identify the output path");
-        options.addOption("q", "quote", true, "Identify the quote character");
-        options.addOption("e", "escape", true, "Identify the quote escape character");
-        options.addOption("H", "header", false, "Identify the csv file has a header");
-        options.addOption("c", "field", true, "Identify the header fields of a csv file");
+        options.addOption("o", "output", true, "Identifies the output path");
+        options.addOption("q", "quote", true, "Identifies the quote character");
+        options.addOption("e", "escape", true, "Identifies the quote escape character");
+        options.addOption("H", "header", false, "Identifies the csv file has a header");
+        options.addOption("c", "field", true, "Identifies the header fields of a csv file");
         options.addOption("S", "sample", true, "Define the data sample to be analized at metadata extraction process");
-        options.addOption("i", "metadata", true, "Identify the csv field metadata");
-        options.addOption("C", "compression", true, "Identify the compression to be applied");
-        options.addOption("y", "dialect", true, "Identify the metadata dialect");
+        options.addOption("i", "metadata", true, "Identifies the csv field metadata");
+        options.addOption("C", "compression", true, "Identifies the compression to be applied");
+        options.addOption("y", "dialect", true, "Identifies the metadata dialect");
         options.addOption("h", "help", false, "Show help and usage message");
         options.addOption("p", "partition", true, "Partition column");
         options.addOption("k", "fieldkey", true, "Unique key field");
-        options.addOption("d", "merge", true, "Identify if should merge existing files");
-        options.addOption("z", "duplicated", true, "Identify if duplicated is allowed");
-        options.addOption("b", "bucket", true, "Identify the storage bucket");
-        options.addOption("m", "mode", true, "Identify the partition mode");
-        options.addOption("w", "reservedWords", true, "Identify the reserved words file list");
-        options.addOption("ps", "splitStrategy", true, "Identify the split strategy");
+        options.addOption("d", "merge", true, "Identifies if should merge existing files");
+        options.addOption("z", "duplicated", true, "Identifies if duplicated is allowed");
+        options.addOption("b", "bucket", true, "Identifies the storage bucket");
+        options.addOption("m", "mode", true, "Identifies the partition mode");
+        options.addOption("w", "reservedWords", true, "Identifies the reserved words file list");
+        options.addOption("ps", "splitStrategy", true, "Identifies the split strategy");
+        options.addOption("nm", "readable", false, "Identifies if partition name should be readable at runtime");
     }
 
     /**
@@ -136,6 +137,7 @@ public class Converter {
         boolean merge = false;
         boolean duplicated = false;
         boolean debug = false;
+        boolean readable = false;
         int thread = 1;
         int fieldKeyPos = -1;
         int fieldPartitionPos = 0;
@@ -228,7 +230,7 @@ public class Converter {
                 sample = Integer.valueOf(line.getOptionValue("sample"));
             }
 
-            //Identify the log level.
+            //Identifies the log level.
             if (line.hasOption("debug")) {
                 debug = (Integer.valueOf(line.getOptionValue("debug")) == 1);
 
@@ -239,27 +241,27 @@ public class Converter {
                 }
             }
 
-            //Identify how many files should be converted simultaneously. 
+            //Identifies how many files should be converted simultaneously. 
             if (line.hasOption("thread")) {
                 thread = Integer.valueOf(line.getOptionValue("thread"));
             }
 
-            //Identify the csv partition column. 
+            //Identifies the csv partition column. 
             if (line.hasOption("partition")) {
                 fieldPartitionPos = Integer.valueOf(line.getOptionValue("partition"));
             }
 
-            //Identify the csv partition column. 
+            //Identifies the csv partition column. 
             if (line.hasOption("fieldkey")) {
                 fieldKeyPos = Integer.valueOf(line.getOptionValue("fieldkey"));
             }
 
-            //Identify if duplicated is allowed. 
+            //Identifies if duplicated is allowed. 
             if (line.hasOption("duplicated")) {
                 duplicated = (Integer.valueOf(line.getOptionValue("duplicated")) == 1);
             }
 
-            //Identify if should merge existing files. 
+            //Identifies if should merge existing files. 
             if (line.hasOption("merge")) {
                 merge = (Integer.valueOf(line.getOptionValue("merge")) == 1);
             }
@@ -279,18 +281,21 @@ public class Converter {
                 splitStrategy = line.getOptionValue("splitStrategy").toUpperCase();
             }
 
-            //Identify if should remove the csv file. 
+            //Identifies if should remove the csv file. 
             replace = line.hasOption("replace");
 
-            //Identify if the csv file has header. 
+            //Identifies if the csv file has header. 
             header = line.hasOption("header");
 
-            //Identify if should show help or convert files.
+            //Identifies if partition name should be readable at runtime.
+            readable = line.hasOption("readable");
+
+            //Identifies if should show help or convert files.
             if (line.hasOption("help") && args.length == 1) {
                 converter.help();
             }
 
-            //Identify if there are files to process.
+            //Identifies if there are files to process.
             if (files != null) {
                 //Define the number of threads.
                 ExecutorService executor = Executors.newFixedThreadPool(thread);
@@ -299,7 +304,7 @@ public class Converter {
                 if (target.equalsIgnoreCase("parquet")) {
                     Schema schema = new Parser(new File(schemaFile)).getAvroSchema();
 
-                    System.out.println("Parquet 1.11.0");
+                    System.out.println("Parquet 1.11.1");
 
                     for (File file : files) {
                         if (file.isDirectory() || "csv".equals(FilenameUtils.getExtension(file.getName()))) {
@@ -326,7 +331,7 @@ public class Converter {
                 } else if (target.equalsIgnoreCase("orc")) {
                     TypeDescription schema = new Parser(new File(schemaFile)).getOrcSchema();
 
-                    System.out.println("ORC 1.5.6");
+                    System.out.println("ORC 1.6.7");
 
                     for (File file : files) {
                         if (file.isDirectory() || "csv".equals(FilenameUtils.getExtension(file.getName()))) {
@@ -365,6 +370,7 @@ public class Converter {
                                                 quoteEscape,
                                                 header,
                                                 replace,
+                                                readable,
                                                 splitStrategy));
                                 break;
                             default:
