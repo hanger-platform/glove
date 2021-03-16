@@ -142,7 +142,8 @@ SELECT * FROM (
 			IF( data_type IN ("bigint"), '["null", "long"]', 
 			IF( data_type IN ("float","double"), '["null", "double"]', 
 			IF( data_type IN ("decimal"), CONCAT( '["null", {"type":"fixed", "name": "', LOWER( REPLACE(column_name,' ','_') ) , '", "size":' , CAST( ROUND( IF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ) / 2 AS SIGNED ) , ', "logicalType": "decimal", "precision":' , ROUND( IF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ) , ', "scale":' , NUMERIC_SCALE , '}]' ), 
-			IF( data_type = "timestamp",'["null", "string"]', IF( data_type="datetime",'["null", "string"]', 
+			IF( data_type = "timestamp",'["null", "string"]', 
+			IF( data_type = "datetime",'["null", "string"]', 
 			IF( data_type = "boolean",'["null", "boolean"]', 
 			IF( data_type = "date",'["null", "string"]', 
 			IF( data_type = "time",'["null", "string"]','["null", "string"]' ))))))))))
@@ -166,8 +167,8 @@ SELECT * FROM (
         999 AS ordinal_position,
         CONCAT('CONCAT(','DATE_FORMAT(now(),','''','%Y-%m-%d %T', '''','),', '''' ,' ${TIMEZONE_OFFSET}', '''',') AS etl_load_date') AS fields,
 		CONCAT('CONCAT(','DATE_FORMAT(now(),','''','%Y-%m-%d %T', '''','),', '''' ,' ${TIMEZONE_OFFSET}', '''',')') AS casting,
-        'timestamp' AS field_type,
-  		'{"name": "etl_load_date","type":["null", { "type": "long", "logicalType": "timestamp-millis"}], "default": null}' AS json,
+        'varchar(19)' AS field_type,
+  		'{"name": "etl_load_date","type":["null", "string"], "default": null}' AS json,
         'etl_load_date' AS column_name,
         0 AS column_key,
 		'' AS encoding
