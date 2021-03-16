@@ -632,6 +632,8 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 
 				# Particiona o arquivo de entrada. 
 				if [ "${#PARTITION_FIELD}" -gt "0" ]; then
+					echo "Partitioning data file delimited by ${DELIMITER}!"
+
 					java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
 						--folder=${RAWFILE_QUEUE_PATH} \
 						--filename=*.csv \
@@ -667,7 +669,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 						aws s3 cp ${RAWFILE_QUEUE_PATH} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive --exclude "${DATA_FILE}*" --only-show-errors --acl bucket-owner-full-control
 						
 						# Remove os arquivos de cada partição. 						
-						find ${RAWFILE_QUEUE_PATH} -type f -not -name '${DATA_FILE}*' -delete
+						find ${RAWFILE_QUEUE_PATH} -not -name '${DATA_FILE}*' -delete
 					else
 						aws s3 cp ${RAWFILE_QUEUE_FILE} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --only-show-errors --acl bucket-owner-full-control
 					fi
