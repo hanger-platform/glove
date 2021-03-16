@@ -1,7 +1,5 @@
 SELECT * FROM (
-	
-	-- Identifica o campo o particionamento. 
-	
+
 	 SELECT DISTINCT
 	    -1 AS ordinal_position,
 	    CASE
@@ -68,8 +66,6 @@ SELECT * FROM (
 
     UNION ALL
 
-	-- Identifica a chave primária da tabela. 
-
 	SELECT * FROM (
 		SELECT DISTINCT
 			0 AS ordinal_position,
@@ -94,7 +90,6 @@ SELECT * FROM (
 
 	UNION ALL
 
-	-- Identifica os campos da tabela e schema de cada um deles. A regra de conversão de tipos de dados do MySQL para tipos de dados do Java pode ser encontrada aqui: (https://dev.mysql.com/doc/connector-j/5.1/en/connector-j-reference-type-conversions.html).
 
     SELECT DISTINCT
         ordinal_position,
@@ -166,8 +161,6 @@ SELECT * FROM (
 		UPPER(COLUMN_NAME) NOT IN (${METADATA_BLACKLIST})
 
     UNION ALL
-
-	-- Identifica o campo de data de atualização da tabela. 
 
     SELECT
         999 AS ordinal_position,
