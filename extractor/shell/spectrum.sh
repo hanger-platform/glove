@@ -630,14 +630,30 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 				# Envia o arquivo para o storage.
 				echo "Exporting resultset to ${EXPORT_BUCKET} using profile ${EXPORT_PROFILE}!"
 
+				# Particiona o arquivo de entrada. 
+				if [ "${#PARTITION_FIELD}" -gt "0" ]; then
+					java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
+						--folder=${RAWFILE_QUEUE_PATH} \
+						--filename=*.csv \
+						--delimiter=${DELIMITER} \
+						--target=csv \
+						--splitStrategy=${SPLIT_STRATEGY} \
+						--partition=0 \
+						--thread=${THREAD} \
+						--escape=${QUOTE_ESCAPE} \
+						--header \
+						--debug=${DEBUG}
+					error_check
+				fi
+
 				# Identifica se deve compactar o arquivo a ser exportado.
 				if [ ${EXPORT_TYPE} == "gz" ]; then
 					# Compacta o arquivo csv e mantém o arquivo original.
-					pigz -k ${RAWFILE_QUEUE_PATH}*${DATA_FILE}*
+					pigz -k ${RAWFILE_QUEUE_PATH}*
 
 					# Envia o arquivo compactado para o bucket de destino.
 					if [ "${#PARTITION_FIELD}" -gt "0" ]; then
-						aws s3 cp ${RAWFILE_QUEUE_PATH} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive --exclude "*" --include "*.gz" --only-show-errors --acl bucket-owner-full-control
+						aws s3 cp ${RAWFILE_QUEUE_PATH} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive --exclude "${DATA_FILE}*" --only-show-errors --acl bucket-owner-full-control
 					else
 						aws s3 cp ${RAWFILE_QUEUE_FILE}.gz ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --only-show-errors --acl bucket-owner-full-control
 					fi
@@ -648,7 +664,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 				else
 					# Envia o arquivo para o bucket de destino.
 					if [ "${#PARTITION_FIELD}" -gt "0" ]; then
-						aws s3 cp ${RAWFILE_QUEUE_PATH} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive --exclude "*" --include "${DATA_FILE}*" --only-show-errors --acl bucket-owner-full-control
+						aws s3 cp ${RAWFILE_QUEUE_PATH} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive --exclude "${DATA_FILE}*" --only-show-errors --acl bucket-owner-full-control
 					else
 						aws s3 cp ${RAWFILE_QUEUE_FILE} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --only-show-errors --acl bucket-owner-full-control
 					fi
