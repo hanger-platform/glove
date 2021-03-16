@@ -151,7 +151,7 @@ public class CSVSplitter implements Runnable {
                             String partition = split[partitionColumn].replaceAll("\\W", "");
 
                             if (partition.isEmpty()) {
-                                partition = "NULL";
+                                partition = "UNDEFINED";
                             }
 
                             if (!partitions.containsKey(partition)) {
@@ -229,7 +229,7 @@ public class CSVSplitter implements Runnable {
                 String partition = record[partitionColumn].replaceAll("\\W", "");
 
                 if (partition.isEmpty()) {
-                    partition = "NULL";
+                    partition = "UNDEFINED";
                 }
 
                 if (!partitions.containsKey(partition)) {
