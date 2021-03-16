@@ -654,7 +654,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 					if [ "${#PARTITION_FIELD}" -gt "0" ]; then
 						pigz -r -k ${RAWFILE_QUEUE_PATH}*
 						
-						aws s3 rm ${EXPORT_BUCKET} --recursive
+						aws s3 rm ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive
 						aws s3 cp ${RAWFILE_QUEUE_PATH} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive --exclude "${DATA_FILE}*" --exclude "*.csv" --only-show-errors --acl bucket-owner-full-control
 					else
 						pigz -k ${RAWFILE_QUEUE_PATH}*
@@ -664,7 +664,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 				else
 					# Envia o arquivo para o bucket de destino.
 					if [ "${#PARTITION_FIELD}" -gt "0" ]; then
-						aws s3 rm ${EXPORT_BUCKET} --recursive
+						aws s3 rm ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive
 						aws s3 cp ${RAWFILE_QUEUE_PATH} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive --exclude "${DATA_FILE}*" --only-show-errors --acl bucket-owner-full-control
 					else
 						aws s3 cp ${RAWFILE_QUEUE_FILE} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --only-show-errors --acl bucket-owner-full-control
