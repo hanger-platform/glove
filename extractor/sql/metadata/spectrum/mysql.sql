@@ -94,7 +94,7 @@ SELECT * FROM (
 
 	UNION ALL
 
-	-- Identifica os campos da tabela e schema de cada um deles. 
+	-- Identifica os campos da tabela e schema de cada um deles. A regra de conversão de tipos de dados do MySQL para tipos de dados do Java pode ser encontrada aqui: (https://dev.mysql.com/doc/connector-j/5.1/en/connector-j-reference-type-conversions.html).
 
     SELECT DISTINCT
         ordinal_position,
@@ -138,6 +138,7 @@ SELECT * FROM (
             WHEN 'char'         THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + ROUND( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
             WHEN 'varchar'      THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + ROUND( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
 			WHEN 'boolean' 		THEN 'boolean'
+			ELSE 'varchar(255)'
         END AS field_type,
 		CONCAT('{"name": "', LOWER( REPLACE(column_name,' ','_') ), '","type":', 
 			IF( data_type IN ("tinyint","smallint","mediumint", "bit"), '["null", "int"]', 
@@ -161,7 +162,8 @@ SELECT * FROM (
 		LOWER( c.table_schema ) = LOWER('${INPUT_TABLE_SCHEMA}')
    		AND
 		LOWER( c.table_name ) = LOWER('${INPUT_TABLE_NAME}')
-		AND UPPER(COLUMN_NAME) NOT IN (${METADATA_BLACKLIST})
+		AND 
+		UPPER(COLUMN_NAME) NOT IN (${METADATA_BLACKLIST})
 
     UNION ALL
 
@@ -173,8 +175,8 @@ SELECT * FROM (
 		CONCAT('CONCAT(','DATE_FORMAT(now(),','''','%Y-%m-%d %T', '''','),', '''' ,' ${TIMEZONE_OFFSET}', '''',')') AS casting,
         'varchar(19)' AS field_type,
   		'{"name": "etl_load_date","type":["null", "string"], "default": null}' AS json,
-        'etl_load_date' 							AS column_name,
-        0 											AS column_key,
-		'' 											AS encoding
+        'etl_load_date' AS column_name,
+        0 AS column_key,
+		'' AS encoding
 ) x
 ORDER BY x.ordinal_position
