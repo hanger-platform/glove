@@ -631,14 +631,16 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 				if [ "${#PARTITION_FIELD}" -gt "0" ]; then
 					FILE_INDEX=0
 
+					echo "Merging files!"
+
 					# Mescla os arquivos gerados para desabilitar o processamento em multhread.  
 					for i in `ls ${RAWFILE_QUEUE_PATH}*`
 					do
 						if [ ${FILE_INDEX} = 0 ]; then	
-							cat ${i}	>> merged.tmp
+							cat ${i}	>> transient.csv
 							error_check
 						else
-							sed '1d' ${i} >> merged.tmp	
+							sed '1d' ${i} >> transient.csv	
 							error_check	
 						fi
 
@@ -651,7 +653,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 					# TODO - A geração de um único arquivo de saída deve ser suportada pelo conversor de dados nativamente sem a necessidade do merge anterior. 
 					java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
 						--folder=${RAWFILE_QUEUE_PATH} \
-						--filename=merged.tmp \
+						--filename=transient.csv \
 						--delimiter=${DELIMITER} \
 						--target=csv \
 						--splitStrategy=${SPLIT_STRATEGY} \
