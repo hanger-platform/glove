@@ -664,7 +664,6 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 						echo "Exporting resultset to ${BUCKETS[index]} using profile ${EXPORT_PROFILE}!"
 
 						if [ "${#PARTITION_FIELD}" -gt "0" ]; then
-							aws s3 rm ${BUCKETS[index]} --profile ${EXPORT_PROFILE} --recursive
 							aws s3 cp ${RAWFILE_QUEUE_PATH} ${BUCKETS[index]} --profile ${EXPORT_PROFILE} --recursive --exclude "${DATA_FILE}*" --exclude "*.csv" --only-show-errors --acl bucket-owner-full-control
 						else
 							aws s3 cp ${RAWFILE_QUEUE_FILE}.${EXPORT_TYPE} ${BUCKETS[index]} --profile ${EXPORT_PROFILE} --only-show-errors --acl bucket-owner-full-control
@@ -677,7 +676,6 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 						echo "Exporting resultset to ${BUCKETS[index]} using profile ${EXPORT_PROFILE}!"
 						
 						if [ "${#PARTITION_FIELD}" -gt "0" ]; then
-							aws s3 rm ${BUCKETS[index]} --profile ${EXPORT_PROFILE} --recursive
 							aws s3 cp ${RAWFILE_QUEUE_PATH} ${BUCKETS[index]} --profile ${EXPORT_PROFILE} --recursive --exclude "${DATA_FILE}*" --only-show-errors --acl bucket-owner-full-control
 						else
 							aws s3 cp ${RAWFILE_QUEUE_FILE} ${BUCKETS[index]} --profile ${EXPORT_PROFILE} --only-show-errors --acl bucket-owner-full-control
