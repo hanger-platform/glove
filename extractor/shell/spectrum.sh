@@ -648,6 +648,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 					echo "Partitioning data file delimited by ${DELIMITER}!"
 
 					# Particiona o arquivo em single thread para preservar os dados e nome das partições.  
+					# TODO - A geração de um único arquivo de saída deve ser suportada pelo conversor de dados nativamente sem a necessidade do merge anterior. 
 					java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
 						--folder=${RAWFILE_QUEUE_PATH} \
 						--filename=merged.tmp \
