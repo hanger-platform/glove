@@ -629,11 +629,28 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 			if [ "${#EXPORT_BUCKET}" -gt "0" ]; then
 				# Particiona o arquivo de entrada. 
 				if [ "${#PARTITION_FIELD}" -gt "0" ]; then
+					FILE_INDEX=0
+
+					# Mescla os arquivos gerados para desabilitar o processamento em multhread.  
+					for i in `ls ${RAWFILE_QUEUE_PATH}*`
+					do
+						if [ ${FILE_INDEX} = 0 ]; then	
+							cat ${i}	>> merged.tmp
+							error_check
+						else
+							sed '1d' ${i} >> merged.tmp	
+							error_check	
+						fi
+
+						FILE_INDEX=$(( $FILE_INDEX + 1 ))
+					done
+
 					echo "Partitioning data file delimited by ${DELIMITER}!"
 
+					# Particiona o arquivo em single thread para preservar os dados e nome das partições.  
 					java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
 						--folder=${RAWFILE_QUEUE_PATH} \
-						--filename=*.csv \
+						--filename=merged.tmp \
 						--delimiter=${DELIMITER} \
 						--target=csv \
 						--splitStrategy=${SPLIT_STRATEGY} \
