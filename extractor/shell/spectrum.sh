@@ -662,6 +662,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 						--escape=${QUOTE_ESCAPE} \
 						--header \
 						--readable \
+						--replace \
 						--debug=${DEBUG}
 					error_check
 				fi
