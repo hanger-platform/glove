@@ -650,9 +650,13 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 				BUCKETS=(`echo ${EXPORT_BUCKET} | tr -d ' ' | tr ',' ' '`)
 
 				# Identifica se deve compactar o arquivo a ser exportado.
-				if [ ${EXPORT_TYPE} == "gz" ]; then
-					pigz -k ${RAWFILE_QUEUE_PATH}*
-				
+				if [ ${EXPORT_TYPE} == "gz" ]  || [ ${EXPORT_TYPE} == "zip" ]; then
+					if [ ${EXPORT_TYPE} == "gz" ]; then
+						pigz -k ${RAWFILE_QUEUE_PATH}*
+					else
+						find ${RAWFILE_QUEUE_PATH} -type f -execdir zip '{}.zip' '{}' \;
+					fi 	
+
 					for index in "${!BUCKETS[@]}"
 					do
 						echo "Exporting resultset to ${BUCKETS[index]} using profile ${EXPORT_PROFILE}!"
@@ -661,7 +665,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 							aws s3 rm ${BUCKETS[index]} --profile ${EXPORT_PROFILE} --recursive
 							aws s3 cp ${RAWFILE_QUEUE_PATH} ${BUCKETS[index]} --profile ${EXPORT_PROFILE} --recursive --exclude "${DATA_FILE}*" --exclude "*.csv" --only-show-errors --acl bucket-owner-full-control
 						else
-							aws s3 cp ${RAWFILE_QUEUE_FILE}.gz ${BUCKETS[index]} --profile ${EXPORT_PROFILE} --only-show-errors --acl bucket-owner-full-control
+							aws s3 cp ${RAWFILE_QUEUE_FILE}.${EXPORT_TYPE} ${BUCKETS[index]} --profile ${EXPORT_PROFILE} --only-show-errors --acl bucket-owner-full-control
 						fi
 						error_check
 					done
