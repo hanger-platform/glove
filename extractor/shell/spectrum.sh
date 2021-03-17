@@ -647,7 +647,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 				fi
 
 				# Identifica cada bucket para o qual o export deve ser enviado.
-				BUCKETS=(`echo ${EXPORT_BUCKET} | tr ',' ' '`)
+				BUCKETS=(`echo ${EXPORT_BUCKET} | tr -d ' ' | tr ',' ' '`)
 
 				# Identifica se deve compactar o arquivo a ser exportado.
 				if [ ${EXPORT_TYPE} == "gz" ]; then
