@@ -627,9 +627,6 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 
 			# Define o storage de exportação.
 			if [ "${#EXPORT_BUCKET}" -gt "0" ]; then
-				# Envia o arquivo para o storage.
-				echo "Exporting resultset to ${EXPORT_BUCKET} using profile ${EXPORT_PROFILE}!"
-
 				# Particiona o arquivo de entrada. 
 				if [ "${#PARTITION_FIELD}" -gt "0" ]; then
 					echo "Partitioning data file delimited by ${DELIMITER}!"
@@ -649,27 +646,38 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 					error_check
 				fi
 
+				# Identifica cada bucket para o qual o export deve ser enviado.
+				BUCKETS=(`echo ${EXPORT_BUCKET} | tr ',' ' '`)
+
 				# Identifica se deve compactar o arquivo a ser exportado.
 				if [ ${EXPORT_TYPE} == "gz" ]; then
 					pigz -k ${RAWFILE_QUEUE_PATH}*
+				
+					for index in "${!BUCKETS[@]}"
+					do
+						echo "Exporting resultset to ${BUCKETS[index]} using profile ${EXPORT_PROFILE}!"
 
-					# Envia o arquivo compactado para o bucket de destino.
-					if [ "${#PARTITION_FIELD}" -gt "0" ]; then
-						aws s3 rm ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive
-						aws s3 cp ${RAWFILE_QUEUE_PATH} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive --exclude "${DATA_FILE}*" --exclude "*.csv" --only-show-errors --acl bucket-owner-full-control
-					else
-						aws s3 cp ${RAWFILE_QUEUE_FILE}.gz ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --only-show-errors --acl bucket-owner-full-control
-					fi
-					error_check
+						if [ "${#PARTITION_FIELD}" -gt "0" ]; then
+							aws s3 rm ${BUCKETS[index]} --profile ${EXPORT_PROFILE} --recursive
+							aws s3 cp ${RAWFILE_QUEUE_PATH} ${BUCKETS[index]} --profile ${EXPORT_PROFILE} --recursive --exclude "${DATA_FILE}*" --exclude "*.csv" --only-show-errors --acl bucket-owner-full-control
+						else
+							aws s3 cp ${RAWFILE_QUEUE_FILE}.gz ${BUCKETS[index]} --profile ${EXPORT_PROFILE} --only-show-errors --acl bucket-owner-full-control
+						fi
+						error_check
+					done
 				else
-					# Envia o arquivo para o bucket de destino.
-					if [ "${#PARTITION_FIELD}" -gt "0" ]; then
-						aws s3 rm ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive
-						aws s3 cp ${RAWFILE_QUEUE_PATH} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive --exclude "${DATA_FILE}*" --only-show-errors --acl bucket-owner-full-control
-					else
-						aws s3 cp ${RAWFILE_QUEUE_FILE} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --only-show-errors --acl bucket-owner-full-control
-					fi
-					error_check
+					for index in "${!BUCKETS[@]}"
+					do
+						echo "Exporting resultset to ${BUCKETS[index]} using profile ${EXPORT_PROFILE}!"
+						
+						if [ "${#PARTITION_FIELD}" -gt "0" ]; then
+							aws s3 rm ${BUCKETS[index]} --profile ${EXPORT_PROFILE} --recursive
+							aws s3 cp ${RAWFILE_QUEUE_PATH} ${BUCKETS[index]} --profile ${EXPORT_PROFILE} --recursive --exclude "${DATA_FILE}*" --only-show-errors --acl bucket-owner-full-control
+						else
+							aws s3 cp ${RAWFILE_QUEUE_FILE} ${BUCKETS[index]} --profile ${EXPORT_PROFILE} --only-show-errors --acl bucket-owner-full-control
+						fi
+						error_check
+					done
 				fi
 
 				# Remove os arquivos temporários. 						
