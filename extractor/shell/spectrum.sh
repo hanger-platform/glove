@@ -633,7 +633,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 
 					echo "Merging files!"
 
-					# Mescla os arquivos gerados para desabilitar o processamento em multhread.  
+					# Une os dados em um único arquivo.  
 					for i in `ls ${RAWFILE_QUEUE_PATH}*`
 					do
 						if [ ${FILE_INDEX} = 0 ]; then	
@@ -649,7 +649,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 
 					echo "Partitioning data file delimited by ${DELIMITER}!"
 
-					# Particiona o arquivo em single thread para preservar os dados e nome das partições.  
+					# Particiona o arquivo em single thread (thread=1) para preservar os dados e nome das partições.  
 					# TODO - A geração de um único arquivo de saída deve ser suportada pelo conversor de dados nativamente sem a necessidade do merge anterior. 
 					java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
 						--folder=${RAWFILE_QUEUE_PATH} \
