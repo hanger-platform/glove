@@ -637,17 +637,15 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 					for i in `ls ${RAWFILE_QUEUE_PATH}*`
 					do
 						if [ ${FILE_INDEX} = 0 ]; then	
-							cat ${i}	>> ${RAWFILE_QUEUE_PATH}merge.csv
+							cat ${i}	>> ${RAWFILE_QUEUE_PATH}merged.csv
 							error_check
 						else
-							sed '1d' ${i} >> ${RAWFILE_QUEUE_PATH}merge.csv
+							sed '1d' ${i} >> ${RAWFILE_QUEUE_PATH}merged.csv
 							error_check	
 						fi
 
 						FILE_INDEX=$(( $FILE_INDEX + 1 ))
 					done
-
-					head ${RAWFILE_QUEUE_PATH}merge.csv
 
 					echo "Partitioning data file delimited by ${DELIMITER}!"
 
@@ -655,7 +653,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 					# TODO - A geração de um único arquivo de saída deve ser suportada pelo conversor de dados nativamente sem a necessidade do merge anterior. 
 					java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
 						--folder=${RAWFILE_QUEUE_PATH} \
-						--filename=merge.csv \
+						--filename=merged.csv \
 						--delimiter=${DELIMITER} \
 						--target=csv \
 						--splitStrategy=${SPLIT_STRATEGY} \
