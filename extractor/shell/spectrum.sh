@@ -641,7 +641,6 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 						--thread=${THREAD} \
 						--escape=${QUOTE_ESCAPE} \
 						--header \
-						--readable \
 						--debug=${DEBUG}
 					error_check
 				fi
