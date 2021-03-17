@@ -656,7 +656,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 					if [ ${EXPORT_TYPE} == "gz" ]; then
 						pigz -k ${RAWFILE_QUEUE_PATH}*
 					else
-						find ${RAWFILE_QUEUE_PATH} -type f -execdir zip '{}.zip' '{}' \;
+						find ${RAWFILE_QUEUE_PATH} -type f -not -name '${DATA_FILE}*' -execdir zip '{}.zip' '{}' \;
 					fi 	
 
 					for index in "${!BUCKETS[@]}"
