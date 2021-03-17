@@ -651,6 +651,8 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 
 				# Identifica se deve compactar o arquivo a ser exportado.
 				if [ ${EXPORT_TYPE} == "gz" ]  || [ ${EXPORT_TYPE} == "zip" ]; then
+					echo "Compacting files at ${RAWFILE_QUEUE_PATH} to ${EXPORT_TYPE}!"
+
 					if [ ${EXPORT_TYPE} == "gz" ]; then
 						pigz -k ${RAWFILE_QUEUE_PATH}*
 					else
