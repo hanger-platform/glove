@@ -179,23 +179,21 @@ public class Scanner {
                     partial = false;
 
                     for (int i = 0; i < encoded.size(); i++) {
-                        if (encoded.get(i).startsWith(FREEZE_OPEN)) {
-                            partial = true;
-                            token = encoded.get(i) + ",";
-                        } else if (encoded.get(i).endsWith(FREEZE_CLOSE)) {
-                            partial = false;
-                            token = token + encoded.get(i);
-                        } else if (partial) {
-                            token = token + encoded.get(i) + ",";
-                        } else {
-                            token = encoded.get(i);
-                        }
+                        String value = encoded.get(i);
 
-                        if (!partial) {
-                            parameters.add(token
-                                    .replace(FREEZE_OPEN, "")
-                                    .replace(FREEZE_CLOSE, "")
-                            );
+                        if (value.startsWith(FREEZE_OPEN)
+                                && value.endsWith(FREEZE_CLOSE)) {
+                            parameters.add(value.replace(FREEZE_OPEN, "").replace(FREEZE_CLOSE, ""));
+                        } else if (value.startsWith(FREEZE_OPEN)) {
+                            partial = true;
+                            token = value + ",";
+                        } else if (value.endsWith(FREEZE_CLOSE)) {
+                            partial = false;
+                            parameters.add((token + value).replace(FREEZE_OPEN, "").replace(FREEZE_CLOSE, ""));
+                        } else if (partial) {
+                            token = token + value + ",";
+                        } else {
+                            parameters.add(value.replace(FREEZE_OPEN, "").replace(FREEZE_CLOSE, ""));
                         }
                     }
                 }
