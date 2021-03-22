@@ -111,7 +111,6 @@ public class Scanner {
         //Identifies if should parse content.
         if (content.contains("::")) {
             List<String> parameters = new ArrayList();
-            List<String> encoded = new ArrayList();
             List<String> transformationClassParameterListItem = new ArrayList();
 
             //Sets an ID for each transformation. 
@@ -165,7 +164,7 @@ public class Scanner {
                                     .replace(FREEZE_CLOSE, ""));
                 } else {
                     //Otherwise, it encode parameters using encodeBase64String to avoid break the parser. 
-                    encoded = Arrays.asList(
+                    List<String> encoded = Arrays.asList(
                             StringUtils.split(
                                     transformationClassParameter = transformationClassParameter.replace(
                                             transformationClassParameterList,
@@ -289,8 +288,10 @@ public class Scanner {
 
         if (instance == null) {
             field = new Field(fieldName);
+            field.setExpression(content);
         } else {
             field = new Field(fieldName, instance, original);
+            field.setExpression(content);
         }
 
         return field;
