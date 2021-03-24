@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job>
   <name>j_extract_data_from_query</name>
-  <description/>
-  <extended_description/>
-  <job_version/>
+  <description />
+  <extended_description />
+  <job_version />
   <job_status>0</job_status>
   <directory>/</directory>
   <created_user>-</created_user>
@@ -13,117 +13,117 @@
   <parameters>
     <parameter>
       <name>CONNECTION_NAME</name>
-      <default_value/>
-      <description/>
+      <default_value />
+      <description />
     </parameter>
     <parameter>
       <name>EXPORT_BUCKET</name>
-      <default_value/>
-      <description/>
+      <default_value />
+      <description />
     </parameter>
     <parameter>
       <name>EXPORT_SHEET</name>
-      <default_value/>
-      <description/>
+      <default_value />
+      <description />
     </parameter>
     <parameter>
       <name>EXPORT_SPREADSHEET</name>
-      <default_value/>
-      <description/>
+      <default_value />
+      <description />
     </parameter>
     <parameter>
       <name>INPUT_DATA_STATEMENT</name>
-      <default_value/>
-      <description/>
+      <default_value />
+      <description />
     </parameter>
     <parameter>
       <name>METADATA</name>
-      <default_value/>
-      <description/>
+      <default_value />
+      <description />
     </parameter>
     <parameter>
       <name>MODE</name>
-      <default_value/>
-      <description/>
+      <default_value />
+      <description />
     </parameter>
     <parameter>
       <name>ORDER</name>
-      <default_value/>
-      <description/>
+      <default_value />
+      <description />
     </parameter>
     <parameter>
       <name>PARAM1</name>
-      <default_value/>
-      <description/>
+      <default_value />
+      <description />
     </parameter>
     <parameter>
       <name>PARAM2</name>
-      <default_value/>
-      <description/>
+      <default_value />
+      <description />
     </parameter>
     <parameter>
       <name>PARAM3</name>
-      <default_value/>
-      <description/>
+      <default_value />
+      <description />
     </parameter>
     <parameter>
       <name>PARAM4</name>
-      <default_value/>
-      <description/>
+      <default_value />
+      <description />
     </parameter>
     <parameter>
       <name>PARAM5</name>
-      <default_value/>
-      <description/>
+      <default_value />
+      <description />
     </parameter>
     <parameter>
       <name>PARAM6</name>
-      <default_value/>
-      <description/>
+      <default_value />
+      <description />
     </parameter>
     <parameter>
       <name>PARAM7</name>
-      <default_value/>
-      <description/>
+      <default_value />
+      <description />
     </parameter>
     <parameter>
       <name>PARAM8</name>
-      <default_value/>
-      <description/>
+      <default_value />
+      <description />
     </parameter>
     <parameter>
       <name>PARAM9</name>
-      <default_value/>
-      <description/>
+      <default_value />
+      <description />
     </parameter>
     <parameter>
       <name>SCHEMA_NAME</name>
-      <default_value/>
-      <description/>
+      <default_value />
+      <description />
     </parameter>
     <parameter>
       <name>TABLE</name>
-      <default_value/>
-      <description/>
+      <default_value />
+      <description />
     </parameter>
     <parameter>
       <name>WHERE_CONDITION_TO_DELTA</name>
-      <default_value/>
-      <description/>
+      <default_value />
+      <description />
     </parameter>
   </parameters>
   <connection>
     <name>GENERIC_JDBC_CONNECTION</name>
-    <server/>
+    <server />
     <type>GENERIC</type>
     <access>Native</access>
-    <database/>
+    <database />
     <port>1521</port>
     <username>${DB_USER}</username>
     <password>${DB_PASSWORD}</password>
-    <servername/>
-    <data_tablespace/>
-    <index_tablespace/>
+    <servername />
+    <data_tablespace />
+    <index_tablespace />
     <attributes>
       <attribute>
         <code>CUSTOM_DRIVER_CLASS</code>
@@ -174,12 +174,12 @@
   <slaveservers>
     </slaveservers>
   <job-log-table>
-    <connection/>
-    <schema/>
-    <table/>
-    <size_limit_lines/>
-    <interval/>
-    <timeout_days/>
+    <connection />
+    <schema />
+    <table />
+    <size_limit_lines />
+    <interval />
+    <timeout_days />
     <field>
       <id>ID_JOB</id>
       <enabled>Y</enabled>
@@ -287,10 +287,10 @@
     </field>
   </job-log-table>
   <jobentry-log-table>
-    <connection/>
-    <schema/>
-    <table/>
-    <timeout_days/>
+    <connection />
+    <schema />
+    <table />
+    <timeout_days />
     <field>
       <id>ID_BATCH</id>
       <enabled>Y</enabled>
@@ -378,10 +378,10 @@
     </field>
   </jobentry-log-table>
   <channel-log-table>
-    <connection/>
-    <schema/>
-    <table/>
-    <timeout_days/>
+    <connection />
+    <schema />
+    <table />
+    <timeout_days />
     <field>
       <id>ID_BATCH</id>
       <enabled>Y</enabled>
@@ -444,13 +444,13 @@
     </field>
   </channel-log-table>
   <pass_batchid>N</pass_batchid>
-  <shared_objects_file/>
+  <shared_objects_file />
   <entries>
     <entry>
       <name>START</name>
-      <description/>
+      <description />
       <type>SPECIAL</type>
-      <attributes/>
+      <attributes />
       <start>Y</start>
       <dummy>N</dummy>
       <repeat>N</repeat>
@@ -466,46 +466,46 @@
       <nr>0</nr>
       <xloc>64</xloc>
       <yloc>48</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Metadata compare</name>
-      <description/>
+      <description />
       <type>TRANS</type>
-      <attributes/>
+      <attributes />
       <specification_method>filename</specification_method>
-      <trans_object_id/>
+      <trans_object_id />
       <filename>${Internal.Job.Filename.Directory}/m_metadata_compare.ktr</filename>
-      <transname/>
+      <transname />
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
       <exec_per_row>N</exec_per_row>
       <clear_rows>N</clear_rows>
       <clear_files>N</clear_files>
       <set_logfile>N</set_logfile>
-      <logfile/>
-      <logext/>
+      <logfile />
+      <logext />
       <add_date>N</add_date>
       <add_time>N</add_time>
       <loglevel>Basic</loglevel>
       <cluster>N</cluster>
-      <slave_server_name/>
+      <slave_server_name />
       <set_append_logfile>N</set_append_logfile>
       <wait_until_finished>Y</wait_until_finished>
       <follow_abort_remote>N</follow_abort_remote>
       <create_parent_folder>N</create_parent_folder>
       <logging_remote_work>N</logging_remote_work>
-      <run_configuration/>
+      <run_configuration />
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
         <parameter>
           <name>METADATA_COLUMNS_FILE</name>
-          <stream_name/>
+          <stream_name />
           <value>${METADATA_COLUMNS_FILE}</value>
         </parameter>
         <parameter>
           <name>METADATA_QUEUE_COLUMNS_FILE</name>
-          <stream_name/>
+          <stream_name />
           <value>${METADATA_QUEUE_COLUMNS_FILE}</value>
         </parameter>
       </parameters>
@@ -514,34 +514,34 @@
       <nr>0</nr>
       <xloc>864</xloc>
       <yloc>160</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Metadata exists?</name>
-      <description/>
+      <description />
       <type>FILE_EXISTS</type>
-      <attributes/>
+      <attributes />
       <filename>${METADATA_COLUMNS_FILE}</filename>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>864</xloc>
       <yloc>384</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Recreate?</name>
-      <description/>
+      <description />
       <type>SIMPLE_EVAL</type>
-      <attributes/>
+      <attributes />
       <valuetype>variable</valuetype>
-      <fieldname/>
+      <fieldname />
       <variablename>${IS_RECREATE}</variablename>
       <fieldtype>number</fieldtype>
-      <mask/>
+      <mask />
       <comparevalue>1</comparevalue>
-      <minvalue/>
-      <maxvalue/>
+      <minvalue />
+      <maxvalue />
       <successcondition>equal</successcondition>
       <successnumbercondition>equal</successnumbercondition>
       <successbooleancondition>false</successbooleancondition>
@@ -551,21 +551,21 @@
       <nr>0</nr>
       <xloc>1088</xloc>
       <yloc>160</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Update metadata</name>
-      <description/>
+      <description />
       <type>SHELL</type>
-      <attributes/>
-      <filename/>
-      <work_directory/>
+      <attributes />
+      <filename />
+      <work_directory />
       <arg_from_previous>N</arg_from_previous>
       <exec_per_row>N</exec_per_row>
       <set_logfile>N</set_logfile>
-      <logfile/>
+      <logfile />
       <set_append_logfile>N</set_append_logfile>
-      <logext/>
+      <logext />
       <add_date>N</add_date>
       <add_time>N</add_time>
       <insertScript>Y</insertScript>
@@ -578,15 +578,15 @@ cp -rf ${METADATA_QUEUE_PATH}* ${METADATA_PATH}</script>
       <nr>0</nr>
       <xloc>976</xloc>
       <yloc>496</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Set recreate to 0</name>
-      <description/>
+      <description />
       <type>SET_VARIABLES</type>
-      <attributes/>
+      <attributes />
       <replacevars>N</replacevars>
-      <filename/>
+      <filename />
       <file_variable_type>CURRENT_JOB</file_variable_type>
       <fields>
         <field>
@@ -600,15 +600,15 @@ cp -rf ${METADATA_QUEUE_PATH}* ${METADATA_PATH}</script>
       <nr>0</nr>
       <xloc>1200</xloc>
       <yloc>160</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Set recreate to 1</name>
-      <description/>
+      <description />
       <type>SET_VARIABLES</type>
-      <attributes/>
+      <attributes />
       <replacevars>N</replacevars>
-      <filename/>
+      <filename />
       <file_variable_type>CURRENT_JOB</file_variable_type>
       <fields>
         <field>
@@ -622,50 +622,50 @@ cp -rf ${METADATA_QUEUE_PATH}* ${METADATA_PATH}</script>
       <nr>0</nr>
       <xloc>864</xloc>
       <yloc>496</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Load data</name>
-      <description/>
+      <description />
       <type>SHELL</type>
-      <attributes/>
+      <attributes />
       <filename>${Internal.Job.Filename.Directory}/shell/${TARGET}.sh</filename>
       <work_directory>/tmp_files/</work_directory>
       <arg_from_previous>N</arg_from_previous>
       <exec_per_row>N</exec_per_row>
       <set_logfile>N</set_logfile>
-      <logfile/>
+      <logfile />
       <set_append_logfile>N</set_append_logfile>
-      <logext/>
+      <logext />
       <add_date>N</add_date>
       <add_time>N</add_time>
       <insertScript>N</insertScript>
-      <script/>
+      <script />
       <loglevel>Basic</loglevel>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>1200</xloc>
       <yloc>608</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Success</name>
-      <description/>
+      <description />
       <type>SUCCESS</type>
-      <attributes/>
+      <attributes />
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>976</xloc>
       <yloc>608</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Log</name>
-      <description/>
+      <description />
       <type>WRITE_TO_LOG</type>
-      <attributes/>
+      <attributes />
       <logmessage>#-----------------------------------------------------------
 # SQL FILE PATTERN
 #-----------------------------------------------------------
@@ -694,12 +694,15 @@ ALLOW_RECREATE              	== ${ALLOW_RECREATE}
 # OUTPUT EXPORT
 #-----------------------------------------------------------
 EXPORT                      	== ${IS_EXPORT}
+ONLY_EXPORT                   	== ${ONLY_EXPORT}
 EXPORT_BUCKET               	== ${EXPORT_BUCKET}
 EXPORT_TYPE               		== ${EXPORT_TYPE}
 EXPORT_PROFILE               	== ${EXPORT_PROFILE}
 EXPORT_SHEETS_METHOD        	== ${EXPORT_SHEETS_METHOD}
 EXPORT_SHEET                	== ${EXPORT_SHEET}
-EXPORT_SPREADSHEET          	== ${EXPORT_SPREADSHEET}</logmessage>
+EXPORT_SPREADSHEET          	== ${EXPORT_SPREADSHEET}
+EXPORT_MANIFEST               	== ${IS_EXPORT_MANIFEST}
+ONLY_EXPORT_MANIFEST          	== ${ONLY_EXPORT_MANIFEST}</logmessage>
       <loglevel>Basic</loglevel>
       <logsubject>LOG</logsubject>
       <parallel>N</parallel>
@@ -707,15 +710,15 @@ EXPORT_SPREADSHEET          	== ${EXPORT_SPREADSHEET}</logmessage>
       <nr>0</nr>
       <xloc>512</xloc>
       <yloc>384</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Module parameters</name>
-      <description/>
+      <description />
       <type>SET_VARIABLES</type>
-      <attributes/>
+      <attributes />
       <replacevars>Y</replacevars>
-      <filename/>
+      <filename />
       <file_variable_type>ROOT_JOB</file_variable_type>
       <fields>
         <field>
@@ -834,34 +837,34 @@ EXPORT_SPREADSHEET          	== ${EXPORT_SPREADSHEET}</logmessage>
       <nr>0</nr>
       <xloc>64</xloc>
       <yloc>384</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Fail loading data</name>
-      <description/>
+      <description />
       <type>ABORT</type>
-      <attributes/>
-      <message/>
+      <attributes />
+      <message />
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>1200</xloc>
       <yloc>720</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Extract metadata</name>
-      <description/>
+      <description />
       <type>SHELL</type>
-      <attributes/>
-      <filename/>
-      <work_directory/>
+      <attributes />
+      <filename />
+      <work_directory />
       <arg_from_previous>N</arg_from_previous>
       <exec_per_row>N</exec_per_row>
       <set_logfile>N</set_logfile>
-      <logfile/>
+      <logfile />
       <set_append_logfile>N</set_append_logfile>
-      <logext/>
+      <logext />
       <add_date>N</add_date>
       <add_time>N</add_time>
       <insertScript>Y</insertScript>
@@ -927,30 +930,30 @@ fi</script>
       <nr>0</nr>
       <xloc>752</xloc>
       <yloc>384</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Get metadata definition</name>
-      <description/>
+      <description />
       <type>TRANS</type>
-      <attributes/>
+      <attributes />
       <specification_method>filename</specification_method>
-      <trans_object_id/>
+      <trans_object_id />
       <filename>${Internal.Job.Filename.Directory}/m_load_metadata_definition.ktr</filename>
-      <transname/>
+      <transname />
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
       <exec_per_row>N</exec_per_row>
       <clear_rows>N</clear_rows>
       <clear_files>N</clear_files>
       <set_logfile>N</set_logfile>
-      <logfile/>
-      <logext/>
+      <logfile />
+      <logext />
       <add_date>N</add_date>
       <add_time>N</add_time>
       <loglevel>Basic</loglevel>
       <cluster>N</cluster>
-      <slave_server_name/>
+      <slave_server_name />
       <set_append_logfile>N</set_append_logfile>
       <wait_until_finished>Y</wait_until_finished>
       <follow_abort_remote>N</follow_abort_remote>
@@ -961,7 +964,7 @@ fi</script>
         <pass_all_parameters>Y</pass_all_parameters>
         <parameter>
           <name>METADATA_FIELDS_FILE</name>
-          <stream_name/>
+          <stream_name />
           <value>${METADATA_FIELDS_FILE}</value>
         </parameter>
       </parameters>
@@ -970,21 +973,21 @@ fi</script>
       <nr>0</nr>
       <xloc>1200</xloc>
       <yloc>496</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Is DBMS</name>
-      <description/>
+      <description />
       <type>SIMPLE_EVAL</type>
-      <attributes/>
+      <attributes />
       <valuetype>variable</valuetype>
-      <fieldname/>
+      <fieldname />
       <variablename>${DATABASE_TYPE}</variablename>
       <fieldtype>string</fieldtype>
-      <mask/>
+      <mask />
       <comparevalue>athena,redshift,bigquery,sisense</comparevalue>
-      <minvalue/>
-      <maxvalue/>
+      <minvalue />
+      <maxvalue />
       <successcondition>notinlist</successcondition>
       <successnumbercondition>equal</successnumbercondition>
       <successbooleancondition>false</successbooleancondition>
@@ -994,41 +997,41 @@ fi</script>
       <nr>0</nr>
       <xloc>624</xloc>
       <yloc>384</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Get connection properties</name>
-      <description/>
+      <description />
       <type>TRANS</type>
-      <attributes/>
+      <attributes />
       <specification_method>filename</specification_method>
-      <trans_object_id/>
+      <trans_object_id />
       <filename>${Internal.Job.Filename.Directory}/m_get_connection_properties.ktr</filename>
-      <transname/>
+      <transname />
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
       <exec_per_row>N</exec_per_row>
       <clear_rows>N</clear_rows>
       <clear_files>N</clear_files>
       <set_logfile>N</set_logfile>
-      <logfile/>
-      <logext/>
+      <logfile />
+      <logext />
       <add_date>N</add_date>
       <add_time>N</add_time>
       <loglevel>Basic</loglevel>
       <cluster>N</cluster>
-      <slave_server_name/>
+      <slave_server_name />
       <set_append_logfile>N</set_append_logfile>
       <wait_until_finished>Y</wait_until_finished>
       <follow_abort_remote>N</follow_abort_remote>
       <create_parent_folder>N</create_parent_folder>
       <logging_remote_work>N</logging_remote_work>
-      <run_configuration/>
+      <run_configuration />
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
         <parameter>
           <name>CONNECTION_NAME</name>
-          <stream_name/>
+          <stream_name />
           <value>${CONNECTION_NAME}</value>
         </parameter>
       </parameters>
@@ -1037,41 +1040,41 @@ fi</script>
       <nr>0</nr>
       <xloc>64</xloc>
       <yloc>160</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Get connection</name>
-      <description/>
+      <description />
       <type>TRANS</type>
-      <attributes/>
+      <attributes />
       <specification_method>filename</specification_method>
-      <trans_object_id/>
+      <trans_object_id />
       <filename>${Internal.Entry.Current.Directory}/m_get_connection.ktr</filename>
-      <transname/>
+      <transname />
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
       <exec_per_row>N</exec_per_row>
       <clear_rows>N</clear_rows>
       <clear_files>N</clear_files>
       <set_logfile>N</set_logfile>
-      <logfile/>
-      <logext/>
+      <logfile />
+      <logext />
       <add_date>N</add_date>
       <add_time>N</add_time>
       <loglevel>Basic</loglevel>
       <cluster>N</cluster>
-      <slave_server_name/>
+      <slave_server_name />
       <set_append_logfile>N</set_append_logfile>
       <wait_until_finished>Y</wait_until_finished>
       <follow_abort_remote>N</follow_abort_remote>
       <create_parent_folder>N</create_parent_folder>
       <logging_remote_work>N</logging_remote_work>
-      <run_configuration/>
+      <run_configuration />
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
         <parameter>
           <name>DATABASE_TYPE</name>
-          <stream_name/>
+          <stream_name />
           <value>${DATABASE_TYPE}</value>
         </parameter>
       </parameters>
@@ -1080,17 +1083,17 @@ fi</script>
       <nr>0</nr>
       <xloc>64</xloc>
       <yloc>272</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Script</name>
-      <description/>
+      <description />
       <type>SQL</type>
-      <attributes/>
+      <attributes />
       <sql>${INPUT_DATA_STATEMENT}</sql>
       <useVariableSubstitution>T</useVariableSubstitution>
       <sqlfromfile>F</sqlfromfile>
-      <sqlfilename/>
+      <sqlfilename />
       <sendOneStatement>F</sendOneStatement>
       <connection>GENERIC_JDBC_CONNECTION</connection>
       <parallel>N</parallel>
@@ -1098,21 +1101,21 @@ fi</script>
       <nr>0</nr>
       <xloc>176</xloc>
       <yloc>720</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Is script</name>
-      <description/>
+      <description />
       <type>SIMPLE_EVAL</type>
-      <attributes/>
+      <attributes />
       <valuetype>variable</valuetype>
-      <fieldname/>
+      <fieldname />
       <variablename>${MODE}</variablename>
       <fieldtype>string</fieldtype>
-      <mask/>
+      <mask />
       <comparevalue>script</comparevalue>
-      <minvalue/>
-      <maxvalue/>
+      <minvalue />
+      <maxvalue />
       <successcondition>equal</successcondition>
       <successnumbercondition>equal</successnumbercondition>
       <successbooleancondition>false</successbooleancondition>
@@ -1122,25 +1125,25 @@ fi</script>
       <nr>0</nr>
       <xloc>176</xloc>
       <yloc>384</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Script Success</name>
-      <description/>
+      <description />
       <type>SUCCESS</type>
-      <attributes/>
+      <attributes />
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>288</xloc>
       <yloc>720</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Script log</name>
-      <description/>
+      <description />
       <type>WRITE_TO_LOG</type>
-      <attributes/>
+      <attributes />
       <logmessage>#-----------------------------------------------------------
 # Source
 #-----------------------------------------------------------
@@ -1161,34 +1164,34 @@ TARGET                      == ${TARGET}
       <nr>0</nr>
       <xloc>176</xloc>
       <yloc>496</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Fail running script</name>
-      <description/>
+      <description />
       <type>ABORT</type>
-      <attributes/>
-      <message/>
+      <attributes />
+      <message />
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>176</xloc>
       <yloc>832</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Is partitioned?</name>
-      <description/>
+      <description />
       <type>SIMPLE_EVAL</type>
-      <attributes/>
+      <attributes />
       <valuetype>variable</valuetype>
-      <fieldname/>
+      <fieldname />
       <variablename>${MODE}</variablename>
       <fieldtype>string</fieldtype>
-      <mask/>
+      <mask />
       <comparevalue>partitioned,partition,staticpartitioned,staticpartition</comparevalue>
-      <minvalue/>
-      <maxvalue/>
+      <minvalue />
+      <maxvalue />
       <successcondition>inlist</successcondition>
       <successnumbercondition>equal</successnumbercondition>
       <successbooleancondition>false</successbooleancondition>
@@ -1198,21 +1201,21 @@ TARGET                      == ${TARGET}
       <nr>0</nr>
       <xloc>400</xloc>
       <yloc>384</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Recreate? </name>
-      <description/>
+      <description />
       <type>SIMPLE_EVAL</type>
-      <attributes/>
+      <attributes />
       <valuetype>variable</valuetype>
-      <fieldname/>
+      <fieldname />
       <variablename>${IS_RECREATE}</variablename>
       <fieldtype>number</fieldtype>
-      <mask/>
+      <mask />
       <comparevalue>1</comparevalue>
-      <minvalue/>
-      <maxvalue/>
+      <minvalue />
+      <maxvalue />
       <successcondition>equal</successcondition>
       <successnumbercondition>equal</successnumbercondition>
       <successbooleancondition>false</successbooleancondition>
@@ -1222,13 +1225,13 @@ TARGET                      == ${TARGET}
       <nr>0</nr>
       <xloc>864</xloc>
       <yloc>272</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Reset partition</name>
-      <description/>
+      <description />
       <type>EVAL</type>
-      <attributes/>
+      <attributes />
       <script>parent_job.setVariable("PARTITION_FIELD", "");
 parent_job.setVariable("PARTITION_MERGE", "0");
 true;</script>
@@ -1237,13 +1240,13 @@ true;</script>
       <nr>0</nr>
       <xloc>400</xloc>
       <yloc>496</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Set partition</name>
-      <description/>
+      <description />
       <type>EVAL</type>
-      <attributes/>
+      <attributes />
       <script>parent_job.setVariable("PARTITION_FIELD", "DUMMY");
 
 if( parent_job.getVariable("MODE").indexOf("static") !== -1 ) {
@@ -1257,13 +1260,13 @@ true;</script>
       <nr>0</nr>
       <xloc>400</xloc>
       <yloc>272</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Recreate log</name>
-      <description/>
+      <description />
       <type>WRITE_TO_LOG</type>
-      <attributes/>
+      <attributes />
       <logmessage>Table will be recreated!</logmessage>
       <loglevel>Basic</loglevel>
       <logsubject>RECREATE</logsubject>
@@ -1272,13 +1275,13 @@ true;</script>
       <nr>0</nr>
       <xloc>976</xloc>
       <yloc>272</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Metadata log</name>
-      <description/>
+      <description />
       <type>WRITE_TO_LOG</type>
-      <attributes/>
+      <attributes />
       <logmessage>Metadata was not extracted!
 Check if query returned at least one record or if happened error on the process.</logmessage>
       <loglevel>Basic</loglevel>
@@ -1288,21 +1291,21 @@ Check if query returned at least one record or if happened error on the process.
       <nr>0</nr>
       <xloc>752</xloc>
       <yloc>496</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Allow recreate? </name>
-      <description/>
+      <description />
       <type>SIMPLE_EVAL</type>
-      <attributes/>
+      <attributes />
       <valuetype>variable</valuetype>
-      <fieldname/>
+      <fieldname />
       <variablename>${ALLOW_RECREATE}</variablename>
       <fieldtype>number</fieldtype>
-      <mask/>
+      <mask />
       <comparevalue>1</comparevalue>
-      <minvalue/>
-      <maxvalue/>
+      <minvalue />
+      <maxvalue />
       <successcondition>equal</successcondition>
       <successnumbercondition>equal</successnumbercondition>
       <successbooleancondition>false</successbooleancondition>
@@ -1312,28 +1315,28 @@ Check if query returned at least one record or if happened error on the process.
       <nr>0</nr>
       <xloc>1088</xloc>
       <yloc>272</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Extract Others</name>
-      <description/>
+      <description />
       <type>JOB</type>
-      <attributes/>
+      <attributes />
       <specification_method>filename</specification_method>
-      <job_object_id/>
+      <job_object_id />
       <filename>${Internal.Entry.Current.Directory}/j_extract_data_from_query_on_${DATABASE_TYPE}.kjb</filename>
-      <jobname/>
-      <directory/>
+      <jobname />
+      <directory />
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
       <exec_per_row>N</exec_per_row>
       <set_logfile>N</set_logfile>
-      <logfile/>
-      <logext/>
+      <logfile />
+      <logext />
       <add_date>N</add_date>
       <add_time>N</add_time>
       <loglevel>Nothing</loglevel>
-      <slave_server_name/>
+      <slave_server_name />
       <wait_until_finished>Y</wait_until_finished>
       <follow_abort_remote>N</follow_abort_remote>
       <expand_remote_job>N</expand_remote_job>
@@ -1349,28 +1352,28 @@ Check if query returned at least one record or if happened error on the process.
       <nr>0</nr>
       <xloc>624</xloc>
       <yloc>496</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Extract DBMS data</name>
-      <description/>
+      <description />
       <type>JOB</type>
-      <attributes/>
+      <attributes />
       <specification_method>filename</specification_method>
-      <job_object_id/>
+      <job_object_id />
       <filename>${Internal.Entry.Current.Directory}/j_extract_data_from_query_on_dbms.kjb</filename>
-      <jobname/>
-      <directory/>
+      <jobname />
+      <directory />
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
       <exec_per_row>N</exec_per_row>
       <set_logfile>N</set_logfile>
-      <logfile/>
-      <logext/>
+      <logfile />
+      <logext />
       <add_date>N</add_date>
       <add_time>N</add_time>
       <loglevel>Nothing</loglevel>
-      <slave_server_name/>
+      <slave_server_name />
       <wait_until_finished>Y</wait_until_finished>
       <follow_abort_remote>N</follow_abort_remote>
       <expand_remote_job>N</expand_remote_job>
@@ -1386,34 +1389,34 @@ Check if query returned at least one record or if happened error on the process.
       <nr>0</nr>
       <xloc>624</xloc>
       <yloc>272</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Fail extracting metadata</name>
-      <description/>
+      <description />
       <type>ABORT</type>
-      <attributes/>
-      <message/>
+      <attributes />
+      <message />
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>752</xloc>
       <yloc>720</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Delete queue</name>
-      <description/>
+      <description />
       <type>SHELL</type>
-      <attributes/>
-      <filename/>
-      <work_directory/>
+      <attributes />
+      <filename />
+      <work_directory />
       <arg_from_previous>N</arg_from_previous>
       <exec_per_row>N</exec_per_row>
       <set_logfile>N</set_logfile>
-      <logfile/>
+      <logfile />
       <set_append_logfile>N</set_append_logfile>
-      <logext/>
+      <logext />
       <add_date>N</add_date>
       <add_time>N</add_time>
       <insertScript>Y</insertScript>
@@ -1428,47 +1431,47 @@ rm -rf ${RAWFILE_QUEUE_STAGING_PATH}*
       <nr>0</nr>
       <xloc>288</xloc>
       <yloc>384</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Metadata exists? </name>
-      <description/>
+      <description />
       <type>FILE_EXISTS</type>
-      <attributes/>
+      <attributes />
       <filename>${METADATA_COLUMNS_FILE}</filename>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>752</xloc>
       <yloc>608</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Recreate is not allowed</name>
-      <description/>
+      <description />
       <type>ABORT</type>
-      <attributes/>
-      <message/>
+      <attributes />
+      <message />
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>1088</xloc>
       <yloc>384</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Is Athena</name>
-      <description/>
+      <description />
       <type>SIMPLE_EVAL</type>
-      <attributes/>
+      <attributes />
       <valuetype>variable</valuetype>
-      <fieldname/>
+      <fieldname />
       <variablename>${DATABASE_TYPE}</variablename>
       <fieldtype>string</fieldtype>
-      <mask/>
+      <mask />
       <comparevalue>athena</comparevalue>
-      <minvalue/>
-      <maxvalue/>
+      <minvalue />
+      <maxvalue />
       <successcondition>equal</successcondition>
       <successnumbercondition>equal</successnumbercondition>
       <successbooleancondition>false</successbooleancondition>
@@ -1478,21 +1481,21 @@ rm -rf ${RAWFILE_QUEUE_STAGING_PATH}*
       <nr>0</nr>
       <xloc>176</xloc>
       <yloc>608</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Athena script</name>
-      <description/>
+      <description />
       <type>SHELL</type>
-      <attributes/>
-      <filename/>
-      <work_directory/>
+      <attributes />
+      <filename />
+      <work_directory />
       <arg_from_previous>N</arg_from_previous>
       <exec_per_row>N</exec_per_row>
       <set_logfile>N</set_logfile>
-      <logfile/>
+      <logfile />
       <set_append_logfile>N</set_append_logfile>
-      <logext/>
+      <logext />
       <add_date>N</add_date>
       <add_time>N</add_time>
       <insertScript>Y</insertScript>
@@ -1543,20 +1546,20 @@ fi</script>
       <nr>0</nr>
       <xloc>288</xloc>
       <yloc>608</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Fail running script </name>
-      <description/>
+      <description />
       <type>ABORT</type>
-      <attributes/>
-      <message/>
+      <attributes />
+      <message />
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>400</xloc>
       <yloc>608</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
   </entries>
   <hops>

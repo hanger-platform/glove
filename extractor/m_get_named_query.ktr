@@ -470,11 +470,13 @@ parameter
 metadata
 export_bucket
 export_sheet
-export_spreadsheet</note>
+export_spreadsheet
+is_export
+only_export</note>
       <xloc>672</xloc>
       <yloc>448</yloc>
       <width>129</width>
-      <heigth>235</heigth>
+      <heigth>262</heigth>
       <fontname>Segoe UI</fontname>
       <fontsize>9</fontsize>
       <fontbold>N</fontbold>
@@ -680,6 +682,7 @@ export_spreadsheet</note>
     <compare>Sort manifest </compare>
     <compare>
     </compare>
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -704,6 +707,7 @@ export_spreadsheet</note>
       <method>none</method>
       <schema_name />
     </partitioning>
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -754,7 +758,20 @@ export_spreadsheet</note>
         <mask />
         <set_empty_string>N</set_empty_string>
       </field>
+      <field>
+        <name>is_export_manifest</name>
+        <value>${IS_EXPORT}</value>
+        <mask />
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>only_export_manifest</name>
+        <value>${ONLY_EXPORT}</value>
+        <mask />
+        <set_empty_string>N</set_empty_string>
+      </field>
     </fields>
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -793,6 +810,7 @@ export_spreadsheet</note>
         <trim_type>both</trim_type>
       </field>
     </fields>
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -831,6 +849,7 @@ export_spreadsheet</note>
         <trim_type>both</trim_type>
       </field>
     </fields>
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -888,6 +907,7 @@ export_spreadsheet</note>
         <valuefield> </valuefield>
       </field>
     </fields>
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -992,6 +1012,7 @@ export_spreadsheet</note>
         <trimtype>both</trimtype>
       </field>
     </fields>
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1026,6 +1047,7 @@ export_spreadsheet</note>
         <rightvalue />
       </condition>
     </compare>
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1069,6 +1091,7 @@ export_spreadsheet</note>
         </value>
       </condition>
     </compare>
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1103,6 +1126,7 @@ export_spreadsheet</note>
         <name>order</name>
       </field>
     </fields>
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1150,6 +1174,7 @@ export_spreadsheet</note>
         <storage_type />
       </meta>
     </fields>
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1191,6 +1216,7 @@ export_spreadsheet</note>
         <type>String</type>
       </value>
     </lookup>
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1267,6 +1293,7 @@ export_spreadsheet</note>
         </conditions>
       </condition>
     </compare>
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1314,6 +1341,7 @@ export_spreadsheet</note>
         <storage_type />
       </meta>
     </fields>
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1355,6 +1383,7 @@ export_spreadsheet</note>
         <type>String</type>
       </value>
     </lookup>
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1388,6 +1417,7 @@ export_spreadsheet</note>
     <keys_2>
       <key>manifest_order</key>
     </keys_2>
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1424,6 +1454,7 @@ export_spreadsheet</note>
         <rightvalue />
       </condition>
     </compare>
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1462,6 +1493,7 @@ export_spreadsheet</note>
         <trim_type>both</trim_type>
       </field>
     </fields>
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1501,6 +1533,7 @@ export_spreadsheet</note>
         <remove_special_characters>none</remove_special_characters>
       </field>
     </fields>
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1536,8 +1569,10 @@ export_spreadsheet</note>
         <replace_field_by_string />
         <whole_word>no</whole_word>
         <case_sensitive>no</case_sensitive>
+        <is_unicode>no</is_unicode>
       </field>
     </fields>
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1573,8 +1608,10 @@ export_spreadsheet</note>
         <replace_field_by_string />
         <whole_word>no</whole_word>
         <case_sensitive>no</case_sensitive>
+        <is_unicode>no</is_unicode>
       </field>
     </fields>
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1736,6 +1773,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     <info_steps />
     <target_steps />
     <usage_parameters />
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1769,6 +1807,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     <IsIgnoreEmptyFile>Y</IsIgnoreEmptyFile>
     <doNotFailIfNoFile>Y</doNotFailIfNoFile>
     <ignoreMissingPath>Y</ignoreMissingPath>
+    <defaultPathLeafToNull>Y</defaultPathLeafToNull>
     <rownum_field />
     <file>
       <name>${GLOVE_NAMED_QUERIES}/${NAMED_QUERY}/</name>
@@ -1861,6 +1900,32 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
         <trim_type>both</trim_type>
         <repeat>N</repeat>
       </field>
+      <field>
+        <name>is_export_manifest</name>
+        <path>$..is_export</path>
+        <type>Integer</type>
+        <format />
+        <currency />
+        <decimal />
+        <group />
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>both</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>only_export_manifest</name>
+        <path>$..only_export</path>
+        <type>Integer</type>
+        <format />
+        <currency />
+        <decimal />
+        <group />
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>both</trim_type>
+        <repeat>N</repeat>
+      </field>
     </fields>
     <limit>0</limit>
     <IsInFields>N</IsInFields>
@@ -1874,6 +1939,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     <rootUriNameFieldName />
     <extensionFieldName />
     <sizeFieldName />
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1907,6 +1973,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     <IsIgnoreEmptyFile>Y</IsIgnoreEmptyFile>
     <doNotFailIfNoFile>Y</doNotFailIfNoFile>
     <ignoreMissingPath>Y</ignoreMissingPath>
+    <defaultPathLeafToNull>Y</defaultPathLeafToNull>
     <rownum_field />
     <file>
       <name />
@@ -1994,6 +2061,32 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
         <trim_type>both</trim_type>
         <repeat>N</repeat>
       </field>
+      <field>
+        <name>is_export_manifest</name>
+        <path>$..is_export</path>
+        <type>Integer</type>
+        <format />
+        <currency />
+        <decimal />
+        <group />
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>both</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>only_export_manifest</name>
+        <path>$..only_export</path>
+        <type>Integer</type>
+        <format />
+        <currency />
+        <decimal />
+        <group />
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>both</trim_type>
+        <repeat>N</repeat>
+      </field>
     </fields>
     <limit>0</limit>
     <IsInFields>Y</IsInFields>
@@ -2007,6 +2100,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     <rootUriNameFieldName />
     <extensionFieldName />
     <sizeFieldName />
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -2056,6 +2150,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
       <file_required>N</file_required>
       <include_subfolders>N</include_subfolders>
     </file>
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -2160,6 +2255,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     <rootUriNameFieldName />
     <extensionFieldName />
     <sizeFieldName />
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -2201,6 +2297,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
         <presorted>N</presorted>
       </field>
     </fields>
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -2242,6 +2339,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
         <presorted>N</presorted>
       </field>
     </fields>
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -2283,6 +2381,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
         <presorted>N</presorted>
       </field>
     </fields>
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -2366,6 +2465,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     <info_steps />
     <target_steps />
     <usage_parameters />
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -2449,6 +2549,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     <info_steps />
     <target_steps />
     <usage_parameters />
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -2483,6 +2584,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
         <case_insensitive>N</case_insensitive>
       </field>
     </fields>
+    <attributes />
     <cluster_schema />
     <remotesteps>
       <input>
@@ -2501,4 +2603,5 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
   <slave-step-copy-partition-distribution>
   </slave-step-copy-partition-distribution>
   <slave_transformation>N</slave_transformation>
+  <attributes />
 </transformation>
