@@ -37,12 +37,22 @@
       <description />
     </parameter>
     <parameter>
+      <name>IS_EXPORT_MANIFEST</name>
+      <default_value />
+      <description />
+    </parameter>
+    <parameter>
       <name>METADATA</name>
       <default_value />
       <description />
     </parameter>
     <parameter>
       <name>MODE</name>
+      <default_value />
+      <description />
+    </parameter>
+    <parameter>
+      <name>ONLY_EXPORT_MANIFEST</name>
       <default_value />
       <description />
     </parameter>
