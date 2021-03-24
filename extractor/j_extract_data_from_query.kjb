@@ -37,7 +37,7 @@
       <description />
     </parameter>
     <parameter>
-      <name>IS_EXPORT_MANIFEST</name>
+      <name>IS_EXPORT</name>
       <default_value />
       <description />
     </parameter>
@@ -52,7 +52,7 @@
       <description />
     </parameter>
     <parameter>
-      <name>ONLY_EXPORT_MANIFEST</name>
+      <name>ONLY_EXPORT</name>
       <default_value />
       <description />
     </parameter>

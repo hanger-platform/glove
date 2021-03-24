@@ -388,12 +388,12 @@
           <value />
         </parameter>
         <parameter>
-          <name>IS_EXPORT_MANIFEST</name>
+          <name>IS_EXPORT</name>
           <stream_name>is_export_manifest</stream_name>
           <value />
         </parameter>
         <parameter>
-          <name>ONLY_EXPORT_MANIFEST</name>
+          <name>ONLY_EXPORT</name>
           <stream_name>only_export_manifest</stream_name>
           <value />
         </parameter>
