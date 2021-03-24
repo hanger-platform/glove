@@ -387,6 +387,16 @@
           <stream_name>export_sheet</stream_name>
           <value />
         </parameter>
+        <parameter>
+          <name>IS_EXPORT_MANIFEST</name>
+          <stream_name>is_export_manifest</stream_name>
+          <value />
+        </parameter>
+        <parameter>
+          <name>ONLY_EXPORT_MANIFEST</name>
+          <stream_name>only_export_manifest</stream_name>
+          <value />
+        </parameter>
       </parameters>
       <set_append_logfile>N</set_append_logfile>
       <parallel>N</parallel>
