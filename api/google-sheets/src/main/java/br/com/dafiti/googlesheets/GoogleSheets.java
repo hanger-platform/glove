@@ -84,15 +84,16 @@ public class GoogleSheets {
         //Define parameters. 
         mitt.getConfiguration()
                 .addParameter("c", "credentials", "Credentials file", "", true, false)
-                .addParameter("s", "spreadsheet", "Identify the id of the spreadsheet", "", true, false)
-                .addParameter("o", "output", "Identify the output path and file name", "", true, false)
+                .addParameter("s", "spreadsheet", "Identifies the id of the spreadsheet", "", true, false)
+                .addParameter("o", "output", "Identifies the output path and file name", "", true, false)
                 .addParameter("k", "key", "Unique key, divided by + if has more than one field", "")
                 .addParameter("p", "partition", "Define the partition field or fields, divided by +", "")
                 .addParameter("f", "field", "(Optional)fields to be extracted", "")
-                .addParameter("sh", "sheets", "(Optional)(Default consider all sheets) Identify the sheets to extract, divided by +")
-                .addParameter("d", "delimiter", "(Optional)(Default is ;) Identify the delimiter character", ";")
-                .addParameter("q", "quote", "(Optional)(Default is \") Identify the quote character", "\"")
-                .addParameter("sr", "skip_row", "(Optional)(Default is 0) Identify where the sheet header begins", "0");
+                .addParameter("sh", "sheets", "(Optional)(Default consider all sheets) Identifies the sheets to extract, divided by +")
+                .addParameter("d", "delimiter", "(Optional)(Default is ;) Identifies the delimiter character", ";")
+                .addParameter("q", "quote", "(Optional)(Default is \") Identifies the quote character", "\"")
+                .addParameter("sr", "skip_row", "(Optional)(Default is 0) Identifies where the sheet header begins", "0")
+                .addParameter("t", "timeout", "(Optional)(Default is 5) Identifies the connection timeout", "5");
 
         //Read the command line interface. 
         CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -109,10 +110,10 @@ public class GoogleSheets {
                 .addCustomField("etl_load_date",
                         new Now());
 
-        //Identify the fields to extract data. 
+        //Identifies the fields to extract data. 
         List<String> fields = cli.getParameterAsList("field", "\\+");
 
-        //Identify if it is to consider just some fields.
+        //Identifies if it is to consider just some fields.
         if (!fields.isEmpty()) {
             mitt.getConfiguration().addField(fields);
             mitt.getConfiguration().addCustomField("sheet_title");
@@ -153,7 +154,7 @@ public class GoogleSheets {
         Sheets sheets = new Sheets.Builder(
                 netHttpTransport,
                 jsonFactory,
-                setHttpTimeout(credential)
+                setHttpTimeout(credential, cli.getParameterAsInteger("timeout"))
         )
                 .setApplicationName("Google Sheets API extractor")
                 .build();
@@ -172,7 +173,7 @@ public class GoogleSheets {
         //Only one sheet header is considered.
         boolean headerOnce = fields.isEmpty();
 
-        //Identify if user want a specific sheet(s).
+        //Identifies if user want a specific sheet(s).
         List<String> parameterSheets = cli.getParameterAsList("sheets", "\\+");
 
         //Loop through each sheet.
@@ -180,7 +181,7 @@ public class GoogleSheets {
             Map<String, Integer> header = new HashMap();
             final String sheetName = sheet.getProperties().getTitle();
 
-            //Identify if it considers all sheets or just some.
+            //Identifies if it considers all sheets or just some.
             if (parameterSheets.isEmpty() || parameterSheets.contains(sheetName)) {
 
                 Logger.getLogger(GoogleSheets.class.getName())
@@ -196,7 +197,7 @@ public class GoogleSheets {
                         .execute()
                         .getValues();
 
-                //Identify where the header begins.
+                //Identifies where the header begins.
                 int skip = cli.getParameterAsInteger("skip_row");
 
                 if (headerOnce) {
@@ -207,10 +208,10 @@ public class GoogleSheets {
 
                 boolean skipFirst = true;
                 for (int index = 0; index < values.size(); index++) {
-                    //Identify if shold skip lines.
+                    //Identifies if shold skip lines.
                     if (index >= skip) {
                         if (!skipFirst) {
-                            //Identify if the field list was provided. 
+                            //Identifies if the field list was provided. 
                             if (!fields.isEmpty()) {
                                 ArrayList<String> record = new ArrayList();
 
@@ -262,11 +263,11 @@ public class GoogleSheets {
      * @param requestInitializer
      * @return
      */
-    private static HttpRequestInitializer setHttpTimeout(final HttpRequestInitializer requestInitializer) {
+    private static HttpRequestInitializer setHttpTimeout(final HttpRequestInitializer requestInitializer, final int timeout) {
         return (HttpRequest httpRequest) -> {
             requestInitializer.initialize(httpRequest);
-            httpRequest.setConnectTimeout(3 * 60000);  // 3 minutes connect timeout
-            httpRequest.setReadTimeout(3 * 60000);  // 3 minutes read timeout
+            httpRequest.setConnectTimeout(timeout * 60000);
+            httpRequest.setReadTimeout(timeout * 60000);
         };
     }
 }
