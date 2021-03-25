@@ -263,7 +263,10 @@ public class GoogleSheets {
      * @param requestInitializer
      * @return
      */
-    private static HttpRequestInitializer setHttpTimeout(final HttpRequestInitializer requestInitializer, final int timeout) {
+    private static HttpRequestInitializer setHttpTimeout(
+            final HttpRequestInitializer requestInitializer, 
+            final int timeout) {
+        
         return (HttpRequest httpRequest) -> {
             requestInitializer.initialize(httpRequest);
             httpRequest.setConnectTimeout(timeout * 60000);
