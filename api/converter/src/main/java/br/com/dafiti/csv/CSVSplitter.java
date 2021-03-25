@@ -53,6 +53,7 @@ public class CSVSplitter implements Runnable {
     private final Character quoteEscape;
     private final boolean header;
     private final boolean replace;
+    private final boolean readable;
     private final String splitStrategy;
 
     /**
@@ -65,6 +66,8 @@ public class CSVSplitter implements Runnable {
      * @param quoteEscape File escape.
      * @param header Identify if the file has header.
      * @param replace Identify if should replace the orignal file.
+     * @param readable Identifies if partition name should be readable at
+     * runtime.
      * @param splitStrategy Identify if should use the fastest strategy to
      * partitioning.
      */
@@ -76,6 +79,7 @@ public class CSVSplitter implements Runnable {
             Character quoteEscape,
             boolean header,
             boolean replace,
+            boolean readable,
             String splitStrategy) {
 
         this.csvFile = csvFile;
@@ -85,7 +89,9 @@ public class CSVSplitter implements Runnable {
         this.quoteEscape = quoteEscape;
         this.replace = replace;
         this.header = header;
+        this.readable = readable;
         this.splitStrategy = splitStrategy;
+
     }
 
     /**
@@ -119,6 +125,7 @@ public class CSVSplitter implements Runnable {
      */
     private void fastSplit() throws IOException {
         String part = "";
+        String fileHeader = "";
         int lineNumber = 0;
         HashMap<String, BufferedWriter> partitions = new HashMap<>();
         LineIterator lineIterator = FileUtils.lineIterator(csvFile, "UTF-8");
@@ -127,7 +134,7 @@ public class CSVSplitter implements Runnable {
             while (lineIterator.hasNext()) {
                 String line = lineIterator.nextLine();
 
-                if (!(lineNumber == 0 && header)) {
+                if (!(lineNumber == 0 && this.header)) {
                     String[] split = line.split(delimiter.toString());
 
                     if (split.length != 0) {
@@ -144,10 +151,26 @@ public class CSVSplitter implements Runnable {
                         if (part.isEmpty()) {
                             String partition = split[partitionColumn].replaceAll("\\W", "");
 
+                            if (partition.isEmpty()) {
+                                partition = "UNDEFINED";
+                            }
+
                             if (!partitions.containsKey(partition)) {
-                                String partitionPath = csvFile.getParent() + "/" + partition;
-                                Files.createDirectories(Paths.get(partitionPath));
-                                BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(partitionPath + "/" + UUID.randomUUID() + ".csv"));
+                                String partitionPath;
+                                BufferedWriter bufferedWriter;
+
+                                if (readable) {
+                                    partitionPath = csvFile.getParent();
+                                    bufferedWriter = new BufferedWriter(new FileWriter(partitionPath + "/" + partition + ".csv"));
+
+                                    if (header) {
+                                        bufferedWriter.append(fileHeader + "\r\n");
+                                    }
+                                } else {
+                                    partitionPath = csvFile.getParent() + "/" + partition;
+                                    Files.createDirectories(Paths.get(partitionPath));
+                                    bufferedWriter = new BufferedWriter(new FileWriter(partitionPath + "/" + UUID.randomUUID() + ".csv"));
+                                }
 
                                 partitions.put(partition, bufferedWriter);
                             }
@@ -155,6 +178,8 @@ public class CSVSplitter implements Runnable {
                             partitions.get(partition).append(line + "\r\n");
                         }
                     }
+                } else {
+                    fileHeader = line;
                 }
 
                 lineNumber++;
@@ -182,6 +207,7 @@ public class CSVSplitter implements Runnable {
      */
     private void secureSplit() throws IOException {
         int lineNumber = 0;
+        String[] fileHeader = null;
         HashMap<String, CsvWriter> partitions = new HashMap<>();
 
         //Writer. 
@@ -210,13 +236,30 @@ public class CSVSplitter implements Runnable {
             if (!(lineNumber == 0 && header)) {
                 String partition = record[partitionColumn].replaceAll("\\W", "");
 
+                if (partition.isEmpty()) {
+                    partition = "UNDEFINED";
+                }
+
                 if (!partitions.containsKey(partition)) {
-                    String partitionPath = csvFile.getParent() + "/" + partition;
-                    Files.createDirectories(Paths.get(partitionPath));
-                    partitions.put(partition, new CsvWriter(new FileWriter(partitionPath + "/" + UUID.randomUUID() + ".csv"), writerSettings));
+                    String partitionPath;
+
+                    if (readable) {
+                        partitionPath = csvFile.getParent();
+                        partitions.put(partition, new CsvWriter(new FileWriter(partitionPath + "/" + partition + ".csv"), writerSettings));
+
+                        if (header) {
+                            partitions.get(partition).writeRow(fileHeader);
+                        }
+                    } else {
+                        partitionPath = csvFile.getParent() + "/" + partition;
+                        Files.createDirectories(Paths.get(partitionPath));
+                        partitions.put(partition, new CsvWriter(new FileWriter(partitionPath + "/" + UUID.randomUUID() + ".csv"), writerSettings));
+                    }
                 }
 
                 partitions.get(partition).writeRow(record);
+            } else {
+                fileHeader = record;
             }
 
             lineNumber++;
