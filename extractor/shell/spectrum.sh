@@ -623,7 +623,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
     if [ ${MODULE} == "query" ]; then
 
 		# Identifica se deve exportar o resultset intermediário.
-		if [ ${IS_EXPORT_MANIFEST} = 1 ]; then
+		if [ ${IS_EXPORT} = 1 ]; then
 
 			# Define o storage de exportação.
 			if [ "${#EXPORT_BUCKET}" -gt "0" ]; then
@@ -681,7 +681,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 			fi
 
 			# Finaliza o processo de exportação.
-			if [ ${ONLY_EXPORT_MANIFEST} = 1 ]; then
+			if [ ${ONLY_EXPORT} = 1 ]; then
 				echo "Exporting finished!"
 				exit 0
 			fi
