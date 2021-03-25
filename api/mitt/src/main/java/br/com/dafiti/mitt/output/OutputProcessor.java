@@ -194,6 +194,7 @@ public class OutputProcessor implements Runnable {
             setting.getFormat().setDelimiter(readerSettings.getDelimiter());
             setting.getFormat().setQuote(readerSettings.getQuote());
             setting.getFormat().setQuoteEscape(readerSettings.getQuoteEscape());
+            setting.getFormat().setComment('\0');
             setting.setNullValue("");
             setting.setMaxCharsPerColumn(-1);
             setting.setInputBufferSize(5 * (1024 * 1024));

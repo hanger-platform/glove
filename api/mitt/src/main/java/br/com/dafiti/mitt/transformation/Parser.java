@@ -200,7 +200,7 @@ public class Parser {
                         Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, "Field {0} does not have value or transformation!", field.getName());
                     }
                 } else {
-                    Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, "Field {0} does not exists!", field.getName());
+                    Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, "Field {0} using expression {1} does not exists!", new Object[]{field.getName(), field.getExpression()});
                 }
             }
         }

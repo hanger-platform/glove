@@ -36,6 +36,7 @@ public class Field {
     private final Transformable transformation;
     private final String alias;
     private final boolean original;
+    private String expression;
 
     /**
      *
@@ -46,6 +47,7 @@ public class Field {
         this.transformation = null;
         this.alias = null;
         this.original = true;
+        this.expression = null;
     }
 
     /**
@@ -61,6 +63,7 @@ public class Field {
         this.transformation = null;
         this.alias = alias;
         this.original = true;
+        this.expression = null;
     }
 
     /**
@@ -76,6 +79,7 @@ public class Field {
         this.transformation = transformation;
         this.alias = null;
         this.original = true;
+        this.expression = null;
 
         this.transformation.init();
     }
@@ -95,6 +99,7 @@ public class Field {
         this.transformation = transformation;
         this.alias = alias;
         this.original = true;
+        this.expression = null;
 
         this.transformation.init();
     }
@@ -114,6 +119,7 @@ public class Field {
         this.transformation = transformation;
         this.alias = null;
         this.original = original;
+        this.expression = null;
 
         this.transformation.init();
     }
@@ -135,6 +141,7 @@ public class Field {
         this.transformation = transformation;
         this.alias = alias;
         this.original = original;
+        this.expression = null;
 
         this.transformation.init();
     }
@@ -169,6 +176,18 @@ public class Field {
      */
     public boolean isOriginal() {
         return original;
+    }
+
+    public void setExpression(String expression) {
+        this.expression = expression;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getExpression() {
+        return expression;
     }
 
     /**

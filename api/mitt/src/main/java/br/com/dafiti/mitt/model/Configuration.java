@@ -26,6 +26,7 @@ package br.com.dafiti.mitt.model;
 import br.com.dafiti.mitt.exception.DuplicateEntityException;
 import br.com.dafiti.mitt.transformation.Scanner;
 import br.com.dafiti.mitt.transformation.Transformable;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -77,6 +78,7 @@ public class Configuration {
     /**
      *
      * @param removeSpecialCharacteres
+     * @param normalize
      * @return
      */
     public List<String> getFieldsName(boolean removeSpecialCharacteres) {
@@ -90,6 +92,12 @@ public class Configuration {
 
                     //Identifies if conform to accepted database field names. 
                     if (removeSpecialCharacteres) {
+                        //Remove accents. 
+                        name = Normalizer
+                                .normalize(name, Normalizer.Form.NFD)
+                                .replaceAll("[^\\p{ASCII}]", "");
+
+                        //Replace invalid characteres. 
                         name = name.replaceAll("\\W", "_").toLowerCase();
                         name = name.replaceAll("^_", "");
                         name = name.replaceAll("_$", "");
