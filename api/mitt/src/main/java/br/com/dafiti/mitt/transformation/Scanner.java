@@ -133,7 +133,7 @@ public class Scanner {
                 String transformationClassParameterList = StringUtils.substringBefore(StringUtils.substringAfter(transformationClassParameter, LIST_OPEN), LIST_CLOSE);
 
                 //Supports parameter parser. 
-                String token = null;
+                String token = "";
                 boolean partial = false;
 
                 //Identifies each item in a parameter list.  
@@ -164,7 +164,7 @@ public class Scanner {
                                     .replace(FREEZE_CLOSE, ""));
                 } else {
                     //Otherwise, it encode parameters using encodeBase64String to avoid break the parser. 
-                    parameters = Arrays.asList(
+                    List<String> encoded = Arrays.asList(
                             StringUtils.split(
                                     transformationClassParameter = transformationClassParameter.replace(
                                             transformationClassParameterList,
@@ -173,14 +173,26 @@ public class Scanner {
                                             )
                                     ), ','));
 
-                    for (int i = 0; i < parameters.size(); i++) {
-                        if (parameters.get(i).startsWith(FREEZE_OPEN)
-                                && parameters.get(i).endsWith(FREEZE_OPEN)) {
+                    //After encode, identifies if freezed parameters are intact. 
+                    token = "";
+                    partial = false;
 
-                            //**...** identifies freezed parameter. 
-                            parameters.set(i, parameters.get(i)
-                                    .replace(FREEZE_OPEN, "")
-                                    .replace(FREEZE_OPEN, ""));
+                    for (int i = 0; i < encoded.size(); i++) {
+                        String value = encoded.get(i);
+
+                        if (value.startsWith(FREEZE_OPEN)
+                                && value.endsWith(FREEZE_CLOSE)) {
+                            parameters.add(value.replace(FREEZE_OPEN, "").replace(FREEZE_CLOSE, ""));
+                        } else if (value.startsWith(FREEZE_OPEN)) {
+                            partial = true;
+                            token = value + ",";
+                        } else if (value.endsWith(FREEZE_CLOSE)) {
+                            partial = false;
+                            parameters.add((token + value).replace(FREEZE_OPEN, "").replace(FREEZE_CLOSE, ""));
+                        } else if (partial) {
+                            token = token + value + ",";
+                        } else {
+                            parameters.add(value.replace(FREEZE_OPEN, "").replace(FREEZE_CLOSE, ""));
                         }
                     }
                 }
@@ -276,8 +288,10 @@ public class Scanner {
 
         if (instance == null) {
             field = new Field(fieldName);
+            field.setExpression(content);
         } else {
             field = new Field(fieldName, instance, original);
+            field.setExpression(content);
         }
 
         return field;
