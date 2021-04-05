@@ -96,9 +96,9 @@ public class S3 {
             ObjectListing listing = AmazonS3ClientBuilder
                     .standard()
                     .build().listObjects(cli.getParameter("bucket"), cli.getParameter("prefix"));
-            
+
             List<S3ObjectSummary> s3ObjectSummaries = listing.getObjectSummaries();
-            
+
             while (listing.isTruncated()) {
                 listing = AmazonS3ClientBuilder
                         .standard()
@@ -120,7 +120,7 @@ public class S3 {
                     if (updatedDate.compareTo(LocalDate.parse(cli.getParameter("start_date"))) >= 0
                             && updatedDate.compareTo(LocalDate.parse(cli.getParameter("end_date"))) <= 0) {
 
-                        Logger.getLogger(S3.class.getName()).log(Level.INFO, "Transfering: {0} of {1}", new Object[]{s3ObjectSummary.getKey(), s3ObjectSummary.getLastModified()});
+                        Logger.getLogger(S3.class.getName()).log(Level.INFO, "Transfering: {0} of {1} ({2} bytes)", new Object[]{s3ObjectSummary.getKey(), s3ObjectSummary.getLastModified(), s3ObjectSummary.getSize()});
 
                         //Identifies the output file. 
                         File outputFile = new File(outputPath.toString() + "/" + s3ObjectSummary.getKey().replaceAll("/", "_"));
