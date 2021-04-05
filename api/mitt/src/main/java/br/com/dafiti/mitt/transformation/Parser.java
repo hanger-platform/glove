@@ -197,7 +197,7 @@ public class Parser {
                                 .getTransformation()
                                 .getValue(this, record);
                     } else {
-                        Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, "Field {0} does not have value or transformation. Impaired record {1}!", new Object[]{field.getName(), record});
+                        Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, "Field {0} does not have value or transformation on {2}. Impaired record {1}!", new Object[]{field.getName(), record, configuration.getOriginalFieldsName()});
                     }
                 } else {
                     Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, "Field {0} using expression {1} does not exists!", new Object[]{field.getName(), field.getExpression()});
