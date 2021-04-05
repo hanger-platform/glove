@@ -71,9 +71,7 @@ public class OutputProcessor implements Runnable {
         this.readerSettings = readerSettings;
         this.writerSettings = writerSettings;
 
-        this.writer = new CsvWriter(
-                writerSettings.getOutputFile(),
-                this.getCSVSettings());
+        this.writer = new CsvWriter(writerSettings.getOutputFile(), this.getCSVSettings());
     }
 
     /**
@@ -111,7 +109,7 @@ public class OutputProcessor implements Runnable {
         setting.setNullValue("");
         setting.setMaxCharsPerColumn(-1);
         setting.setHeaderWritingEnabled(true);
-        setting.setHeaders(parser.getConfiguration().getFieldsName(true).toArray(new String[0]));
+        setting.setHeaders(parser.getConfiguration().getFieldName(true).toArray(new String[0]));
 
         return setting;
     }

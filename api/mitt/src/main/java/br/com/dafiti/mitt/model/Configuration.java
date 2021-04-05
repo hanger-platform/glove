@@ -38,26 +38,25 @@ import java.util.Map;
  */
 public class Configuration {
 
-    private final List<Field> originalField;
-    private final List<String> fieldName;
-    private final List<String> originalFieldName;
-    private final List<String> normalizedFieldName;
-    private final List<Transformable> tranformation;
-    private final Map<Field, Integer> fieldIndex;
-    private final Map<Field, Integer> originalFieldIndex;
-
-    private final boolean debug;
     private final Scanner scanner;
     private final List<Field> fields = new ArrayList();
     private final List<Parameter> parameters = new ArrayList();
+    private final List<String> fieldName;
+    private final List<String> originalFieldName;
+    private final List<String> normalizedFieldName;
+    private final List<Field> originalField;
+    private final List<Transformable> tranformation;
+    private final Map<Field, Integer> fieldIndex;
+    private final Map<Field, Integer> originalFieldIndex;
+    private final boolean debug;
 
     public Configuration() {
         this.scanner = Scanner.getInstance();
 
-        this.originalField = new ArrayList();
         this.fieldName = new ArrayList();
         this.originalFieldName = new ArrayList();
         this.normalizedFieldName = new ArrayList();
+        this.originalField = new ArrayList();
         this.tranformation = new ArrayList();
         this.fieldIndex = new HashMap();
         this.originalFieldIndex = new HashMap();
@@ -68,10 +67,10 @@ public class Configuration {
     public Configuration(boolean debug) {
         this.scanner = Scanner.getInstance();
 
-        this.originalField = new ArrayList();
         this.fieldName = new ArrayList();
         this.originalFieldName = new ArrayList();
         this.normalizedFieldName = new ArrayList();
+        this.originalField = new ArrayList();
         this.tranformation = new ArrayList();
         this.fieldIndex = new HashMap();
         this.originalFieldIndex = new HashMap();
@@ -83,7 +82,7 @@ public class Configuration {
      *
      * @return
      */
-    public List<Field> getFields() {
+    public List<Field> getField() {
         return fields;
     }
 
@@ -92,7 +91,7 @@ public class Configuration {
      * @return
      */
     public List<String> getFieldName() {
-        return this.getFieldsName(false);
+        return fieldName;
     }
 
     /**
@@ -100,15 +99,15 @@ public class Configuration {
      * @param cleanup
      * @return
      */
-    public List<String> getFieldsName(boolean cleanup) {
-        return fieldName;
+    public List<String> getFieldName(boolean cleanup) {
+        return normalizedFieldName;
     }
 
     /**
      *
      * @return
      */
-    public List<Transformable> getFieldsTransformation() {
+    public List<Transformable> getFieldTransformation() {
         return tranformation;
     }
 
@@ -163,19 +162,20 @@ public class Configuration {
             fieldIndex.put(field, (fieldIndex.size() - 1) + 1);
             tranformation.add(field.getTransformation());
 
+            normalizedFieldName.add(
+                    Normalizer
+                            .normalize(name, Normalizer.Form.NFD)
+                            .replaceAll("[^\\p{ASCII}]", "")
+                            .replaceAll("\\W", "_")
+                            .replaceAll("^_", "")
+                            .replaceAll("_$", "")
+                            .toLowerCase());
+
             if (field.isOriginal()) {
                 originalField.add(field);
                 originalFieldName.add(field.getName());
                 originalFieldIndex.put(field, (originalFieldIndex.size() - 1) + 1);
             }
-
-            normalizedFieldName.add(Normalizer
-                    .normalize(name, Normalizer.Form.NFD)
-                    .replaceAll("[^\\p{ASCII}]", "")
-                    .replaceAll("\\W", "_")
-                    .replaceAll("^_", "")
-                    .replaceAll("_$", "")
-                    .toLowerCase());
         } else {
             throw new DuplicateEntityException("Duplicated field: " + field.getName());
         }

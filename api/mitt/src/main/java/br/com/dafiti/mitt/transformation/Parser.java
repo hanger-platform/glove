@@ -97,7 +97,7 @@ public class Parser {
         List<Object> values = new ArrayList();
 
         configuration
-                .getFields()
+                .getField()
                 .forEach((field) -> {
                     values.add(
                             this.evaluate(record, field)
@@ -191,13 +191,13 @@ public class Parser {
                 index = configuration.getFieldIndex(field);
 
                 if (index != null) {
-                    Field clone = configuration
-                            .getFields()
+                    Field customField = configuration
+                            .getField()
                             .get(index);
 
                     //Identifies if a field has transformation.
-                    if (clone.getTransformation() != null) {
-                        value = clone
+                    if (customField.getTransformation() != null) {
+                        value = customField
                                 .getTransformation()
                                 .getValue(this, record);
                     } else {

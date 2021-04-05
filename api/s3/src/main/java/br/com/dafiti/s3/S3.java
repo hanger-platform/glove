@@ -44,6 +44,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.io.FileUtils;
 import org.joda.time.LocalDate;
 
 /**
@@ -120,7 +121,7 @@ public class S3 {
                     if (updatedDate.compareTo(LocalDate.parse(cli.getParameter("start_date"))) >= 0
                             && updatedDate.compareTo(LocalDate.parse(cli.getParameter("end_date"))) <= 0) {
 
-                        Logger.getLogger(S3.class.getName()).log(Level.INFO, "Transfering: {0} of {1} ({2} bytes)", new Object[]{s3ObjectSummary.getKey(), s3ObjectSummary.getLastModified(), s3ObjectSummary.getSize()});
+                        Logger.getLogger(S3.class.getName()).log(Level.INFO, "Transfering: {0} of {1} ({2})", new Object[]{s3ObjectSummary.getKey(), s3ObjectSummary.getLastModified(), FileUtils.byteCountToDisplaySize(s3ObjectSummary.getSize())});
 
                         //Identifies the output file. 
                         File outputFile = new File(outputPath.toString() + "/" + s3ObjectSummary.getKey().replaceAll("/", "_"));
