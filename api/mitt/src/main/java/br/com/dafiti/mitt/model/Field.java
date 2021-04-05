@@ -223,4 +223,9 @@ public class Field {
         final Field other = (Field) obj;
         return Objects.equals(this.name, other.name);
     }
+
+    @Override
+    public String toString() {
+        return "Field{" + "name=" + name + ", transformation=" + transformation + ", alias=" + alias + ", original=" + original + ", expression=" + expression + '}';
+    }
 }
