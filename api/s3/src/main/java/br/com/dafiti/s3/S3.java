@@ -96,7 +96,9 @@ public class S3 {
             ObjectListing listing = AmazonS3ClientBuilder
                     .standard()
                     .build().listObjects(cli.getParameter("bucket"), cli.getParameter("prefix"));
+            
             List<S3ObjectSummary> s3ObjectSummaries = listing.getObjectSummaries();
+            
             while (listing.isTruncated()) {
                 listing = AmazonS3ClientBuilder
                         .standard()

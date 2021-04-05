@@ -27,9 +27,9 @@ import br.com.dafiti.mitt.model.Configuration;
 import br.com.dafiti.mitt.model.Field;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,7 +39,7 @@ import java.util.logging.Logger;
  */
 public class Parser {
 
-    private final Map<String, Field> fields = new HashMap();
+    private final Map<String, Field> fields = new ConcurrentHashMap<>();
 
     private File file;
     private final Scanner scanner;
@@ -197,7 +197,7 @@ public class Parser {
                                 .getTransformation()
                                 .getValue(this, record);
                     } else {
-                        Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, "Field {0} does not have value or transformation!", field.getName());
+                        Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, "Field {0} does not have value or transformation. Impaired record {1}!", new Object[]{field.getName(), record});
                     }
                 } else {
                     Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, "Field {0} using expression {1} does not exists!", new Object[]{field.getName(), field.getExpression()});

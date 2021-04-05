@@ -78,7 +78,6 @@ public class Configuration {
     /**
      *
      * @param removeSpecialCharacteres
-     * @param normalize
      * @return
      */
     public List<String> getFieldsName(boolean removeSpecialCharacteres) {
@@ -115,12 +114,16 @@ public class Configuration {
      */
     public List<Transformable> getFieldsTransformation() {
         if (tranformations == null) {
-            tranformations = new ArrayList();
+            synchronized (this) {
+                if (tranformations == null) {
+                    tranformations = new ArrayList();
 
-            this.fields
-                    .forEach((field) -> {
-                        tranformations.add(field.getTransformation());
-                    });
+                    this.fields
+                            .forEach((field) -> {
+                                tranformations.add(field.getTransformation());
+                            });
+                }
+            }
         }
 
         return tranformations;
@@ -132,14 +135,18 @@ public class Configuration {
      */
     public List<Field> getOriginalFields() {
         if (originalFields == null) {
-            originalFields = new ArrayList();
+            synchronized (this) {
+                if (originalFields == null) {
+                    originalFields = new ArrayList();
 
-            this.fields
-                    .forEach((field) -> {
-                        if (field.isOriginal()) {
-                            originalFields.add(field);
-                        }
-                    });
+                    this.fields
+                            .forEach((field) -> {
+                                if (field.isOriginal()) {
+                                    originalFields.add(field);
+                                }
+                            });
+                }
+            }
         }
 
         return originalFields;
@@ -151,7 +158,7 @@ public class Configuration {
      */
     public List<String> getOriginalFieldsName() {
         if (originalFieldsNames == null) {
-            synchronized (Configuration.class) {
+            synchronized (this) {
                 if (originalFieldsNames == null) {
                     originalFieldsNames = new ArrayList();
 
@@ -173,13 +180,17 @@ public class Configuration {
      */
     public Integer getFieldIndex(Field field) {
         if (fieldIndex == null) {
-            fieldIndex = new ConcurrentHashMap<>();
+            synchronized (this) {
+                if (fieldIndex == null) {
+                    fieldIndex = new ConcurrentHashMap<>();
 
-            List<Field> all = this.getFields();
+                    List<Field> all = this.getFields();
 
-            //Relates a field to its position in the configuration. 
-            for (int i = 0; i < all.size(); i++) {
-                fieldIndex.put(all.get(i), i);
+                    //Relates a field to its position in the configuration. 
+                    for (int i = 0; i < all.size(); i++) {
+                        fieldIndex.put(all.get(i), i);
+                    }
+                }
             }
         }
 
@@ -193,13 +204,17 @@ public class Configuration {
      */
     public Integer getOriginalFieldIndex(Field field) {
         if (originalFieldIndex == null) {
-            originalFieldIndex = new ConcurrentHashMap();
+            synchronized (this) {
+                if (originalFieldIndex == null) {
+                    originalFieldIndex = new ConcurrentHashMap();
 
-            List<Field> originals = this.getOriginalFields();
+                    List<Field> originals = this.getOriginalFields();
 
-            //Relates an original field to its position in the configuration. 
-            for (int i = 0; i < originals.size(); i++) {
-                originalFieldIndex.put(originals.get(i), i);
+                    //Relates an original field to its position in the configuration. 
+                    for (int i = 0; i < originals.size(); i++) {
+                        originalFieldIndex.put(originals.get(i), i);
+                    }
+                }
             }
         }
 
