@@ -266,7 +266,7 @@ public class OutputProcessor implements Runnable {
             //Identifies which columns should be read. 
             setting.selectFields(
                     parser.getConfiguration()
-                            .getOriginalFieldsName().toArray(new String[0]));
+                            .getOriginalFieldName().toArray(new String[0]));
 
             //Read the input file and write to the output.
             CsvParser csvParser = new CsvParser(setting);

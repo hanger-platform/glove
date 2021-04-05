@@ -153,7 +153,7 @@ public class S3 {
                 mitt.getWriterSettings().setHeader(
                         mitt
                                 .getConfiguration()
-                                .getOriginalFieldsName());
+                                .getOriginalFieldName());
             }
 
             //Writes the final file.
