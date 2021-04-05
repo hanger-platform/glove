@@ -627,33 +627,86 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 
 			# Define o storage de exportação.
 			if [ "${#EXPORT_BUCKET}" -gt "0" ]; then
-				# Envia o arquivo para o storage.
-				echo "Exporting resultset to ${EXPORT_BUCKET} using profile ${EXPORT_PROFILE}!"
+				# Particiona o arquivo de entrada. 
+				if [ "${#PARTITION_FIELD}" -gt "0" ]; then
+					FILE_INDEX=0
 
-				# Identifica se deve compactar o arquivo a ser exportado.
-				if [ ${EXPORT_TYPE} == "gz" ]; then
-					# Compacta o arquivo csv e mantém o arquivo original.
-					pigz -k ${RAWFILE_QUEUE_PATH}*${DATA_FILE}*
+					echo "Merging files!"
 
-					# Envia o arquivo compactado para o bucket de destino.
-					if [ "${#PARTITION_FIELD}" -gt "0" ]; then
-						aws s3 cp ${RAWFILE_QUEUE_PATH} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive --exclude "*" --include "*.gz" --only-show-errors --acl bucket-owner-full-control
-					else
-						aws s3 cp ${RAWFILE_QUEUE_FILE}.gz ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --only-show-errors --acl bucket-owner-full-control
-					fi
-					error_check
+					# Une os dados em um único arquivo.  
+					for i in `ls ${RAWFILE_QUEUE_PATH}*`
+					do
+						if [ ${FILE_INDEX} = 0 ]; then	
+							cat ${i}	>> ${RAWFILE_QUEUE_PATH}merged.csv
+							error_check
+						else
+							sed '1d' ${i} >> ${RAWFILE_QUEUE_PATH}merged.csv
+							error_check	
+						fi
 
-					# Remove o arquivo compactado do diretório.
-					rm -f ${RAWFILE_QUEUE_PATH}*.gz
-				else
-					# Envia o arquivo para o bucket de destino.
-					if [ "${#PARTITION_FIELD}" -gt "0" ]; then
-						aws s3 cp ${RAWFILE_QUEUE_PATH} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --recursive --exclude "*" --include "${DATA_FILE}*" --only-show-errors --acl bucket-owner-full-control
-					else
-						aws s3 cp ${RAWFILE_QUEUE_FILE} ${EXPORT_BUCKET} --profile ${EXPORT_PROFILE} --only-show-errors --acl bucket-owner-full-control
-					fi
+						FILE_INDEX=$(( $FILE_INDEX + 1 ))
+					done
+
+					echo "Partitioning data file delimited by ${DELIMITER}!"
+
+					# Particiona o arquivo em single thread (thread=1) para preservar os dados e nome das partições.  
+					# TODO - A geração de um único arquivo de saída deve ser suportada pelo conversor de dados nativamente sem a necessidade do merge anterior. 
+					java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
+						--folder=${RAWFILE_QUEUE_PATH} \
+						--filename=merged.csv \
+						--delimiter=${DELIMITER} \
+						--target=csv \
+						--splitStrategy=${SPLIT_STRATEGY} \
+						--partition=0 \
+						--thread=1 \
+						--escape=${QUOTE_ESCAPE} \
+						--header \
+						--readable \
+						--replace \
+						--debug=${DEBUG}
 					error_check
 				fi
+
+				# Identifica cada bucket para o qual o export deve ser enviado.
+				BUCKETS=(`echo ${EXPORT_BUCKET} | tr -d ' ' | tr ',' ' '`)
+
+				# Identifica se deve compactar o arquivo a ser exportado.
+				if [ ${EXPORT_TYPE} == "gz" ]  || [ ${EXPORT_TYPE} == "zip" ]; then
+					echo "Compacting files at ${RAWFILE_QUEUE_PATH} to ${EXPORT_TYPE}!"
+
+					if [ ${EXPORT_TYPE} == "gz" ]; then
+						pigz -k ${RAWFILE_QUEUE_PATH}*
+					else
+						find ${RAWFILE_QUEUE_PATH} -type f -not -name '${DATA_FILE}*' -execdir zip '{}.zip' '{}' \;
+					fi 	
+
+					for index in "${!BUCKETS[@]}"
+					do
+						echo "Exporting resultset to ${BUCKETS[index]} using profile ${EXPORT_PROFILE}!"
+
+						if [ "${#PARTITION_FIELD}" -gt "0" ]; then
+							aws s3 cp ${RAWFILE_QUEUE_PATH} ${BUCKETS[index]} --profile ${EXPORT_PROFILE} --recursive --exclude "${DATA_FILE}*" --exclude "*.csv" --only-show-errors --acl bucket-owner-full-control
+						else
+							aws s3 cp ${RAWFILE_QUEUE_FILE}.${EXPORT_TYPE} ${BUCKETS[index]} --profile ${EXPORT_PROFILE} --only-show-errors --acl bucket-owner-full-control
+						fi
+						error_check
+					done
+				else
+					for index in "${!BUCKETS[@]}"
+					do
+						echo "Exporting resultset to ${BUCKETS[index]} using profile ${EXPORT_PROFILE}!"
+						
+						if [ "${#PARTITION_FIELD}" -gt "0" ]; then
+							aws s3 cp ${RAWFILE_QUEUE_PATH} ${BUCKETS[index]} --profile ${EXPORT_PROFILE} --recursive --exclude "${DATA_FILE}*" --only-show-errors --acl bucket-owner-full-control
+						else
+							aws s3 cp ${RAWFILE_QUEUE_FILE} ${BUCKETS[index]} --profile ${EXPORT_PROFILE} --only-show-errors --acl bucket-owner-full-control
+						fi
+						error_check
+					done
+				fi
+
+				# Remove os arquivos temporários. 						
+				find ${RAWFILE_QUEUE_PATH} -not -name '${DATA_FILE}*.csv' -delete
 			elif [ "${#EXPORT_SPREADSHEET}" -gt "0" ]; then
 				if [ ${DEBUG} = 1 ] ; then
 					echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/google-sheets-export.jar \

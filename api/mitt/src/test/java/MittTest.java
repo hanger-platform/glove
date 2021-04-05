@@ -59,7 +59,7 @@ public class MittTest {
         mitt.getConfiguration().addCustomField("regex::regexp(nome,[9])");
         mitt.getConfiguration().addCustomField("checksum::checksum()");
         mitt.getConfiguration().addCustomField("renamed::rename(nome)");
-        mitt.getConfiguration().addCustomField("xxx::dateformat(::jsonpath(json,$.[0].time,false),yyyy-MM-dd,yyyyMM)");
+        mitt.getConfiguration().addCustomField("xxx::dateformat(**::jsonpath(json,$.[0].time,false)**,yyyy-MM-dd,yyyyMM)");
 
         //Parameters. 
         mitt.getConfiguration().addParameter("a", "primeiro", "Primeiro parâmetro", "xxx");
