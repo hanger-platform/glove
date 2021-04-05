@@ -135,7 +135,11 @@ public class Mitt {
      */
     public Configuration getConfiguration() {
         if (configuration == null) {
-            configuration = new Configuration(debug);
+            synchronized (this) {
+                if (configuration == null) {
+                    configuration = new Configuration(debug);
+                }
+            }
         }
 
         return configuration;

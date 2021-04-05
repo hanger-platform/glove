@@ -96,9 +96,13 @@ public class Parser {
     public List<Object> evaluate(List<Object> record) {
         List<Object> values = new ArrayList();
 
-        configuration.getFields().forEach((field) -> {
-            values.add(this.evaluate(record, field));
-        });
+        configuration
+                .getFields()
+                .forEach((field) -> {
+                    values.add(
+                            this.evaluate(record, field)
+                    );
+                });
 
         //Logs input and parsed output record. 
         if (configuration.isDebug()) {
@@ -197,7 +201,7 @@ public class Parser {
                                 .getTransformation()
                                 .getValue(this, record);
                     } else {
-                        Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, "Field {0} does not have value or transformation on {2}. Impaired record {1}!", new Object[]{field.getName(), record, configuration.getOriginalFieldsName()});
+                        Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, "Field {0} does not have value or transformation. Impaired record {1}!", new Object[]{field.getName(), record});
                     }
                 } else {
                     Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, "Field {0} using expression {1} does not exists!", new Object[]{field.getName(), field.getExpression()});

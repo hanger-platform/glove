@@ -145,6 +145,8 @@ public class Configuration {
                                     originalFields.add(field);
                                 }
                             });
+                    
+                    System.out.println(this.fields);
                 }
             }
         }
