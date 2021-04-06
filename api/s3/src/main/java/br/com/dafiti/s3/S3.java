@@ -73,10 +73,10 @@ public class S3 {
                     .addParameter("o", "output", "Output file", "", true, false)
                     .addParameter("b", "bucket", "S3 Bucket name", "", true, false)
                     .addParameter("p", "prefix", "Object prefix (folder/subfolder/ or folder/subfolder/key.csv)", "", true, true)
-                    .addParameter("sd", "start_date", "Start date", "", true, false)
-                    .addParameter("ed", "end_date", "End date", "", true, false)
                     .addParameter("f", "field", "Fields to be extracted from the file", "", true, false)
-                    .addParameter("fr", "filter", "(Optional) Object regexp filter", "")
+                    .addParameter("sd", "start_date", "(Optional) Object modified date since", "")
+                    .addParameter("ed", "end_date", "(Optional) Object modified date to", "")
+                    .addParameter("fr", "filter", "(Optional) Object key filter", "")
                     .addParameter("r", "retries", "(Optional)(Default is 3) Identifies how many retries will do when limit rate exceeded.", "3")
                     .addParameter("d", "delimiter", "(Optional) File delimiter; ';' as default", ";")
                     .addParameter("p", "partition", "(Optional)  Partition, divided by + if has more than one field")
@@ -120,20 +120,36 @@ public class S3 {
             for (S3ObjectSummary s3ObjectSummary : s3ObjectSummaries) {
                 if (s3ObjectSummary.getSize() > 0) {
                     boolean match = true;
+                    boolean interval = true;
+
                     String objectKey = s3ObjectSummary.getKey();
                     LocalDate updatedDate = LocalDate.fromDateFields(s3ObjectSummary.getLastModified());
 
-                    //Identifies if should apply a filter on the object key. 
-                    if (cli.getParameter("filter") != null) {
-                        Pattern pattern = Pattern.compile(cli.getParameter("filter"), Pattern.CASE_INSENSITIVE);
-                        Matcher matcher = pattern.matcher(objectKey);
-                        match = matcher.find();
+                    if (cli.getParameter("filter") != null
+                            && cli.getParameter("start_date") != null
+                            && cli.getParameter("end_date") != null) {
+
+                        //Identifies if should apply a filter on the object key. 
+                        if (cli.getParameter("filter") != null) {
+                            Pattern pattern = Pattern.compile(cli.getParameter("filter"), Pattern.CASE_INSENSITIVE);
+                            Matcher matcher = pattern.matcher(objectKey);
+                            match = matcher.find();
+                        }
+
+                        //Identifies if should apply a filter on the object modified date.
+                        if (cli.getParameter("start_date") != null
+                                && cli.getParameter("end_date") != null) {
+                            
+                            interval = updatedDate.compareTo(LocalDate.parse(cli.getParameter("start_date"))) >= 0
+                                    && updatedDate.compareTo(LocalDate.parse(cli.getParameter("end_date"))) <= 0;
+                        }
+                    } else {
+                        Logger.getLogger(S3.class.getName()).log(Level.SEVERE, "Start_date and end_date parameters or a filter should be supplied");
+                        System.exit(1);
                     }
 
                     //Identifies if the file modification date is between start_date and end_date or if ir match an regexp filter.
-                    if ((updatedDate.compareTo(LocalDate.parse(cli.getParameter("start_date"))) >= 0
-                            && updatedDate.compareTo(LocalDate.parse(cli.getParameter("end_date"))) <= 0) && match) {
-
+                    if (interval && match) {
                         Logger.getLogger(S3.class.getName()).log(Level.INFO, "Transfering: {0} of {1} ({2})", new Object[]{s3ObjectSummary.getKey(), s3ObjectSummary.getLastModified(), FileUtils.byteCountToDisplaySize(s3ObjectSummary.getSize())});
 
                         //Identifies the output file. 
