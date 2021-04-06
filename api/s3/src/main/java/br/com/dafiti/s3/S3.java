@@ -125,9 +125,9 @@ public class S3 {
                     String objectKey = s3ObjectSummary.getKey();
                     LocalDate updatedDate = LocalDate.fromDateFields(s3ObjectSummary.getLastModified());
 
-                    if (cli.getParameter("filter") != null
-                            && cli.getParameter("start_date") != null
-                            && cli.getParameter("end_date") != null) {
+                    if ((cli.getParameter("filter") != null)
+                            || (cli.getParameter("start_date") != null
+                            && cli.getParameter("end_date") != null)) {
 
                         //Identifies if should apply a filter on the object key. 
                         if (cli.getParameter("filter") != null) {
@@ -139,12 +139,12 @@ public class S3 {
                         //Identifies if should apply a filter on the object modified date.
                         if (cli.getParameter("start_date") != null
                                 && cli.getParameter("end_date") != null) {
-                            
+
                             interval = updatedDate.compareTo(LocalDate.parse(cli.getParameter("start_date"))) >= 0
                                     && updatedDate.compareTo(LocalDate.parse(cli.getParameter("end_date"))) <= 0;
                         }
                     } else {
-                        Logger.getLogger(S3.class.getName()).log(Level.SEVERE, "Start_date and end_date parameters or a filter should be supplied");
+                        Logger.getLogger(S3.class.getName()).log(Level.SEVERE, "start_date and end_date or filter parameter should be supplied");
                         System.exit(1);
                     }
 
