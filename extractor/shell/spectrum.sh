@@ -713,7 +713,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 	
 				cat ${RAWFILE_QUEUE_FILE}
 
-				find ${RAWFILE_QUEUE_PATH} -not -name '${DATA_FILE}*.csv' -delete
+				find ${RAWFILE_QUEUE_PATH} -not -name '${DATA_FILE}.csv' -delete
 
 				cat ${RAWFILE_QUEUE_FILE}
 			elif [ "${#EXPORT_SPREADSHEET}" -gt "0" ]; then
