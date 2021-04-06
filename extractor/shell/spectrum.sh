@@ -708,7 +708,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 				# Remove os arquivos temporários. 	
 
 				echo "XXXXXXXX"
-				echo "RAWFILE_QUEUE_PATH ${RAWFILE_QUEUE_PATH}"
+				echo "RAWFILE_QUEUE_FILE ${RAWFILE_QUEUE_FILE}"
 				echo "DATA_FILE ${DATA_FILE}"
 	
 				find ${RAWFILE_QUEUE_PATH} -not -name '${DATA_FILE}*.csv' -delete
