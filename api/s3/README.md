@@ -34,9 +34,9 @@ java -jar s3.jar  \
 	--output=<Output path> \
 	--bucket=<AWS S3 Bucket name> \
 	--prefix=<(Optional) Object prefix> \
-	--start_date=<Start date as YYYY-MM-DD> \
-	--end_date=<End date as YYYY-MM-DD>  \ 
 	--field=<Fields of ouput file> \
+	--start_date=<(Optional) Object modified date since as YYYY-MM-DD> \
+	--end_date=<(Optional) Object modified date to as YYYY-MM-DD>  \ 
 	--filter=<(Optional) Regexp expression to filter to select desired objects> \ 
 	--partition=<(Optional) Partition, divided by + if has more than one field> \
 	--key=<(Optional) Unique key, divided by + if has more than one field> \
