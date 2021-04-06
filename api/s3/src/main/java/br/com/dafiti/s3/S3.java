@@ -110,7 +110,6 @@ public class S3 {
                         .listNextBatchOfObjects(listing);
 
                 s3ObjectSummaries.addAll(listing.getObjectSummaries());
-                break;
             }
 
             //Defines the output path. 
