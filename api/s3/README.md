@@ -37,6 +37,7 @@ java -jar s3.jar  \
 	--start_date=<Start date as YYYY-MM-DD> \
 	--end_date=<End date as YYYY-MM-DD>  \ 
 	--field=<Fields of ouput file> \
+	--filter=<(Optional) Regexp expression to filter to select desired objects> \ 
 	--partition=<(Optional) Partition, divided by + if has more than one field> \
 	--key=<(Optional) Unique key, divided by + if has more than one field> \
 	--delimiter=<(Optional) File delimiter. ';' as default> \

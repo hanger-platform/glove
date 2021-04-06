@@ -44,6 +44,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 import org.joda.time.LocalDate;
 
@@ -74,10 +76,11 @@ public class S3 {
                     .addParameter("sd", "start_date", "Start date", "", true, false)
                     .addParameter("ed", "end_date", "End date", "", true, false)
                     .addParameter("f", "field", "Fields to be extracted from the file", "", true, false)
-                    .addParameter("r", "retries", "(Optional)(Default is 3) Identify how many retries will do when limit rate exceeded.", "3")
+                    .addParameter("fr", "filter", "(Optional) Object regexp filter", "")
+                    .addParameter("r", "retries", "(Optional)(Default is 3) Identifies how many retries will do when limit rate exceeded.", "3")
                     .addParameter("d", "delimiter", "(Optional) File delimiter; ';' as default", ";")
                     .addParameter("p", "partition", "(Optional)  Partition, divided by + if has more than one field")
-                    .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "")
+                    .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", " ")
                     .addParameter("n", "no_header", "(Optional)(Default is true) File has heaer", false);
 
             //Defines the command line interface. 
@@ -105,7 +108,9 @@ public class S3 {
                         .standard()
                         .build()
                         .listNextBatchOfObjects(listing);
+
                 s3ObjectSummaries.addAll(listing.getObjectSummaries());
+                break;
             }
 
             //Defines the output path. 
@@ -115,11 +120,20 @@ public class S3 {
 
             for (S3ObjectSummary s3ObjectSummary : s3ObjectSummaries) {
                 if (s3ObjectSummary.getSize() > 0) {
+                    boolean match = true;
+                    String objectKey = s3ObjectSummary.getKey();
                     LocalDate updatedDate = LocalDate.fromDateFields(s3ObjectSummary.getLastModified());
 
-                    //Identifies if the file modification date is between start_date and end_date.
-                    if (updatedDate.compareTo(LocalDate.parse(cli.getParameter("start_date"))) >= 0
-                            && updatedDate.compareTo(LocalDate.parse(cli.getParameter("end_date"))) <= 0) {
+                    //Identifies if should apply a filter on the object key. 
+                    if (cli.getParameter("filter") != null) {
+                        Pattern pattern = Pattern.compile(cli.getParameter("filter"), Pattern.CASE_INSENSITIVE);
+                        Matcher matcher = pattern.matcher(objectKey);
+                        match = matcher.find();
+                    }
+
+                    //Identifies if the file modification date is between start_date and end_date or if ir match an regexp filter.
+                    if ((updatedDate.compareTo(LocalDate.parse(cli.getParameter("start_date"))) >= 0
+                            && updatedDate.compareTo(LocalDate.parse(cli.getParameter("end_date"))) <= 0) && match) {
 
                         Logger.getLogger(S3.class.getName()).log(Level.INFO, "Transfering: {0} of {1} ({2})", new Object[]{s3ObjectSummary.getKey(), s3ObjectSummary.getLastModified(), FileUtils.byteCountToDisplaySize(s3ObjectSummary.getSize())});
 
