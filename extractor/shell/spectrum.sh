@@ -711,7 +711,11 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 				echo "RAWFILE_QUEUE_FILE ${RAWFILE_QUEUE_FILE}"
 				echo "DATA_FILE ${DATA_FILE}"
 	
+				cat ${RAWFILE_QUEUE_FILE}
+
 				find ${RAWFILE_QUEUE_PATH} -not -name '${DATA_FILE}*.csv' -delete
+
+				cat ${RAWFILE_QUEUE_FILE}
 			elif [ "${#EXPORT_SPREADSHEET}" -gt "0" ]; then
 				if [ ${DEBUG} = 1 ] ; then
 					echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/google-sheets-export.jar \
