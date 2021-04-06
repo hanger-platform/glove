@@ -705,7 +705,12 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 					done
 				fi
 
-				# Remove os arquivos temporários. 						
+				# Remove os arquivos temporários. 	
+
+				echo "XXXXXXXX"
+				echo "RAWFILE_QUEUE_PATH ${RAWFILE_QUEUE_PATH}"
+				echo "DATA_FILE ${DATA_FILE}"
+	
 				find ${RAWFILE_QUEUE_PATH} -not -name '${DATA_FILE}*.csv' -delete
 			elif [ "${#EXPORT_SPREADSHEET}" -gt "0" ]; then
 				if [ ${DEBUG} = 1 ] ; then
