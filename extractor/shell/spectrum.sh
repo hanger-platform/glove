@@ -677,7 +677,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 					if [ ${EXPORT_TYPE} == "gz" ]; then
 						pigz -k ${RAWFILE_QUEUE_PATH}*
 					else
-						find ${RAWFILE_QUEUE_PATH} -type f -not -name '${DATA_FILE}*' -execdir zip '{}.zip' '{}' \;
+						find ${RAWFILE_QUEUE_PATH} -type f -not -name "${DATA_FILE}*" -execdir zip '{}.zip' '{}' \;
 					fi 	
 
 					for index in "${!BUCKETS[@]}"
@@ -705,8 +705,8 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 					done
 				fi
 
-				# Remove os arquivos temporários. 						
-				find ${RAWFILE_QUEUE_PATH} -not -name '${DATA_FILE}*.csv' -delete
+				# Remove os arquivos temporários. 	
+				find ${RAWFILE_QUEUE_PATH} -not -name "${DATA_FILE}*.csv" -delete
 			elif [ "${#EXPORT_SPREADSHEET}" -gt "0" ]; then
 				if [ ${DEBUG} = 1 ] ; then
 					echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/google-sheets-export.jar \
