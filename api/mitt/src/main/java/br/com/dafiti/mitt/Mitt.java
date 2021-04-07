@@ -91,6 +91,18 @@ public class Mitt {
      *
      * @return
      */
+    public synchronized Configuration getConfiguration() {
+        if (configuration == null) {
+            configuration = new Configuration(debug);
+        }
+
+        return configuration;
+    }
+
+    /**
+     *
+     * @return
+     */
     private Output getOutput() {
         if (output == null) {
             output = new Output(
@@ -127,18 +139,6 @@ public class Mitt {
         }
 
         return commandLineInterface;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public Configuration getConfiguration() {
-        if (configuration == null) {
-            configuration = new Configuration(debug);
-        }
-
-        return configuration;
     }
 
     /**

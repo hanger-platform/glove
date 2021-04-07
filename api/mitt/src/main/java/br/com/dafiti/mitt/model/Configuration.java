@@ -28,9 +28,9 @@ import br.com.dafiti.mitt.transformation.Scanner;
 import br.com.dafiti.mitt.transformation.Transformable;
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -38,32 +38,51 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Configuration {
 
-    private List<Field> originalFields;
-    private List<String> originalFieldsNames;
-    private List<Transformable> tranformations;
-    private Map<Field, Integer> fieldIndex;
-    private Map<Field, Integer> originalFieldIndex;
-
-    private final boolean debug;
     private final Scanner scanner;
     private final List<Field> fields = new ArrayList();
     private final List<Parameter> parameters = new ArrayList();
+    private final List<String> fieldName;
+    private final List<String> originalFieldName;
+    private final List<String> normalizedFieldName;
+    private final List<Field> originalField;
+    private final List<Transformable> tranformation;
+    private final Map<Field, Integer> fieldIndex;
+    private final Map<Field, Integer> originalFieldIndex;
+    private final boolean debug;
 
     public Configuration() {
-        this.debug = false;
         this.scanner = Scanner.getInstance();
+
+        this.fieldName = new ArrayList();
+        this.originalFieldName = new ArrayList();
+        this.normalizedFieldName = new ArrayList();
+        this.originalField = new ArrayList();
+        this.tranformation = new ArrayList();
+        this.fieldIndex = new HashMap();
+        this.originalFieldIndex = new HashMap();
+
+        this.debug = false;
     }
 
     public Configuration(boolean debug) {
-        this.debug = debug;
         this.scanner = Scanner.getInstance();
+
+        this.fieldName = new ArrayList();
+        this.originalFieldName = new ArrayList();
+        this.normalizedFieldName = new ArrayList();
+        this.originalField = new ArrayList();
+        this.tranformation = new ArrayList();
+        this.fieldIndex = new HashMap();
+        this.originalFieldIndex = new HashMap();
+
+        this.debug = debug;
     }
 
     /**
      *
      * @return
      */
-    public List<Field> getFields() {
+    public List<Field> getField() {
         return fields;
     }
 
@@ -71,99 +90,41 @@ public class Configuration {
      *
      * @return
      */
-    public List<String> getFieldsName() {
-        return this.getFieldsName(false);
+    public List<String> getFieldName() {
+        return fieldName;
     }
 
     /**
      *
-     * @param removeSpecialCharacteres
-     * @param normalize
+     * @param cleanup
      * @return
      */
-    public List<String> getFieldsName(boolean removeSpecialCharacteres) {
-        List<String> nameList = new ArrayList();
-
-        this.fields
-                .forEach((field) -> {
-                    String name = field.getAlias() == null || field.getAlias().isEmpty()
-                            ? field.getName()
-                            : field.getAlias();
-
-                    //Identifies if conform to accepted database field names. 
-                    if (removeSpecialCharacteres) {
-                        //Remove accents. 
-                        name = Normalizer
-                                .normalize(name, Normalizer.Form.NFD)
-                                .replaceAll("[^\\p{ASCII}]", "");
-
-                        //Replace invalid characteres. 
-                        name = name.replaceAll("\\W", "_").toLowerCase();
-                        name = name.replaceAll("^_", "");
-                        name = name.replaceAll("_$", "");
-                    }
-
-                    nameList.add(name);
-                });
-
-        return nameList;
+    public List<String> getFieldName(boolean cleanup) {
+        return normalizedFieldName;
     }
 
     /**
      *
      * @return
      */
-    public List<Transformable> getFieldsTransformation() {
-        if (tranformations == null) {
-            tranformations = new ArrayList();
-
-            this.fields
-                    .forEach((field) -> {
-                        tranformations.add(field.getTransformation());
-                    });
-        }
-
-        return tranformations;
+    public List<Transformable> getFieldTransformation() {
+        return tranformation;
     }
 
     /**
      *
      * @return
      */
-    public List<Field> getOriginalFields() {
-        if (originalFields == null) {
-            originalFields = new ArrayList();
-
-            this.fields
-                    .forEach((field) -> {
-                        if (field.isOriginal()) {
-                            originalFields.add(field);
-                        }
-                    });
-        }
-
-        return originalFields;
+    public List<Field> getOriginalField() {
+        return originalField;
     }
 
     /**
      *
      * @return
      */
-    public List<String> getOriginalFieldsName() {
-        if (originalFieldsNames == null) {
-            synchronized (Configuration.class) {
-                if (originalFieldsNames == null) {
-                    originalFieldsNames = new ArrayList();
-
-                    this.getOriginalFields()
-                            .forEach((field) -> {
-                                originalFieldsNames.add(field.getName());
-                            });
-                }
-            }
-        }
-
-        return originalFieldsNames;
+    public List<String> getOriginalFieldName() {
+        return originalFieldName;
     }
 
     /**
@@ -172,17 +133,6 @@ public class Configuration {
      * @return
      */
     public Integer getFieldIndex(Field field) {
-        if (fieldIndex == null) {
-            fieldIndex = new ConcurrentHashMap<>();
-
-            List<Field> all = this.getFields();
-
-            //Relates a field to its position in the configuration. 
-            for (int i = 0; i < all.size(); i++) {
-                fieldIndex.put(all.get(i), i);
-            }
-        }
-
         return fieldIndex.get(field);
     }
 
@@ -192,17 +142,6 @@ public class Configuration {
      * @return
      */
     public Integer getOriginalFieldIndex(Field field) {
-        if (originalFieldIndex == null) {
-            originalFieldIndex = new ConcurrentHashMap();
-
-            List<Field> originals = this.getOriginalFields();
-
-            //Relates an original field to its position in the configuration. 
-            for (int i = 0; i < originals.size(); i++) {
-                originalFieldIndex.put(originals.get(i), i);
-            }
-        }
-
         return originalFieldIndex.get(field);
     }
 
@@ -213,7 +152,30 @@ public class Configuration {
      */
     private void addField(Field field) throws DuplicateEntityException {
         if (!fields.contains(field)) {
+            String name
+                    = field.getAlias() == null || field.getAlias().isEmpty()
+                    ? field.getName()
+                    : field.getAlias();
+
             fields.add(field);
+            fieldName.add(name);
+            fieldIndex.put(field, (fieldIndex.size() - 1) + 1);
+            tranformation.add(field.getTransformation());
+
+            normalizedFieldName.add(
+                    Normalizer
+                            .normalize(name, Normalizer.Form.NFD)
+                            .replaceAll("[^\\p{ASCII}]", "")
+                            .replaceAll("\\W", "_")
+                            .replaceAll("^_", "")
+                            .replaceAll("_$", "")
+                            .toLowerCase());
+
+            if (field.isOriginal()) {
+                originalField.add(field);
+                originalFieldName.add(field.getName());
+                originalFieldIndex.put(field, (originalFieldIndex.size() - 1) + 1);
+            }
         } else {
             throw new DuplicateEntityException("Duplicated field: " + field.getName());
         }

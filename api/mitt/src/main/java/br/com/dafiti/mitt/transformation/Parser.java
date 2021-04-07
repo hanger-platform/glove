@@ -27,9 +27,9 @@ import br.com.dafiti.mitt.model.Configuration;
 import br.com.dafiti.mitt.model.Field;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,7 +39,7 @@ import java.util.logging.Logger;
  */
 public class Parser {
 
-    private final Map<String, Field> fields = new HashMap();
+    private final Map<String, Field> fields = new ConcurrentHashMap<>();
 
     private File file;
     private final Scanner scanner;
@@ -96,9 +96,13 @@ public class Parser {
     public List<Object> evaluate(List<Object> record) {
         List<Object> values = new ArrayList();
 
-        configuration.getFields().forEach((field) -> {
-            values.add(this.evaluate(record, field));
-        });
+        configuration
+                .getField()
+                .forEach((field) -> {
+                    values.add(
+                            this.evaluate(record, field)
+                    );
+                });
 
         //Logs input and parsed output record. 
         if (configuration.isDebug()) {
@@ -187,17 +191,17 @@ public class Parser {
                 index = configuration.getFieldIndex(field);
 
                 if (index != null) {
-                    Field clone = configuration
-                            .getFields()
+                    Field customField = configuration
+                            .getField()
                             .get(index);
 
                     //Identifies if a field has transformation.
-                    if (clone.getTransformation() != null) {
-                        value = clone
+                    if (customField.getTransformation() != null) {
+                        value = customField
                                 .getTransformation()
                                 .getValue(this, record);
                     } else {
-                        Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, "Field {0} does not have value or transformation!", field.getName());
+                        Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, "Field {0} does not have value or transformation. Impaired record {1}!", new Object[]{field.getName(), record});
                     }
                 } else {
                     Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, "Field {0} using expression {1} does not exists!", new Object[]{field.getName(), field.getExpression()});
