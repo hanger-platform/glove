@@ -53,7 +53,7 @@ import org.json.simple.parser.ParseException;
 public class SimilarWeb {
 
     private static final Logger LOG = Logger.getLogger(SimilarWeb.class.getName());
-    private static final String SIMILARWEB_ENDPOINT = "https://api.similarweb.com/v1/website/bbc.com/traffic-sources/";
+    private static final String SIMILARWEB_ENDPOINT = "https://api.similarweb.com/v1/";
 
     /**
      * SimilarWeb API data transfer
@@ -74,8 +74,7 @@ public class SimilarWeb {
                     .addParameter("c", "credentials", "Credentials file", "", true, false)
                     .addParameter("o", "output", "Output file", "", true, false)
                     .addParameter("f", "field", "Fields to be retrieved from an endpoint in a JsonPath format", "", true, false)
-                    .addParameter("e", "endpoint", "Endpoint name", "", true, false)
-                    .addParameter("y", "country", "Country filter as a 2-letter", "", true, false)
+                    .addParameter("e", "endpoint", "Endpoint path", "", true, false)
                     .addParameter("p", "parameters", "(Optional) Endpoint parameters", "", true, true)
                     .addParameter("b", "object", "(Optional) Json object", "", true, true)
                     .addParameter("a", "partition", "(Optional)  Partition, divided by + if has more than one field", "")
@@ -128,8 +127,7 @@ public class SimilarWeb {
 
                 //Sets default URI parameters. 
                 URIBuilder uriBuilder = new URIBuilder(httpGet.getURI())
-                        .addParameter("api_key", apiKey)
-                        .addParameter("country", cli.getParameter("country"));
+                        .addParameter("api_key", apiKey);
 
                 //Sets endpoint URI parameters. 
                 if (parameters != null && !parameters.isEmpty()) {
@@ -154,7 +152,7 @@ public class SimilarWeb {
                     if (!json.isEmpty()) {
                         String status = JsonPath.read(json, "$.meta.status");
 
-                        //Identifies the response status code.
+                        //Identifies the response status.
                         if ("Success".equals(status)) {
                             Object object;
 
