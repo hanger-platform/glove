@@ -1,4 +1,4 @@
 
 
-# SimularWeb API extractor
-### Extrator de dados da API SimularWeb.
+# SimilarWeb API extractor
+### Extrator de dados da API SimilarWeb.

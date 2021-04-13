@@ -75,8 +75,8 @@ public class SimilarWeb {
                     .addParameter("o", "output", "Output file", "", true, false)
                     .addParameter("f", "field", "Fields to be retrieved from an endpoint in a JsonPath format", "", true, false)
                     .addParameter("e", "endpoint", "Endpoint path", "", true, false)
+                    .addParameter("b", "object", "Json object", "", true, false)
                     .addParameter("p", "parameters", "(Optional) Endpoint parameters", "", true, true)
-                    .addParameter("b", "object", "(Optional) Json object", "", true, true)
                     .addParameter("a", "partition", "(Optional)  Partition, divided by + if has more than one field", "")
                     .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "");
 
@@ -157,14 +157,10 @@ public class SimilarWeb {
                             Object object;
 
                             //Identifies which object should be picked up from the payload.
-                            if (cli.getParameter("object") == null || cli.getParameter("object").isEmpty()) {
-                                object = json.get(cli.getParameter("endpoint"));
+                            if ("*".equals(cli.getParameter("object"))) {
+                                object = json;
                             } else {
-                                if ("*".equals(cli.getParameter("object"))) {
-                                    object = json;
-                                } else {
-                                    object = json.get(cli.getParameter("object"));
-                                }
+                                object = json.get(cli.getParameter("object"));
                             }
 
                             //Identifies if the payload is an array or an object.
