@@ -53,7 +53,7 @@ import org.json.simple.parser.ParseException;
 public class SimilarWeb {
 
     private static final Logger LOG = Logger.getLogger(SimilarWeb.class.getName());
-    private static final String SIMILARWEB_ENDPOINT = "https://api.similarweb.com/v1/";
+    private static final String SIMILARWEB_ENDPOINT = "https://api.similarweb.com/";
 
     /**
      * SimilarWeb API data transfer
@@ -149,11 +149,19 @@ public class SimilarWeb {
                     JSONObject json = (JSONObject) new JSONParser().parse(entity);
 
                     //Identifies if there are payload to process. 
-                    if (!json.isEmpty()) {
-                        String status = JsonPath.read(json, "$.meta.status");
+                    if (!json.isEmpty()
+                            && response.getStatusLine().getStatusCode() == 200) {
+
+                        String status;
+
+                        try {
+                            status = JsonPath.read(json, "$.meta.status");
+                        } catch (PathNotFoundException ex) {
+                            status = "SUCCESS";
+                        }
 
                         //Identifies the response status.
-                        if ("Success".equals(status)) {
+                        if ("SUCCESS".equalsIgnoreCase(status)) {
                             Object object;
 
                             //Identifies which object should be picked up from the payload.
