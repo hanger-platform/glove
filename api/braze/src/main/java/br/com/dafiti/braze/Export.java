@@ -48,13 +48,10 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 /**
- * This class flow is:
- *  1 - Request export file to download 
- *  2 - Wait file be ready to download 
- *  3 - Download the file to temporary folder 
- *  4 - Unzip the downloaded file
- *  5 - Write output file with mitt transformations
- * 
+ * This class flow is: 1 - Request export file to download 2 - Wait file be
+ * ready to download 3 - Download the file to temporary folder 4 - Unzip the
+ * downloaded file 5 - Write output file with mitt transformations
+ *
  * @author Helio Leal
  */
 public class Export {
@@ -113,7 +110,7 @@ public class Export {
         //Defines the input file don't has header. 
         mitt.getWriterSettings().setHeader(mitt
                 .getConfiguration()
-                .getOriginalFieldsName());
+                .getOriginalFieldName());
 
         //Defines the output path for temp files.
         Path outputPath = Files.createTempDirectory("braze_export_users_");

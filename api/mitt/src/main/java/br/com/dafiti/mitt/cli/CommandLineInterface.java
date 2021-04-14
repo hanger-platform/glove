@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.MissingOptionException;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
@@ -95,7 +96,13 @@ public final class CommandLineInterface {
             }
         } catch (ParseException ex) {
             this.help();
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Fail parsing parameters!", ex);
+            List missingOptions = new ArrayList();
+
+            if (ex instanceof MissingOptionException) {
+                missingOptions = ((MissingOptionException) ex).getMissingOptions();
+            }
+
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Fail parsing parameters! {0}", missingOptions.toString());
             System.exit(1);
         }
     }
@@ -106,7 +113,6 @@ public final class CommandLineInterface {
     private void help() {
         HelpFormatter formatter = new HelpFormatter();
         formatter.printHelp("Mitt", options, true);
-        System.exit(0);
     }
 
     /**

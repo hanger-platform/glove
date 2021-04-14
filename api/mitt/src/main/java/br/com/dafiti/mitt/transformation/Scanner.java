@@ -237,7 +237,7 @@ public class Scanner {
                                                             ).split("\\+");
 
                                                             for (String parameterField : fields) {
-                                                                fieldList.add(this.scan(parameterField));
+                                                                fieldList.add(this.scan(parameterField.trim()));
                                                             }
                                                         }
                                                     }
@@ -245,16 +245,16 @@ public class Scanner {
                                                     constructorParameters.add(fieldList);
                                                     break;
                                                 case "Field":
-                                                    constructorParameters.add(this.scan(parameters.get(i)));
+                                                    constructorParameters.add(this.scan(parameters.get(i).trim()));
                                                 case "String":
-                                                    constructorParameters.add(parameters.get(i));
+                                                    constructorParameters.add(parameters.get(i).trim());
                                                     break;
                                                 default:
                                                     if (constructor.getParameterTypes()[i].isPrimitive()) {
                                                         Method method = constructor
                                                                 .getParameterTypes()[i]
                                                                 .getDeclaredMethod("valueOf", String.class);
-                                                        constructorParameters.add(method.invoke(parameters.get(i)));
+                                                        constructorParameters.add(method.invoke(parameters.get(i).trim()));
                                                     }
 
                                                     break;
