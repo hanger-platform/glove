@@ -5,7 +5,7 @@
 
 ## How it works
 
-O SimilarWeb API Extractor permite a extração de dados da API Rest disponibilizada pelo SimilarWeb. O extrator é baseado na V1 da API, e a documentação dos endpoints e campos estão disponíveis neste documento: https://documenter.getpostman.com/view/5388671/RzfcNs8W
+O SimilarWeb API Extractor possibilita a extração de dados para análise dos concorrentes, fornecendo insights para tomar decisões de marketing e negócios fornecidos pela SimilarWeb API. A documentação dos endpoints e campos estão disponíveis neste documento: https://documenter.getpostman.com/view/5388671/RzfcNs8W
 
 ## Instalação
 
