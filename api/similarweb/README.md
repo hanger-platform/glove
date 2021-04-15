@@ -48,7 +48,7 @@ java -jar similarweb.jar  \
 
 ```
 
-## Examplo 1
+##### Exemplo 1
 Seguindo a documentação da SimilarWeb API, podemos dar o exemplo de extração do endpoint **total-traffic-and-engagement/visits**, extraindo a data e o total de visitas.
 
 ```javascript
@@ -89,7 +89,7 @@ java -jar similarweb.jar \
 	--key='::checksum()'
 ```
 
-## Exemplo 2
+##### Exemplo 2
 Em algumas situações é necessário utilizar configurações avançadas para extrair os dados corretamente. Considerando o endpoint **mobile-traffic-sources/search-visits-distribution**, é necessário que sejam passados parâmetros para o endpoint e, posteriormente, selecionados valores aninhados no JSON retornado pela API, como é o caso dos dados de **visits_distribution**:
 
 ```javascript
@@ -130,7 +130,7 @@ java -jar similarweb.jar \
 
 Para recuperar campos aninhados no JSON de retorno é necessário utilizar a sintaxe do JSONPath, ou seja, montando o caminho dos campos separados por ponto: Ex.: **visits_distribution.organic_branded_visits**
 
-## Exemplo 3
+##### Exemplo 3
 Como pode ser observado, qualquer parâmetro pode ser fornecido para API por meio do parâmetro **parameters** do extrator, que, como pode ser observado, recebe um JSON contendo os parâmetros desejados. 
 
 Em outras situações, como no caso do endpoint **total-traffic-and-engagement/visits-split**, o object (ou lista contendo os valores desejados) não é disponibilizado no JSON:
