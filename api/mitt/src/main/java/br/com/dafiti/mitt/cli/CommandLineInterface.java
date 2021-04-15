@@ -102,7 +102,7 @@ public final class CommandLineInterface {
                 missingOptions = ((MissingOptionException) ex).getMissingOptions();
             }
 
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Fail parsing parameters! {0}", missingOptions.toString());
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Missing parameters! {0}", missingOptions.toString());
             System.exit(1);
         }
     }
