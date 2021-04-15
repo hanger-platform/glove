@@ -748,8 +748,10 @@
         <replace_field_by_string/>
         <whole_word>no</whole_word>
         <case_sensitive>no</case_sensitive>
+        <is_unicode>no</is_unicode>
       </field>
     </fields>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -789,7 +791,6 @@
     <create_parent_folder>Y</create_parent_folder>
     <file>
       <name>file</name>
-      <is_command>N</is_command>
       <servlet_output>N</servlet_output>
       <do_not_open_new_file_init>N</do_not_open_new_file_init>
       <extention>txt</extention>
@@ -848,6 +849,7 @@
       <targetFieldLength>0</targetFieldLength>
       <removeSelectedFields>N</removeSelectedFields>
     </ConcatFields>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -877,7 +879,7 @@
         <field_name>casting</field_name>
         <variable_name>DELTA_FIELD_CASTING</variable_name>
         <variable_type>ROOT_JOB</variable_type>
-        <default_value/>
+        <default_value>${DELTA_FIELD_IN_METADATA}</default_value>
       </field>
       <field>
         <field_name>field_type</field_name>
@@ -887,6 +889,7 @@
       </field>
     </fields>
     <use_formatting>Y</use_formatting>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -926,6 +929,7 @@
         <remove_special_characters>none</remove_special_characters>
       </field>
     </fields>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -959,6 +963,7 @@
       </field>
     </fields>
     <use_formatting>Y</use_formatting>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -992,6 +997,7 @@
       </field>
     </fields>
     <use_formatting>Y</use_formatting>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1029,7 +1035,7 @@
       <value>
         <name>casting</name>
         <rename>casting</rename>
-        <default>'19000101'</default>
+        <default/>
         <type>String</type>
       </value>
       <value>
@@ -1039,6 +1045,7 @@
         <type>String</type>
       </value>
     </lookup>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1080,6 +1087,7 @@
         <type>String</type>
       </value>
     </lookup>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1121,6 +1129,7 @@
         <type>String</type>
       </value>
     </lookup>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1159,6 +1168,7 @@
         <trim_type>both</trim_type>
       </field>
     </fields>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1190,6 +1200,7 @@
     <execute_each_row>N</execute_each_row>
     <variables_active>Y</variables_active>
     <lazy_conversion_active>N</lazy_conversion_active>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1232,6 +1243,7 @@
         <valuefield/>
       </field>
     </fields>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1274,6 +1286,7 @@
         <valuefield/>
       </field>
     </fields>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1316,6 +1329,7 @@
         <valuefield/>
       </field>
     </fields>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1340,6 +1354,7 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1365,6 +1380,7 @@
       <schema_name/>
     </partitioning>
     <resultfieldname>last</resultfieldname>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1439,6 +1455,7 @@
     <info_steps/>
     <target_steps/>
     <usage_parameters/>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1472,6 +1489,7 @@
       </field>
     </fields>
     <use_formatting>Y</use_formatting>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1514,6 +1532,7 @@
         <item>partition_field</item>
       </line>
     </data>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1618,6 +1637,7 @@
     <rootUriNameFieldName/>
     <extensionFieldName/>
     <sizeFieldName/>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1678,6 +1698,7 @@
     <info_steps/>
     <target_steps/>
     <usage_parameters/>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1711,6 +1732,7 @@
       </field>
     </fields>
     <use_formatting>Y</use_formatting>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1750,6 +1772,7 @@
         <remove_special_characters>none</remove_special_characters>
       </field>
     </fields>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1789,7 +1812,6 @@
     <create_parent_folder>Y</create_parent_folder>
     <file>
       <name>${METADATA_QUEUE_JSON_FILE}</name>
-      <is_command>N</is_command>
       <servlet_output>N</servlet_output>
       <do_not_open_new_file_init>Y</do_not_open_new_file_init>
       <extention/>
@@ -1819,6 +1841,7 @@
         <precision>-1</precision>
       </field>
     </fields>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1858,7 +1881,6 @@
     <create_parent_folder>Y</create_parent_folder>
     <file>
       <name>${METADATA_QUEUE_COLUMNS_FILE}</name>
-      <is_command>N</is_command>
       <servlet_output>N</servlet_output>
       <do_not_open_new_file_init>N</do_not_open_new_file_init>
       <extention/>
@@ -1900,6 +1922,7 @@
         <precision>0</precision>
       </field>
     </fields>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1939,7 +1962,6 @@
     <create_parent_folder>Y</create_parent_folder>
     <file>
       <name>${METADATA_QUEUE_FIELDS_FILE}</name>
-      <is_command>N</is_command>
       <servlet_output>N</servlet_output>
       <do_not_open_new_file_init>N</do_not_open_new_file_init>
       <extention/>
@@ -1969,6 +1991,7 @@
         <precision>-1</precision>
       </field>
     </fields>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -2008,7 +2031,6 @@
     <create_parent_folder>Y</create_parent_folder>
     <file>
       <name>${METADATA_QUEUE_FIELDS_AND_TYPE_FILE}</name>
-      <is_command>N</is_command>
       <servlet_output>N</servlet_output>
       <do_not_open_new_file_init>N</do_not_open_new_file_init>
       <extention/>
@@ -2038,6 +2060,7 @@
         <precision>-1</precision>
       </field>
     </fields>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -2077,7 +2100,6 @@
     <create_parent_folder>Y</create_parent_folder>
     <file>
       <name>${METADATA_QUEUE_FIELDS_NAME_FILE}</name>
-      <is_command>N</is_command>
       <servlet_output>N</servlet_output>
       <do_not_open_new_file_init>N</do_not_open_new_file_init>
       <extention/>
@@ -2107,6 +2129,7 @@
         <precision>-1</precision>
       </field>
     </fields>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -2125,4 +2148,5 @@
   <slave-step-copy-partition-distribution>
   </slave-step-copy-partition-distribution>
   <slave_transformation>N</slave_transformation>
+  <attributes/>
 </transformation>
