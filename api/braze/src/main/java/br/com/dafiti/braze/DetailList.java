@@ -95,7 +95,9 @@ public class DetailList {
                 .addField(this.fields);
 
         //Identifies original fields.
-        List<String> listFields = mitt.getConfiguration().getOriginalFieldsName();
+        List<String> listFields = mitt
+                .getConfiguration()
+                .getOriginalFieldName();
 
         boolean nextPage = true;
         int page = 0;

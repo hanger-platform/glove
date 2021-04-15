@@ -91,7 +91,9 @@ public class Detail {
                 .addField(this.fields);
 
         //Identifies original fields.
-        List<String> listFields = mitt.getConfiguration().getOriginalFieldsName();
+        List<String> listFields = mitt
+                .getConfiguration()
+                .getOriginalFieldName();
 
         //Connect to API.
         HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(this.endpointDetail).openConnection();
