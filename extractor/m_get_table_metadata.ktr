@@ -727,6 +727,11 @@
     </hop>
     <hop>
       <from>Is delta a field?</from>
+      <to>Null if</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Null if</from>
       <to>DELTA_FIELD_CASTING</to>
       <enabled>Y</enabled>
     </hop>
@@ -884,7 +889,7 @@
         <field_name>casting</field_name>
         <variable_name>DELTA_FIELD_CASTING</variable_name>
         <variable_type>ROOT_JOB</variable_type>
-        <default_value/>
+        <default_value>'0'</default_value>
       </field>
       <field>
         <field_name>field_type</field_name>
@@ -904,7 +909,7 @@
     </remotesteps>
     <GUI>
       <xloc>352</xloc>
-      <yloc>896</yloc>
+      <yloc>992</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1420,15 +1425,15 @@
     <fields>
       <field>
         <name>casting</name>
-        <value/>
+        <value>${DELTA_FIELD_IN_METADATA}</value>
         <mask/>
-        <set_empty_string>Y</set_empty_string>
+        <set_empty_string>N</set_empty_string>
       </field>
       <field>
         <name>field_type</name>
-        <value/>
+        <value>${DELTA_FIELD_TYPE}</value>
         <mask/>
-        <set_empty_string>Y</set_empty_string>
+        <set_empty_string>N</set_empty_string>
       </field>
     </fields>
     <attributes/>
@@ -2191,6 +2196,37 @@
     <GUI>
       <xloc>928</xloc>
       <yloc>1008</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Null if</name>
+    <type>NullIf</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <name>casting</name>
+        <value/>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>352</xloc>
+      <yloc>880</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
