@@ -2224,6 +2224,12 @@
         <mask/>
         <set_empty_string>N</set_empty_string>
       </field>
+      <field>
+        <name>field_type</name>
+        <value/>
+        <mask/>
+        <set_empty_string>Y</set_empty_string>
+      </field>
     </fields>
     <attributes/>
     <cluster_schema/>
