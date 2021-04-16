@@ -38,6 +38,7 @@ import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.io.FileUtils;
 
 /**
  *
@@ -85,6 +86,16 @@ public class GoogleDriveManager {
                     api.copyPermissions(cli.getParameter("id"), copyMetadata.getId());
 
                     Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.INFO, "Permissions copied successfully to: {0}", copyMetadata.getName());
+
+                    //Create output file containing id of the new document.
+                    if ((cli.getParameter("output") != null) && (!cli.getParameter("output").isEmpty())) {
+                        java.io.File file = new java.io.File(cli.getParameter("output"));
+
+                        FileUtils.writeStringToFile(file, copyMetadata.getId(), "UTF-8");
+
+                        Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.INFO, "Output file created successfully: {0}", cli.getParameter("output"));
+                    }
+
                 } else {
                     Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.SEVERE, "Parameter title is empty. For COPY, it is required.");
                 }
