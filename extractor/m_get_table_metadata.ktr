@@ -726,13 +726,18 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Is delta a field?</from>
-      <to>Write to log</to>
+      <from>Write to log</from>
+      <to>DELTA_FIELD_CASTING</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Write to log</from>
-      <to>DELTA_FIELD_CASTING</to>
+      <from>Is delta a field?</from>
+      <to>Is delta a field? 2</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Is delta a field? 2</from>
+      <to>Write to log</to>
       <enabled>Y</enabled>
     </hop>
   </order>
@@ -909,7 +914,7 @@
     </remotesteps>
     <GUI>
       <xloc>352</xloc>
-      <yloc>1008</yloc>
+      <yloc>1104</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -2218,6 +2223,46 @@
     <fields>
       <field>
         <name>casting</name>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>352</xloc>
+      <yloc>976</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Is delta a field? 2</name>
+    <type>IfNull</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <replaceAllByValue/>
+    <replaceAllMask/>
+    <selectFields>Y</selectFields>
+    <selectValuesType>N</selectValuesType>
+    <setEmptyStringAll>N</setEmptyStringAll>
+    <valuetypes>
+      </valuetypes>
+    <fields>
+      <field>
+        <name>casting</name>
+        <value>'0'</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
       </field>
     </fields>
     <attributes/>
