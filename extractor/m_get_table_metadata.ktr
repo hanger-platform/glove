@@ -1051,7 +1051,7 @@
       <value>
         <name>field_type</name>
         <rename>field_type</rename>
-        <default>'String'</default>
+        <default>'UNDEFINED'</default>
         <type>String</type>
       </value>
     </lookup>
