@@ -1051,7 +1051,7 @@
       <value>
         <name>field_type</name>
         <rename>field_type</rename>
-        <default/>
+        <default>'String'</default>
         <type>String</type>
       </value>
     </lookup>
@@ -1426,12 +1426,6 @@
       <field>
         <name>casting</name>
         <value>${DELTA_FIELD_IN_METADATA}</value>
-        <mask/>
-        <set_empty_string>N</set_empty_string>
-      </field>
-      <field>
-        <name>field_type</name>
-        <value>${DELTA_FIELD_TYPE}</value>
         <mask/>
         <set_empty_string>N</set_empty_string>
       </field>
@@ -2223,12 +2217,6 @@
         <value>'0'</value>
         <mask/>
         <set_empty_string>N</set_empty_string>
-      </field>
-      <field>
-        <name>field_type</name>
-        <value/>
-        <mask/>
-        <set_empty_string>Y</set_empty_string>
       </field>
     </fields>
     <attributes/>
