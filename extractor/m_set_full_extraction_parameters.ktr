@@ -7,7 +7,7 @@
     <trans_version/>
     <trans_type>Normal</trans_type>
     <trans_status>0</trans_status>
-    <directory>&#x2f;</directory>
+    <directory>/</directory>
     <parameters>
     </parameters>
     <log>
@@ -428,10 +428,10 @@
     <clusterschemas>
     </clusterschemas>
     <created_user>-</created_user>
-    <created_date>2017&#x2f;04&#x2f;11 10&#x3a;04&#x3a;48.892</created_date>
+    <created_date>2017/04/11 10:04:48.892</created_date>
     <modified_user>-</modified_user>
-    <modified_date>2017&#x2f;04&#x2f;11 10&#x3a;04&#x3a;48.892</modified_date>
-    <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA&#x3d;</key_for_session_key>
+    <modified_date>2017/04/11 10:04:48.892</modified_date>
+    <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA=</key_for_session_key>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
@@ -459,6 +459,7 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -471,8 +472,7 @@
       <yloc>176</yloc>
       <draw>Y</draw>
     </GUI>
-    </step>
-
+  </step>
   <step>
     <name>Data cleaner</name>
     <type>UserDefinedJavaClass</type>
@@ -484,14 +484,11 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-
     <definitions>
-        <definition>
+      <definition>
         <class_type>TRANSFORM_CLASS</class_type>
-
         <class_name>Processor</class_name>
-
-        <class_source><![CDATA[import java.util.regex.Pattern;
+        <class_source>import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 String[] type;
@@ -517,7 +514,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
         Object[] output = createOutputRow(r, data.outputRowMeta.size());
 
         //Process each row. 
-        for (int i=0; i < type.length; i++) {
+        for (int i=0; i &lt; type.length; i++) {
             //Remove the undesirable characteres from string fields.
             if ( ( type[i].trim() ).equals( "(String)" ) ) {
 				if ( r[i] == null ) {
@@ -537,12 +534,17 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
     }
 
     return process;
-}]]></class_source>
-        </definition>
+}</class_source>
+      </definition>
     </definitions>
     <fields>
-    </fields><clear_result_fields>N</clear_result_fields>
-<info_steps></info_steps><target_steps></target_steps><usage_parameters></usage_parameters>    <cluster_schema/>
+    </fields>
+    <clear_result_fields>N</clear_result_fields>
+    <info_steps/>
+    <target_steps/>
+    <usage_parameters/>
+    <attributes/>
+    <cluster_schema/>
     <remotesteps>
       <input>
       </input>
@@ -554,8 +556,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
       <yloc>64</yloc>
       <draw>N</draw>
     </GUI>
-    </step>
-
+  </step>
   <step>
     <name>Defines parameters</name>
     <type>DataGrid</type>
@@ -603,8 +604,13 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
       </field>
     </fields>
     <data>
-      <line> <item>1</item><item>1&#x3d;1</item><item>1&#x3d;1</item> </line>
+      <line>
+        <item>1</item>
+        <item>1=1</item>
+        <item>1=1</item>
+      </line>
     </data>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -617,8 +623,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
       <yloc>176</yloc>
       <draw>Y</draw>
     </GUI>
-    </step>
-
+  </step>
   <step>
     <name>Full extraction parameters</name>
     <type>DataGrid</type>
@@ -655,8 +660,12 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
       </field>
     </fields>
     <data>
-      <line> <item>1</item><item>19000101</item> </line>
+      <line>
+        <item>dummy</item>
+        <item>0</item>
+      </line>
     </data>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -669,8 +678,7 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
       <yloc>64</yloc>
       <draw>Y</draw>
     </GUI>
-    </step>
-
+  </step>
   <step>
     <name>Set full parameters</name>
     <type>SetVariable</type>
@@ -687,16 +695,17 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
         <field_name>delta_value</field_name>
         <variable_name>DELTA_VALUE</variable_name>
         <variable_type>ROOT_JOB</variable_type>
-        <default_value>19000101</default_value>
-        </field>
+        <default_value/>
+      </field>
       <field>
         <field_name>deta_field</field_name>
         <variable_name>DELTA_FIELD</variable_name>
         <variable_type>ROOT_JOB</variable_type>
-        <default_value>1</default_value>
-        </field>
-      </fields>
+        <default_value/>
+      </field>
+    </fields>
     <use_formatting>Y</use_formatting>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -709,11 +718,11 @@ public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws K
       <yloc>64</yloc>
       <draw>Y</draw>
     </GUI>
-    </step>
-
+  </step>
   <step_error_handling>
   </step_error_handling>
   <slave-step-copy-partition-distribution>
   </slave-step-copy-partition-distribution>
   <slave_transformation>N</slave_transformation>
+  <attributes/>
 </transformation>
