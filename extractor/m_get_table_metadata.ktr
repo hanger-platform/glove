@@ -884,7 +884,7 @@
         <field_name>casting</field_name>
         <variable_name>DELTA_FIELD_CASTING</variable_name>
         <variable_type>ROOT_JOB</variable_type>
-        <default_value>'000'</default_value>
+        <default_value/>
       </field>
       <field>
         <field_name>field_type</field_name>
@@ -1420,15 +1420,15 @@
     <fields>
       <field>
         <name>casting</name>
-        <value>${DELTA_FIELD_IN_METADATA}</value>
+        <value/>
         <mask/>
-        <set_empty_string>N</set_empty_string>
+        <set_empty_string>Y</set_empty_string>
       </field>
       <field>
         <name>field_type</name>
-        <value>${DELTA_FIELD_TYPE}</value>
+        <value/>
         <mask/>
-        <set_empty_string>N</set_empty_string>
+        <set_empty_string>Y</set_empty_string>
       </field>
     </fields>
     <attributes/>
