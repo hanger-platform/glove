@@ -2220,7 +2220,7 @@
     <fields>
       <field>
         <name>casting</name>
-        <value>'19000101'</value>
+        <value>'0'</value>
         <mask/>
         <set_empty_string>N</set_empty_string>
       </field>
