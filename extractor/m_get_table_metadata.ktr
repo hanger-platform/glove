@@ -727,11 +727,11 @@
     </hop>
     <hop>
       <from>Is delta a field?</from>
-      <to>Null if</to>
+      <to>Write to log</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Null if</from>
+      <from>Write to log</from>
       <to>DELTA_FIELD_CASTING</to>
       <enabled>Y</enabled>
     </hop>
@@ -909,7 +909,7 @@
     </remotesteps>
     <GUI>
       <xloc>352</xloc>
-      <yloc>992</yloc>
+      <yloc>1008</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -2200,8 +2200,8 @@
     </GUI>
   </step>
   <step>
-    <name>Null if</name>
-    <type>NullIf</type>
+    <name>Write to log</name>
+    <type>WriteToLog</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -2210,10 +2210,14 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
+    <loglevel>log_level_basic</loglevel>
+    <displayHeader>Y</displayHeader>
+    <limitRows>N</limitRows>
+    <limitRowsNumber>0</limitRowsNumber>
+    <logmessage/>
     <fields>
       <field>
         <name>casting</name>
-        <value/>
       </field>
     </fields>
     <attributes/>
