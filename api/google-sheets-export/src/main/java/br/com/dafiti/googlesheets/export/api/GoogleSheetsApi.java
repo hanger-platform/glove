@@ -40,25 +40,15 @@ import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
-import com.google.api.services.sheets.v4.model.AppendValuesResponse;
-import com.google.api.services.sheets.v4.model.BatchClearValuesByDataFilterRequest;
-import com.google.api.services.sheets.v4.model.BatchClearValuesRequest;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
-import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetResponse;
-import com.google.api.services.sheets.v4.model.BatchUpdateValuesRequest;
-import com.google.api.services.sheets.v4.model.ClearValuesRequest;
-import com.google.api.services.sheets.v4.model.DataFilter;
 import com.google.api.services.sheets.v4.model.DeleteDimensionRequest;
 import com.google.api.services.sheets.v4.model.DimensionRange;
-import com.google.api.services.sheets.v4.model.FindReplaceResponse;
 import com.google.api.services.sheets.v4.model.GridRange;
 import com.google.api.services.sheets.v4.model.InsertDimensionRequest;
 import com.google.api.services.sheets.v4.model.Request;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
-import com.google.api.services.sheets.v4.model.SpreadsheetProperties;
 import com.google.api.services.sheets.v4.model.UpdateCellsRequest;
-import com.google.api.services.sheets.v4.model.UpdateSpreadsheetPropertiesRequest;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import java.io.File;
 import java.io.FileInputStream;
@@ -78,9 +68,9 @@ import java.util.List;
 public class GoogleSheetsApi {
 
     private final String sheetName;
+    private final boolean debug;
     private Sheets service;
     private Spreadsheet spreadsheet;
-    private boolean debug;
 
     /**
      * Credentials file.
@@ -97,9 +87,10 @@ public class GoogleSheetsApi {
      *
      * @param credentials
      * @param spreadSheetId
+     * @param timeout
      * @return GoogleSheetsApi
      */
-    public GoogleSheetsApi authenticate(String credentials, String spreadSheetId) {
+    public GoogleSheetsApi authenticate(String credentials, String spreadSheetId, int timeout) {
         try {
             //Build a new authorized API client service.
             NetHttpTransport netHttpTransport
@@ -133,7 +124,7 @@ public class GoogleSheetsApi {
             Credential credential = new AuthorizationCodeInstalledApp(googleAuthorizationCodeFlow, new LocalServerReceiver()).authorize("user");
 
             //Instance of sheets service.
-            this.service = new Sheets.Builder(netHttpTransport, jsonFactory, setHttpTimeout(credential))
+            this.service = new Sheets.Builder(netHttpTransport, jsonFactory, setHttpTimeout(credential, timeout))
                     .setApplicationName("Google Sheets Export API")
                     .build();
 
@@ -151,18 +142,17 @@ public class GoogleSheetsApi {
     }
 
     /**
+     * Define HTTP timeouts.
      *
-     * @param requestInitializer
-     * @return
+     * @param requestInitializer Credentials.
+     * @param timeout Timeout.
+     * @return HTTP request with defined credentials and timeout.
      */
-    private HttpRequestInitializer setHttpTimeout(final HttpRequestInitializer requestInitializer) {
-        return new HttpRequestInitializer() {
-            @Override
-            public void initialize(HttpRequest httpRequest) throws IOException {
-                requestInitializer.initialize(httpRequest);
-                httpRequest.setConnectTimeout(3 * 60000);  // 3 minutes connect timeout
-                httpRequest.setReadTimeout(3 * 60000);  // 3 minutes read timeout
-            }
+    private HttpRequestInitializer setHttpTimeout(final HttpRequestInitializer requestInitializer, int timeout) {
+        return (HttpRequest httpRequest) -> {
+            requestInitializer.initialize(httpRequest);
+            httpRequest.setConnectTimeout(timeout * 60000);
+            httpRequest.setReadTimeout(timeout * 60000);
         };
     }
 

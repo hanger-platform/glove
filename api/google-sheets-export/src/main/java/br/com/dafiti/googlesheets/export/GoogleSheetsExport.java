@@ -53,6 +53,7 @@ public class GoogleSheetsExport {
      * @throws br.com.dafiti.mitt.exception.DuplicateEntityException
      * @throws java.security.GeneralSecurityException
      * @throws java.io.IOException
+     * @throws java.lang.InterruptedException
      */
     public static void main(String[] args) throws
             DuplicateEntityException,
@@ -76,7 +77,8 @@ public class GoogleSheetsExport {
                 .addParameter("d", "debug", "(Optional) Identify if it is debug mode; 0 is default", "0")
                 .addParameter("de", "delimiter", "(Optional) Delimiter, default is semicolon(;) ", ";")
                 .addParameter("q", "quote", "(Optional) Quote, default is double quotes(\") ", "\"")
-                .addParameter("qe", "quote_escape", "(Optional) Quote Escaoe, default is double quotes(\") ", "\"");
+                .addParameter("qe", "quote_escape", "(Optional) Quote Escaoe, default is double quotes(\") ", "\"")
+                .addParameter("t", "timeout", "(Optional) Read and connect timeout; 6 is default", "6");
 
         //Read the command line interface. 
         CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -87,7 +89,7 @@ public class GoogleSheetsExport {
             //Define spreadsheet API manager.
             GoogleSheetsApi api
                     = new GoogleSheetsApi(cli.getParameter("sheet"), cli.getParameterAsInteger("debug") == 1)
-                            .authenticate(cli.getParameter("credentials"), cli.getParameter("spreadsheet"));
+                            .authenticate(cli.getParameter("credentials"), cli.getParameter("spreadsheet"), cli.getParameterAsInteger("timeout"));
 
             //Define the input file.
             File file = new File(cli.getParameter("input"));
@@ -231,6 +233,7 @@ public class GoogleSheetsExport {
      * Define CSV settings.
      *
      * @param headerExtraction extract header from CSV.
+     * @param cli
      * @return
      */
     public static CsvParserSettings getSettings(boolean headerExtraction, CommandLineInterface cli) {
