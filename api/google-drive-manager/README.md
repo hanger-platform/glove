@@ -71,7 +71,7 @@ java -jar /home/user_name/glove/extractor/lib/google-drive-manager.jar \
   --folder="if_you_want_to_copy_the_file_to_a_folder_put_the_folder_id_here"  
 ```
 
->If you want users to be notified by email, use the "send_email = true" parameter.
+>If you want users to be notified by email, use the "send_email=true" parameter.
 
 ##### IMPORT
 This action will download one file from Google Drive and will turn it into a csv file, the gain here is that the file is processed on mitt framework, then, you can use it's transformations (https://github.com/dafiti-group/glove/tree/master/api/mitt)
