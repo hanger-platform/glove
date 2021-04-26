@@ -146,9 +146,9 @@ public class GoogleDriveApi {
      *
      * @param from Origin file id.
      * @param to Target file id.
-     * @param sendEmail Send notification email.
+     * @param notification Send notification email.
      */
-    public void copyPermissions(String from, String to, Boolean sendEmail) {
+    public void copyPermissions(String from, String to, Boolean notification) {
         try {
             //Get permissions of the source file.
             List<Permission> permissions = this.service
@@ -190,7 +190,7 @@ public class GoogleDriveApi {
                 //Put copy permission request to batch queue.
                 this.service.permissions()
                         .create(to, userPermission)
-                        .setSendNotificationEmail(sendEmail)
+                        .setSendNotificationEmail(notification)
                         .queue(batch, callback);
 
             }
