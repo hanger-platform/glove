@@ -56,7 +56,7 @@ java -jar google-drive-manager.jar \
 	--partition=<(Optional)  Partition, divided by + if has more than one field> \
 	--key=<(Optional) Unique key, divided by + if has more than one field> \
 	--input=<(Optional) Input file; Required for UPLOAD> \
-  --notification=<(Optional) Send notification email; COPY only; FALSE is default>
+  	--notification=<(Optional) Send notification email; COPY only; FALSE is default>
 ```
 
 ##### COPY
