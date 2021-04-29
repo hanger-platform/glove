@@ -38,6 +38,7 @@ import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.io.FileUtils;
 
 /**
  *
@@ -64,7 +65,8 @@ public class GoogleDriveManager {
                 .addParameter("f", "field", "(Optional) Fields to be extracted from the file, Required for IMPORT", "")
                 .addParameter("pa", "partition", "(Optional)  Partition, divided by + if has more than one field")
                 .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "")
-                .addParameter("h", "input", "(Optional) Input file; Required for UPLOAD", "");
+                .addParameter("h", "input", "(Optional) Input file; Required for UPLOAD", "")
+                .addParameter("n", "notification", "(Optional) Send notification email; COPY only; FALSE is default", "false");
 
         //Command Line.
         CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -82,9 +84,25 @@ public class GoogleDriveManager {
                     Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.INFO, "File copied successfully, new file id: {0}", copyMetadata.getId());
 
                     //Copy original file permissions to new file.        
-                    api.copyPermissions(cli.getParameter("id"), copyMetadata.getId());
+                    api.copyPermissions(cli.getParameter("id"), copyMetadata.getId(), cli.getParameterAsBoolean("notification"));
 
                     Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.INFO, "Permissions copied successfully to: {0}", copyMetadata.getName());
+
+                    if (cli.getParameterAsBoolean("notification")) {
+                        Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.INFO, "Notification is enabled. Users were notified by email.");
+                    } else {
+                        Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.INFO, "Notification sending is disabled.");
+                    }
+
+                    //Create output file containing id of the new document.
+                    if ((cli.getParameter("output") != null) && (!cli.getParameter("output").isEmpty())) {
+                        java.io.File file = new java.io.File(cli.getParameter("output"));
+
+                        FileUtils.writeStringToFile(file, copyMetadata.getId(), "UTF-8");
+
+                        Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.INFO, "Output file created successfully: {0}", cli.getParameter("output"));
+                    }
+
                 } else {
                     Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.SEVERE, "Parameter title is empty. For COPY, it is required.");
                 }
