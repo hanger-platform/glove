@@ -146,12 +146,16 @@ public class SimilarWeb {
                 String entity = EntityUtils.toString(response.getEntity(), "UTF-8");
 
                 if (!entity.isEmpty()) {
-                    JSONObject json = (JSONObject) new JSONParser().parse(entity);
+                    JSONObject json = new JSONObject();
+
+                    try {
+                        json = (JSONObject) new JSONParser().parse(entity);
+                    } catch (ParseException ex) {
+                        throw new Exception("Could not parse entity. " + entity);
+                    }
 
                     //Identifies if there are payload to process. 
-                    if (!json.isEmpty()
-                            && response.getStatusLine().getStatusCode() == 200) {
-
+                    if (!json.isEmpty()) {
                         String status;
 
                         try {
@@ -161,7 +165,8 @@ public class SimilarWeb {
                         }
 
                         //Identifies the response status.
-                        if ("SUCCESS".equalsIgnoreCase(status)) {
+                        if ("SUCCESS".equalsIgnoreCase(status)
+                                && response.getStatusLine().getStatusCode() == 200) {
                             Object object;
 
                             //Identifies which object should be picked up from the payload.
@@ -208,7 +213,7 @@ public class SimilarWeb {
                                 }
                             }
                         } else {
-                            throw new Exception("HTTP Exception " + status);
+                            throw new Exception("API error message: " + (String) JsonPath.read(json, "$.meta.error_message"));
                         }
                     }
                 } else {
