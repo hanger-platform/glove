@@ -151,7 +151,7 @@ public class SimilarWeb {
                     try {
                         json = (JSONObject) new JSONParser().parse(entity);
                     } catch (ParseException ex) {
-                        throw new Exception(entity);
+                        throw new Exception("Could not parse entity. " + entity);
                     }
 
                     //Identifies if there are payload to process. 
