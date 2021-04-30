@@ -213,7 +213,7 @@ public class SimilarWeb {
                                 }
                             }
                         } else {
-                            throw new Exception("API error message: " + (String) JsonPath.read(json, "$.meta.error_message"));
+                            LOG.log(Level.WARNING, "API error message: {0}", (String) JsonPath.read(json, "$.meta.error_message"));
                         }
                     }
                 } else {
