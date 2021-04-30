@@ -55,6 +55,7 @@ public class Hi {
 
     private static final Logger LOG = Logger.getLogger(Hi.class.getName());
     private static final String HI_PLAFTORM_ENDPOINT = "http://plataforma1.seekr.com.br/api/v3/";
+    private static final int MAX_RETRY = 3;
 
     /**
      * Kestraa File transfer
@@ -64,9 +65,11 @@ public class Hi {
     public static void main(String[] args) {
         LOG.info("GLOVE - Hi Platform API extractor started");
 
-        int page = 0;
+        int page = 1;
+        int retries = 0;
         boolean process = true;
         boolean paginate = false;
+        boolean retry = false;
         JSONObject parameters = null;
 
         //Define the mitt.
@@ -131,20 +134,23 @@ public class Hi {
             }
 
             do {
-                //Identifies the page number. 
-                page++;
+                //Identifies if is a retry. 
+                if (!retry) {
+                    page++;
+                }
 
+                //Idenfities if the endpoint has pagination. 
                 if (paginate) {
                     LOG.log(Level.INFO, "Page: {0} (50 per page)", page);
                 }
 
-                //Defines the credential parameter values. 
-                String ts = String.valueOf(System.currentTimeMillis() / 1000);
-                String hash = DigestUtils.sha1Hex(secretKey.concat(ts));
-
                 //Connect to the API. 
                 try (CloseableHttpClient client = HttpClients.createDefault()) {
                     HttpGet httpGet = new HttpGet(HI_PLAFTORM_ENDPOINT + cli.getParameter("endpoint") + ".json");
+
+                    //Defines the credential parameter values. 
+                    String ts = String.valueOf(System.currentTimeMillis() / 1000);
+                    String hash = DigestUtils.sha1Hex(secretKey.concat(ts));
 
                     //Sets default URI parameters. 
                     URIBuilder uriBuilder = new URIBuilder(httpGet.getURI())
@@ -175,65 +181,84 @@ public class Hi {
 
                         //Identifies if there are payload to process. 
                         if (!json.isEmpty()) {
-                            long statusCode = JsonPath.read(json, "$.response.code");
+                            int statusCode = JsonPath.read(json, "$.response.code");
 
                             //Identifies the response status code.
-                            if (statusCode == 200) {
-                                Object object;
+                            switch (statusCode) {
+                                case 200 /*OK*/:
+                                    Object object;
 
-                                //Identifies which object should be picked up from the payload.
-                                if (cli.getParameter("object") == null || cli.getParameter("object").isEmpty()) {
-                                    object = json.get(cli.getParameter("endpoint"));
-                                } else {
-                                    if ("*".equals(cli.getParameter("object"))) {
-                                        object = json;
+                                    //Identifies which object should be picked up from the payload.
+                                    if (cli.getParameter("object") == null || cli.getParameter("object").isEmpty()) {
+                                        object = json.get(cli.getParameter("endpoint"));
                                     } else {
-                                        object = json.get(cli.getParameter("object"));
+                                        if ("*".equals(cli.getParameter("object"))) {
+                                            object = json;
+                                        } else {
+                                            object = json.get(cli.getParameter("object"));
+                                        }
                                     }
-                                }
 
-                                //Identifies if the payload is an array or an object.
-                                if (object instanceof JSONArray) {
-                                    if (((JSONArray) object).isEmpty()) {
-                                        process = false;
-                                    } else {
-                                        ((JSONArray) object).forEach(item -> {
+                                    //Identifies if the payload is an array or an object.
+                                    if (object instanceof JSONArray) {
+                                        if (((JSONArray) object).isEmpty()) {
+                                            process = false;
+                                        } else {
+                                            ((JSONArray) object).forEach(item -> {
+                                                List record = new ArrayList();
+
+                                                mitt.getConfiguration()
+                                                        .getOriginalFieldsName()
+                                                        .forEach(field -> {
+                                                            try {
+                                                                record.add(JsonPath.read(item, "$." + field));
+                                                            } catch (PathNotFoundException ex) {
+                                                                record.add("");
+                                                            }
+                                                        });
+
+                                                mitt.write(record);
+                                            });
+                                        }
+                                    } else if (object instanceof JSONObject) {
+                                        if (((JSONObject) object).isEmpty()) {
+                                            process = false;
+                                        } else {
                                             List record = new ArrayList();
 
                                             mitt.getConfiguration()
                                                     .getOriginalFieldsName()
                                                     .forEach(field -> {
                                                         try {
-                                                            record.add(JsonPath.read(item, "$." + field));
+                                                            record.add(JsonPath.read(object, "$." + field));
                                                         } catch (PathNotFoundException ex) {
                                                             record.add("");
                                                         }
                                                     });
 
                                             mitt.write(record);
-                                        });
+                                        }
                                     }
-                                } else if (object instanceof JSONObject) {
-                                    if (((JSONObject) object).isEmpty()) {
-                                        process = false;
+
+                                    //Identifies that retry is not needed.
+                                    retry = false;
+
+                                    break;
+                                case 403 /*NO_PERMISSION*/:
+                                    retries++;
+
+                                    //Identifies that is a retry.
+                                    retry = true;
+
+                                    if (retries > MAX_RETRY) {
+                                        throw new Exception("HTTP Exception " + statusCode);
                                     } else {
-                                        List record = new ArrayList();
-
-                                        mitt.getConfiguration()
-                                                .getOriginalFieldsName()
-                                                .forEach(field -> {
-                                                    try {
-                                                        record.add(JsonPath.read(object, "$." + field));
-                                                    } catch (PathNotFoundException ex) {
-                                                        record.add("");
-                                                    }
-                                                });
-
-                                        mitt.write(record);
+                                        LOG.log(Level.INFO, "Authentication error, retry {0}", retries);
                                     }
-                                }
-                            } else {
-                                throw new Exception("HTTP Exception " + statusCode);
+
+                                    break;
+                                default:
+                                    throw new Exception("HTTP Exception " + statusCode);
                             }
                         }
                     } else {
