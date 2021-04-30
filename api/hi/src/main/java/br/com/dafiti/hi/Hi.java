@@ -65,7 +65,7 @@ public class Hi {
     public static void main(String[] args) {
         LOG.info("GLOVE - Hi Platform API extractor started");
 
-        int page = 1;
+        int page = 0;
         int retries = 0;
         boolean process = true;
         boolean paginate = false;
@@ -181,10 +181,10 @@ public class Hi {
 
                         //Identifies if there are payload to process. 
                         if (!json.isEmpty()) {
-                            int statusCode = JsonPath.read(json, "$.response.code");
+                            long statusCode = JsonPath.read(json, "$.response.code");
 
                             //Identifies the response status code.
-                            switch (statusCode) {
+                            switch ((int) statusCode) {
                                 case 200 /*OK*/:
                                     Object object;
 
