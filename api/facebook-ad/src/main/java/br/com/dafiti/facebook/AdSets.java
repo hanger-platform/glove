@@ -116,7 +116,7 @@ public class AdSets {
         }
 
         //Identifies original fields.
-        List<String> originalFields = mitt.getConfiguration().getOriginalFieldsName();
+        List<String> originalFields = mitt.getConfiguration().getOriginalFieldName();
 
         //Iterates for each account.
         this.adAccount.forEach(account -> {
