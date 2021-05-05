@@ -170,6 +170,7 @@ public class AdCampaign {
                 }
             } catch (APIException ex) {
                 LOG.log(Level.SEVERE, "Fail retrieving campaigns from account {0}. Exception: {1}", new Object[]{account.trim(), ex});
+                System.exit(1);
             }
         });
 

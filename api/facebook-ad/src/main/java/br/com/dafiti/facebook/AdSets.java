@@ -171,6 +171,7 @@ public class AdSets {
                 }
             } catch (APIException ex) {
                 LOG.log(Level.SEVERE, "Fail retrieving adSets from account {0}. Exception: {1}", new Object[]{account.trim(), ex});
+                System.exit(1);
             }
         });
 
