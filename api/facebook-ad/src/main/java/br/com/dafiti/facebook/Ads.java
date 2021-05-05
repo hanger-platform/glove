@@ -118,7 +118,7 @@ public class Ads {
         }
 
         //Identifies original fields.
-        List<String> originalFields = mitt.getConfiguration().getOriginalFieldsName();
+        List<String> originalFields = mitt.getConfiguration().getOriginalFieldName();
 
         //Iterates for each account.
         this.adAccount.forEach(account -> {
@@ -172,6 +172,7 @@ public class Ads {
                 }
             } catch (APIException ex) {
                 LOG.log(Level.SEVERE, "Fail retrieving ads from account {0}. Exception: {1}", new Object[]{account.trim(), ex});
+                System.exit(1);
             }
         });
 

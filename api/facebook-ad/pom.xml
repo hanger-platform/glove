@@ -10,12 +10,12 @@
         <dependency>
             <groupId>com.facebook.business.sdk</groupId>
             <artifactId>facebook-java-business-sdk</artifactId> 
-            <version>8.0.3</version>
+            <version>10.0.1</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>mitt</artifactId>
-            <version>1.0.2</version>
+            <version>1.0.7</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>
