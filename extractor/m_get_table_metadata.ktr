@@ -596,11 +596,6 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Finds delta field</from>
-      <to>DELTA_FIELD_CASTING</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
       <from>Finds partition field</from>
       <to>PARTITION_FIELD_CASTING</to>
       <enabled>Y</enabled>
@@ -725,6 +720,21 @@
       <to>Hub</to>
       <enabled>Y</enabled>
     </hop>
+    <hop>
+      <from>Finds delta field</from>
+      <to>Is delta a field?</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Is delta a field?</from>
+      <to>Has delta casting?</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Has delta casting?</from>
+      <to>DELTA_FIELD_CASTING</to>
+      <enabled>Y</enabled>
+    </hop>
   </order>
   <step>
     <name>Column name normalizer</name>
@@ -748,8 +758,10 @@
         <replace_field_by_string/>
         <whole_word>no</whole_word>
         <case_sensitive>no</case_sensitive>
+        <is_unicode>no</is_unicode>
       </field>
     </fields>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -789,7 +801,6 @@
     <create_parent_folder>Y</create_parent_folder>
     <file>
       <name>file</name>
-      <is_command>N</is_command>
       <servlet_output>N</servlet_output>
       <do_not_open_new_file_init>N</do_not_open_new_file_init>
       <extention>txt</extention>
@@ -848,6 +859,7 @@
       <targetFieldLength>0</targetFieldLength>
       <removeSelectedFields>N</removeSelectedFields>
     </ConcatFields>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -887,6 +899,7 @@
       </field>
     </fields>
     <use_formatting>Y</use_formatting>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -896,7 +909,7 @@
     </remotesteps>
     <GUI>
       <xloc>352</xloc>
-      <yloc>768</yloc>
+      <yloc>1120</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -926,6 +939,7 @@
         <remove_special_characters>none</remove_special_characters>
       </field>
     </fields>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -959,6 +973,7 @@
       </field>
     </fields>
     <use_formatting>Y</use_formatting>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -992,6 +1007,7 @@
       </field>
     </fields>
     <use_formatting>Y</use_formatting>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1029,16 +1045,17 @@
       <value>
         <name>casting</name>
         <rename>casting</rename>
-        <default>'19000101'</default>
+        <default/>
         <type>String</type>
       </value>
       <value>
         <name>field_type</name>
         <rename>field_type</rename>
-        <default/>
+        <default>'UNDEFINED'</default>
         <type>String</type>
       </value>
     </lookup>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1080,6 +1097,7 @@
         <type>String</type>
       </value>
     </lookup>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1121,6 +1139,7 @@
         <type>String</type>
       </value>
     </lookup>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1159,6 +1178,7 @@
         <trim_type>both</trim_type>
       </field>
     </fields>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1167,7 +1187,7 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>96</xloc>
+      <xloc>80</xloc>
       <yloc>656</yloc>
       <draw>Y</draw>
     </GUI>
@@ -1190,6 +1210,7 @@
     <execute_each_row>N</execute_each_row>
     <variables_active>Y</variables_active>
     <lazy_conversion_active>N</lazy_conversion_active>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1232,6 +1253,7 @@
         <valuefield/>
       </field>
     </fields>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1274,6 +1296,7 @@
         <valuefield/>
       </field>
     </fields>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1316,6 +1339,7 @@
         <valuefield/>
       </field>
     </fields>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1340,6 +1364,7 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1365,6 +1390,7 @@
       <schema_name/>
     </partitioning>
     <resultfieldname>last</resultfieldname>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1374,6 +1400,46 @@
     </remotesteps>
     <GUI>
       <xloc>1072</xloc>
+      <yloc>768</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Is delta a field?</name>
+    <type>IfNull</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <replaceAllByValue/>
+    <replaceAllMask/>
+    <selectFields>Y</selectFields>
+    <selectValuesType>N</selectValuesType>
+    <setEmptyStringAll>N</setEmptyStringAll>
+    <valuetypes>
+      </valuetypes>
+    <fields>
+      <field>
+        <name>casting</name>
+        <value>${DELTA_FIELD_IN_METADATA}</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>352</xloc>
       <yloc>768</yloc>
       <draw>Y</draw>
     </GUI>
@@ -1439,6 +1505,7 @@
     <info_steps/>
     <target_steps/>
     <usage_parameters/>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1472,6 +1539,7 @@
       </field>
     </fields>
     <use_formatting>Y</use_formatting>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1514,6 +1582,7 @@
         <item>partition_field</item>
       </line>
     </data>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1618,6 +1687,7 @@
     <rootUriNameFieldName/>
     <extensionFieldName/>
     <sizeFieldName/>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1678,6 +1748,7 @@
     <info_steps/>
     <target_steps/>
     <usage_parameters/>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1711,6 +1782,7 @@
       </field>
     </fields>
     <use_formatting>Y</use_formatting>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1750,6 +1822,7 @@
         <remove_special_characters>none</remove_special_characters>
       </field>
     </fields>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1789,7 +1862,6 @@
     <create_parent_folder>Y</create_parent_folder>
     <file>
       <name>${METADATA_QUEUE_JSON_FILE}</name>
-      <is_command>N</is_command>
       <servlet_output>N</servlet_output>
       <do_not_open_new_file_init>Y</do_not_open_new_file_init>
       <extention/>
@@ -1819,6 +1891,7 @@
         <precision>-1</precision>
       </field>
     </fields>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1858,7 +1931,6 @@
     <create_parent_folder>Y</create_parent_folder>
     <file>
       <name>${METADATA_QUEUE_COLUMNS_FILE}</name>
-      <is_command>N</is_command>
       <servlet_output>N</servlet_output>
       <do_not_open_new_file_init>N</do_not_open_new_file_init>
       <extention/>
@@ -1900,6 +1972,7 @@
         <precision>0</precision>
       </field>
     </fields>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -1939,7 +2012,6 @@
     <create_parent_folder>Y</create_parent_folder>
     <file>
       <name>${METADATA_QUEUE_FIELDS_FILE}</name>
-      <is_command>N</is_command>
       <servlet_output>N</servlet_output>
       <do_not_open_new_file_init>N</do_not_open_new_file_init>
       <extention/>
@@ -1969,6 +2041,7 @@
         <precision>-1</precision>
       </field>
     </fields>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -2008,7 +2081,6 @@
     <create_parent_folder>Y</create_parent_folder>
     <file>
       <name>${METADATA_QUEUE_FIELDS_AND_TYPE_FILE}</name>
-      <is_command>N</is_command>
       <servlet_output>N</servlet_output>
       <do_not_open_new_file_init>N</do_not_open_new_file_init>
       <extention/>
@@ -2038,6 +2110,7 @@
         <precision>-1</precision>
       </field>
     </fields>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -2077,7 +2150,6 @@
     <create_parent_folder>Y</create_parent_folder>
     <file>
       <name>${METADATA_QUEUE_FIELDS_NAME_FILE}</name>
-      <is_command>N</is_command>
       <servlet_output>N</servlet_output>
       <do_not_open_new_file_init>N</do_not_open_new_file_init>
       <extention/>
@@ -2107,6 +2179,7 @@
         <precision>-1</precision>
       </field>
     </fields>
+    <attributes/>
     <cluster_schema/>
     <remotesteps>
       <input>
@@ -2120,9 +2193,50 @@
       <draw>Y</draw>
     </GUI>
   </step>
+  <step>
+    <name>Has delta casting?</name>
+    <type>IfNull</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <replaceAllByValue/>
+    <replaceAllMask/>
+    <selectFields>Y</selectFields>
+    <selectValuesType>N</selectValuesType>
+    <setEmptyStringAll>N</setEmptyStringAll>
+    <valuetypes>
+      </valuetypes>
+    <fields>
+      <field>
+        <name>casting</name>
+        <value>'0'</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>352</xloc>
+      <yloc>880</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
   <step_error_handling>
   </step_error_handling>
   <slave-step-copy-partition-distribution>
   </slave-step-copy-partition-distribution>
   <slave_transformation>N</slave_transformation>
+  <attributes/>
 </transformation>
