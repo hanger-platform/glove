@@ -208,7 +208,7 @@ public class Hi {
                                                 List record = new ArrayList();
 
                                                 mitt.getConfiguration()
-                                                        .getOriginalFieldsName()
+                                                        .getOriginalFieldName()
                                                         .forEach(field -> {
                                                             try {
                                                                 record.add(JsonPath.read(item, "$." + field));
@@ -227,7 +227,7 @@ public class Hi {
                                             List record = new ArrayList();
 
                                             mitt.getConfiguration()
-                                                    .getOriginalFieldsName()
+                                                    .getOriginalFieldName()
                                                     .forEach(field -> {
                                                         try {
                                                             record.add(JsonPath.read(object, "$." + field));
