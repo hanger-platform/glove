@@ -107,7 +107,7 @@ public class SimilarWeb {
             JSONParser parser = new JSONParser();
             JSONObject credentials = (JSONObject) parser.parse(new FileReader(cli.getParameter("credentials")));
 
-            //Retrives API credentials.
+            //Retrieves API credentials.
             String apiKey = credentials.get("api_key").toString();
 
             //Identifies endpoint parameters. 
@@ -131,8 +131,8 @@ public class SimilarWeb {
 
                 //Sets endpoint URI parameters. 
                 if (parameters != null && !parameters.isEmpty()) {
-                    for (Object k : parameters.keySet()) {
-                        uriBuilder.addParameter((String) k, (String) parameters.get(k));
+                    for (Object key : parameters.keySet()) {
+                        uriBuilder.addParameter((String) key, (String) parameters.get(key));
                     }
                 }
 
@@ -142,7 +142,7 @@ public class SimilarWeb {
                 //Executes a request.
                 CloseableHttpResponse response = client.execute(httpGet);
 
-                //Gets a reponse entity. 
+                //Gets a response entity. 
                 String entity = EntityUtils.toString(response.getEntity(), "UTF-8");
 
                 if (!entity.isEmpty()) {
