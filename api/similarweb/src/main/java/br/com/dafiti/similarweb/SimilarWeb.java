@@ -173,26 +173,61 @@ public class SimilarWeb {
                             if ("*".equals(cli.getParameter("object"))) {
                                 object = json;
                             } else {
-                                object = json.get(cli.getParameter("object"));
+                                object = JsonPath.read(json, "$." + cli.getParameter("object"));
                             }
+
+                            // Gets original fields.
+                            List<String> originalFields = mitt.getConfiguration().getOriginalFieldName();
 
                             //Identifies if the payload is an array or an object.
                             if (object instanceof JSONArray) {
                                 if (!((JSONArray) object).isEmpty()) {
                                     ((JSONArray) object).forEach(item -> {
-                                        List record = new ArrayList();
+                                        boolean hasNextNode = true;
+                                        int index = 0;
 
-                                        mitt.getConfiguration()
-                                                .getOriginalFieldName()
-                                                .forEach(field -> {
+                                        //Identifies if has next itens on nested array.
+                                        while (hasNextNode) {
+                                            hasNextNode = false;
+                                            List record = new ArrayList();
+
+                                            for (String field : originalFields) {
+                                                if (field.contains("[index]")) {
+                                                    hasNextNode = true;
+
+                                                    //Macro replaces node position using index.
+                                                    field = field.replace("[index]", "[" + String.valueOf(index) + "]");
+
+                                                    try {
+                                                        Object value = JsonPath.read(item, "$." + field);
+
+                                                        if (value != null) {
+                                                            record.add(value);
+                                                        } else {
+                                                            record.add("");
+                                                        }
+
+                                                    } catch (PathNotFoundException ex) {
+                                                        hasNextNode = false;
+                                                        break;
+                                                    }
+                                                } else {
                                                     try {
                                                         record.add(JsonPath.read(item, "$." + field));
                                                     } catch (PathNotFoundException ex) {
                                                         record.add("");
                                                     }
-                                                });
+                                                }
+                                            }
 
-                                        mitt.write(record);
+                                            //Increments index that manages nested array.                            
+                                            index++;
+
+                                            //Identifies if record has the same records of fields.
+                                            if (record.size() == originalFields.size()) {
+                                                mitt.write(record);
+                                            }
+                                        }
                                     });
                                 }
                             } else if (object instanceof JSONObject) {
