@@ -163,7 +163,75 @@ java -jar similarweb.jar \
 	--object="*"
 ```
 
-> Não é possível extrair dados de endpoint que recebam ID como parâmetro diretamente no nome. 
+> Não é possível extrair dados de endpoint que recebam ID como parâmetro diretamente no nome.
+
+##### EXEMPLO 4
+Pegando o endpoint **traffic-sources/overview-share** como exemplo, que contém um formato um pouco diferente de json:
+
+```javascript
+{
+  "meta": {
+    "request": {
+      "granularity": "Monthly",
+      ...
+    },
+    "status": "Success",
+    "last_updated": "2019-02-28"
+  },
+  "visits": {
+    "bbc.com": [
+      {
+        "source_type": "Search",
+        "visits": [
+          {
+            "date": "2017-11-01",
+            "organic": 1684411.973757629,
+            "paid": 5098.656956320019
+          },
+          {
+            "date": "2017-12-01",
+            "organic": 1744108.1481261088,
+            "paid": 3939.4573192256294
+          },
+          ...
+        ]
+      },
+      {
+        "source_type": "Social",
+        "visits": [
+          {
+            "date": "2017-11-01",
+            "organic": 1175749.3938003941,
+            "paid": 0
+          },
+          {
+            "date": "2017-12-01",
+            "organic": 1248981.2556664492,
+            "paid": 0
+          },
+          ...
+        ]
+      },
+      ...
+    ]
+  }
+}
+```
+
+Nesse caso, para conseguirmos pegar os dados de **source_type**, **date** e **organic**, precisamos informar de uma maneira um pouco diferente o parâmetros field e object:
+
+```bash
+java -jar similarweb.jar \
+  --credentials="/home/etl/credentials/similarweb.json" \
+  --output="/tmp/similarweb/desktop_traffic_sources_overview/desktop_traffic_sources_overview.csv" \
+  --endpoint="/v1/website/bbc.com/traffic-sources/overview-share" \
+  --field="source_type+visits[index].date+visits[index].organic" \
+  --parameters='{"country":"br","granularity":"daily"}' \
+  --object="visits.['bbc.com']" 
+```
+
+Como vamos pegar o **date** que está dentro de **visits** que contém vários arrays, temos que obrigatoriamente informar o campo dessa maneira: visits[index].date
+
 
 ## Contributing, Bugs, Questions
 Contributions are more than welcome! If you want to propose new changes, fix bugs or improve something feel free to fork the repository and send us a Pull Request. You can also open new `Issues` for reporting bugs and general problems.
