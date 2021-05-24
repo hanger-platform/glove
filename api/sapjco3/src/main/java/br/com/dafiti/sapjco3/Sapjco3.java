@@ -74,7 +74,8 @@ public class Sapjco3 {
                     .addParameter("i", "import", "(Optional)  Json Object - Function importation parameters.", "")
                     .addParameter("t", "tables", "(Optional)  Json Array - Function tables parameters.", "")
                     .addParameter("a", "partition", "(Optional)  Partition, divided by + if has more than one field", "")
-                    .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "");
+                    .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "")
+                    .addParameter("d", "input_delimiter", "(Optional) SAPJCO3 function resultset return delimiter; ',' as default", ",");
 
             //Reads the command line interface. 
             CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -162,7 +163,7 @@ public class Sapjco3 {
 
                 for (int i = 0; i < rows.getNumRows(); i++) {
                     rows.setRow(i);
-                    String[] values = rows.getString("WA").split(",");
+                    String[] values = rows.getString("WA").split(cli.getParameter("input_delimiter"));
 
                     for (int y = 0; y < values.length; y++) {
                         record.add(values[y]);
