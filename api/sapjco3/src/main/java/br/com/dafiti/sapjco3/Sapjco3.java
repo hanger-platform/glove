@@ -36,6 +36,7 @@ import com.sap.conn.jco.ext.DestinationDataEventListener;
 import com.sap.conn.jco.ext.DestinationDataProvider;
 import com.sap.conn.jco.ext.Environment;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -75,7 +76,7 @@ public class Sapjco3 {
                     .addParameter("t", "tables", "(Optional)  Json Array - Function tables parameters.", "")
                     .addParameter("a", "partition", "(Optional)  Partition, divided by + if has more than one field", "")
                     .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "")
-                    .addParameter("d", "input_delimiter", "(Optional) SAPJCO3 function resultset return delimiter; ',' as default", ",");
+                    .addParameter("d", "input_delimiter", "(Optional) SAPJCO3 function resultset return delimiter; '|' as default", "\\|");
 
             //Reads the command line interface. 
             CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -123,31 +124,35 @@ public class Sapjco3 {
             JCoDestination destination = JCoDestinationManager.getDestination("ABAP_AS");
             JCoFunction function = destination.getRepository().getFunction(cli.getParameter("function"));
 
-            //Retrieves function importation parameters.
+            if (cli.getParameter("import") != null) {
+                //Retrieves function importation parameters.
             JSONObject importParameters = (JSONObject) parser.parse(cli.getParameter("import"));
 
-            if (importParameters != null && !importParameters.isEmpty()) {
-                for (Object key : importParameters.keySet()) {
-                    function.getImportParameterList().setValue((String) key, importParameters.get(key));
+                if (importParameters != null && !importParameters.isEmpty()) {
+                    for (Object key : importParameters.keySet()) {
+                        function.getImportParameterList().setValue((String) key, importParameters.get(key));
+                    }
                 }
             }
 
-            //Retrieves function tables parameters.            
-            JSONArray tablesParameters = (JSONArray) parser.parse(cli.getParameter("tables"));
+            if (cli.getParameter("tables") != null) {
+                //Retrieves function tables parameters.            
+                JSONArray tablesParameters = (JSONArray) parser.parse(cli.getParameter("tables"));
 
-            if (tablesParameters != null && !tablesParameters.isEmpty()) {
-                for (Object tableParameter : tablesParameters) {
-                    JSONObject parameter = (JSONObject) tableParameter;
+                if (tablesParameters != null && !tablesParameters.isEmpty()) {
+                    for (Object tableParameter : tablesParameters) {
+                        JSONObject parameter = (JSONObject) tableParameter;
 
-                    JCoTable options = function.getTableParameterList().getTable(parameter.get("TABLE").toString());
-                    JSONArray parameterValues = (JSONArray) parameter.get("VALUES");
+                        JCoTable options = function.getTableParameterList().getTable(parameter.get("TABLE").toString());
+                        JSONArray parameterValues = (JSONArray) parameter.get("VALUES");
 
-                    for (Object values : parameterValues) {
-                        JSONObject value = (JSONObject) values;
+                        for (Object values : parameterValues) {
+                            JSONObject value = (JSONObject) values;
 
-                        for (Object key : value.keySet()) {
-                            options.appendRow();
-                            options.setValue((String) key, value.get(key));
+                            for (Object key : value.keySet()) {
+                                options.appendRow();
+                                options.setValue((String) key, value.get(key));
+                            }
                         }
                     }
                 }
@@ -157,16 +162,18 @@ public class Sapjco3 {
             if (function != null) {
                 //Execute ABAP function.
                 function.execute(destination);
-
-                List record = new ArrayList();
+                
                 final JCoTable rows = function.getTableParameterList().getTable("DATA");
 
                 for (int i = 0; i < rows.getNumRows(); i++) {
-                    rows.setRow(i);
-                    String[] values = rows.getString("WA").split(cli.getParameter("input_delimiter"));
+                    List record = new ArrayList();
+
+                    rows.setRow(i);                    
+                    String row = rows.getString("WA") + "\n";                    
+                    String[] values = row.split(cli.getParameter("input_delimiter"));
 
                     for (int y = 0; y < values.length; y++) {
-                        record.add(values[y]);
+                        record.add(values[y].trim());
                     }
 
                     mitt.write(record);
