@@ -51,7 +51,7 @@ java -jar sapjco3.jar \
   --credentials="<Identifica o caminho onde o arquivo secreto com as credenciais está localizado>" \
   --output="<Identifica o caminho e nome do arquivo que será gerado>" \
   --function="<Identifica o nome da função a ser chamada no sistema SAP, exemplo: RFC_READ_TABLE>" \
-  --field="<Identifica o nome dos campos que serão extraídos>" \
+  --field="<Opcional, Identifica o nome dos campos que serão extraídos, senão for passado o processo tentará pegar os campos automaticamente>" \
   --import='conteúdo json que representa os parâmetros de importação da função desejada' \
   --tables='conteúdo json que representa os parâmetros de tabelas da função desejada ' \
   --key=<Identifica a chave primária> \

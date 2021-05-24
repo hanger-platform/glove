@@ -126,8 +126,8 @@ public class Sapjco3 {
             JCoDestination destination = JCoDestinationManager.getDestination("ABAP_AS");
             JCoFunction function = destination.getRepository().getFunction(cli.getParameter("function"));
 
+            //Retrieves function importation parameters.
             if (cli.getParameter("import") != null) {
-                //Retrieves function importation parameters.
                 JSONObject importParameters = (JSONObject) parser.parse(cli.getParameter("import"));
 
                 if (importParameters != null && !importParameters.isEmpty()) {
@@ -137,8 +137,8 @@ public class Sapjco3 {
                 }
             }
 
+            //Retrieves function tables parameters.
             if (cli.getParameter("tables") != null) {
-                //Retrieves function tables parameters.            
                 JSONArray tablesParameters = (JSONArray) parser.parse(cli.getParameter("tables"));
 
                 if (tablesParameters != null && !tablesParameters.isEmpty()) {
@@ -168,14 +168,16 @@ public class Sapjco3 {
                 //If no fields were informed, try to automatically get fields.
                 if (!cli.hasParameter("field")) {
                     final JCoTable fields = function.getTableParameterList().getTable("FIELDS");
-                    
+
                     for (int i = 0; i < fields.getNumRows(); i++) {
-                        fields.setRow(i);                        
-                        configuration.addField(fields.getString("FIELDNAME"));                        
+                        fields.setRow(i);
+                        configuration.addField(fields.getString("FIELDNAME"));
                     }
                 }
 
                 final JCoTable rows = function.getTableParameterList().getTable("DATA");
+
+                LOG.info("This request returned a resultset with "+rows.getNumRows()+" rows.");
 
                 for (int i = 0; i < rows.getNumRows(); i++) {
                     List record = new ArrayList();
