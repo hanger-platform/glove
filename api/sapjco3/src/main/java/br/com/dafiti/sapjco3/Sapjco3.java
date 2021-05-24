@@ -36,7 +36,6 @@ import com.sap.conn.jco.ext.DestinationDataEventListener;
 import com.sap.conn.jco.ext.DestinationDataProvider;
 import com.sap.conn.jco.ext.Environment;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -126,7 +125,7 @@ public class Sapjco3 {
 
             if (cli.getParameter("import") != null) {
                 //Retrieves function importation parameters.
-            JSONObject importParameters = (JSONObject) parser.parse(cli.getParameter("import"));
+                JSONObject importParameters = (JSONObject) parser.parse(cli.getParameter("import"));
 
                 if (importParameters != null && !importParameters.isEmpty()) {
                     for (Object key : importParameters.keySet()) {
@@ -162,14 +161,14 @@ public class Sapjco3 {
             if (function != null) {
                 //Execute ABAP function.
                 function.execute(destination);
-                
+
                 final JCoTable rows = function.getTableParameterList().getTable("DATA");
 
                 for (int i = 0; i < rows.getNumRows(); i++) {
                     List record = new ArrayList();
 
-                    rows.setRow(i);                    
-                    String row = rows.getString("WA") + "\n";                    
+                    rows.setRow(i);
+                    String row = rows.getString("WA") + "\n";
                     String[] values = row.split(cli.getParameter("input_delimiter"));
 
                     for (int y = 0; y < values.length; y++) {
