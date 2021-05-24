@@ -69,8 +69,8 @@ public class Sapjco3 {
             mitt.getConfiguration()
                     .addParameter("c", "credentials", "Credentials file", "", true, false)
                     .addParameter("o", "output", "Output file", "", true, false)
-                    .addParameter("f", "field", "Fields to be retrieved", "", true, false)
                     .addParameter("f", "function", "RFC function name", "", true, false)
+                    .addParameter("fi", "field", "(Optional)  Fields to be retrieved, if not passed, try to get all of them.", "")
                     .addParameter("i", "import", "(Optional)  Json Object - Function importation parameters.", "")
                     .addParameter("t", "tables", "(Optional)  Json Array - Function tables parameters.", "")
                     .addParameter("a", "partition", "(Optional)  Partition, divided by + if has more than one field", "")
@@ -97,8 +97,11 @@ public class Sapjco3 {
             }
 
             configuration
-                    .addCustomField("etl_load_date", new Now())
-                    .addField(cli.getParameterAsList("field", "\\+"));
+                    .addCustomField("etl_load_date", new Now());
+
+            if (cli.hasParameter("field")) {
+                configuration.addField(cli.getParameterAsList("field", "\\+"));
+            }
 
             //Reads the credentials file. 
             JSONParser parser = new JSONParser();
@@ -161,6 +164,16 @@ public class Sapjco3 {
             if (function != null) {
                 //Execute ABAP function.
                 function.execute(destination);
+
+                //If no fields were informed, try to automatically get fields.
+                if (!cli.hasParameter("field")) {
+                    final JCoTable fields = function.getTableParameterList().getTable("FIELDS");
+                    
+                    for (int i = 0; i < fields.getNumRows(); i++) {
+                        fields.setRow(i);                        
+                        configuration.addField(fields.getString("FIELDNAME"));                        
+                    }
+                }
 
                 final JCoTable rows = function.getTableParameterList().getTable("DATA");
 

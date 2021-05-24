@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.sap.Sap --credentials=/home/helio.leal/credentials/bw_dev.json --output=/tmp/sap/bw_dev/ZBW000029.csv --function="RFC_READ_TABLE" --import='{\"QUERY_TABLE\":\"ZBW000029\",\"DELIMITER\":\",\"}' '--field=MANDT+/BIC/ZUPDATED'</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.sapjco3.Sapjco3 --credentials=/home/helio.leal/credentials/bw_dev.json --output="/tmp/sapjco3/bw_dev/ZBW000016.csv" --function="RFC_READ_TABLE" --import='{"QUERY_TABLE":"ZBW000016","DELIMITER":"|"}'</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.sap.Sap --credentials=/home/helio.leal/credentials/bw_dev.json --output=/tmp/sap/bw_dev/ZBW000029.csv --function="RFC_READ_TABLE" --import='{\"QUERY_TABLE\":\"ZBW000029\",\"DELIMITER\":\",\"}' '--field=MANDT+/BIC/ZUPDATED'</exec.args>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.sapjco3.Sapjco3 --credentials=/home/helio.leal/credentials/bw_dev.json --output="/tmp/sapjco3/bw_dev/ZBW000016.csv" --function="RFC_READ_TABLE" --import='{"QUERY_TABLE":"ZBW000016","DELIMITER":"|"}'</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.sap.Sap --credentials=/home/helio.leal/credentials/bw_dev.json --output=/tmp/sap/bw_dev/ZBW000029.csv --function="RFC_READ_TABLE" --import='{\"QUERY_TABLE\":\"ZBW000029\",\"DELIMITER\":\",\"}' '--field=MANDT+/BIC/ZUPDATED'</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.sapjco3.Sapjco3 --credentials=/home/helio.leal/credentials/bw_dev.json --output="/tmp/sapjco3/bw_dev/ZBW000016.csv" --function="RFC_READ_TABLE" --import='{"QUERY_TABLE":"ZBW000016","DELIMITER":"|"}'</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
