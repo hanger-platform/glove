@@ -21,29 +21,23 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
  */
-package br.com.dafiti.sap;
+package br.com.dafiti.sapjco3;
 
 import br.com.dafiti.mitt.Mitt;
 import br.com.dafiti.mitt.cli.CommandLineInterface;
 import br.com.dafiti.mitt.model.Configuration;
-import br.com.dafiti.mitt.model.Field;
 import br.com.dafiti.mitt.transformation.embedded.Concat;
 import br.com.dafiti.mitt.transformation.embedded.Now;
 import com.sap.conn.jco.JCoDestination;
 import com.sap.conn.jco.JCoDestinationManager;
-import com.sap.conn.jco.JCoField;
 import com.sap.conn.jco.JCoFunction;
-import com.sap.conn.jco.JCoRecordFieldIterator;
 import com.sap.conn.jco.JCoTable;
 import com.sap.conn.jco.ext.DestinationDataEventListener;
 import com.sap.conn.jco.ext.DestinationDataProvider;
 import com.sap.conn.jco.ext.Environment;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -55,9 +49,9 @@ import org.json.simple.parser.JSONParser;
  *
  * @author Helio Leal
  */
-public class Sap {
+public class Sapjco3 {
 
-    private static final Logger LOG = Logger.getLogger(Sap.class.getName());
+    private static final Logger LOG = Logger.getLogger(Sapjco3.class.getName());
 
     /**
      * SAPJCO3 data transfer
@@ -126,7 +120,6 @@ public class Sap {
             }
 
             JCoDestination destination = JCoDestinationManager.getDestination("ABAP_AS");
-
             JCoFunction function = destination.getRepository().getFunction(cli.getParameter("function"));
 
             //Retrieves function importation parameters.
