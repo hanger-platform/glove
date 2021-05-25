@@ -58,16 +58,51 @@ java -jar sapjco3.jar \
   --partition=<Identifica o campo que será utilizado para particionamento dos dados>
 ```
 
-* Para saber quais são os parâmetros da função (importação ou tabelas), deve se consultar a Transação **SE37** dentro do **SAP GUI**.
+* o parâmetro _tables_ deve seguir sempre a seguinte estrutura para suas funções:
+```json
+[
+	{
+		"TABLE":"<Nome do parâmetro de tabelas 1>",
+		"VALUES":[{
+			"<Tipo de referência - Componente 1>":"<Valor>"
+		}]
+	},
+	{
+		"TABLE":"<Nome do parâmetro de tabelas 2>",
+		"VALUES":[
+			{"<Tipo de referência - Componente 1>":"<Valor 1>"},
+			{"<Tipo de referência - Componente 2>":"<Valor 2>"}
+		]
+	}
+]
+```
 
-* {"QUERY_TABLE":"ZBW000029","DELIMITER":"|"}
 
+* o parâmetro _import_ deve seguir sempre a seguinte estrutura para suas funções:
+```json
+{
+	"<NOME_DO_PARÂMETRO 1>":"<VALOR 1>",
+	"<NOME_DO_PARÂMETRO_2>":"<VALOR 2>"
+}
+```
+
+* Para saber quais são os parâmetros da função (**importação ou tabelas**), deve se consultar a Transação **SE37 (Módulos de função ABAP)** dentro do **SAP GUI**.
 
 ## Exemplos
 
 ##### Usando a função RFC_READ_TABLE
 
-
+```bash
+java -jar /home/etl/lib/sapjco3.jar \
+  --credentials="/caminho/bw.json" \
+  --output="/tmp/ZBW000029/ZBW000029.csv" \
+  --function="RFC_READ_TABLE" \
+  --field="MANDT+DELIV_NUMB+AMOUNT+CURRENCY+MOTIVO+/BIC/ZUPDATED" \
+  --import='{"QUERY_TABLE":"ZBW000029","DELIMITER":"|"}' \
+  --tables='[{"TABLE":"OPTIONS","VALUES": [{"TEXT":"AMOUNT > 1 OR DELIV_NUMB = '"'"'8043143930'"'"' "}]},{"TABLE":"FIELDS","VALUES":[{"FIELDNAME":"MANDT"},{"FIELDNAME":"DELIV_NUMB"},{"FIELDNAME":"AMOUNT"},{"FIELDNAME":"CURRENCY"},{"FIELDNAME":"MOTIVO"},{"FIELDNAME":"/BIC/ZUPDATED"}]}]' \
+  --key='::checksum()' \
+  --partition='::fixed(FULL)'
+```
 
 
 ## Contributing, Bugs, Questions
