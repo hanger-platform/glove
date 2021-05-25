@@ -104,7 +104,7 @@ java -jar /home/etl/lib/sapjco3.jar \
   --partition='::fixed(FULL)'
 ```
 * No exemplo acima, estamos usando a função **RFC_READ_TABLE**
-* Ela possui vários parãmetros de importação, nesse exemplo usamos o **QUERY_TABLE** que recebe o nome da tabela a ser extraída e **DELIMITER**, que receber qual o delimitador do )resultset_.
+* Ela possui vários parãmetros de importação, nesse exemplo usamos o **QUERY_TABLE** que recebe o nome da tabela a ser extraída e **DELIMITER**, que receber qual o delimitador do _resultset_.
 * Ela possui vários parâmetros de tabelas, nesse exemplos usamos o **OPTIONS** para fazer um filtro (_WHERE_) na consulta e **FIELDS** para trazer somente alguns determinados campos.
 
 
