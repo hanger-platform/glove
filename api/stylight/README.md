@@ -48,6 +48,7 @@ java -jar stylight.jar  \
 ##### EXEMPLO 1
 
 ```bash
+java -jar stylight.jar  \
 	--credentials="/home/etl/credentials/stylight.json" \
 	--output="/tmp/stylight/commision_report.csv" \
 	--field="vertical+device_type+date+ppc_clickout_count+average_ppc_price+estimated_overall_commission_per_overall_clickout+ppc_commission" \
