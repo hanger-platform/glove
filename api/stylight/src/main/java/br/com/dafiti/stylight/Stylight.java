@@ -32,29 +32,17 @@ import br.com.dafiti.mitt.transformation.embedded.Now;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -111,10 +99,11 @@ public class Stylight {
             JSONParser parser = new JSONParser();
             JSONObject credentials = (JSONObject) parser.parse(new FileReader(cli.getParameter("credentials")));
 
-            //Retrives API credentials. 
+            //Retrieves API credentials. 
             String username = URLEncoder.encode(credentials.get("username").toString(), "UTF-8");
             String password = URLEncoder.encode(credentials.get("password").toString(), "UTF-8");
 
+            //Retrieves API Token.
             HttpResponse<String> token = Unirest.post(STYLIGHT_TOKEN_URL)
                     .header("Content-Type", "application/x-www-form-urlencoded")
                     .body("username=" + username + "&password=" + password)
@@ -122,20 +111,19 @@ public class Stylight {
 
             if (!token.getBody().isEmpty()) {
 
-                //Executes API call
+                //Executes API call.
                 HttpResponse<String> response = Unirest.get(cli.getParameter("endpoint"))
                         .header("Accept", "text/csv")
                         .header("Authorization", "Bearer " + token.getBody())
                         .asString();
 
-                //Defines the output path. 
+                //Defines a temporary path. 
                 Path outputPath = Files.createTempDirectory("stylight_");
 
-                //Identifies the output file. 
+                //Defines a temporary output file. 
                 File targetFile = new File(outputPath.toString() + "/" + UUID.randomUUID() + ".tmp");
-                
-                System.out.println("" + response.getBody());
 
+                //Writes API response to temporary output file.
                 FileUtils.copyInputStreamToFile(response.getRawBody(), targetFile);
 
                 //Writes the final file.
