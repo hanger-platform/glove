@@ -32,19 +32,19 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.List;
 import com.google.api.ads.admanager.axis.factory.AdManagerServices;
-import com.google.api.ads.admanager.axis.utils.v202005.DateTimes;
-import com.google.api.ads.admanager.axis.utils.v202005.ReportDownloader;
-import com.google.api.ads.admanager.axis.utils.v202005.StatementBuilder;
-import com.google.api.ads.admanager.axis.v202005.Column;
-import com.google.api.ads.admanager.axis.v202005.DateRangeType;
-import com.google.api.ads.admanager.axis.v202005.Dimension;
-import com.google.api.ads.admanager.axis.v202005.DimensionAttribute;
-import com.google.api.ads.admanager.axis.v202005.ExportFormat;
-import com.google.api.ads.admanager.axis.v202005.ReportDownloadOptions;
-import com.google.api.ads.admanager.axis.v202005.ReportJob;
-import com.google.api.ads.admanager.axis.v202005.ReportQuery;
-import com.google.api.ads.admanager.axis.v202005.ReportQueryAdUnitView;
-import com.google.api.ads.admanager.axis.v202005.ReportServiceInterface;
+import com.google.api.ads.admanager.axis.utils.v202105.DateTimes;
+import com.google.api.ads.admanager.axis.utils.v202105.ReportDownloader;
+import com.google.api.ads.admanager.axis.utils.v202105.StatementBuilder;
+import com.google.api.ads.admanager.axis.v202105.Column;
+import com.google.api.ads.admanager.axis.v202105.DateRangeType;
+import com.google.api.ads.admanager.axis.v202105.Dimension;
+import com.google.api.ads.admanager.axis.v202105.DimensionAttribute;
+import com.google.api.ads.admanager.axis.v202105.ExportFormat;
+import com.google.api.ads.admanager.axis.v202105.ReportDownloadOptions;
+import com.google.api.ads.admanager.axis.v202105.ReportJob;
+import com.google.api.ads.admanager.axis.v202105.ReportQuery;
+import com.google.api.ads.admanager.axis.v202105.ReportQueryAdUnitView;
+import com.google.api.ads.admanager.axis.v202105.ReportServiceInterface;
 import com.google.api.ads.admanager.lib.client.AdManagerSession;
 import com.google.api.ads.common.lib.auth.OfflineCredentials;
 import com.google.api.ads.common.lib.exception.OAuthException;
@@ -91,14 +91,14 @@ public class GoogleAdManager {
                 .addParameter("da", "dimensions_attributes", "define the columns that will be loaded", "", true, false)
                 .addParameter("f", "filters", "Query filter", "")
                 .addParameter("tz", "time_zone", "Time zone", "America/Sao_Paulo")
-                .addParameter("de", "delimiter", "Identify the delimiter character", ";")
+                .addParameter("de", "delimiter", "Identify the delimiter character", ",")
                 .addParameter("q", "quote", "Identify the quote character", "\"");
 
         //Read the command line interface. 
         CommandLineInterface cli = mitt.getCommandLineInterface(args);
 
         //Define output file.
-        mitt.setOutput(cli.getParameter("output"));
+        mitt.setOutputFile(cli.getParameter("output"));
 
         //Define fields.
         mitt.getConfiguration()
@@ -202,7 +202,11 @@ public class GoogleAdManager {
         }
 
         // Writes all source files to a single target file.
-        mitt.write(file, ',', '"', '\\', "UTF-8");
+        mitt.getReaderSettings().setDelimiter(',');
+        mitt.getReaderSettings().setQuote('"');
+        mitt.getReaderSettings().setQuoteEscape('\\');
+        mitt.getReaderSettings().setEncode("UTF-8");
+        mitt.write(file, "*");
         mitt.close();
 
         Logger.getLogger(GoogleAdManager.class.getName()).info("Google Ad Manager extration finalized.");
