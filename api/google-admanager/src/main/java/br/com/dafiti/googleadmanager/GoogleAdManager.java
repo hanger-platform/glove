@@ -32,19 +32,19 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.List;
 import com.google.api.ads.admanager.axis.factory.AdManagerServices;
-import com.google.api.ads.admanager.axis.utils.v202005.DateTimes;
-import com.google.api.ads.admanager.axis.utils.v202005.ReportDownloader;
-import com.google.api.ads.admanager.axis.utils.v202005.StatementBuilder;
-import com.google.api.ads.admanager.axis.v202005.Column;
-import com.google.api.ads.admanager.axis.v202005.DateRangeType;
-import com.google.api.ads.admanager.axis.v202005.Dimension;
-import com.google.api.ads.admanager.axis.v202005.DimensionAttribute;
-import com.google.api.ads.admanager.axis.v202005.ExportFormat;
-import com.google.api.ads.admanager.axis.v202005.ReportDownloadOptions;
-import com.google.api.ads.admanager.axis.v202005.ReportJob;
-import com.google.api.ads.admanager.axis.v202005.ReportQuery;
-import com.google.api.ads.admanager.axis.v202005.ReportQueryAdUnitView;
-import com.google.api.ads.admanager.axis.v202005.ReportServiceInterface;
+import com.google.api.ads.admanager.axis.utils.v202105.DateTimes;
+import com.google.api.ads.admanager.axis.utils.v202105.ReportDownloader;
+import com.google.api.ads.admanager.axis.utils.v202105.StatementBuilder;
+import com.google.api.ads.admanager.axis.v202105.Column;
+import com.google.api.ads.admanager.axis.v202105.DateRangeType;
+import com.google.api.ads.admanager.axis.v202105.Dimension;
+import com.google.api.ads.admanager.axis.v202105.DimensionAttribute;
+import com.google.api.ads.admanager.axis.v202105.ExportFormat;
+import com.google.api.ads.admanager.axis.v202105.ReportDownloadOptions;
+import com.google.api.ads.admanager.axis.v202105.ReportJob;
+import com.google.api.ads.admanager.axis.v202105.ReportQuery;
+import com.google.api.ads.admanager.axis.v202105.ReportQueryAdUnitView;
+import com.google.api.ads.admanager.axis.v202105.ReportServiceInterface;
 import com.google.api.ads.admanager.lib.client.AdManagerSession;
 import com.google.api.ads.common.lib.auth.OfflineCredentials;
 import com.google.api.ads.common.lib.exception.OAuthException;
@@ -53,8 +53,10 @@ import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import java.io.File;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.io.FileUtils;
 
 /**
  * Google Ad manager extractor.
@@ -91,14 +93,14 @@ public class GoogleAdManager {
                 .addParameter("da", "dimensions_attributes", "define the columns that will be loaded", "", true, false)
                 .addParameter("f", "filters", "Query filter", "")
                 .addParameter("tz", "time_zone", "Time zone", "America/Sao_Paulo")
-                .addParameter("de", "delimiter", "Identify the delimiter character", ";")
+                .addParameter("de", "delimiter", "Identify the delimiter character", ",")
                 .addParameter("q", "quote", "Identify the quote character", "\"");
 
         //Read the command line interface. 
         CommandLineInterface cli = mitt.getCommandLineInterface(args);
 
         //Define output file.
-        mitt.setOutput(cli.getParameter("output"));
+        mitt.setOutputFile(cli.getParameter("output"));
 
         //Define fields.
         mitt.getConfiguration()
@@ -182,8 +184,11 @@ public class GoogleAdManager {
         //Wait for the report to be ready.
         reportDownloader.waitForReportReady();
 
+        //Path where files will be stored.
+        Path outputPath = java.nio.file.Files.createTempDirectory("google_admanager_");
+
         //Change to your file location.
-        File file = File.createTempFile("admanager-report-", ".csv");
+        File file = new File(outputPath.toString() + "/admanager-report.csv");
 
         try {
             //Output file settings.
@@ -201,8 +206,12 @@ public class GoogleAdManager {
             Logger.getLogger(GoogleAdManager.class.getName()).log(Level.SEVERE, "Error on downloading report", ex);
         }
 
-        // Writes all source files to a single target file.
-        mitt.write(file, ',', '"', '\\', "UTF-8");
+        //Write to the output.
+        mitt.getReaderSettings().setDelimiter(cli.getParameter("delimiter").charAt(0));
+        mitt.getReaderSettings().setEncode("UTF-8");
+        mitt.write(outputPath.toFile(), "*");
+        FileUtils.deleteDirectory(outputPath.toFile());
+
         mitt.close();
 
         Logger.getLogger(GoogleAdManager.class.getName()).info("Google Ad Manager extration finalized.");
