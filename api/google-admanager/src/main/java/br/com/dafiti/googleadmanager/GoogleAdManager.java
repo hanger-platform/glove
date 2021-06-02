@@ -203,8 +203,6 @@ public class GoogleAdManager {
 
         // Writes all source files to a single target file.
         mitt.getReaderSettings().setDelimiter(',');
-        mitt.getReaderSettings().setQuote('"');
-        mitt.getReaderSettings().setQuoteEscape('\\');
         mitt.getReaderSettings().setEncode("UTF-8");
         mitt.write(file, "*");
         mitt.close();
