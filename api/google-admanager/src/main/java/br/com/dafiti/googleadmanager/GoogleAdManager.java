@@ -53,8 +53,10 @@ import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import java.io.File;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.io.FileUtils;
 
 /**
  * Google Ad manager extractor.
@@ -182,8 +184,11 @@ public class GoogleAdManager {
         //Wait for the report to be ready.
         reportDownloader.waitForReportReady();
 
+        //Path where files will be stored.
+        Path outputPath = java.nio.file.Files.createTempDirectory("google_admanager_");
+
         //Change to your file location.
-        File file = File.createTempFile("admanager-report-", ".csv");
+        File file = new File(outputPath.toString() + "/admanager-report.csv");
 
         try {
             //Output file settings.
@@ -201,10 +206,12 @@ public class GoogleAdManager {
             Logger.getLogger(GoogleAdManager.class.getName()).log(Level.SEVERE, "Error on downloading report", ex);
         }
 
-        // Writes all source files to a single target file.
-        mitt.getReaderSettings().setDelimiter(',');
+        //Write to the output.
+        mitt.getReaderSettings().setDelimiter(cli.getParameter("delimiter").charAt(0));
         mitt.getReaderSettings().setEncode("UTF-8");
-        mitt.write(file, "*");
+        mitt.write(outputPath.toFile(), "*");
+        FileUtils.deleteDirectory(outputPath.toFile());
+
         mitt.close();
 
         Logger.getLogger(GoogleAdManager.class.getName()).info("Google Ad Manager extration finalized.");
