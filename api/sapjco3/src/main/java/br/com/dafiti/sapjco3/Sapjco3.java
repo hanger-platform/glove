@@ -77,6 +77,7 @@ public class Sapjco3 {
                     .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "")
                     .addParameter("d", "input_delimiter", "(Optional) SAPJCO3 function resultset return delimiter; '|' as default", "|")
                     .addParameter("r", "row_count", "(Optional) how many records will return at once; '0' as default and means return everything", "0")
+                    .addParameter("r", "row_skips", "(Optional) starts getting data at what record index; '0' as default", "0")
                     .addParameter("d", "delimiter", "(Optional) SAPJCO3 function resultset return delimiter; '|' as default", "\\|");
 
             //Reads the command line interface. 
@@ -128,7 +129,7 @@ public class Sapjco3 {
             JCoDestination destination = JCoDestinationManager.getDestination("ABAP_AS");
 
             int rowCount = cli.getParameterAsInteger("row_count");
-            int rowSkips = 0;
+            int rowSkips = cli.getParameterAsInteger("row_skips");
             int numRows = ZRFCGetTableCount(destination, cli);
 
             LOG.log(Level.INFO, "Table {0} has {1} records [WHERE CONDITION: {2}].", new Object[]{cli.getParameter("table"), numRows, cli.getParameter("where")});
