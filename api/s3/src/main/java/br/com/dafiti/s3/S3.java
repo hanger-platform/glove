@@ -81,7 +81,8 @@ public class S3 {
                     .addParameter("d", "delimiter", "(Optional) File delimiter; ';' as default", ";")
                     .addParameter("p", "partition", "(Optional)  Partition, divided by + if has more than one field")
                     .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", " ")
-                    .addParameter("n", "no_header", "(Optional)(Default is true) File has heaer", false);
+                    .addParameter("n", "no_header", "(Optional)(Default is true) File has heaer", false)
+                    .addParameter("pr", "properties", "(Optional) Reader properties.", "");
 
             //Defines the command line interface. 
             CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -188,6 +189,11 @@ public class S3 {
 
             //Writes the final file.
             mitt.getReaderSettings().setDelimiter(cli.getParameter("delimiter").charAt(0));
+
+            if (cli.getParameter("properties") != null) {
+                mitt.getReaderSettings().setProperties(cli.getParameter("properties"));
+            }
+
             mitt.write(outputPath.toFile());
 
             //Remove temporary path. 
