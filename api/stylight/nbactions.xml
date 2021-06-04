@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>run</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-classpath %classpath br.com.dafiti.stylight.Stylight --credentials="/home/helio.leal/credentials/stylight.json" --output="/tmp/stylight/teste.csv" '--field=vertical+device_type+date+ppc_clickout_count+average_ppc_price+estimated_overall_commission_per_overall_clickout+ppc_commission' --endpoint="https://partner.stylight.net/api/v1/report?from_date=2021-05-26&amp;to_date=2021-05-26&amp;group_by=device_type&amp;group_by=date&amp;group_by=vertical&amp;currency=BRL" --key="::checksum()" --partition="date"</exec.args>
+                <exec.executable>java</exec.executable>
+            </properties>
+        </action>
+        <action>
+            <actionName>debug</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.stylight.Stylight --credentials="/home/helio.leal/credentials/stylight.json" --output="/tmp/stylight/teste.csv" '--field=vertical+device_type+date+ppc_clickout_count+average_ppc_price+estimated_overall_commission_per_overall_clickout+ppc_commission' --endpoint="https://partner.stylight.net/api/v1/report?from_date=2021-05-26&amp;to_date=2021-05-26&amp;group_by=device_type&amp;group_by=date&amp;group_by=vertical&amp;currency=BRL" --key="::checksum()" --partition="date"</exec.args>
+                <exec.executable>java</exec.executable>
+                <jpda.listen>true</jpda.listen>
+            </properties>
+        </action>
+        <action>
+            <actionName>profile</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-classpath %classpath br.com.dafiti.stylight.Stylight --credentials="/home/helio.leal/credentials/stylight.json" --output="/tmp/stylight/teste.csv" '--field=vertical+device_type+date+ppc_clickout_count+average_ppc_price+estimated_overall_commission_per_overall_clickout+ppc_commission' --endpoint="https://partner.stylight.net/api/v1/report?from_date=2021-05-26&amp;to_date=2021-05-26&amp;group_by=device_type&amp;group_by=date&amp;group_by=vertical&amp;currency=BRL" --key="::checksum()" --partition="date"</exec.args>
+                <exec.executable>java</exec.executable>
+            </properties>
+        </action>
+    </actions>
