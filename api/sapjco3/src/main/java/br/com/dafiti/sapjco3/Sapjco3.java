@@ -62,7 +62,7 @@ public class Sapjco3 {
      */
     public static void main(String[] args) {
         //configure the appender
-        ConsoleAppender console = new ConsoleAppender();        
+        ConsoleAppender console = new ConsoleAppender();
         String PATTERN = "%d{yyyy-MM-dd HH:mm:ss} %-5p %m%n";
         console.setLayout(new PatternLayout(PATTERN));
         console.setThreshold(Level.DEBUG);
@@ -94,7 +94,7 @@ public class Sapjco3 {
 
             //Reads the command line interface. 
             CommandLineInterface cli = mitt.getCommandLineInterface(args);
-            
+
             //Defines the log level.
             if (cli.getParameterAsBoolean("debug")) {
                 LOG.setLevel(Level.DEBUG);
