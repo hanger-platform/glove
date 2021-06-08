@@ -51,42 +51,17 @@ java -jar sapjco3.jar \
   --credentials="<Identifica o caminho onde o arquivo secreto com as credenciais está localizado>" \
   --output="<Identifica o caminho e nome do arquivo que será gerado>" \
   --function="<Identifica o nome da função a ser chamada no sistema SAP, exemplo: RFC_READ_TABLE>" \
+  --table="<Nome da tabela a ser retornada>" \
   --field="<Opcional, Identifica o nome dos campos que serão extraídos, senão for passado o processo tentará pegar os campos automaticamente>" \
-  --import='conteúdo json que representa os parâmetros de importação da função desejada' \
-  --tables='conteúdo json que representa os parâmetros de tabelas da função desejada ' \
-  --key=<Identifica a chave primária> \
-  --partition=<Identifica o campo que será utilizado para particionamento dos dados>
+  --where="<Opcional, Identifca a condição where>" \
+  --partition="<Opcional, Identifica o campo que será utilizado para particionamento dos dados>" \
+  --key="<Opcional, Identifica a chave primária>" \
+  --input_delimiter="<Opcional, Delimitador do resultado vindo da função chamada; '|' é o padrão>" \
+  --row_count="<Opcional, quantidade de registros que serão trazidos por vez; '0' é o padrão e significar trazer tudo de uma vez>" \
+  --row_skips="<Opcional, Começa a trazer registros a partir de qual índice; '0' é o padrão>" \
+  --delimiter="<Opcional, esse é o delimitador usado no mitt; '|' é o padrão>" \
+  --debug="Opcional, Identifica se é modo debug ou não; 'false' é o padrão>"  
 ```
-
-* o parâmetro _tables_ deve seguir sempre a seguinte estrutura para suas funções:
-```json
-[
-	{
-		"TABLE":"<Nome do parâmetro de tabelas 1>",
-		"VALUES":[{
-			"<Tipo de referência - Componente 1>":"<Valor>"
-		}]
-	},
-	{
-		"TABLE":"<Nome do parâmetro de tabelas 2>",
-		"VALUES":[
-			{"<Tipo de referência - Componente 1>":"<Valor 1>"},
-			{"<Tipo de referência - Componente 2>":"<Valor 2>"}
-		]
-	}
-]
-```
-
-
-* o parâmetro _import_ deve seguir sempre a seguinte estrutura para suas funções:
-```json
-{
-	"<NOME_DO_PARÂMETRO 1>":"<VALOR 1>",
-	"<NOME_DO_PARÂMETRO_2>":"<VALOR 2>"
-}
-```
-
-* Para saber quais são os parâmetros da função (**importação ou tabelas**), deve se consultar a Transação **SE37 (Módulos de função ABAP)** dentro do **SAP GUI**.
 
 ## Exemplos
 
