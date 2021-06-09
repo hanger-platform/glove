@@ -107,8 +107,46 @@ java -jar /home/etl/lib/sapjco3.jar \
   --debug="true" \
   --row_count=300000
 ```
+
 * No exemplo acima especificamos uma **condição** para a extração dos dados no parâmetro _where_ e no parâmetro **row_count** colocamos o número 300.000 que será responsável por fazer a extração dos dados por partes de 300.000, ou seja, irá trazer os dados de 0 a 300.000, depois de 300.000 até 600.000 até que atinja o tamanho total de registros.
 * Também colocamos o parâmetro **debug** com o valor true para efetuarmos um acompanhamento do que está acontecendo no processo, dessa maneira conseguimos traquear onde o processo está através de um log bem detalhado. Esse log apresenta a quantidade de registros por chamada e também é possível acompanhar o tempo de chamada de ida e vinda do servidor SAP e também é possível acompanhar o tempo de escrita do mitt.
+
+#### Exemplo de Log da aplicação com o modo _debug_ ativado
+
+```javascript
+2021-06-09 09:39:04 INFO  GLOVE - SAPJCO3 extractor started
+Jun 09, 2021 9:39:04 AM br.com.dafiti.mitt.Mitt <init>
+INFO: MITT v1.0.7
+2021-06-09 09:39:38 DEBUG Before ZRFC_GET_TABLE_COUNT execute.
+2021-06-09 09:39:40 DEBUG After ZRFC_GET_TABLE_COUNT execute.
+2021-06-09 09:39:40 INFO  Table /B1H/ASD_D1100 has 1328376 records [WHERE CONDITION:  /BIC/ZUPDATED >= '020210601000000' ].
+2021-06-09 09:39:40 DEBUG Before ZRFC_READ_TABLE execute
+2021-06-09 09:45:55 DEBUG After ZRFC_READ_TABLE execute
+2021-06-09 09:45:55 INFO  This request returned 300000 rows [ROWCOUNT: 300000, ROWSKIPS: 0].
+2021-06-09 09:45:55 DEBUG Before mitt write.
+2021-06-09 09:46:15 DEBUG After mitt write.
+2021-06-09 09:46:15 DEBUG Before ZRFC_READ_TABLE execute
+2021-06-09 09:50:09 DEBUG After ZRFC_READ_TABLE execute
+2021-06-09 09:50:09 INFO  This request returned 300000 rows [ROWCOUNT: 300000, ROWSKIPS: 300000].
+2021-06-09 09:50:09 DEBUG Before mitt write.
+2021-06-09 09:50:29 DEBUG After mitt write.
+2021-06-09 09:50:29 DEBUG Before ZRFC_READ_TABLE execute
+2021-06-09 09:55:22 DEBUG After ZRFC_READ_TABLE execute
+2021-06-09 09:55:22 INFO  This request returned 300000 rows [ROWCOUNT: 300000, ROWSKIPS: 600000].
+2021-06-09 09:55:22 DEBUG Before mitt write.
+2021-06-09 09:55:39 DEBUG After mitt write.
+2021-06-09 09:55:39 DEBUG Before ZRFC_READ_TABLE execute
+2021-06-09 09:58:57 DEBUG After ZRFC_READ_TABLE execute
+2021-06-09 09:58:57 INFO  This request returned 300000 rows [ROWCOUNT: 300000, ROWSKIPS: 900000].
+2021-06-09 09:58:57 DEBUG Before mitt write.
+2021-06-09 09:59:14 DEBUG After mitt write.
+2021-06-09 09:59:14 DEBUG Before ZRFC_READ_TABLE execute
+2021-06-09 10:01:17 DEBUG After ZRFC_READ_TABLE execute
+2021-06-09 10:01:17 INFO  This request returned 134061 rows [ROWCOUNT: 300000, ROWSKIPS: 1200000].
+2021-06-09 10:01:17 DEBUG Before mitt write.
+2021-06-09 10:01:22 DEBUG After mitt write.
+2021-06-09 10:01:22 INFO  GLOVE - SAPJCO3 extractor finalized
+```
 
 ## Contributing, Bugs, Questions
 Contributions are more than welcome! If you want to propose new changes, fix bugs or improve something feel free to fork the repository and send us a Pull Request. You can also open new `Issues` for reporting bugs and general problems.
