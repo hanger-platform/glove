@@ -83,7 +83,8 @@ public class SFTP {
                     .addParameter("P", "port", "(Optional) SFTP port; 22 as default", "22")
                     .addParameter("r", "pattern", "(Optional) SFTP file pattern; *.csv as default", "*.csv")
                     .addParameter("pa", "partition", "(Optional)  Partition, divided by + if has more than one field")
-                    .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "");
+                    .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "")
+                    .addParameter("pr", "properties", "(Optional) Reader properties", "");
 
             //Read the command line interface. 
             CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -156,11 +157,16 @@ public class SFTP {
                     );
                 }
             }
-            
+
             Logger.getLogger(SFTP.class.getName()).log(Level.INFO, "Writing output file to: {0}", cli.getParameter("output"));
 
             //Write to the output.
             mitt.getReaderSettings().setDelimiter(cli.getParameter("delimiter").charAt(0));
+
+            if (cli.getParameter("properties") != null) {
+                mitt.getReaderSettings().setProperties(cli.getParameter("properties"));
+            }
+
             mitt.write(outputPath.toFile(), "*");
 
             //Remove temporary path. 
