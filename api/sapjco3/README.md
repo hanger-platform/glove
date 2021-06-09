@@ -65,23 +65,50 @@ java -jar sapjco3.jar \
 
 ## Exemplos
 
-##### Usando a função RFC_READ_TABLE
+##### Chamada simples
 
 ```bash
 java -jar /home/etl/lib/sapjco3.jar \
-  --credentials="/caminho/bw.json" \
-  --output="/tmp/ZBW000029/ZBW000029.csv" \
-  --function="RFC_READ_TABLE" \
-  --field="MANDT+DELIV_NUMB+AMOUNT+CURRENCY+MOTIVO+/BIC/ZUPDATED" \
-  --import='{"QUERY_TABLE":"ZBW000029","DELIMITER":"|"}' \
-  --tables='[{"TABLE":"OPTIONS","VALUES": [{"TEXT":"AMOUNT > 1 OR DELIV_NUMB = '"'"'8043143930'"'"' "}]},{"TABLE":"FIELDS","VALUES":[{"FIELDNAME":"MANDT"},{"FIELDNAME":"DELIV_NUMB"},{"FIELDNAME":"AMOUNT"},{"FIELDNAME":"CURRENCY"},{"FIELDNAME":"MOTIVO"},{"FIELDNAME":"/BIC/ZUPDATED"}]}]' \
+  --credentials="/<credentials_path>/<credentials_file>.json" \
+  --output="/tmp/sapjco3/bw/ZBW000016/ZBW000016.csv" \
+  --function="ZRFC_READ_TABLE" \
+  --table="ZBW000016" \
   --key='::checksum()' \
   --partition='::fixed(FULL)'
 ```
-* No exemplo acima, estamos usando a função **RFC_READ_TABLE**
-* Ela possui vários parãmetros de importação, nesse exemplo usamos o **QUERY_TABLE** que recebe o nome da tabela a ser extraída e **DELIMITER**, que receber qual o delimitador do _resultset_.
-* Ela possui vários parâmetros de tabelas, nesse exemplos usamos o **OPTIONS** para fazer um filtro (_WHERE_) na consulta e **FIELDS** para trazer somente alguns determinados campos.
+* No exemplo acima não especificamos os campos que desejamos de retorno, desta maneira, todos os campos serão extraídos para o arquivo de saída.
 
+#### Chamada com filtro e especificação de campos
+
+```bash
+java -jar /home/etl/lib/sapjco3.jar \
+  --credentials="/<credentials_path>/<credentials_file>.json" \
+  --output="/tmp/sapjco3/bw/ZBW000029/ZBW000029.csv" \
+  --function="ZRFC_READ_TABLE" \
+  --field="MANDT+DELIV_NUMB+AMOUNT+CURRENCY+MOTIVO+/BIC/ZUPDATED" \
+  --table="ZBW000029" \
+  --where='AMOUNT > 1 OR DELIV_NUMB = '"'"'8043143930'"'"'' \
+  --key='::checksum()' \
+  --partition='::fixed(FULL)'
+```
+* No exemplo acima especificamos os campos que queremos de retorno no parâmetro _field_ e colocamos uma **condição** para a extração dos dados no parâmetro _where_
+
+#### Chamada com filtro e quantidade de linhas por 'lote'
+
+```bash
+java -jar /home/etl/lib/sapjco3.jar \
+  --credentials="/<credentials_path>/<credentials_file>.json" \
+  --output="/tmp/sapjco3/bw/B1H/ASD_D1100/BI0_ASD_D1100.csv" \
+  --function="ZRFC_READ_TABLE" \
+  --table="/B1H/ASD_D1100" \
+  --key='::checksum()' \
+  --where=' /BIC/ZUPDATED >= '"'"'020210601000000'"'"' ' \
+  --partition="::dateformat(/BIC/ZUPDATED,yyyyMMdd,yyyy)" \
+  --debug="true" \
+  --row_count=300000
+```
+* No exemplo acima especificamos uma **condição** para a extração dos dados no parâmetro _where_ e no parâmetro **row_count** colocamos o número 300.000 que será responsável por fazer a extração dos dados por partes de 300.000, ou seja, irá trazer os dados de 0 a 300.000, depois de 300.000 até 600.000 até que atinja o tamanho total de registros.
+* Também colocamos o parâmetro **debug** com o valor true para efetuarmos um acompanhamento do que está acontecendo no processo, dessa maneira conseguimos traquear onde o processo está através de um log bem detalhado. Esse log apresenta a quantidade de registros por chamada e também é possível acompanhar o tempo de chamada de ida e vinda do servidor SAP e também é possível acompanhar o tempo de escrita do mitt.
 
 ## Contributing, Bugs, Questions
 Contributions are more than welcome! If you want to propose new changes, fix bugs or improve something feel free to fork the repository and send us a Pull Request. You can also open new `Issues` for reporting bugs and general problems.
