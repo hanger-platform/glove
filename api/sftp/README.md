@@ -49,7 +49,8 @@ java -jar sftp.jar  \
 	--pattern=<(Optional) SFTP file pattern; *.csv as default> \
 	--partition=<(Optional)  Partition, divided by + if has more than one field> \
 	--key=<(Optional) Unique key, divided by + if has more than one field> \
-	--field=<Fields to extracted from raw file, divided by +>
+	--field=<Fields to extracted from raw file, divided by +> \
+	--properties=<(optional) reader properties>
 ```
 
 ## Contributing, Bugs, Questions
