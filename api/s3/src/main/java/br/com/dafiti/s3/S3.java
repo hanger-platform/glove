@@ -47,7 +47,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
-import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 
 /**
