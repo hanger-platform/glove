@@ -81,6 +81,7 @@ Uma das principais características do MITT é a possibilidade de transformaçã
 | **Eval**| Transforma um campo usando funções do JavaScript | ::eval(\*\*<campo\>.replace('A','B')\*\*) |
 | **FarmFingerprint**| Aplica a função de hash FarmFingerprint em um ou mais campos | ::farmfingerprint([[<campo\>,<campo\>]]) |
 | **FileName**| Retorna o nome do arquivo que está sendo processado, quando o input for um arquivo  | ::filename() |
+| **FileLastModified**| Retorna a data de modificação do arquivo, quando o input for um arquivo  | ::fileLastModified() |
 | **Fixed**| Retorna um valor fixo | ::fixed(oi) |
 | **MD5**| Aplica a função de hash MD5 em um ou mais campos | ::md5([[<campo\>,<campo\>]])|
 | **Now**| Retorna a data e hora corrente | ::now() |
