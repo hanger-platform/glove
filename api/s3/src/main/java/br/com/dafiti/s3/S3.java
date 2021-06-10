@@ -47,7 +47,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
-import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
 
 /**
  * S3 file extractor.
@@ -75,7 +75,9 @@ public class S3 {
                     .addParameter("p", "prefix", "Object prefix (folder/subfolder/ or folder/subfolder/key.csv)", "", true, true)
                     .addParameter("f", "field", "Fields to be extracted from the file", "", true, false)
                     .addParameter("sd", "start_date", "(Optional) Object modified date since", "")
+                    .addParameter("st", "start_time", "(Optional) Object modified time since", "00:00:00")
                     .addParameter("ed", "end_date", "(Optional) Object modified date to", "")
+                    .addParameter("et", "end_time", "(Optional) Object modified time to", "23:59:59")
                     .addParameter("fr", "filter", "(Optional) Object key filter", "")
                     .addParameter("r", "retries", "(Optional)(Default is 3) Identifies how many retries will do when limit rate exceeded.", "3")
                     .addParameter("d", "delimiter", "(Optional) File delimiter; ';' as default", ";")
@@ -124,7 +126,7 @@ public class S3 {
                     boolean interval = true;
 
                     String objectKey = s3ObjectSummary.getKey();
-                    LocalDate updatedDate = LocalDate.fromDateFields(s3ObjectSummary.getLastModified());
+                    LocalDateTime updatedDate = LocalDateTime.fromDateFields(s3ObjectSummary.getLastModified());
 
                     if ((cli.getParameter("filter") != null)
                             || (cli.getParameter("start_date") != null
@@ -141,8 +143,8 @@ public class S3 {
                         if (cli.getParameter("start_date") != null
                                 && cli.getParameter("end_date") != null) {
 
-                            interval = updatedDate.compareTo(LocalDate.parse(cli.getParameter("start_date"))) >= 0
-                                    && updatedDate.compareTo(LocalDate.parse(cli.getParameter("end_date"))) <= 0;
+                            interval = updatedDate.compareTo(LocalDateTime.parse(cli.getParameter("start_date") + "T" + cli.getParameter("start_time"))) >= 0
+                                    && updatedDate.compareTo(LocalDateTime.parse(cli.getParameter("end_date") + "T" + cli.getParameter("end_time"))) <= 0;
                         }
                     } else {
                         Logger.getLogger(S3.class.getName()).log(Level.SEVERE, "start_date and end_date or filter parameter should be supplied");
@@ -173,6 +175,9 @@ public class S3 {
                                 throw new AmazonClientException("Fail downloading object" + cli.getParameter("bucket") + "/" + s3ObjectSummary.getKey() + " with state " + transferState.name() + "!");
                             }
                         }
+
+                        //Sets the same modified date as the original file.
+                        outputFile.setLastModified(s3ObjectSummary.getLastModified().getTime());
                     }
                 }
             }

@@ -36,7 +36,9 @@ java -jar s3.jar  \
 	--prefix=<(Optional) Object prefix> \
 	--field=<Fields of ouput file> \
 	--start_date=<(Optional) Object modified date since as YYYY-MM-DD> \
+	--start_time=<(Optional) Object modified time since as HH:MM:SS. Default 00:00:00> \
 	--end_date=<(Optional) Object modified date to as YYYY-MM-DD>  \ 
+	--end_time=<(Optional) Object modified time to as HH:MM:SS. Default 23:59:59>  \ 
 	--filter=<(Optional) Regexp expression to filter to select desired objects> \ 
 	--partition=<(Optional) Partition, divided by + if has more than one field> \
 	--key=<(Optional) Unique key, divided by + if has more than one field> \
