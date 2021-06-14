@@ -97,16 +97,16 @@ partition_load()
 		
 		# Atualiza/Cria a partição no BigQuery. 
 		if [ "${PARTITION_EXISTS}" -eq "1" ]; then 
-			bq query --allow_large_results --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --destination_table=${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}_${PARTITION} "SELECT R.* FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION} R LEFT JOIN ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} S ON R.CUSTOM_PRIMARY_KEY=S.CUSTOM_PRIMARY_KEY  WHERE S.CUSTOM_PRIMARY_KEY IS NULL AND R.PARTITION_FIELD = '${PARTITION}';"  
+			bq query --allow_large_results --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --destination_table=${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}_${PARTITION} "SELECT R.* FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION} R LEFT JOIN ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} S ON R.CUSTOM_PRIMARY_KEY=S.CUSTOM_PRIMARY_KEY  WHERE S.CUSTOM_PRIMARY_KEY IS NULL AND CAST(R.PARTITION_FIELD AS STRING) = '${PARTITION}';"  
 			error_check
 			
 			bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION}
-			bq query --allow_large_results --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --destination_table=${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION} "SELECT R.* FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}_${PARTITION} R UNION ALL SELECT S.* FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} S WHERE S.PARTITION_FIELD = '${PARTITION}';"
+			bq query --allow_large_results --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --destination_table=${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION} "SELECT R.* FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}_${PARTITION} R UNION ALL SELECT S.* FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} S WHERE CAST(S.PARTITION_FIELD AS STRING) = '${PARTITION}';"
 			
 			error_check
 			bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}_${PARTITION}
 		else
-			bq query --allow_large_results --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --destination_table=${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION} "SELECT * FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} WHERE PARTITION_FIELD = '${PARTITION}';"  
+			bq query --allow_large_results --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --destination_table=${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION} "SELECT * FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} WHERE CAST(PARTITION_FIELD AS STRING) = '${PARTITION}';"  
 			error_check
 		fi			
     done	
