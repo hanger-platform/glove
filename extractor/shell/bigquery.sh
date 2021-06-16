@@ -92,8 +92,7 @@ partition_load()
 		elif [ "${#PARTITION}" -eq "4" ]; then
 			PARTITION_TYPE=YEAR
 		else 
-			echo "This partition is invalid, allowed partition format are: yyyyMMdd, yyyyMM or yyyy"
-			exit 1
+			echo "Partition '${PARTITION}' is invalid, allowed partition format are: yyyyMMdd, yyyyMM or yyyy"
 		fi
 
         # Identifica se a partição existe no BigQuery. 
