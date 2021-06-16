@@ -82,10 +82,24 @@ partition_load()
     do
         # Identifica a partição. 
         PARTITION=`echo $i | cut -d '.' -f 1`
+		PARTITION_SIZE=${#PARTITION}
+		PARTITION_TYPE=DAY
         error_check
+		
+		if [ PARTITION_SIZE -eq 8 ]; then
+			PARTITION_TYPE=DAY
+		else if [ PARTITION_SIZE -eq 6 ]; then
+			PARTITION_TYPE=MONTH
+		else if [ PARTITION_SIZE -eq 4 ]; then
+			PARTITION_TYPE=YEAR
+		else 
+			echo "This partition is invalid, allowed partition format are: yyyyMMdd, yyyyMM or yyyy"
+			exit 1
+		fi
+		 
 
         # Identifica se a partição existe no BigQuery. 
-        echo "Cheking partition ${PARTITION}!"
+        echo "Cheking partition ${PARTIT}!"
 		bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}_${PARTITION}
 		bq query --allow_large_results --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false "SELECT COUNT(1) AS TOTAL_ROWS_IN_PARTITION FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION}"
 
@@ -106,9 +120,9 @@ partition_load()
 			error_check
 			bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}_${PARTITION}
 		else
-			bq query --allow_large_results --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --destination_table=${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION} "SELECT * FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} WHERE CAST(PARTITION_FIELD AS STRING) = '${PARTITION}';"  
+			bq query --allow_large_results --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --time_partitioning_type=${PARTITION_TYPE} --destination_table=${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION} "SELECT * FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} WHERE CAST(PARTITION_FIELD AS STRING) = '${PARTITION}';"  
 			error_check
-		fi			
+		fi
     done	
 
     # Remove os arquivos temporários.
