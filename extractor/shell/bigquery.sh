@@ -82,15 +82,14 @@ partition_load()
     do
         # Identifica a partição. 
         PARTITION=`echo $i | cut -d '.' -f 1`
-		PARTITION_SIZE=${#PARTITION}
 		PARTITION_TYPE=DAY
         error_check
 		
-		if [ PARTITION_SIZE -eq 8 ]; then
+		if [ ${#PARTITION} -eq "8" ]; then
 			PARTITION_TYPE=DAY
-		elif [ PARTITION_SIZE -eq 6 ]; then
+		elif [ ${#PARTITION} -eq "6" ]; then
 			PARTITION_TYPE=MONTH
-		elif [ PARTITION_SIZE -eq 4 ]; then
+		elif [ ${#PARTITION} -eq "4" ]; then
 			PARTITION_TYPE=YEAR
 		else 
 			echo "This partition is invalid, allowed partition format are: yyyyMMdd, yyyyMM or yyyy"
