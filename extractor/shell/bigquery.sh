@@ -85,11 +85,11 @@ partition_load()
 		PARTITION_TYPE=DAY
         error_check
 		
-		if [ ${#PARTITION} -eq "8" ]; then
+		if [ "${#PARTITION}" -eq "8" ]; then
 			PARTITION_TYPE=DAY
-		elif [ ${#PARTITION} -eq "6" ]; then
+		elif [ "${#PARTITION}" -eq "6" ]; then
 			PARTITION_TYPE=MONTH
-		elif [ ${#PARTITION} -eq "4" ]; then
+		elif [ "${#PARTITION}" -eq "4" ]; then
 			PARTITION_TYPE=YEAR
 		else 
 			echo "This partition is invalid, allowed partition format are: yyyyMMdd, yyyyMM or yyyy"
@@ -97,7 +97,7 @@ partition_load()
 		fi
 
         # Identifica se a partição existe no BigQuery. 
-        echo "Cheking partition ${PARTIT}!"
+        echo "Cheking partition ${PARTITION}!"
 		bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}_${PARTITION}
 		bq query --allow_large_results --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false "SELECT COUNT(1) AS TOTAL_ROWS_IN_PARTITION FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION}"
 
