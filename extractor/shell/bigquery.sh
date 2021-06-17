@@ -82,7 +82,7 @@ partition_load()
     do
         # Identifica a partição. 
         PARTITION=`echo $i | cut -d '.' -f 1`
-		PARTITION_TYPE=DAY
+		PARTITION_TYPE=
         error_check
 		
 		# Identifica se a partição é por dia, mês ou ano.
@@ -95,31 +95,34 @@ partition_load()
 		else 
 			echo "Partition '${PARTITION}' is invalid, allowed partition format are: yyyyMMdd, yyyyMM or yyyy"
 		fi
-
-        # Identifica se a partição existe no BigQuery. 
-        echo "Cheking partition ${PARTITION}!"
-		bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}_${PARTITION}
-		bq query --allow_large_results --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false "SELECT COUNT(1) AS TOTAL_ROWS_IN_PARTITION FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION}"
-
-		if [ $? -eq 0 ]; then
-			PARTITION_EXISTS=1
-		else
-			PARTITION_EXISTS=0
-		fi		
 		
-		# Atualiza/Cria a partição no BigQuery. 
-		if [ "${PARTITION_EXISTS}" -eq "1" ]; then 
-			bq query --allow_large_results --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --destination_table=${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}_${PARTITION} "SELECT R.* FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION} R LEFT JOIN ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} S ON R.CUSTOM_PRIMARY_KEY=S.CUSTOM_PRIMARY_KEY  WHERE S.CUSTOM_PRIMARY_KEY IS NULL AND CAST(R.PARTITION_FIELD AS STRING) = '${PARTITION}';"  
-			error_check
-			
-			bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION}
-			bq query --allow_large_results --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --time_partitioning_type=${PARTITION_TYPE} --destination_table=${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION} "SELECT R.* FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}_${PARTITION} R UNION ALL SELECT S.* FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} S WHERE CAST(S.PARTITION_FIELD AS STRING) = '${PARTITION}';"
-			
-			error_check
+		# Identifica se a partição foi definida.
+		if [ ${#PARTITION_TYPE} -gt 0 ]; then
+			# Identifica se a partição existe no BigQuery. 
+			echo "Cheking partition ${PARTITION}!"
 			bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}_${PARTITION}
-		else
-			bq query --allow_large_results --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --time_partitioning_type=${PARTITION_TYPE} --destination_table=${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION} "SELECT * FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} WHERE CAST(PARTITION_FIELD AS STRING) = '${PARTITION}';"  
-			error_check
+			bq query --allow_large_results --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false "SELECT COUNT(1) AS TOTAL_ROWS_IN_PARTITION FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION}"
+
+			if [ $? -eq 0 ]; then
+				PARTITION_EXISTS=1
+			else
+				PARTITION_EXISTS=0
+			fi		
+			
+			# Atualiza/Cria a partição no BigQuery. 
+			if [ "${PARTITION_EXISTS}" -eq "1" ]; then 
+				bq query --allow_large_results --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --destination_table=${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}_${PARTITION} "SELECT R.* FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION} R LEFT JOIN ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} S ON R.CUSTOM_PRIMARY_KEY=S.CUSTOM_PRIMARY_KEY  WHERE S.CUSTOM_PRIMARY_KEY IS NULL AND CAST(R.PARTITION_FIELD AS STRING) = '${PARTITION}';"  
+				error_check
+				
+				bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION}
+				bq query --allow_large_results --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --time_partitioning_type=${PARTITION_TYPE} --destination_table=${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION} "SELECT R.* FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}_${PARTITION} R UNION ALL SELECT S.* FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} S WHERE CAST(S.PARTITION_FIELD AS STRING) = '${PARTITION}';"
+				
+				error_check
+				bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}_${PARTITION}
+			else
+				bq query --allow_large_results --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --time_partitioning_type=${PARTITION_TYPE} --destination_table=${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION} "SELECT * FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} WHERE CAST(PARTITION_FIELD AS STRING) = '${PARTITION}';"  
+				error_check
+			fi
 		fi
     done
 
