@@ -85,6 +85,7 @@ partition_load()
 		PARTITION_TYPE=DAY
         error_check
 		
+		# Identifica se a partição é por dia, mês ou ano.
 		if [ "${#PARTITION}" -eq "8" ]; then
 			PARTITION_TYPE=DAY
 		elif [ "${#PARTITION}" -eq "6" ]; then
@@ -112,7 +113,7 @@ partition_load()
 			error_check
 			
 			bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION}
-			bq query --allow_large_results --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --destination_table=${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION} "SELECT R.* FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}_${PARTITION} R UNION ALL SELECT S.* FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} S WHERE CAST(S.PARTITION_FIELD AS STRING) = '${PARTITION}';"
+			bq query --allow_large_results --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --time_partitioning_type=${PARTITION_TYPE} --destination_table=${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION} "SELECT R.* FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}_${PARTITION} R UNION ALL SELECT S.* FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} S WHERE CAST(S.PARTITION_FIELD AS STRING) = '${PARTITION}';"
 			
 			error_check
 			bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}_${PARTITION}
