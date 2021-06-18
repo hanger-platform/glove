@@ -34,10 +34,8 @@ import com.criteo.marketing.ApiClient;
 import com.criteo.marketing.ApiException;
 import com.criteo.marketing.ApiResponse;
 import com.criteo.marketing.Configuration;
-import com.criteo.marketing.api.AuthenticationApi;
-import com.criteo.marketing.api.StatisticsApi;
-import com.criteo.marketing.model.StatsQueryMessageEx;
-import com.criteo.marketing.model.StatsQueryMessageEx.*;
+import com.criteo.marketing.api.AnalyticsApi;
+import com.criteo.marketing.model.StatisticsReportQueryMessage;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -58,6 +56,7 @@ import org.json.simple.parser.ParseException;
 /**
  *
  * @author Valdiney V GOMES
+ * @author Fernando Saga
  */
 public class Criteo {
 
@@ -99,10 +98,9 @@ public class Criteo {
                     .addField(cli.getParameterAsList("field", "\\+"));
 
             //Defines report dimensions. 
-            ArrayList QueryDimensions = new ArrayList<DimensionsEnum>();
-
+            ArrayList QueryDimensions = new ArrayList<StatisticsReportQueryMessage.DimensionsEnum>();
             cli.getParameterAsList("dimensions", "\\+").forEach(dimension -> {
-                QueryDimensions.add(DimensionsEnum.valueOf(dimension.toUpperCase()));
+                QueryDimensions.add(StatisticsReportQueryMessage.DimensionsEnum.valueOf(dimension.toUpperCase()));
             });
 
             //Define report metrics. 
@@ -123,36 +121,31 @@ public class Criteo {
                     );
 
             //Defines query parameters.
-            StatsQueryMessageEx statsQuery = new StatsQueryMessageEx();
-            statsQuery.setReportType(ReportTypeEnum.CAMPAIGNPERFORMANCE);
-            statsQuery.setAdvertiserIds(cli.getParameter("account"));
-            statsQuery.setStartDate(OffsetDateTime.of(startDate.atStartOfDay(), ZoneOffset.UTC));
-            statsQuery.setEndDate(OffsetDateTime.of(endDate.atStartOfDay(), ZoneOffset.UTC));
-            statsQuery.setTimezone(TimezoneEnum.GMT);
-            statsQuery.setFormat(FormatEnum.CSV);
-            statsQuery.setCurrency(cli.getParameter("currency"));
-            statsQuery.setDimensions(QueryDimensions);
-            statsQuery.setMetrics(QueryMetrics);
-
-            //Defines the client API. 
-            ApiClient client = Configuration.getDefaultApiClient();
-            client.setDebugging(cli.hasParameter("debug"));
-
-            client.setDateFormat(DateFormat.getDateInstance(DateFormat.SHORT));
+            StatisticsReportQueryMessage srqm = new StatisticsReportQueryMessage();
+            srqm.advertiserIds(cli.getParameter("account"));
+            srqm.startDate(OffsetDateTime.of(startDate.atStartOfDay(), ZoneOffset.UTC));
+            srqm.endDate(OffsetDateTime.of(endDate.atStartOfDay(), ZoneOffset.UTC));
+            srqm.timezone("GMT");
+            srqm.format("Csv");
+            srqm.currency(cli.getParameter("currency"));
+            srqm.dimensions(QueryDimensions);
+            srqm.metrics(QueryMetrics);
 
             //Reads the credentials file. 
             JSONParser parser = new JSONParser();
             JSONObject credentials = (JSONObject) parser.parse(new FileReader(cli.getParameter("credentials")));
 
-            //Requests the access token. 
-            String accessToken = new AuthenticationApi(client).oAuth2TokenPost(
-                    credentials.get("client_id").toString(),
-                    credentials.get("client_secret").toString(),
-                    "client_credentials"
-            ).getAccessToken();
+            //Defines the client API. 
+            ApiClient client = Configuration.getDefaultApiClient();
 
-            //Requests report data. 
-            ApiResponse<byte[]> stats = new StatisticsApi(client).getStatsWithHttpInfo("Bearer " + accessToken, statsQuery);
+            client.setUsername(credentials.get("client_id").toString());
+            client.setPassword(credentials.get("client_secret").toString());
+            client.setDebugging(cli.hasParameter("debug"));
+            client.setDateFormat(DateFormat.getDateInstance(DateFormat.SHORT));
+
+            //Requests report data.
+            AnalyticsApi analyticsApi = new AnalyticsApi(client);
+            ApiResponse<byte[]> stats = analyticsApi.getAdsetReportWithHttpInfo(srqm);
 
             Path outputPath = Files.createTempDirectory("criteo_");
             FileUtils.writeByteArrayToFile(
@@ -171,7 +164,7 @@ public class Criteo {
             System.exit(1);
         } finally {
             mitt.close();
-            
+
             LOG.info("Glove - Criteo Analytics Extractor finalized.");
             System.exit(0);
         }
