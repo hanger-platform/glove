@@ -55,11 +55,13 @@ public class MittTest {
         mitt.getConfiguration().addCustomField("custom_primary_key::farmfingerprint([[nome]])");
         mitt.getConfiguration().addCustomField("scanner::concat([[id,nome,::now(),::Dateformat(data,YYYYMM),::eval(**nome.replace('A','xxx')**)]])");
         mitt.getConfiguration().addCustomField("fixed::concat([[id,nome,::eval(**nome.replace('A','xxx')**)]])");
-        mitt.getConfiguration().addCustomField("bola::eval(**nome.replace(/[^0-9.]/g,'xxx')**)");
+        mitt.getConfiguration().addCustomField("eval::eval(**nome.replace(/[^0-9.]/g,'xxx')**)");
         mitt.getConfiguration().addCustomField("regex::regexp(nome,[9])");
         mitt.getConfiguration().addCustomField("checksum::checksum()");
         mitt.getConfiguration().addCustomField("renamed::rename(nome)");
-        mitt.getConfiguration().addCustomField("xxx::dateformat(**::jsonpath(json, $.[0].time, false)**,yyyy-MM-dd,yyyyMM)");
+        mitt.getConfiguration().addCustomField("complex::dateformat(**::jsonpath(json, $.[0].time, false)**,yyyy-MM-dd,yyyyMM)");
+        mitt.getConfiguration().addCustomField("rownumber::RowNumber()");
+        mitt.getConfiguration().addCustomField("at::at(4)");
 
         //Parameters. 
         mitt.getConfiguration().addParameter("a", "primeiro", "Primeiro parâmetro", "xxx");

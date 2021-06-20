@@ -25,8 +25,9 @@ package br.com.dafiti.mitt.transformation.embedded;
 
 import br.com.dafiti.mitt.transformation.Parser;
 import br.com.dafiti.mitt.transformation.Transformable;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -47,7 +48,14 @@ public class FileLastModified implements Transformable {
         String lastModified = "";
 
         if (parser.getFile() != null) {
-            lastModified = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(parser.getFile().lastModified()));
+            BasicFileAttributes fileAttributes = parser.getFileAttributes();
+
+            if (parser.getFileAttributes() != null) {
+                lastModified = DateTimeFormatter
+                        .ofPattern("yyyy-MM-dd HH:mm:ss")
+                        .withZone(ZoneId.systemDefault())
+                        .format(fileAttributes.lastAccessTime().toInstant());
+            }
         }
 
         return lastModified;

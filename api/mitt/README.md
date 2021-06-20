@@ -1,4 +1,5 @@
 
+
 # MITT Framework [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ### O MITT é um framework utilizado para criação de conectores para o Glove.
 
@@ -93,6 +94,9 @@ Uma das principais características do MITT é a possibilidade de transformaçã
 | **Replace**| Substitui todas as ocorrências de um conjunto de caracteres em uma string existente por outros caracteres especificados | ::replace(<campo\>,<valor a substituir\>,<novo valor\>) |
 | **Trim**| Remove os espaços em branco iniciais e finais, ou pode remover apenas os iniciais ou apenas os finais | ::trim(<campo\>,[(Opcional) Para limpar apenas os iniciais informar LTRIM, para limpar apenas os finais informar RTRIM]) |
 | **JsonPath**| Retorna o valor para o par de valor:chave referenciado por um JSON | ::jsonpath(<campo\>,<valor:chave, exemplo: $['book']['title']\>) ou em alguns casos pode estourar erro no console ao parsear algum campo, senão quiser apresentar o erro no console pode usar a função da seguinte maneira: ::jsonpath(<campo\>,<valor:chave, exemplo: $['book']['title']\>,<apresenta erros no console, true sim, false não; exemplo: false>) |
+| **At**| Retorna o valor em uma posição específica de um campo original | ::At(<posisão\>) |
+| **FileSize**| Retorna o tamanho do arquivo em bytes, quando o input for um arquivo  | ::fileSize() |
+| **RowNumber**| Retorna o número da linha | ::RowNumber([(Opcional) Campo, quando informado a função retornará o mesmo número de linha para o mesmo valor de campo]) |
 
 
 ##### RESERVED CHARACTERES
