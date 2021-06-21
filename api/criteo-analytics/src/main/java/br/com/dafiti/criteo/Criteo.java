@@ -25,7 +25,6 @@ package br.com.dafiti.criteo;
 
 import br.com.dafiti.mitt.Mitt;
 import br.com.dafiti.mitt.cli.CommandLineInterface;
-import br.com.dafiti.mitt.exception.DuplicateEntityException;
 import br.com.dafiti.mitt.transformation.embedded.Concat;
 import br.com.dafiti.mitt.transformation.embedded.Now;
 import java.time.OffsetDateTime;
@@ -38,7 +37,6 @@ import com.criteo.marketing.api.AnalyticsApi;
 import com.criteo.marketing.model.StatisticsReportQueryMessage;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DateFormat;
@@ -51,7 +49,6 @@ import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 /**
  *
@@ -64,6 +61,9 @@ public class Criteo {
 
     public static void main(String[] args) {
         LOG.info("Glove - Criteo Analytics Extractor started");
+
+        int retries = 0;
+        boolean retry = false;
 
         //Defines a MITT instance. 
         Mitt mitt = new Mitt();
@@ -82,7 +82,8 @@ public class Criteo {
                     .addParameter("cu", "currency", "(Optional) Currency code.  Default is BRL", "BRL")
                     .addParameter("pa", "partition", "(Optional)  Partition, divided by + if has more than one field")
                     .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "")
-                    .addParameter("d", "debug", "(Optional) Identifies if debug mode is enabled", false);
+                    .addParameter("d", "debug", "(Optional) Identifies if debug mode is enabled", false)
+                    .addParameter("r", "retry", "(Optional) How many retries. Default is 3", "3");
 
             //Reads the command line interface. 
             CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -143,22 +144,37 @@ public class Criteo {
             client.setDebugging(cli.hasParameter("debug"));
             client.setDateFormat(DateFormat.getDateInstance(DateFormat.SHORT));
 
-            //Requests report data.
-            AnalyticsApi analyticsApi = new AnalyticsApi(client);
-            ApiResponse<byte[]> stats = analyticsApi.getAdsetReportWithHttpInfo(srqm);
+            do {
+                try {
+                    //Requests report data.
+                    AnalyticsApi analyticsApi = new AnalyticsApi(client);
+                    ApiResponse<byte[]> stats = analyticsApi.getAdsetReportWithHttpInfo(srqm);
 
-            Path outputPath = Files.createTempDirectory("criteo_");
-            FileUtils.writeByteArrayToFile(
-                    new File(outputPath.toString() + "/" + "criteo-analytics.csv"),
-                    stats.getData());
+                    Path outputPath = Files.createTempDirectory("criteo_");
+                    FileUtils.writeByteArrayToFile(
+                            new File(outputPath.toString() + "/" + "criteo-analytics.csv"),
+                            stats.getData());
 
-            //Write the data to output file. 
-            mitt.write(outputPath.toFile(), "*.csv");
-            FileUtils.deleteDirectory(outputPath.toFile());
-        } catch (DuplicateEntityException
-                | IOException
-                | ParseException
-                | ApiException ex) {
+                    //Write the data to output file. 
+                    mitt.write(outputPath.toFile(), "*.csv");
+                    FileUtils.deleteDirectory(outputPath.toFile());
+
+                    retry = false;
+
+                } catch (ApiException e) {
+                    retries++;
+                    retry = true;
+
+                    if (retries > Integer.parseInt(cli.getParameter("retry"))) {
+                        throw new Exception("HTTP Exception " + e.getResponseBody());
+                    } else {
+                        Thread.sleep(retries * 10000);
+                        LOG.log(Level.INFO, "Authentication error, retry {0}", retries);
+                    }
+                }
+            } while (retry);
+
+        } catch (Exception ex) {
 
             LOG.log(Level.SEVERE, "Criteo Analytics Extractor failure: ", ex);
             System.exit(1);
