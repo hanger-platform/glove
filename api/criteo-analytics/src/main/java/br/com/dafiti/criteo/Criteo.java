@@ -166,7 +166,7 @@ public class Criteo {
                     retry = true;
 
                     if (retries > Integer.parseInt(cli.getParameter("retry"))) {
-                        throw new Exception("HTTP Exception " + e.getResponseBody());
+                        throw new Exception("ApiException: " + e);
                     } else {
                         Thread.sleep(retries * 10000);
                         LOG.log(Level.INFO, "Authentication error, retry {0}", retries);
