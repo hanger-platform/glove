@@ -85,7 +85,8 @@ public class FTP {
                     .addParameter("pa", "partition", "(Optional)  Partition, divided by + if has more than one field")
                     .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "")
                     .addParameter("ps", "passive", "(Optional) Define the connection mode. Default is true (passive)", "true")
-                    .addParameter("en", "encode", "(Optional) Encode file.", "auto");
+                    .addParameter("en", "encode", "(Optional) Encode file.", "auto")
+                    .addParameter("pr", "properties", "(Optional) Reader properties", "");
 
             //Reads the command line interface. 
             CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -156,6 +157,11 @@ public class FTP {
 
             //Write to the output.
             mitt.getReaderSettings().setDelimiter(cli.getParameter("delimiter").charAt(0));
+            
+            if (cli.getParameter("properties") != null) {
+                mitt.getReaderSettings().setProperties(cli.getParameter("properties"));
+            }
+            
             mitt.getReaderSettings().setEncode(cli.getParameter("encode"));
             mitt.write(outputPath.toFile(), "*");
             FileUtils.deleteDirectory(outputPath.toFile());
