@@ -293,8 +293,13 @@ drop_partitioned_table()
 	
 	for i in $(bq ls -n 9999 ${CUSTOM_SCHEMA}${SCHEMA_NAME} | grep ${TABLE}_ | awk '{print $1}'); 	
 	do 
-		echo "Removing partition ${i}!"		
-		bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${i}
+		# Identifica se a partição termina com uma data após nome da tabela.
+		pattern="^${TABLE}_[0-9]{8}"
+
+		if [[ $i =~ $pattern ]]; then
+			echo "Removing partition ${i}!"		
+			bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${i}
+		fi		
 	done;
 }
 
