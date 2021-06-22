@@ -285,6 +285,20 @@ error_check()
 	fi
 }
 
+# Dropa uma tabela particionada.
+drop_partitioned_table()
+{
+	# Dropa todas as partições da tabela.
+	echo "Removing table ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} partitions!"
+	
+	for i in $(bq ls -n 9999 ${CUSTOM_SCHEMA}${SCHEMA_NAME} | grep ${TABLE}_ | awk '{print $1}'); 	
+	do 
+		echo "Removing partition ${i}!"		
+	done;
+	
+	exit 1
+}
+
 # Identifica o tamanho do diretório de trabalho.
 QUEUE_FOLDER_SIZE=`du -s ${RAWFILE_QUEUE_PATH} | cut -f1`
 
@@ -300,13 +314,6 @@ if [ ${QUEUE_FOLDER_SIZE} -gt ${QUEUE_FILES_SIZE_LIMIT} ]; then
 	exit 1
 else
 	echo "${QUEUE_FOLDER_SIZE} KB of data will be processed ( ${QUEUE_FILES_SIZE_LIMIT} KB is the limit )!"
-fi
-
-# Identifica se deve recriar a tabela.
-if [ ${IS_RECREATE} = 1 ]; then
-    # Dropa a tabela para que possa ser recriada.
-	echo "Removing table ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}!"
-	bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} 
 fi
 
 # Identifica a quantidade de arquivos a serem processados.
@@ -360,8 +367,19 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 
 	# Identifica o tipo de carga que será realizado.
 	if [ "${#PARTITION_FIELD}" -gt "0" ]; then
+		# Identifica se deve recriar a tabela.
+		if [ ${IS_RECREATE} = 1 ]; then
+			drop_partitioned_table			
+		fi		
 		partition_load		
-	else
+	else	
+		# Identifica se deve recriar a tabela.
+		if [ ${IS_RECREATE} = 1 ]; then
+			# Dropa a tabela para que possa ser recriada.
+			echo "Removing table ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}!"
+			bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} 
+		fi
+	
 		if [ "${#DELTA_FIELD_IN_METADATA}" -gt "0" ]; then
 			delta_load			
 		else
