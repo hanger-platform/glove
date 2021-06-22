@@ -296,8 +296,6 @@ drop_partitioned_table()
 		echo "Removing partition ${i}!"		
 		bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${i}
 	done;
-	
-	exit 1
 }
 
 # Identifica o tamanho do diretório de trabalho.
