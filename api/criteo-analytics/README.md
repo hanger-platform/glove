@@ -6,9 +6,9 @@
 
 O **Criteo Analytics** possibilita a extração de dados da API de Analytics da Criteo,as possíveis combinações de dimensões e métrica podem ser consultadas na documentação da API, disponível nestes links:
 
-Metrics: https://developers.criteo.com/marketing-solutions/docs/metrics
+**Metrics**: https://developers.criteo.com/marketing-solutions/docs/metrics
 
-Dimensions: https://developers.criteo.com/marketing-solutions/docs/dimensions
+**Dimensions**: https://developers.criteo.com/marketing-solutions/docs/dimensions
 
 ## Instalação
 
