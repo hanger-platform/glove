@@ -4,7 +4,11 @@
 
 ## How it works
 
-O **Criteo Analytics** possibilita a extração de dados da API de Analytics da Criteo,as possíveis combinações de dimensões e métrica podem ser consultadas na documentação da API, disponível neste link: [Statistics v1](https://developers.criteo.com/marketing-solutions/v2020/docs/statistics-v1)
+O **Criteo Analytics** possibilita a extração de dados da API de Analytics da Criteo,as possíveis combinações de dimensões e métrica podem ser consultadas na documentação da API, disponível nestes links:
+
+**Metrics**: https://developers.criteo.com/marketing-solutions/docs/metrics
+
+**Dimensions**: https://developers.criteo.com/marketing-solutions/docs/dimensions
 
 ## Instalação
 
@@ -48,6 +52,7 @@ java -jar facebook-ad.jar \
 	--currency="[(Optional) Currency code.  Default is BRL]" \
 	--partition=[(Optional)  Partition field] \
 	--key=[(Optional) Unique key] \
+	--retry=[(Optional) Identifies the maximum retries after a fail. Default: 3] \
 	--debug
 ```
 

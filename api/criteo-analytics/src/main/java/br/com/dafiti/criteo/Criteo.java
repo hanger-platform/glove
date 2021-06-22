@@ -25,7 +25,6 @@ package br.com.dafiti.criteo;
 
 import br.com.dafiti.mitt.Mitt;
 import br.com.dafiti.mitt.cli.CommandLineInterface;
-import br.com.dafiti.mitt.exception.DuplicateEntityException;
 import br.com.dafiti.mitt.transformation.embedded.Concat;
 import br.com.dafiti.mitt.transformation.embedded.Now;
 import java.time.OffsetDateTime;
@@ -34,13 +33,10 @@ import com.criteo.marketing.ApiClient;
 import com.criteo.marketing.ApiException;
 import com.criteo.marketing.ApiResponse;
 import com.criteo.marketing.Configuration;
-import com.criteo.marketing.api.AuthenticationApi;
-import com.criteo.marketing.api.StatisticsApi;
-import com.criteo.marketing.model.StatsQueryMessageEx;
-import com.criteo.marketing.model.StatsQueryMessageEx.*;
+import com.criteo.marketing.api.AnalyticsApi;
+import com.criteo.marketing.model.StatisticsReportQueryMessage;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DateFormat;
@@ -53,11 +49,11 @@ import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 /**
  *
  * @author Valdiney V GOMES
+ * @author Fernando Saga
  */
 public class Criteo {
 
@@ -65,6 +61,9 @@ public class Criteo {
 
     public static void main(String[] args) {
         LOG.info("Glove - Criteo Analytics Extractor started");
+
+        int retries = 0;
+        boolean retry = false;
 
         //Defines a MITT instance. 
         Mitt mitt = new Mitt();
@@ -83,7 +82,8 @@ public class Criteo {
                     .addParameter("cu", "currency", "(Optional) Currency code.  Default is BRL", "BRL")
                     .addParameter("pa", "partition", "(Optional)  Partition, divided by + if has more than one field")
                     .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "")
-                    .addParameter("d", "debug", "(Optional) Identifies if debug mode is enabled", false);
+                    .addParameter("d", "debug", "(Optional) Identifies if debug mode is enabled", false)
+                    .addParameter("r", "retry", "(Optional) How many retries. Default is 3", "3");
 
             //Reads the command line interface. 
             CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -99,10 +99,9 @@ public class Criteo {
                     .addField(cli.getParameterAsList("field", "\\+"));
 
             //Defines report dimensions. 
-            ArrayList QueryDimensions = new ArrayList<DimensionsEnum>();
-
+            ArrayList QueryDimensions = new ArrayList<StatisticsReportQueryMessage.DimensionsEnum>();
             cli.getParameterAsList("dimensions", "\\+").forEach(dimension -> {
-                QueryDimensions.add(DimensionsEnum.valueOf(dimension.toUpperCase()));
+                QueryDimensions.add(StatisticsReportQueryMessage.DimensionsEnum.valueOf(dimension.toUpperCase()));
             });
 
             //Define report metrics. 
@@ -123,55 +122,65 @@ public class Criteo {
                     );
 
             //Defines query parameters.
-            StatsQueryMessageEx statsQuery = new StatsQueryMessageEx();
-            statsQuery.setReportType(ReportTypeEnum.CAMPAIGNPERFORMANCE);
-            statsQuery.setAdvertiserIds(cli.getParameter("account"));
-            statsQuery.setStartDate(OffsetDateTime.of(startDate.atStartOfDay(), ZoneOffset.UTC));
-            statsQuery.setEndDate(OffsetDateTime.of(endDate.atStartOfDay(), ZoneOffset.UTC));
-            statsQuery.setTimezone(TimezoneEnum.GMT);
-            statsQuery.setFormat(FormatEnum.CSV);
-            statsQuery.setCurrency(cli.getParameter("currency"));
-            statsQuery.setDimensions(QueryDimensions);
-            statsQuery.setMetrics(QueryMetrics);
-
-            //Defines the client API. 
-            ApiClient client = Configuration.getDefaultApiClient();
-            client.setDebugging(cli.hasParameter("debug"));
-
-            client.setDateFormat(DateFormat.getDateInstance(DateFormat.SHORT));
+            StatisticsReportQueryMessage srqm = new StatisticsReportQueryMessage();
+            srqm.advertiserIds(cli.getParameter("account"));
+            srqm.startDate(OffsetDateTime.of(startDate.atStartOfDay(), ZoneOffset.UTC));
+            srqm.endDate(OffsetDateTime.of(endDate.atStartOfDay(), ZoneOffset.UTC));
+            srqm.timezone("GMT");
+            srqm.format("Csv");
+            srqm.currency(cli.getParameter("currency"));
+            srqm.dimensions(QueryDimensions);
+            srqm.metrics(QueryMetrics);
 
             //Reads the credentials file. 
             JSONParser parser = new JSONParser();
             JSONObject credentials = (JSONObject) parser.parse(new FileReader(cli.getParameter("credentials")));
 
-            //Requests the access token. 
-            String accessToken = new AuthenticationApi(client).oAuth2TokenPost(
-                    credentials.get("client_id").toString(),
-                    credentials.get("client_secret").toString(),
-                    "client_credentials"
-            ).getAccessToken();
+            //Defines the client API. 
+            ApiClient client = Configuration.getDefaultApiClient();
 
-            //Requests report data. 
-            ApiResponse<byte[]> stats = new StatisticsApi(client).getStatsWithHttpInfo("Bearer " + accessToken, statsQuery);
+            client.setUsername(credentials.get("client_id").toString());
+            client.setPassword(credentials.get("client_secret").toString());
+            client.setDebugging(cli.hasParameter("debug"));
+            client.setDateFormat(DateFormat.getDateInstance(DateFormat.SHORT));
 
-            Path outputPath = Files.createTempDirectory("criteo_");
-            FileUtils.writeByteArrayToFile(
-                    new File(outputPath.toString() + "/" + "criteo-analytics.csv"),
-                    stats.getData());
+            do {
+                try {
+                    //Requests report data.
+                    AnalyticsApi analyticsApi = new AnalyticsApi(client);
+                    ApiResponse<byte[]> stats = analyticsApi.getAdsetReportWithHttpInfo(srqm);
 
-            //Write the data to output file. 
-            mitt.write(outputPath.toFile(), "*.csv");
-            FileUtils.deleteDirectory(outputPath.toFile());
-        } catch (DuplicateEntityException
-                | IOException
-                | ParseException
-                | ApiException ex) {
+                    Path outputPath = Files.createTempDirectory("criteo_");
+                    FileUtils.writeByteArrayToFile(
+                            new File(outputPath.toString() + "/" + "criteo-analytics.csv"),
+                            stats.getData());
+
+                    //Write the data to output file. 
+                    mitt.write(outputPath.toFile(), "*.csv");
+                    FileUtils.deleteDirectory(outputPath.toFile());
+
+                    retry = false;
+
+                } catch (ApiException e) {
+                    retries++;
+                    retry = true;
+
+                    if (retries > Integer.parseInt(cli.getParameter("retry"))) {
+                        throw new Exception("ApiException: " + e);
+                    } else {
+                        Thread.sleep(retries * 20000);
+                        LOG.log(Level.INFO, "Authentication error, retry {0}", retries);
+                    }
+                }
+            } while (retry);
+
+        } catch (Exception ex) {
 
             LOG.log(Level.SEVERE, "Criteo Analytics Extractor failure: ", ex);
             System.exit(1);
         } finally {
             mitt.close();
-            
+
             LOG.info("Glove - Criteo Analytics Extractor finalized.");
             System.exit(0);
         }
