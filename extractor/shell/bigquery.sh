@@ -84,6 +84,9 @@ partition_load()
         PARTITION=`echo $i | cut -d '.' -f 1`
 		PARTITION_LENGTH=
         error_check
+
+		# Partição a ser analisada.
+		echo "Cheking partition ${PARTITION}!"
 		
 		# Identifica se a partição é por dia, mês ou ano.
 		if [ "${#PARTITION}" -eq "8" ]; then
@@ -100,8 +103,7 @@ partition_load()
 		
 		# Identifica se a partição foi definida.
 		if [ ${#PARTITION_LENGTH} -gt 0 ]; then
-			# Identifica se a partição existe no BigQuery. 
-			echo "Cheking partition ${PARTITION}!"
+			# Identifica se a partição existe no BigQuery. 			
 			bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}_${PARTITION}
 			bq query --allow_large_results --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false "SELECT COUNT(1) AS TOTAL_ROWS_IN_PARTITION FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION}"
 
