@@ -21,40 +21,69 @@ partition_load()
 
 	#Particiona o arquivo contendo os dados. 
 	echo "Partitioning data file delimited by ${DELIMITER}!"
-	if [ ${IS_PARALLEL} = 1 ]; then
-		echo "Paralle actived"	
-			
-		if [ ${DELIMITER} == ";" ]; then
-			cat ${RAWFILE_QUEUE_FILE} | parallel --no-notice --pipe -L1000 --jobs 4 awk \'BEGIN{ FS=OFS=\"\;\" } { gsub\(/\\W/, \"\", \$1\)\; gsub\( \"\\042\", \"\", \$2\)\; print\>\$1\"_tmp_{#}\" }\'
-		else
-			cat ${RAWFILE_QUEUE_FILE} | parallel --no-notice --pipe -L1000 --jobs 4 awk \'BEGIN{ FS=OFS=\"\,\" } { gsub\(/\\W/, \"\", \$1\)\; gsub\( \"\\042\", \"\", \$2\)\; print\>\$1\"_tmp_{#}\" }\'
+
+	if [ ${MODULE} == "query" ] || [ ${MODULE} == "file" ]; then
+		if [ ${DEBUG} = 1 ] ; then
+			echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
+				--folder=${RAWFILE_QUEUE_PATH} \
+				--filename=*.csv \
+				--delimiter=${DELIMITER} \
+				--target=csv \
+				--splitStrategy=${SPLIT_STRATEGY} \
+				--partition=0 \
+				--thread=${THREAD} \
+				--escape=${QUOTE_ESCAPE} \
+				--header \
+				--replace \
+				--debug=${DEBUG}"
 		fi
-		error_check 	
-	else
-		if [ ${DELIMITER} == ";" ]; then
-			awk 'BEGIN{ FS=OFS=";" } { gsub(/\W/, "", $1); gsub( "\042", "", $2); print>$1".csv" }' ${RAWFILE_QUEUE_FILE}
-		else
-			awk 'BEGIN{ FS=OFS="," } { gsub(/\W/, "", $1); gsub( "\042", "", $2); print>$1".csv" }' ${RAWFILE_QUEUE_FILE}
-		fi
+
+        java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
+			--folder=${RAWFILE_QUEUE_PATH} \
+			--filename=*.csv \
+			--delimiter=${DELIMITER} \
+			--target=csv \
+			--splitStrategy=${SPLIT_STRATEGY} \
+			--partition=0 \
+			--thread=${THREAD} \
+			--escape=${QUOTE_ESCAPE} \
+			--header \
+			--replace \
+			--debug=${DEBUG}
 		error_check
-	fi
+    else
+		if [ ${DEBUG} = 1 ] ; then
+			echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
+				--folder=${RAWFILE_QUEUE_PATH} \
+				--filename=*.csv \
+				--delimiter=${DELIMITER} \
+				--target=csv \
+				--splitStrategy=${SPLIT_STRATEGY} \
+				--partition=0 \
+				--thread=${THREAD} \
+				--escape=${QUOTE_ESCAPE} \
+				--replace \
+				--debug=${DEBUG}"
+		fi
+
+        java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
+			--folder=${RAWFILE_QUEUE_PATH} \
+			--filename=*.csv \
+			--delimiter=${DELIMITER} \
+			--target=csv \
+			--splitStrategy=${SPLIT_STRATEGY} \
+			--partition=0 \
+			--thread=${THREAD} \
+			--escape=${QUOTE_ESCAPE} \
+			--replace \
+			--debug=${DEBUG}
+		error_check
+    fi
 
     # Remove o arquivo original, mantendo apenas as partições. 
-	echo "Removing file ${RAWFILE_QUEUE_FILE}!"
-	rm -f ${RAWFILE_QUEUE_FILE}
-	error_check
-
-	# Une os fragmentos da partição criados por cada executor do parallel. 
-	if [ ${IS_PARALLEL} = 1 ]; then
-		echo "Removing temporary files!"
-		
-		for i in `ls | cut -d"_" -f1 | uniq`
-		do 
-			cat ${i}_tmp_* > ${i}.csv
-			rm -f ${i}_tmp_*
-		done
-		error_check	
-	fi		
+	#echo "Removing file ${RAWFILE_QUEUE_FILE}!"
+	#rm -f ${RAWFILE_QUEUE_FILE}
+	#error_check
 	
 	# Compacta o arquivo de cada partição. 
 	echo "Compacting csv files!"
@@ -366,9 +395,9 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 		fi 
 		
 		# Remove o header do csv intermediário.
-		echo "Removing header from ${RAWFILE_QUEUE_FILE}!"
-		tail -n +2 ${RAWFILE_QUEUE_FILE} > ${RAWFILE_QUEUE_FILE}.tmp
-		mv -f ${RAWFILE_QUEUE_FILE}.tmp ${RAWFILE_QUEUE_FILE};
+		#echo "Removing header from ${RAWFILE_QUEUE_FILE}!"
+		#tail -n +2 ${RAWFILE_QUEUE_FILE} > ${RAWFILE_QUEUE_FILE}.tmp
+		#mv -f ${RAWFILE_QUEUE_FILE}.tmp ${RAWFILE_QUEUE_FILE};
     fi
 
 	# Identifica o tipo de carga que será realizado.
