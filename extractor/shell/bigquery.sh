@@ -289,11 +289,12 @@ error_check()
 drop_partitioned_table()
 {
 	# Dropa todas as partições da tabela.
-	echo "Removing table ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} partitions!"
+	echo "Removing table ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_ partitions!"
 	
 	for i in $(bq ls -n 9999 ${CUSTOM_SCHEMA}${SCHEMA_NAME} | grep ${TABLE}_ | awk '{print $1}'); 	
 	do 
 		echo "Removing partition ${i}!"		
+		bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${i}
 	done;
 	
 	exit 1
