@@ -17,68 +17,44 @@ DATA_FILE="${SCHEMA}_${TABLE}"
 partition_load()
 {
 	echo "Running partition load!"
-	cd ${RAWFILE_QUEUE_PATH}
+	cd ${RAWFILE_QUEUE_PATH}	
 
-	#Particiona o arquivo contendo os dados. 
+	FILE_INDEX=0
+
+	echo "Merging files!"
+
+	# Une os dados em um único arquivo.  
+	for i in `ls ${RAWFILE_QUEUE_PATH}*`
+	do
+		if [ ${FILE_INDEX} = 0 ]; then	
+			cat ${i}	>> ${RAWFILE_QUEUE_PATH}merged.csv
+			error_check
+		else
+			sed '1d' ${i} >> ${RAWFILE_QUEUE_PATH}merged.csv
+			error_check	
+		fi
+
+		FILE_INDEX=$(( $FILE_INDEX + 1 ))
+	done
+
 	echo "Partitioning data file delimited by ${DELIMITER}!"
 
-	if [ ${MODULE} == "query" ] || [ ${MODULE} == "file" ]; then
-		if [ ${DEBUG} = 1 ] ; then
-			echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
-				--folder=${RAWFILE_QUEUE_PATH} \
-				--filename=*.csv \
-				--delimiter=${DELIMITER} \
-				--target=csv \
-				--splitStrategy=${SPLIT_STRATEGY} \
-				--partition=0 \
-				--thread=${THREAD} \
-				--escape=${QUOTE_ESCAPE} \
-				--header \
-				--replace \
-				--debug=${DEBUG}"
-		fi
-
-        java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
-			--folder=${RAWFILE_QUEUE_PATH} \
-			--filename=*.csv \
-			--delimiter=${DELIMITER} \
-			--target=csv \
-			--splitStrategy=${SPLIT_STRATEGY} \
-			--partition=0 \
-			--thread=${THREAD} \
-			--escape=${QUOTE_ESCAPE} \
-			--header \
-			--replace \
-			--debug=${DEBUG}
-		error_check
-    else
-		if [ ${DEBUG} = 1 ] ; then
-			echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
-				--folder=${RAWFILE_QUEUE_PATH} \
-				--filename=*.csv \
-				--delimiter=${DELIMITER} \
-				--target=csv \
-				--splitStrategy=${SPLIT_STRATEGY} \
-				--partition=0 \
-				--thread=${THREAD} \
-				--escape=${QUOTE_ESCAPE} \
-				--replace \
-				--debug=${DEBUG}"
-		fi
-
-        java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
-			--folder=${RAWFILE_QUEUE_PATH} \
-			--filename=*.csv \
-			--delimiter=${DELIMITER} \
-			--target=csv \
-			--splitStrategy=${SPLIT_STRATEGY} \
-			--partition=0 \
-			--thread=${THREAD} \
-			--escape=${QUOTE_ESCAPE} \
-			--replace \
-			--debug=${DEBUG}
-		error_check
-    fi
+	# Particiona o arquivo em single thread (thread=1) para preservar os dados e nome das partições.  
+	# TODO - A geração de um único arquivo de saída deve ser suportada pelo conversor de dados nativamente sem a necessidade do merge anterior. 
+	java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
+		--folder=${RAWFILE_QUEUE_PATH} \
+		--filename=merged.csv \
+		--delimiter=${DELIMITER} \
+		--target=csv \
+		--splitStrategy=${SPLIT_STRATEGY} \
+		--partition=0 \
+		--thread=1 \
+		--escape=${QUOTE_ESCAPE} \
+		--header \
+		--readable \
+		--replace \
+		--debug=${DEBUG}
+	error_check
 
     # Remove o arquivo original, mantendo apenas as partições. 
 	#echo "Removing file ${RAWFILE_QUEUE_FILE}!"
