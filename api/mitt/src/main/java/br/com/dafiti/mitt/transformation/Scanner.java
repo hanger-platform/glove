@@ -106,6 +106,7 @@ public class Scanner {
     public Field scan(String content, boolean original) {
         String fieldName;
         Field field;
+        String alias = "";
         Transformable instance = null;
 
         //Identifies if should parse content.
@@ -282,12 +283,16 @@ public class Scanner {
                     }
                 }
             }
+        } else if (content.contains(">>")) {
+            //Identifies if should rename a field.
+            fieldName = StringUtils.substringBefore(content, ">>");
+            alias = StringUtils.substringAfter(content, ">>");
         } else {
             fieldName = content;
         }
 
         if (instance == null) {
-            field = new Field(fieldName);
+            field = new Field(fieldName, alias);
             field.setExpression(content);
         } else {
             field = new Field(fieldName, instance, original);

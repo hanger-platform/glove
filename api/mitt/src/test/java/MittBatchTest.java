@@ -35,13 +35,13 @@ public class MittBatchTest {
     public static void main(String[] args) throws DuplicateEntityException {
         Mitt mitt = new Mitt();
 
-        String xxx = "database+size+rownumber::rownumber()+FileLastModified::FileLastModified()+FileSize::FileSize()";
+        String xxx = "field+field+field";
 
-        mitt.setOutputFile("/tmp/braze/output/xxx.csv");
+        mitt.setOutputFile("/tmp/mitt/output/mitt.csv");
         mitt.getConfiguration().addField(Arrays.asList(xxx.split("\\+")));
         
         mitt.getReaderSettings().setDelimiter(',');
         
-        mitt.write(new File("/home/valdiney.gomes/Debug"), "*.*");
+        mitt.write(new File("/tmp/mitt/debug"), "*.*");
     }
 }

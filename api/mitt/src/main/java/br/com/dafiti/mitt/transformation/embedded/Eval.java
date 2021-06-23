@@ -62,9 +62,9 @@ public class Eval implements Transformable {
         for (String chunck : expression.split("\\W")) {
             if (parser
                     .getConfiguration()
-                    .getFieldName()
+                    .getOriginalFieldName()
                     .contains(chunck)) {
-                
+
                 String evaluated = parser.evaluate(record, chunck).toString();
                 parseable = parseable.replaceFirst(
                         chunck,

@@ -34,7 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class RowNumber implements Transformable {
 
-    private Object field;
+    private List<Object> fields;
     private ConcurrentHashMap<String, Integer> map;
 
     @Override
@@ -45,8 +45,8 @@ public class RowNumber implements Transformable {
     public RowNumber() {
     }
 
-    public RowNumber(String field) {
-        this.field = field;
+    public RowNumber(List<Object> fields) {
+        this.fields = fields;
     }
 
     @Override
@@ -55,19 +55,21 @@ public class RowNumber implements Transformable {
             List<Object> record) {
 
         int row = 0;
-        String key = "";
+        String key = new String();
 
         if (parser.getFile() != null) {
             key = parser.getFile().getName();
         }
 
         //Identifies if should define the key based on a field. 
-        if (field != null) {
-            Object content = parser.evaluate(record, field);
+        if (fields != null) {
+            String value = "";
 
-            if (content != null) {
-                key = key + "|" + String.valueOf(content);
+            for (Object field : fields) {
+                value += parser.evaluate(record, field);
             }
+
+            key += String.valueOf(value);
         }
 
         //Identifies if the key already exists and increment the counter.
