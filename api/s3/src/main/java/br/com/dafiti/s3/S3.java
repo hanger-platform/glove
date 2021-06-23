@@ -30,6 +30,8 @@ import br.com.dafiti.mitt.transformation.embedded.Concat;
 import br.com.dafiti.mitt.transformation.embedded.Now;
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
+import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
@@ -50,7 +52,7 @@ import org.apache.commons.io.FileUtils;
 import org.joda.time.LocalDateTime;
 
 /**
- * S3 file extractor.
+ * S3 File Extractor
  *
  * @author Helio Leal
  */
@@ -74,6 +76,7 @@ public class S3 {
                     .addParameter("b", "bucket", "S3 Bucket name", "", true, false)
                     .addParameter("p", "prefix", "Object prefix (folder/subfolder/ or folder/subfolder/key.csv)", "", true, true)
                     .addParameter("f", "field", "Fields to be extracted from the file", "", true, false)
+                    .addParameter("pf", "profile", "(Optional) Profile name.", "default")
                     .addParameter("sd", "start_date", "(Optional) Object modified date since", "")
                     .addParameter("st", "start_time", "(Optional) Object modified time since", "00:00:00")
                     .addParameter("ed", "end_date", "(Optional) Object modified date to", "")
@@ -99,18 +102,19 @@ public class S3 {
                     .addCustomField("etl_load_date", new Now())
                     .addField(cli.getParameterAsList("field", "\\+"));
 
-            //Defines a S3 client and lists objects of a folder.
-            ObjectListing listing = AmazonS3ClientBuilder
+            //Defines a S3 client
+            AmazonS3 amazonS3Client = AmazonS3ClientBuilder
                     .standard()
-                    .build().listObjects(cli.getParameter("bucket"), cli.getParameter("prefix"));
+                    .withCredentials(new ProfileCredentialsProvider(cli.getParameter("profile")))
+                    .build();
+
+            //Lists objects of a folder.
+            ObjectListing listing = amazonS3Client.listObjects(cli.getParameter("bucket"), cli.getParameter("prefix"));
 
             List<S3ObjectSummary> s3ObjectSummaries = listing.getObjectSummaries();
 
             while (listing.isTruncated()) {
-                listing = AmazonS3ClientBuilder
-                        .standard()
-                        .build()
-                        .listNextBatchOfObjects(listing);
+                listing = amazonS3Client.listNextBatchOfObjects(listing);
 
                 s3ObjectSummaries.addAll(listing.getObjectSummaries());
             }
@@ -159,12 +163,12 @@ public class S3 {
                         File outputFile = new File(outputPath.toString() + "/" + s3ObjectSummary.getKey().replaceAll("/", "_"));
 
                         //Transfer a file to local filesystem.               
-                        TransferState transferState = downloadObject(cli.getParameter("bucket"), s3ObjectSummary.getKey(), outputFile);
+                        TransferState transferState = downloadObject(cli.getParameter("bucket"), s3ObjectSummary.getKey(), outputFile, amazonS3Client);
 
                         //Identifies if should retry.
                         if (!transferState.equals(TransferState.Completed)) {
                             for (int i = 0; i < cli.getParameterAsInteger("retries"); i++) {
-                                transferState = downloadObject(cli.getParameter("bucket"), s3ObjectSummary.getKey(), outputFile);
+                                transferState = downloadObject(cli.getParameter("bucket"), s3ObjectSummary.getKey(), outputFile, amazonS3Client);
 
                                 if (transferState.equals(TransferState.Completed)) {
                                     break;
@@ -222,12 +226,13 @@ public class S3 {
      * @param bucket Bucket name.
      * @param object Object path name.
      * @param outputFile Output file.
+     * @param amazonS3Client
      * @return TransferState.
      * @throws InterruptedException
      */
-    public static TransferState downloadObject(String bucket, String object, File outputFile)
+    public static TransferState downloadObject(String bucket, String object, File outputFile, AmazonS3 amazonS3Client)
             throws AmazonServiceException, AmazonClientException, InterruptedException {
-        TransferManager transferManager = TransferManagerBuilder.standard().build();
+        TransferManager transferManager = TransferManagerBuilder.standard().withS3Client(amazonS3Client).build();
         Download download = transferManager.download(bucket, object, outputFile);
         download.waitForCompletion();
         transferManager.shutdownNow();
