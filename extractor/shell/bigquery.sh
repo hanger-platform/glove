@@ -86,7 +86,7 @@ partition_load()
 	echo "Loading data to ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} from ${STORAGE_QUEUE_PATH}"
 	bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} 
 	bq mk --project_id=${BIG_QUERY_PROJECT_ID} ${CUSTOM_SCHEMA}${SCHEMA_NAME}
-	bq load --project_id=${BIG_QUERY_PROJECT_ID} --field_delimiter="${DELIMITER}" ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} ${STORAGE_QUEUE_PATH}* ${METADATA_JSON_FILE}
+	bq load --project_id=${BIG_QUERY_PROJECT_ID} --skip_leading_rows=1 --field_delimiter="${DELIMITER}" ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} ${STORAGE_QUEUE_PATH}* ${METADATA_JSON_FILE}
 	error_check
 	
     # Percorre o arquivo de cada partição. 
