@@ -34,6 +34,13 @@ partition_load()
 			error_check	
 		fi
 
+		# Remove o arquivo já mergeado.
+		if [ ${DEBUG} = 1 ] ; then
+			echo "Removing just merged file ${i}."
+		fi
+		rm -f ${i}
+		error_check
+
 		FILE_INDEX=$(( $FILE_INDEX + 1 ))
 	done
 
@@ -57,9 +64,9 @@ partition_load()
 	error_check
 
     # Remove o arquivo original, mantendo apenas as partições. 
-	#echo "Removing file ${RAWFILE_QUEUE_FILE}!"
-	#rm -f ${RAWFILE_QUEUE_FILE}
-	#error_check
+	echo "Removing file ${RAWFILE_QUEUE_PATH}merged.csv!"
+	rm -f ${RAWFILE_QUEUE_PATH}merged.csv
+	error_check
 	
 	# Compacta o arquivo de cada partição. 
 	echo "Compacting csv files!"
