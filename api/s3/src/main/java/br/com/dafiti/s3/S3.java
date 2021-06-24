@@ -163,12 +163,12 @@ public class S3 {
                         File outputFile = new File(outputPath.toString() + "/" + s3ObjectSummary.getKey().replaceAll("/", "_"));
 
                         //Transfer a file to local filesystem.               
-                        TransferState transferState = downloadObject(cli.getParameter("bucket"), s3ObjectSummary.getKey(), outputFile, amazonS3Client);
+                        TransferState transferState = downloadObject(cli.getParameter("bucket"), s3ObjectSummary.getKey(), outputFile, cli.getParameter("profile"));
 
                         //Identifies if should retry.
                         if (!transferState.equals(TransferState.Completed)) {
                             for (int i = 0; i < cli.getParameterAsInteger("retries"); i++) {
-                                transferState = downloadObject(cli.getParameter("bucket"), s3ObjectSummary.getKey(), outputFile, amazonS3Client);
+                                transferState = downloadObject(cli.getParameter("bucket"), s3ObjectSummary.getKey(), outputFile, cli.getParameter("profile"));
 
                                 if (transferState.equals(TransferState.Completed)) {
                                     break;
@@ -226,13 +226,20 @@ public class S3 {
      * @param bucket Bucket name.
      * @param object Object path name.
      * @param outputFile Output file.
-     * @param amazonS3Client
+     * @param profile String profile.
      * @return TransferState.
      * @throws InterruptedException
      */
-    public static TransferState downloadObject(String bucket, String object, File outputFile, AmazonS3 amazonS3Client)
+    public static TransferState downloadObject(String bucket, String object, File outputFile, String profile)
             throws AmazonServiceException, AmazonClientException, InterruptedException {
-        TransferManager transferManager = TransferManagerBuilder.standard().withS3Client(amazonS3Client).build();
+
+        //Defines a S3 client
+        AmazonS3 client = AmazonS3ClientBuilder
+                .standard()
+                .withCredentials(new ProfileCredentialsProvider(profile))
+                .build();
+
+        TransferManager transferManager = TransferManagerBuilder.standard().withS3Client(client).build();
         Download download = transferManager.download(bucket, object, outputFile);
         download.waitForCompletion();
         transferManager.shutdownNow();
