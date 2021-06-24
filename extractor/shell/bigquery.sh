@@ -21,7 +21,7 @@ partition_load()
 
 	FILE_INDEX=0
 
-	echo "Merging files!"
+	echo "Merging input files!"
 
 	# Une os dados em um único arquivo.  
 	for i in `ls ${RAWFILE_QUEUE_PATH}*`
