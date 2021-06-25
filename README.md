@@ -92,6 +92,7 @@ O destino de dados suportados são os seguintes:
 1. Os campos do tipo _Timestamp_ e _Date_ são sempre convertidos para _String_. 
 2. O particionamento dos arquivos Parquet e Orc é sempre realizado pela coluna partition_field e, quando utilizada partição real, a filtragem dos registros deve ser realizada pela coluna partition_value. 
 3. Named queries com tipo de carga script é suportado apenas pelo banco de dados destino Redshift.
+4. Para destino Big Query, somente as partições com formatos yyyyMMdd, yyyyMM ou yyyy serão aceitos. Para geração de tabelas particionadas no Big query, utilizamos o conceito de tabelas fragmentadas ([Documentação](https://cloud.google.com/bigquery/docs/partitioned-tables?hl=pt-br#dt_partition_shard)), então a geração da tabela será schema.tabela_yyyyMMdd, onde para partição por mês o dia sempre será 01 e para partição ano o mês e dia será 0101.
 
 ## Módulos
 
