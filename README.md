@@ -91,6 +91,7 @@ O destino de dados suportados são os seguintes:
 
 1. Os campos do tipo _Timestamp_ e _Date_ são sempre convertidos para _String_. 
 2. O particionamento dos arquivos Parquet e Orc é sempre realizado pela coluna partition_field e, quando utilizada partição real, a filtragem dos registros deve ser realizada pela coluna partition_value. 
+3. Named queries com tipo de carga script é suportado apenas pelo banco de dados destino Redshift.
 
 ## Módulos
 
