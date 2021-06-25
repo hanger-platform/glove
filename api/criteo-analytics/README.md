@@ -40,7 +40,7 @@ Utilizando o [Maven](https://maven.apache.org/):
 ## Utilização
 
 ```bash
-java -jar facebook-ad.jar \
+java -jar criteo-analytics.jar \
 	--credentials="<Credentials file>" \
 	--output="<Output file>" \
 	--account="<Advertiser account ID>" \
@@ -53,7 +53,7 @@ java -jar facebook-ad.jar \
 	--partition=[(Optional)  Partition field] \
 	--key=[(Optional) Unique key] \
 	--retry=[(Optional) Identifies the maximum retries after a fail. Default: 3] \
-	--debug
+	--debug=[(Optional) Enable debug mode. Default: false]
 ```
 
 > Para saber os campos que são exportados pela API e que podem ser utilizados no parâmetro fields, recomendamos o extrator seja executado em modo de debug inicialmente. 
