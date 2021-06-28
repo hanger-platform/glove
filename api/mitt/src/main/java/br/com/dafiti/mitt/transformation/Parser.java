@@ -26,6 +26,9 @@ package br.com.dafiti.mitt.transformation;
 import br.com.dafiti.mitt.model.Configuration;
 import br.com.dafiti.mitt.model.Field;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +45,7 @@ public class Parser {
     private final Map<String, Field> fields = new ConcurrentHashMap<>();
 
     private File file;
+    private BasicFileAttributes fileAttributes;
     private final Scanner scanner;
     private final Configuration configuration;
 
@@ -51,6 +55,12 @@ public class Parser {
      */
     public void setFile(File file) {
         this.file = file;
+
+        try {
+            fileAttributes = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+        } catch (IOException ex) {
+            Logger.getLogger(Parser.class.getName()).log(Level.WARNING, "Fail getting file " + file.getName() + " attributes", ex);
+        }
     }
 
     /**
@@ -59,6 +69,14 @@ public class Parser {
      */
     public File getFile() {
         return file;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public BasicFileAttributes getFileAttributes() {
+        return fileAttributes;
     }
 
     /**

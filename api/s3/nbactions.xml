@@ -12,7 +12,7 @@
             <properties>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.executable>java</exec.executable>
-                <exec.appArgs>--output=/tmp/s3/adjust/tricae/events/ --bucket=bi-dafiti-group-adjust-tricae --prefix= --start_date=2021-04-02 --end_date=2021-04-02 '--field={app_name}+{network_name}+{adgroup_name}+{campaign_name}+{creative_name}+{adid}+{app_version}+{country}+{event_name}+{gps_adid}+{idfa}+{installed_at}+{keywords}+{os_name}+{os_version}+{shop_country}+{sku}+{created_at}+{transaction_id}+{user_id}+{activity_kind}+{att_status}' '--key=::FileLastModified()' '--partition=::regexp(::filename(),**[0-9]{4}-[0-9]{2}-[0-9]{2}**)' --delimiter=,</exec.appArgs>
+                <exec.appArgs>--output=/tmp/s3/adjust/tricae/events/ --bucket=bi-dafiti-group-adjust-tricae --prefix= --start_date=2021-04-02 --end_date=2021-04-02 '--field={app_name}+{network_name}+{adgroup_name}+{campaign_name}+{creative_name}+{adid}+{app_version}+{country}+{event_name}+{gps_adid}+{idfa}+{installed_at}+{keywords}+{os_name}+{os_version}+{shop_country}+{sku}+{created_at}+{transaction_id}+{user_id}+{activity_kind}+{att_status}' '--key=::RowNumber()' '--partition=::regexp(::filename(),**[0-9]{4}-[0-9]{2}-[0-9]{2}**)' --delimiter=,</exec.appArgs>
                 <exec.vmArgs></exec.vmArgs>
                 <exec.mainClass>br.com.dafiti.s3.S3</exec.mainClass>
             </properties>
@@ -30,7 +30,7 @@
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
-                <exec.appArgs>--output=/tmp/s3/adjust/tricae/events/ --bucket=bi-dafiti-group-adjust-tricae --prefix= --start_date=2021-04-02 --end_date=2021-04-02 '--field={app_name}+{network_name}+{adgroup_name}+{campaign_name}+{creative_name}+{adid}+{app_version}+{country}+{event_name}+{gps_adid}+{idfa}+{installed_at}+{keywords}+{os_name}+{os_version}+{shop_country}+{sku}+{created_at}+{transaction_id}+{user_id}+{activity_kind}+{att_status}' '--key=::FileLastModified()' '--partition=::regexp(::filename(),**[0-9]{4}-[0-9]{2}-[0-9]{2}**)' --delimiter=,</exec.appArgs>
+                <exec.appArgs>--output=/tmp/s3/adjust/tricae/events/ --bucket=bi-dafiti-group-adjust-tricae --prefix= --start_date=2021-04-02 --end_date=2021-04-02 '--field={app_name}+{network_name}+{adgroup_name}+{campaign_name}+{creative_name}+{adid}+{app_version}+{country}+{event_name}+{gps_adid}+{idfa}+{installed_at}+{keywords}+{os_name}+{os_version}+{shop_country}+{sku}+{created_at}+{transaction_id}+{user_id}+{activity_kind}+{att_status}' '--key=::RowNumber()' '--partition=::regexp(::filename(),**[0-9]{4}-[0-9]{2}-[0-9]{2}**)' --delimiter=,</exec.appArgs>
                 <exec.vmArgs>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
                 <exec.mainClass>br.com.dafiti.s3.S3</exec.mainClass>
             </properties>
@@ -47,7 +47,7 @@
             <properties>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.executable>java</exec.executable>
-                <exec.appArgs>--output=/tmp/s3/adjust/tricae/events/ --bucket=bi-dafiti-group-adjust-tricae --prefix= --start_date=2021-04-02 --end_date=2021-04-02 '--field={app_name}+{network_name}+{adgroup_name}+{campaign_name}+{creative_name}+{adid}+{app_version}+{country}+{event_name}+{gps_adid}+{idfa}+{installed_at}+{keywords}+{os_name}+{os_version}+{shop_country}+{sku}+{created_at}+{transaction_id}+{user_id}+{activity_kind}+{att_status}' '--key=::FileLastModified()' '--partition=::regexp(::filename(),**[0-9]{4}-[0-9]{2}-[0-9]{2}**)' --delimiter=,</exec.appArgs>
+                <exec.appArgs>--output=/tmp/s3/adjust/tricae/events/ --bucket=bi-dafiti-group-adjust-tricae --prefix= --start_date=2021-04-02 --end_date=2021-04-02 '--field={app_name}+{network_name}+{adgroup_name}+{campaign_name}+{creative_name}+{adid}+{app_version}+{country}+{event_name}+{gps_adid}+{idfa}+{installed_at}+{keywords}+{os_name}+{os_version}+{shop_country}+{sku}+{created_at}+{transaction_id}+{user_id}+{activity_kind}+{att_status}' '--key=::RowNumber()' '--partition=::regexp(::filename(),**[0-9]{4}-[0-9]{2}-[0-9]{2}**)' --delimiter=,</exec.appArgs>
                 <exec.vmArgs></exec.vmArgs>
                 <exec.mainClass>br.com.dafiti.s3.S3</exec.mainClass>
             </properties>
