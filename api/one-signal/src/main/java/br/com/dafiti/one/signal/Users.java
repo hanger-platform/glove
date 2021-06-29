@@ -195,6 +195,8 @@ public class Users {
         mitt.getReaderSettings().setDelimiter(this.delimiter);
         mitt.getReaderSettings().setEncode(this.encode);
         mitt.write(outputPath.toFile(), "*");
+        
+        Files.delete(outputPath);
     }
 
     /**
