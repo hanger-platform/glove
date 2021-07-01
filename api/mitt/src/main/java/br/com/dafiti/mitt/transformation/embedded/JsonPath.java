@@ -69,14 +69,14 @@ public class JsonPath implements Transformable {
             json = String.valueOf(parser.evaluate(record, field));
 
             if (json != null) {
-                //Extracts the desired value from json. 
+                //Extracts the desired value from json.
                 value = com.jayway.jsonpath.JsonPath
                         .parse(json)
-                        .read(this.path, String.class);
+                        .read(this.path).toString();
             }
         } catch (Exception ex) {
             if (this.displayException) {
-                Logger.getLogger(JsonPath.class.getName()).log(Level.SEVERE, "Error parsing json {0}", json);
+                Logger.getLogger(JsonPath.class.getName()).log(Level.SEVERE, "Error parsing json {0} with path {1}", new Object[]{json, this.path});
             }
         }
 
