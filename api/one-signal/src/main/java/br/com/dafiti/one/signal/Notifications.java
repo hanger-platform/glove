@@ -97,7 +97,7 @@ public class Notifications {
                 .addField(this.fields);
 
         //Identifies original fields.
-        List<String> fields = mitt.getConfiguration().getOriginalFieldsName();
+        List<String> fields = mitt.getConfiguration().getOriginalFieldName();
 
         //Fetchs all apps.
         for (String app : this.apps) {
