@@ -31,10 +31,12 @@
             <version>2.10.6</version>
             <type>jar</type>
         </dependency>
+        
+        <!-- MITT -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>mitt</artifactId>
-            <version>1.0.2</version>
+            <version>1.0.9</version>
         </dependency>
     </dependencies>
     
