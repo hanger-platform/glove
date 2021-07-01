@@ -35,6 +35,7 @@ java -jar s3.jar  \
 	--bucket=<AWS S3 Bucket name> \
 	--prefix=<(Optional) Object prefix> \
 	--field=<Fields of ouput file> \
+	--profile=<(Optional) Profile name in AWS Credentials file> \
 	--start_date=<(Optional) Object modified date since as YYYY-MM-DD> \
 	--start_time=<(Optional) Object modified time since as HH:MM:SS. Default 00:00:00> \
 	--end_date=<(Optional) Object modified date to as YYYY-MM-DD>  \ 
