@@ -22,6 +22,7 @@
  *
  */
 package br.com.dafiti.mitt.transformation.embedded;
+
 import br.com.dafiti.mitt.transformation.Parser;
 import br.com.dafiti.mitt.transformation.Transformable;
 import java.text.ParseException;
@@ -36,33 +37,39 @@ import java.util.logging.Logger;
  * @author Valdiney V GOMES
  */
 public class NumberFormat implements Transformable {
+
     private final String field;
     private final String language;
     private final String country;
     private java.text.NumberFormat numberFormat;
+
     public NumberFormat(String field, String language, String country) {
         this.field = field;
         this.language = language;
         this.country = country;
     }
+
     @Override
     public void init() {
         numberFormat = java.text.NumberFormat.getInstance(new Locale(language, country));
     }
+
     @Override
     public String getValue(
             Parser parser,
             List<Object> record) {
-        String value = "";
+
+        String value = ((String) parser.evaluate(record, field));
+
         try {
-            value = String.valueOf(
-                    numberFormat.parse(
-                            ((String) parser.evaluate(record, field))
-                    )
-            );
+            if (!value.isEmpty()) {
+                value = String.valueOf(numberFormat.parse(value));
+            }
         } catch (ParseException ex) {
-            Logger.getLogger(NumberFormat.class.getName()).log(Level.SEVERE, "Error formatting a number", ex);
+            Logger.getLogger(NumberFormat.class.getName()).log(Level.SEVERE, "Error formatting value: " + value, ex);
+
         }
+
         return value;
     }
 }
