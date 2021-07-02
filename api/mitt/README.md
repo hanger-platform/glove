@@ -95,7 +95,7 @@ Uma das principais características do MITT é a possibilidade de transformaçã
 | **At**| Retorna o valor em uma posição específica de um campo original iniciando da posição 0 | ::At(<posisão\>) |
 | **FileSize**| Retorna o tamanho do arquivo em bytes, quando o input for um arquivo  | ::fileSize() |
 | **RowNumber**| Retorna o número da linha | ::RowNumber() ou ::RowNumber([<campo\>,<campo\>,..]), quando um ou mais campos forem informados a função retornará o mesmo número de linha para o mesmo valor de campo]) |
-| **NumberFormat**| Retorna um número a partir de uma representação em string em um formato diferente de americano | ::numberFormat(<campo>,<idioma>,<pais>). Ex.: Para transforma a string -1.066,68 em um número, devemos usar ::numberFormat(value,pt,BR). Para maior parte dos casos, pode ser utilizada uma desta configurações: (123 456) fr FR, (345 987,246) fr FR, (123.456) de DE, (345.987,246) de DE, (123,456) en US e (345,987.246) en US|
+| **NumberFormat**| Retorna um número a partir de uma representação em string em um formato diferente de americano | ::numberFormat(<campo\>,<idioma\>,<país\>). Ex.: Para transforma a string -1.066,68 em um número, devemos usar ::numberFormat(value,pt,BR). Para maior parte dos casos, pode ser utilizada uma desta configurações: (123 456) fr FR, (345 987,246) fr FR, (123.456) de DE, (345.987,246) de DE, (123,456) en US e (345,987.246) en US|
 
 ##### RESERVED CHARACTERES
 
