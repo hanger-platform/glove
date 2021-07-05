@@ -287,100 +287,100 @@ public class CSVToParquet implements Runnable {
             GenericData genericData = new GenericData();
             genericData.addLogicalTypeConversion(new Conversions.DecimalConversion());
 
-            //Define the writer.
-            ParquetWriter<GenericRecord> parquetWriter = AvroParquetWriter.<GenericRecord>builder(new Path(transientFile.getAbsolutePath()))
-                    .withSchema(schema)
-                    .withDataModel(genericData)
-                    .withCompressionCodec(this.compression)
-                    .withDictionaryEncoding(true)
-                    .build();
-
             //Convert to parquet.
-            if (inputFile.isDirectory()) {
-                File[] files = inputFile.listFiles();
-
-                for (File file : files) {
-                    this.toParquet(file, parquetWriter, key, statistics);
-                }
-            } else {
-                this.toParquet(inputFile, parquetWriter, key, statistics);
-            }
-
-            //Identifies if merge is necessary.
-            if (merge) {
-                String object = parquetFile.getName();
-
-                //Download the original object. 
-                new S3().downloadObject(bucketPath, object, mode, originalFile);
-
-                //Identify if the original file was downloaded. 
-                if (originalFile.exists()) {
-                    //Define the reader.
-                    ParquetReader<GenericRecord> parquetReader = AvroParquetReader.<GenericRecord>builder(new Path(originalFile.getAbsolutePath()))
+            try (
+                    //Define the writer.
+                    ParquetWriter<GenericRecord> parquetWriter = AvroParquetWriter.<GenericRecord>builder(new Path(transientFile.getAbsolutePath()))
+                            .withSchema(schema)
                             .withDataModel(genericData)
-                            .disableCompatibility()
-                            .build();
+                            .withCompressionCodec(this.compression)
+                            .withDictionaryEncoding(true)
+                            .build()) {
 
-                    //Parquet row.
-                    GenericRecord row;
+                        //Convert to parquet.
+                        if (inputFile.isDirectory()) {
+                            File[] files = inputFile.listFiles();
 
-                    //Read a parquet file.
-                    while ((row = parquetReader.read()) != null) {
-                        boolean add = true;
-
-                        //Identify merge file records.
-                        statistics.incrementOutputRows();
-
-                        //Identify if can add a record.
-                        if (fieldKey >= 0 && !duplicated) {
-                            add = !key.contains(String.valueOf(row.get(fieldKey)));
-                        }
-
-                        if (add) {
-                            //Write date into parquet file.
-                            parquetWriter.write(row);
+                            for (File file : files) {
+                                this.toParquet(file, parquetWriter, key, statistics);
+                            }
                         } else {
-                            statistics.incrementOutputUpdatedRows();
+                            this.toParquet(inputFile, parquetWriter, key, statistics);
                         }
 
-                        //Identify the record being processed.
-                        statistics.incrementRowNumber();
+                        //Identifies if merge is necessary.
+                        if (merge) {
+                            String object = parquetFile.getName();
+
+                            //Download the original object.
+                            new S3().downloadObject(bucketPath, object, mode, originalFile);
+
+                            //Identify if the original file was downloaded.
+                            if (originalFile.exists()) {
+                                //Define the reader.
+                                ParquetReader<GenericRecord> parquetReader = AvroParquetReader.<GenericRecord>builder(new Path(originalFile.getAbsolutePath()))
+                                        .withDataModel(genericData)
+                                        .disableCompatibility()
+                                        .build();
+
+                                //Parquet row.
+                                GenericRecord row;
+
+                                //Read a parquet file.
+                                while ((row = parquetReader.read()) != null) {
+                                    boolean add = true;
+
+                                    //Identify merge file records.
+                                    statistics.incrementOutputRows();
+
+                                    //Identify if can add a record.
+                                    if (fieldKey >= 0 && !duplicated) {
+                                        add = !key.contains(String.valueOf(row.get(fieldKey)));
+                                    }
+
+                                    if (add) {
+                                        //Write date into parquet file.
+                                        parquetWriter.write(row);
+                                    } else {
+                                        statistics.incrementOutputUpdatedRows();
+                                    }
+
+                                    //Identify the record being processed.
+                                    statistics.incrementRowNumber();
+                                }
+                            }
+                        }
                     }
-                }
-            }
 
-            //Close the parquet file.
-            parquetWriter.close();
+                    //Identifies if the csv file is empty.
+                    if (statistics.getRowNumber() == 0) {
+                        throw new Exception("Empty csv file!");
+                    } else {
+                        //Print on console.
+                        System.out.println("[" + parquetFile.getName() + "] records: "
+                                + statistics.getOutputRows()
+                                + ", Delta: "
+                                + (statistics.getInputRows() + statistics.getDuplicatedRows())
+                                + ", ( Updated: " + statistics.getOutputUpdatedRows() + ", Inserted: " + (statistics.getInputRows() - statistics.getOutputUpdatedRows()) + ", Duplicated:" + statistics.getDuplicatedRows() + " )"
+                                + " Final: "
+                                + (statistics.getOutputRows() + (statistics.getInputRows() - statistics.getOutputUpdatedRows())));
+                    }
 
-            //Identifies if the csv file is empty.
-            if (statistics.getRowNumber() == 0) {
-                throw new Exception("Empty csv file!");
-            } else {
-                //Print on console.
-                System.out.println("[" + parquetFile.getName() + "] records: "
-                        + statistics.getOutputRows()
-                        + ", Delta: "
-                        + (statistics.getInputRows() + statistics.getDuplicatedRows())
-                        + ", ( Updated: " + statistics.getOutputUpdatedRows() + ", Inserted: " + (statistics.getInputRows() - statistics.getOutputUpdatedRows()) + ", Duplicated:" + statistics.getDuplicatedRows() + " )"
-                        + " Final: "
-                        + (statistics.getOutputRows() + (statistics.getInputRows() - statistics.getOutputUpdatedRows())));
-            }
+                    //Rename transient to final file. 
+                    Files.move(transientFile.toPath(), parquetFile.toPath(), REPLACE_EXISTING);
 
-            //Rename transient to final file. 
-            Files.move(transientFile.toPath(), parquetFile.toPath(), REPLACE_EXISTING);
+                    //Remove the original file.
+                    Files.deleteIfExists(originalFile.toPath());
 
-            //Remove the original file.
-            Files.deleteIfExists(originalFile.toPath());
+                    //Identify if should remove csv file. 
+                    if (replace) {
+                        if (inputFile.isDirectory()) {
+                            FileUtils.deleteDirectory(inputFile);
+                        } else {
 
-            //Identify if should remove csv file. 
-            if (replace) {
-                if (inputFile.isDirectory()) {
-                    FileUtils.deleteDirectory(inputFile);
-                } else {
-
-                    Files.deleteIfExists(inputFile.toPath());
-                }
-            }
+                            Files.deleteIfExists(inputFile.toPath());
+                        }
+                    }
         } catch (Exception ex) {
             Logger.getLogger(this.getClass()).error("Error [" + ex + "] generating parquet file " + parquetFile.getName());
             System.exit(1);
