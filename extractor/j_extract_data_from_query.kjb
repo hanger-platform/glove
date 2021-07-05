@@ -1256,9 +1256,11 @@ true;</script>
       <type>EVAL</type>
       <attributes/>
       <script>// Cria um partition field fake para Named queries. 
+
 parent_job.setVariable("PARTITION_FIELD", "DUMMY");
 
 // Identifica se deve ser feito merge ou substituição das partições. 
+
 if( parent_job.getVariable("MODE").indexOf("static") !== -1 ) {
 	parent_job.setVariable("PARTITION_MERGE", "0");
 }else{
@@ -1266,10 +1268,11 @@ if( parent_job.getVariable("MODE").indexOf("static") !== -1 ) {
 }
 
 // Identifica se deve ser gerado um único arquivo de dados temporário. 
+
 if( parent_job.getVariable("DATABASE_TYPE").indexOf("redshift") !== -1 ) {
-	parent_job.setVariable("IS_SPLITABLE_FILE", "0");
+	parent_job.setVariable("SPLITABLE_FILE", "0");
 }else{
-	parent_job.setVariable("IS_SPLITABLE_FILE", "1");
+	parent_job.setVariable("SPLITABLE_FILE", "1");
 }
 
 true;</script>
