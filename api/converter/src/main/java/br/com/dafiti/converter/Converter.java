@@ -44,9 +44,7 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.orc.OrcFile;
 import org.apache.orc.TypeDescription;
-import org.apache.parquet.avro.AvroParquetWriter;
 
 /**
  * Convert file format.
@@ -306,7 +304,7 @@ public class Converter {
                 if (target.equalsIgnoreCase("parquet")) {
                     Schema schema = new Parser(new File(schemaFile)).getAvroSchema();
 
-                    System.out.println("Parquet " + AvroParquetWriter.class.getPackage().getImplementationVersion());
+                    System.out.println("Parquet 1.12.0");
 
                     for (File file : files) {
                         if (file.isDirectory() || "csv".equals(FilenameUtils.getExtension(file.getName()))) {
@@ -329,10 +327,11 @@ public class Converter {
                             );
                         }
                     }
+
                 } else if (target.equalsIgnoreCase("orc")) {
                     TypeDescription schema = new Parser(new File(schemaFile)).getOrcSchema();
 
-                    System.out.println("ORC " + OrcFile.class.getPackage().getImplementationVersion());
+                    System.out.println("ORC 1.5.6");
 
                     for (File file : files) {
                         if (file.isDirectory() || "csv".equals(FilenameUtils.getExtension(file.getName()))) {
