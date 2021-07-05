@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job>
   <name>j_extract_data_from_query_on_redshift</name>
-  <description />
-  <extended_description />
-  <job_version />
+  <description/>
+  <extended_description/>
+  <job_version/>
   <job_status>0</job_status>
   <directory>/</directory>
   <created_user>-</created_user>
@@ -21,9 +21,9 @@
     <port>${DB_PORT}</port>
     <username>${DB_USER}</username>
     <password>${DB_PASSWORD}</password>
-    <servername />
-    <data_tablespace />
-    <index_tablespace />
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
     <attributes>
       <attribute>
         <code>EXTRA_OPTION_POSTGRESQL.defaultRowFetchSize</code>
@@ -70,12 +70,12 @@
   <slaveservers>
     </slaveservers>
   <job-log-table>
-    <connection />
-    <schema />
-    <table />
-    <size_limit_lines />
-    <interval />
-    <timeout_days />
+    <connection/>
+    <schema/>
+    <table/>
+    <size_limit_lines/>
+    <interval/>
+    <timeout_days/>
     <field>
       <id>ID_JOB</id>
       <enabled>Y</enabled>
@@ -183,10 +183,10 @@
     </field>
   </job-log-table>
   <jobentry-log-table>
-    <connection />
-    <schema />
-    <table />
-    <timeout_days />
+    <connection/>
+    <schema/>
+    <table/>
+    <timeout_days/>
     <field>
       <id>ID_BATCH</id>
       <enabled>Y</enabled>
@@ -274,10 +274,10 @@
     </field>
   </jobentry-log-table>
   <channel-log-table>
-    <connection />
-    <schema />
-    <table />
-    <timeout_days />
+    <connection/>
+    <schema/>
+    <table/>
+    <timeout_days/>
     <field>
       <id>ID_BATCH</id>
       <enabled>Y</enabled>
@@ -340,13 +340,13 @@
     </field>
   </channel-log-table>
   <pass_batchid>N</pass_batchid>
-  <shared_objects_file />
+  <shared_objects_file/>
   <entries>
     <entry>
       <name>START</name>
-      <description />
+      <description/>
       <type>SPECIAL</type>
-      <attributes />
+      <attributes/>
       <start>Y</start>
       <dummy>N</dummy>
       <repeat>N</repeat>
@@ -362,40 +362,40 @@
       <nr>0</nr>
       <xloc>64</xloc>
       <yloc>192</yloc>
-      <attributes_kjc />
+      <attributes_kjc/>
     </entry>
     <entry>
       <name>Success</name>
-      <description />
+      <description/>
       <type>SUCCESS</type>
-      <attributes />
+      <attributes/>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>720</xloc>
       <yloc>304</yloc>
-      <attributes_kjc />
+      <attributes_kjc/>
     </entry>
     <entry>
       <name>Fail extracting data from Redshift</name>
-      <description />
+      <description/>
       <type>ABORT</type>
-      <attributes />
-      <message />
+      <attributes/>
+      <message/>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>480</xloc>
       <yloc>416</yloc>
-      <attributes_kjc />
+      <attributes_kjc/>
     </entry>
     <entry>
       <name>Set defaults</name>
-      <description />
+      <description/>
       <type>SET_VARIABLES</type>
-      <attributes />
+      <attributes/>
       <replacevars>Y</replacevars>
-      <filename />
+      <filename/>
       <file_variable_type>JVM</file_variable_type>
       <fields>
         <field>
@@ -414,13 +414,13 @@
       <nr>0</nr>
       <xloc>192</xloc>
       <yloc>192</yloc>
-      <attributes_kjc />
+      <attributes_kjc/>
     </entry>
     <entry>
       <name>Unload from Redshift</name>
-      <description />
+      <description/>
       <type>SQL</type>
-      <attributes />
+      <attributes/>
       <sql>BEGIN;
 	CREATE TABLE #${SCHEMA_NAME}_${TABLE_NAME} AS ${INPUT_DATA_STATEMENT};
 	UNLOAD ( 'SELECT * FROM #${SCHEMA_NAME}_${TABLE_NAME};' ) TO 's3://${GLOVE_STORARE_BUCKET_STAGING}/unload/${SCHEMA_NAME}/${TABLE_NAME}/'
@@ -436,7 +436,7 @@
 END; </sql>
       <useVariableSubstitution>T</useVariableSubstitution>
       <sqlfromfile>F</sqlfromfile>
-      <sqlfilename />
+      <sqlfilename/>
       <sendOneStatement>F</sendOneStatement>
       <connection>GENERIC_CONNECTION</connection>
       <parallel>N</parallel>
@@ -444,21 +444,21 @@ END; </sql>
       <nr>0</nr>
       <xloc>480</xloc>
       <yloc>304</yloc>
-      <attributes_kjc />
+      <attributes_kjc/>
     </entry>
     <entry>
       <name>Extract data</name>
-      <description />
+      <description/>
       <type>SHELL</type>
-      <attributes />
-      <filename />
-      <work_directory />
+      <attributes/>
+      <filename/>
+      <work_directory/>
       <arg_from_previous>N</arg_from_previous>
       <exec_per_row>N</exec_per_row>
       <set_logfile>N</set_logfile>
-      <logfile />
+      <logfile/>
       <set_append_logfile>N</set_append_logfile>
-      <logext />
+      <logext/>
       <add_date>N</add_date>
       <add_time>N</add_time>
       <insertScript>Y</insertScript>
@@ -491,13 +491,15 @@ error_check
 echo "Merging data file!"
 FILE_INDEX=0
 
+echo "Split is allowed: ${IS_SPLITABLE_FILE}"
+
 for i in `ls ${RAWFILE_QUEUE_STAGING_PATH}*`
 do
 	if [ ${FILE_INDEX} = 0 ]; then	
 		cat ${i}	>> 	${RAWFILE_QUEUE_FILE}
 		error_check
 	else
-		if [ "${#PARTITION_FIELD}" -gt "0" ]; then
+		if [ "${#PARTITION_FIELD}" -gt "0" ] &amp;&amp; [ ${IS_SPLITABLE_FILE} = 1 ]; then
 			mv ${i}	${RAWFILE_QUEUE_PATH}${SCHEMA_NAME}_${TABLE}_${FILE_INDEX}.csv
 			error_check
 		else
@@ -518,21 +520,21 @@ aws s3 rm s3://${GLOVE_STORARE_BUCKET_STAGING}/unload/${SCHEMA_NAME}/${TABLE_NAM
       <nr>0</nr>
       <xloc>608</xloc>
       <yloc>304</yloc>
-      <attributes_kjc />
+      <attributes_kjc/>
     </entry>
     <entry>
       <name>Unload with quotes?</name>
-      <description />
+      <description/>
       <type>SIMPLE_EVAL</type>
-      <attributes />
+      <attributes/>
       <valuetype>variable</valuetype>
-      <fieldname />
+      <fieldname/>
       <variablename>${QUOTE}</variablename>
       <fieldtype>number</fieldtype>
-      <mask />
+      <mask/>
       <comparevalue>1</comparevalue>
-      <minvalue />
-      <maxvalue />
+      <minvalue/>
+      <maxvalue/>
       <successcondition>equal</successcondition>
       <successnumbercondition>equal</successnumbercondition>
       <successbooleancondition>false</successbooleancondition>
@@ -542,15 +544,15 @@ aws s3 rm s3://${GLOVE_STORARE_BUCKET_STAGING}/unload/${SCHEMA_NAME}/${TABLE_NAM
       <nr>0</nr>
       <xloc>320</xloc>
       <yloc>192</yloc>
-      <attributes_kjc />
+      <attributes_kjc/>
     </entry>
     <entry>
       <name>Without quotes</name>
-      <description />
+      <description/>
       <type>SET_VARIABLES</type>
-      <attributes />
+      <attributes/>
       <replacevars>Y</replacevars>
-      <filename />
+      <filename/>
       <file_variable_type>JVM</file_variable_type>
       <fields>
         <field>
@@ -564,15 +566,15 @@ aws s3 rm s3://${GLOVE_STORARE_BUCKET_STAGING}/unload/${SCHEMA_NAME}/${TABLE_NAM
       <nr>0</nr>
       <xloc>320</xloc>
       <yloc>304</yloc>
-      <attributes_kjc />
+      <attributes_kjc/>
     </entry>
     <entry>
       <name>With quotes</name>
-      <description />
+      <description/>
       <type>SET_VARIABLES</type>
-      <attributes />
+      <attributes/>
       <replacevars>Y</replacevars>
-      <filename />
+      <filename/>
       <file_variable_type>JVM</file_variable_type>
       <fields>
         <field>
@@ -586,7 +588,7 @@ aws s3 rm s3://${GLOVE_STORARE_BUCKET_STAGING}/unload/${SCHEMA_NAME}/${TABLE_NAM
       <nr>0</nr>
       <xloc>480</xloc>
       <yloc>192</yloc>
-      <attributes_kjc />
+      <attributes_kjc/>
     </entry>
   </entries>
   <hops>
@@ -674,5 +676,5 @@ aws s3 rm s3://${GLOVE_STORARE_BUCKET_STAGING}/unload/${SCHEMA_NAME}/${TABLE_NAM
   </hops>
   <notepads>
   </notepads>
-  <attributes />
+  <attributes/>
 </job>
