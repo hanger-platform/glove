@@ -343,10 +343,10 @@ error_check
 echo "Merging data file!"
 FILE_INDEX=0
 
-if [ ${SPLITABLE_FILE} -gt 0 ]; then
-	echo "SPLITABLE_FILE ACTIVED!"
+if [ ${MULTIPLE_FILE} -gt 0 ]; then
+	echo "MULTIPLE FILE ENABLED!"
 else
-        echo "SPLITABLE_FILE DISABLED!"
+        echo "MULTIPLE FILE DISABLED!"
 fi
 
 for i in `ls ${RAWFILE_QUEUE_STAGING_PATH}*`
@@ -355,7 +355,7 @@ do
 		cat ${i}	>> 	${RAWFILE_QUEUE_FILE}
 		error_check
 	else
-		if [ "${#PARTITION_FIELD}" -gt "0" ] &amp;&amp; [ ${SPLITABLE_FILE} = 1 ]; then
+		if [ "${#PARTITION_FIELD}" -gt "0" ] &amp;&amp; [ ${MULTIPLE_FILE} = 1 ]; then
 			mv ${i}	${RAWFILE_QUEUE_PATH}${SCHEMA_NAME}_${TABLE}_${FILE_INDEX}.csv
 			error_check
 		else

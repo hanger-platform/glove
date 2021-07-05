@@ -679,38 +679,38 @@ cp -rf ${METADATA_QUEUE_PATH}* ${METADATA_PATH}</script>
       <logmessage>#-----------------------------------------------------------
 # SQL FILE PATTERN
 #-----------------------------------------------------------
-ORDER                       	== ${ORDER}
-SCHEMA_NAME                 	== ${SCHEMA_NAME}
-TABLE                       	== ${TABLE}
-CONNECTION_NAME             	== ${CONNECTION_NAME}
-MODE                        	== ${MODE}
+ORDER                           == ${ORDER}
+SCHEMA_NAME                     == ${SCHEMA_NAME}
+TABLE                           == ${TABLE}
+CONNECTION_NAME                 == ${CONNECTION_NAME}
+MODE                            == ${MODE}
 #-----------------------------------------------------------
 # INPUT
 #-----------------------------------------------------------
-DATABASE_TYPE               	== ${DATABASE_TYPE}
-SAMPLE                      	== ${SAMPLE}
-SQL                         	== ${INPUT_DATA_STATEMENT}
-METADATA                    	== ${METADATA} 
+DATABASE_TYPE                   == ${DATABASE_TYPE}
+SAMPLE                          == ${SAMPLE}
+SQL                             == ${INPUT_DATA_STATEMENT}
+METADATA                        == ${METADATA} 
 #-----------------------------------------------------------
 # OUTPUT 
 #-----------------------------------------------------------
-TARGET                      	== ${TARGET}
-OUTPUT_FORMAT               	== ${OUTPUT_FORMAT}
-OUTPUT_COMPRESSION          	== ${OUTPUT_COMPRESSION}
-STORAGE_BUCKET              	== ${STORAGE_BUCKET}
-ALLOW_DUPLICATED              	== ${ALLOW_DUPLICATED}
-ALLOW_RECREATE              	== ${ALLOW_RECREATE}
+TARGET                          == ${TARGET}
+OUTPUT_FORMAT                   == ${OUTPUT_FORMAT}
+OUTPUT_COMPRESSION              == ${OUTPUT_COMPRESSION}
+STORAGE_BUCKET                  == ${STORAGE_BUCKET}
+ALLOW_DUPLICATED                == ${ALLOW_DUPLICATED}
+ALLOW_RECREATE                 == ${ALLOW_RECREATE}
 #-----------------------------------------------------------
 # OUTPUT EXPORT
 #-----------------------------------------------------------
-EXPORT                      	== ${IS_EXPORT}
-ONLY_EXPORT                   	== ${ONLY_EXPORT}
-EXPORT_BUCKET               	== ${EXPORT_BUCKET}
-EXPORT_TYPE               		== ${EXPORT_TYPE}
-EXPORT_PROFILE               	== ${EXPORT_PROFILE}
-EXPORT_SHEETS_METHOD        	== ${EXPORT_SHEETS_METHOD}
-EXPORT_SHEET                	== ${EXPORT_SHEET}
-EXPORT_SPREADSHEET          	== ${EXPORT_SPREADSHEET}</logmessage>
+EXPORT                          == ${IS_EXPORT}
+ONLY_EXPORT                     == ${ONLY_EXPORT}
+EXPORT_BUCKET                   == ${EXPORT_BUCKET}
+EXPORT_TYPE                     == ${EXPORT_TYPE}
+EXPORT_PROFILE                  == ${EXPORT_PROFILE}
+EXPORT_SHEETS_METHOD            == ${EXPORT_SHEETS_METHOD}
+EXPORT_SHEET                    == ${EXPORT_SHEET}
+EXPORT_SPREADSHEET              == ${EXPORT_SPREADSHEET}</logmessage>
       <loglevel>Basic</loglevel>
       <logsubject>LOG</logsubject>
       <parallel>N</parallel>
@@ -1270,9 +1270,9 @@ if( parent_job.getVariable("MODE").indexOf("static") !== -1 ) {
 // Identifica se deve ser gerado um único arquivo de dados temporário. 
 
 if( parent_job.getVariable("DATABASE_TYPE").indexOf("redshift") !== -1 ) {
-	parent_job.setVariable("SPLITABLE_FILE", "0");
+	parent_job.setVariable("MULTIPLE_FILE", "0");
 }else{
-	parent_job.setVariable("SPLITABLE_FILE", "1");
+	parent_job.setVariable("MULTIPLE_FILE", "1");
 }
 
 true;</script>
