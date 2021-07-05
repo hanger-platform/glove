@@ -27,6 +27,8 @@
           <archive>
             <manifest>
               <mainClass>br.com.dafiti.converter.Converter</mainClass>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
             </manifest>
           </archive>
         </configuration>
