@@ -150,10 +150,10 @@ SELECT * FROM (
 
     UNION ALL
 
-    SELECT
+	SELECT
         999 AS ordinal_position,
-        CONCAT('CONCAT(','DATE_FORMAT(now(),','''','%Y-%m-%d %T', '''','),', '''' ,' ${TIMEZONE_OFFSET}', '''',') AS etl_load_date') AS fields,
-		CONCAT('CONCAT(','DATE_FORMAT(now(),','''','%Y-%m-%d %T', '''','),', '''' ,' ${TIMEZONE_OFFSET}', '''',')') AS casting,
+        CONCAT('CONCAT(','FORMAT(GETDATE(),','''','yyyy-MM-dd HH:mm:ss', '''','),', '''' ,' ${TIMEZONE_OFFSET}', '''',') AS etl_load_date') AS fields,
+		CONCAT('CONCAT(','FORMAT(GETDATE(),','''','yyyy-MM-dd HH:mm:ss', '''','),', '''' ,' ${TIMEZONE_OFFSET}', '''',')') AS casting,
         'varchar(19)' AS field_type,
   		'{"name": "etl_load_date","type":["null", "string"], "default": null}' AS json,
         'etl_load_date' AS column_name,
