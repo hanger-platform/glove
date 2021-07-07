@@ -1197,7 +1197,7 @@ TARGET                      == ${TARGET}
       <variablename>${MODE}</variablename>
       <fieldtype>string</fieldtype>
       <mask/>
-      <comparevalue>partitioned,partition,staticpartitioned,staticpartition,delta</comparevalue>
+      <comparevalue>partitioned,partition,staticpartitioned,staticpartition,incremental</comparevalue>
       <minvalue/>
       <maxvalue/>
       <successcondition>inlist</successcondition>
