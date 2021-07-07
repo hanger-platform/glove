@@ -54,27 +54,26 @@ SELECT * FROM (
 
     UNION ALL
 
-	SELECT * FROM (
-		SELECT DISTINCT
-			0 AS ordinal_position,
-			CASE WHEN '${CUSTOM_PRIMARY_KEY}'!= '' THEN CONCAT('CONCAT(','${CUSTOM_PRIMARY_KEY}',')',' AS custom_primary_key') ELSE CONCAT('CONCAT(', GROUP_CONCAT(LOWER(column_name)),')',' AS custom_primary_key')  end AS fields,
-			CASE WHEN '${CUSTOM_PRIMARY_KEY}'!= '' THEN CONCAT('CONCAT(','${CUSTOM_PRIMARY_KEY}',')') ELSE CONCAT('CONCAT(', GROUP_CONCAT(LOWER(column_name)),')') END AS casting,
-			'varchar(255)' AS field_type,
-			'{"name": "custom_primary_key","type":["null", "string"], "default": null}' AS json,
-			'custom_primary_key' AS column_name,
-			1 AS column_key,
-			'' AS encoding
-		FROM
-			information_schema.columns c
-		WHERE
-			LOWER( c.table_schema ) = LOWER('${INPUT_TABLE_SCHEMA}')
-			AND
-			LOWER( c.table_name ) = LOWER('${INPUT_TABLE_NAME}')
-			AND
-			c.column_key="PRI"
-		ORDER BY 
-			c.ordinal_position
-	) x
+	SELECT DISTINCT 
+		0 AS ordinal_position,
+		CASE WHEN '${CUSTOM_PRIMARY_KEY}'!= '' THEN CONCAT('CONCAT(','${CUSTOM_PRIMARY_KEY}',')',' AS custom_primary_key') ELSE CONCAT('CONCAT(', STRING_AGG(LOWER(column_name),','),')',' AS custom_primary_key') END AS fields,
+		CASE WHEN '${CUSTOM_PRIMARY_KEY}'!= '' THEN CONCAT('CONCAT(','${CUSTOM_PRIMARY_KEY}',')') ELSE CONCAT('CONCAT(', STRING_AGG(LOWER(column_name),','),')') END AS casting,
+		'varchar(255)' AS field_type,
+		'{"name": "custom_primary_key","type":["null", "string"], "default": null}' AS json,
+		'custom_primary_key' AS column_name,
+		1 AS column_key,
+		'' AS encoding
+	FROM
+		INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS TC
+	INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS KU ON
+		TC.CONSTRAINT_TYPE = 'PRIMARY KEY'
+		AND 
+		TC.CONSTRAINT_NAME = KU.CONSTRAINT_NAME
+		AND 
+		LOWER(KU.TABLE_SCHEMA) = LOWER('${INPUT_TABLE_SCHEMA}')
+		AND 
+		LOWER(KU.TABLE_NAME) = LOWER('${INPUT_TABLE_NAME}')
+	ORDER BY 1;
 
 	UNION ALL
 
