@@ -77,7 +77,6 @@ SELECT * FROM (
 
 	UNION ALL
 
-
     SELECT DISTINCT
         ordinal_position,
         CASE
@@ -95,47 +94,36 @@ SELECT * FROM (
             ELSE CONCAT('`',column_name,'`')
         END AS casting,
 		CASE data_type
-			WHEN 'bit'          THEN 'int'
-			WHEN 'tinyint'      THEN 'int'
-			WHEN 'smallint'     THEN 'int'
-			WHEN 'mediumint'    THEN 'int'
-          	WHEN 'int'          THEN IF(column_type LIKE '%unsigned%', 'bigint', 'int') 
-            WHEN 'bigint'       THEN 'bigint'
-           	WHEN 'tinytext'     THEN 'varchar(65535)'
-           	WHEN 'mediumtext'   THEN 'varchar(65535)'
-           	WHEN 'text'         THEN 'varchar(65535)'
-           	WHEN 'longtext'     THEN 'varchar(65535)'
-            WHEN 'blob'         THEN 'varchar(65535)'
-            WHEN 'mediumblob'   THEN 'varchar(65535)'
-	        WHEN 'longblob'   	THEN 'varchar(65535)'	
-            WHEN 'date'         THEN 'varchar(10)'
-            WHEN 'datetime'     THEN 'varchar(19)'
-            WHEN 'time'         THEN 'varchar(17)'
-            WHEN 'timestamp'    THEN 'varchar(19)'
-			WHEN 'decimal'      THEN CONCAT('decimal','(', IF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ,',',NUMERIC_SCALE,')')
-            WHEN 'double'       THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
-            WHEN 'float'        THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
-            WHEN 'set'          THEN 'varchar(255)'
-            WHEN 'enum'         THEN 'varchar(255)'
-            WHEN 'char'         THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + ROUND( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
-            WHEN 'varchar'      THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + ROUND( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
-			WHEN 'boolean' 		THEN 'boolean'
-			ELSE 'varchar(255)'
-        END AS field_type,
-		CONCAT('{"name": "', LOWER( REPLACE(column_name,' ','_') ), '","type":', 
-			IF( data_type IN ("tinyint","smallint","mediumint", "bit"), '["null", "int"]', 
-			IF( data_type IN ("int") AND column_type LIKE '%unsigned%', '["null", "long"]', 
-			IF( data_type IN ("int") AND column_type NOT LIKE '%unsigned%', '["null", "int"]', 
-			IF( data_type IN ("bigint"), '["null", "long"]', 
-			IF( data_type IN ("float","double"), '["null", "double"]', 
-			IF( data_type IN ("decimal"), CONCAT( '["null", {"type":"fixed", "name": "', LOWER( REPLACE(column_name,' ','_') ) , '", "size":' , CAST( ROUND( IF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ) / 2 AS SIGNED ) , ', "logicalType": "decimal", "precision":' , ROUND( IF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ) , ', "scale":' , NUMERIC_SCALE , '}]' ), 
-			IF( data_type = "timestamp",'["null", "string"]', 
-			IF( data_type = "datetime",'["null", "string"]', 
-			IF( data_type = "boolean",'["null", "boolean"]', 
-			IF( data_type = "date",'["null", "string"]', 
-			IF( data_type = "time",'["null", "string"]','["null", "string"]' ))))))))))
+			WHEN 'bit'      THEN 'int'
+			WHEN 'tinyint'  THEN 'int'
+			WHEN 'smallint' THEN 'int'
+          	WHEN 'int'      THEN 'int'          	
+            WHEN 'bigint'   THEN 'bigint'            
+           	WHEN 'text'     THEN 'varchar(65535)'
+           	WHEN 'image'    THEN 'varchar(65535)'
+           	WHEN 'xml'      THEN 'varchar(65535)'
+            WHEN 'date'     THEN 'varchar(10)'            
+            WHEN 'datetime' THEN 'varchar(19)'            
+            WHEN 'time'     THEN 'varchar(17)'            
+			WHEN 'decimal'  THEN CONCAT('decimal','(', IIF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ,',',NUMERIC_SCALE,')')
+			WHEN 'numeric'  THEN CONCAT('decimal','(', IIF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ,',',NUMERIC_SCALE,')')			
+            WHEN 'real'     THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
+            WHEN 'float'    THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
+            WHEN 'char'     THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + CEILING( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')            
+            WHEN 'varchar'  THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + CEILING( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
+            WHEN 'nvarchar' THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + CEILING( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
+			ELSE 'varchar(255)' 
+		END AS field_type,
+		CONCAT('{"name": "', LOWER( REPLACE(column_name,' ','_') ), '","type":',
+			IIF( data_type IN ('tinyint','smallint','int','bit'), '["null", "int"]',
+			IIF( data_type IN ('bigint'), '["null", "long"]', 
+			IIF( data_type IN ('float','real'), '["null", "double"]', 
+			IIF( data_type IN ('decimal','numeric'), CONCAT( '["null", {"type":"fixed", "name": "', LOWER( REPLACE(column_name,' ','_') ) , '", "size":' , CAST( CEILING( IIF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ) / 2 AS TINYINT ) , ', "logicalType": "decimal", "precision":' , CEILING( IIF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ) , ', "scale":' , NUMERIC_SCALE , '}]' ), 
+			IIF( data_type = 'datetime','["null", "string"]', 
+			IIF( data_type = 'date','["null", "string"]', 
+			IIF( data_type = 'time','["null", "string"]','["null", "string"]' )))))))
 			), ' , "default": null}'
-		) AS json,
+		 AS json ,
 		LOWER( REPLACE(column_name,' ','_') ) AS column_name,
         0 AS column_key,
 		'' AS encoding
