@@ -123,8 +123,8 @@ SELECT * FROM (
 			IIF( data_type IN ('decimal','numeric'), CONCAT( '["null", {"type":"fixed", "name": "', LOWER( REPLACE(column_name,' ','_') ) , '", "size":' , CAST( CEILING( IIF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ) / 2 AS TINYINT ) , ', "logicalType": "decimal", "precision":' , CEILING( IIF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ) , ', "scale":' , NUMERIC_SCALE , '}]' ), 
 			IIF( data_type = 'datetime','["null", "string"]', 
 			IIF( data_type = 'date','["null", "string"]', 
-			IIF( data_type = 'time','["null", "string"]','["null", "string"]' )))))))
-			), ' , "default": null}'
+			IIF( data_type = 'time','["null", "string"]','["null", "string"]' ))))))
+			), ' , "default": null}')
 		 AS json ,
 		LOWER( REPLACE(column_name,' ','_') ) AS column_name,
         0 AS column_key,
