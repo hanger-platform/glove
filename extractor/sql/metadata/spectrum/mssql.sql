@@ -18,7 +18,11 @@ SELECT * FROM (
 						WHEN 'YYYYMMDD' THEN '''19000101'''
 						ELSE '''190001''' 
 				END,') AS partition_field')
-	        WHEN '${PARTITION_TYPE}' = 'id' THEN CONCAT('(( floor( COALESCE(CAST(',column_name,' AS INT),1) / ( ${PARTITION_LENGTH} + 0.01 ) ) + 1 ) * ${PARTITION_LENGTH}) AS partition_field')
+	        WHEN '${PARTITION_TYPE}' = 'id' THEN 
+				CASE 
+	        		WHEN data_type = 'uniqueidentifier' THEN '(( floor( 16 / ( ${PARTITION_LENGTH} + 0.01 ) ) + 1 ) * ${PARTITION_LENGTH}) AS partition_field'
+	        		ELSE CONCAT('(( floor( COALESCE(CAST(',column_name,' AS INT),1) / ( ${PARTITION_LENGTH} + 0.01 ) ) + 1 ) * ${PARTITION_LENGTH}) AS partition_field')
+	        	END
 		END AS fields,
 	    CASE
 	        WHEN '${PARTITION_TYPE}' = 'date' OR '${PARTITION_TYPE}' = 'timestamp' THEN 
@@ -36,7 +40,11 @@ SELECT * FROM (
 						WHEN 'YYYYMMDD' THEN '''19000101'''
 						ELSE '''190001''' 
 				END,')')
-	        WHEN '${PARTITION_TYPE}' = 'id' THEN CONCAT('(( floor( COALESCE(CAST(',column_name,' AS INT),1) / ( ${PARTITION_LENGTH} + 0.01 ) ) + 1 ) * ${PARTITION_LENGTH})')
+	        WHEN '${PARTITION_TYPE}' = 'id' THEN
+				CASE 
+	        		WHEN data_type = 'uniqueidentifier' THEN '(( floor( 16 / ( ${PARTITION_LENGTH} + 0.01 ) ) + 1 ) * ${PARTITION_LENGTH})'
+	        		ELSE CONCAT('(( floor( COALESCE(CAST(',column_name,' AS INT),1) / ( ${PARTITION_LENGTH} + 0.01 ) ) + 1 ) * ${PARTITION_LENGTH})')
+	        	END
 	    END AS casting,
 	    'int' AS field_type,
 		'{"name": "partition_field","type":["null", "int"], "default": null}' AS json,
