@@ -18,7 +18,7 @@ SELECT * FROM (
 						WHEN 'YYYYMMDD' THEN '''19000101'''
 						ELSE '''190001''' 
 				END,') AS partition_field')
-	        WHEN '${PARTITION_TYPE}' = 'id' THEN CONCAT('(( floor( COALESCE(CAST(',column_name,' AS TINYINT ),1) / ( ${PARTITION_LENGTH} + 0.01 ) ) + 1 ) * ${PARTITION_LENGTH}) AS partition_field')
+	        WHEN '${PARTITION_TYPE}' = 'id' THEN CONCAT('(( floor( COALESCE(CAST(',column_name,' AS INT),1) / ( ${PARTITION_LENGTH} + 0.01 ) ) + 1 ) * ${PARTITION_LENGTH}) AS partition_field')
 		END AS fields,
 	    CASE
 	        WHEN '${PARTITION_TYPE}' = 'date' OR '${PARTITION_TYPE}' = 'timestamp' THEN 
@@ -36,7 +36,7 @@ SELECT * FROM (
 						WHEN 'YYYYMMDD' THEN '''19000101'''
 						ELSE '''190001''' 
 				END,')')
-	        WHEN '${PARTITION_TYPE}' = 'id' THEN CONCAT('(( floor( COALESCE(CAST(',column_name,' AS TINYINT ),1) / ( ${PARTITION_LENGTH} + 0.01 ) ) + 1 ) * ${PARTITION_LENGTH})')
+	        WHEN '${PARTITION_TYPE}' = 'id' THEN CONCAT('(( floor( COALESCE(CAST(',column_name,' AS INT),1) / ( ${PARTITION_LENGTH} + 0.01 ) ) + 1 ) * ${PARTITION_LENGTH})')
 	    END AS casting,
 	    'int' AS field_type,
 		'{"name": "partition_field","type":["null", "int"], "default": null}' AS json,
@@ -80,38 +80,41 @@ SELECT * FROM (
     SELECT DISTINCT
         ordinal_position,
         CASE
-            WHEN data_type IN ('datetime','timestamp') THEN CONCAT('COALESCE(DATE_FORMAT(IF( WEEKDAY(',column_name,') IS NULL', ',' , '''1900-01-01 00:00:00''', ',', column_name, '),', '''%Y-%m-%d %T', ' ${TIMEZONE_OFFSET}', '''), ', '''1900-01-01 00:00:00''', ') AS `',column_name,'`')
-            WHEN data_type = 'date' THEN CONCAT('COALESCE(DATE_FORMAT(IF( WEEKDAY(',column_name,') IS NULL', ',' , '''1900-01-01''', ',', column_name, '),', '''%Y-%m-%d', '''), ', '''1900-01-01''', ') AS `',REPLACE(column_name,' ','_'),'`')
-			WHEN data_type IN ('tinyint','smallint','mediumint', 'int', 'bigint') THEN CONCAT('CAST(`',column_name,'` AS SIGNED) AS `',REPLACE(column_name,' ','_'),'`')
-            WHEN data_type IN ('text', 'longtext', 'mediumtext', 'tinytext', 'varchar') then concat('`', column_name, '` AS `',REPLACE(column_name,' ','_'),'`' )
-            ELSE CONCAT('`',column_name,'`')
+            WHEN data_type IN ('datetime') THEN CONCAT('COALESCE(FORMAT(IIF(',column_name,' IS NULL', ',' , '''1900-01-01 00:00:00''', ',', column_name, '),', '''yyyy-MM-dd HH:mm:ss', ' ${TIMEZONE_OFFSET}', '''), ', '''1900-01-01 00:00:00''', ') AS ',column_name,'')
+            WHEN data_type = 'date' THEN CONCAT('COALESCE(FORMAT(IIF(',column_name,' IS NULL', ',' , '''1900-01-01''', ',', column_name, '),', '''yyyy-MM-dd', '''), ', '''1900-01-01''', ') AS ',REPLACE(column_name,' ','_'),'')
+			WHEN data_type IN ('bit','tinyint','smallint','int') THEN CONCAT('CAST(',column_name,' AS int) AS ',REPLACE(column_name,' ','_'),'')
+			WHEN data_type IN ('bigint') THEN CONCAT('CAST(',column_name,' AS bigint) AS ',REPLACE(column_name,' ','_'),'')
+            WHEN data_type IN ('text', 'varchar') then concat('', column_name, ' AS ',REPLACE(column_name,' ','_'),'' )
+            ELSE CONCAT('',column_name,'')
         END AS fields,
         CASE
-            WHEN data_type IN ('datetime','timestamp') THEN CONCAT('COALESCE(DATE_FORMAT(IF( WEEKDAY(',column_name,') IS NULL', ',' , '''1900-01-01 00:00:00''', ',', column_name, '),', '''%Y-%m-%d %T', ' ${TIMEZONE_OFFSET}', '''), ', '''1900-01-01 00:00:00''', ')')
-            WHEN data_type = 'date' THEN CONCAT('COALESCE(DATE_FORMAT(IF( WEEKDAY(',column_name,') IS NULL', ',' , '''1900-01-01''', ',', column_name, '),', '''%Y-%m-%d', '''), ', '''1900-01-01''', ')' )
-			WHEN data_type IN ('tinyint','smallint','mediumint', 'int', 'bigint') THEN CONCAT('CAST(`',column_name,'` AS SIGNED)')
-            WHEN data_type IN ('text', 'longtext', 'mediumtext', 'tinytext', 'varchar') then concat('`', column_name, '`' )
-            ELSE CONCAT('`',column_name,'`')
+            WHEN data_type IN ('datetime') THEN CONCAT('COALESCE(FORMAT(IIF(',column_name,' IS NULL', ',' , '''1900-01-01 00:00:00''', ',', column_name, '),', '''yyyy-MM-dd HH:mm:ss', ' ${TIMEZONE_OFFSET}', '''), ', '''1900-01-01 00:00:00''', ')')
+            WHEN data_type = 'date' THEN CONCAT('COALESCE(FORMAT(IIF(',column_name,' IS NULL', ',' , '''1900-01-01''', ',', column_name, '),', '''yyyy-MM-dd', '''), ', '''1900-01-01''', ')' )
+			WHEN data_type IN ('bit','tinyint','smallint', 'int') THEN CONCAT('CAST(',column_name,' AS int)')
+			WHEN data_type IN ('bigint') THEN CONCAT('CAST(',column_name,' AS bigint)')
+            WHEN data_type IN ('text', 'varchar') then concat('', column_name, '' )
+            ELSE CONCAT('',column_name,'')
         END AS casting,
 		CASE data_type
-			WHEN 'bit'      THEN 'int'
-			WHEN 'tinyint'  THEN 'int'
-			WHEN 'smallint' THEN 'int'
-          	WHEN 'int'      THEN 'int'          	
-            WHEN 'bigint'   THEN 'bigint'            
-           	WHEN 'text'     THEN 'varchar(65535)'
-           	WHEN 'image'    THEN 'varchar(65535)'
-           	WHEN 'xml'      THEN 'varchar(65535)'
-            WHEN 'date'     THEN 'varchar(10)'            
-            WHEN 'datetime' THEN 'varchar(19)'            
-            WHEN 'time'     THEN 'varchar(17)'            
-			WHEN 'decimal'  THEN CONCAT('decimal','(', IIF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ,',',NUMERIC_SCALE,')')
-			WHEN 'numeric'  THEN CONCAT('decimal','(', IIF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ,',',NUMERIC_SCALE,')')			
-            WHEN 'real'     THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
-            WHEN 'float'    THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
-            WHEN 'char'     THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + CEILING( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')            
-            WHEN 'varchar'  THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + CEILING( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
-            WHEN 'nvarchar' THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + CEILING( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
+			WHEN 'bit'       THEN 'int'
+			WHEN 'tinyint'   THEN 'int'
+			WHEN 'smallint'  THEN 'int'
+          	WHEN 'int'       THEN 'int'          	
+            WHEN 'bigint'    THEN 'bigint'            
+           	WHEN 'text'      THEN 'varchar(65535)'
+           	WHEN 'image'     THEN 'varchar(65535)'
+           	WHEN 'xml'       THEN 'varchar(65535)'
+			WHEN 'varbinary' THEN 'varchar(65535)'			
+            WHEN 'date'      THEN 'varchar(10)'            
+            WHEN 'datetime'  THEN 'varchar(19)'            
+            WHEN 'time'      THEN 'varchar(17)'            
+			WHEN 'decimal'   THEN CONCAT('decimal','(', IIF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ,',',NUMERIC_SCALE,')')
+			WHEN 'numeric'   THEN CONCAT('decimal','(', IIF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ,',',NUMERIC_SCALE,')')			
+            WHEN 'real'      THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
+            WHEN 'float'     THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
+            WHEN 'char'      THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + CEILING( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')            
+            WHEN 'varchar'   THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + CEILING( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
+            WHEN 'nvarchar'  THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + CEILING( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
 			ELSE 'varchar(255)' 
 		END AS field_type,
 		CONCAT('{"name": "', LOWER( REPLACE(column_name,' ','_') ), '","type":',
