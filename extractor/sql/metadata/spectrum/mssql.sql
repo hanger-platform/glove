@@ -111,7 +111,7 @@ SELECT * FROM (
            	WHEN 'text'      THEN 'varchar(65535)'
            	WHEN 'image'     THEN 'varchar(65535)'
            	WHEN 'xml'       THEN 'varchar(65535)'
-			WHEN 'varbinary' THEN 'varchar(65535)'			
+			WHEN 'varbinary' THEN 'varchar(65535)'
             WHEN 'date'      THEN 'varchar(10)'            
             WHEN 'datetime'  THEN 'varchar(19)'            
             WHEN 'time'      THEN 'varchar(17)'            
@@ -119,16 +119,16 @@ SELECT * FROM (
 			WHEN 'numeric'   THEN CONCAT('decimal','(', IIF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ,',',NUMERIC_SCALE,')')			
             WHEN 'real'      THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
             WHEN 'float'     THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
-            WHEN 'char'      THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + CEILING( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')            
-            WHEN 'varchar'   THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + CEILING( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
-            WHEN 'nvarchar'  THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + CEILING( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
+            WHEN 'char'      THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + ABS( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')            
+            WHEN 'varchar'   THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + ABS( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
+            WHEN 'nvarchar'  THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + ABS( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
 			ELSE 'varchar(255)' 
 		END AS field_type,
 		CONCAT('{"name": "', LOWER( REPLACE(column_name,' ','_') ), '","type":',
 			IIF( data_type IN ('tinyint','smallint','int','bit'), '["null", "int"]',
 			IIF( data_type IN ('bigint'), '["null", "long"]', 
 			IIF( data_type IN ('float','real'), '["null", "double"]', 
-			IIF( data_type IN ('decimal','numeric'), CONCAT( '["null", {"type":"fixed", "name": "', LOWER( REPLACE(column_name,' ','_') ) , '", "size":' , CAST( CEILING( IIF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ) / 2 AS TINYINT ) , ', "logicalType": "decimal", "precision":' , CEILING( IIF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ) , ', "scale":' , NUMERIC_SCALE , '}]' ), 
+			IIF( data_type IN ('decimal','numeric'), CONCAT( '["null", {"type":"fixed", "name": "', LOWER( REPLACE(column_name,' ','_') ) , '", "size":' , CAST( ABS( IIF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ) / 2 AS TINYINT ) , ', "logicalType": "decimal", "precision":' , CEILING( IIF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ) , ', "scale":' , NUMERIC_SCALE , '}]' ), 
 			IIF( data_type = 'datetime','["null", "string"]', 
 			IIF( data_type = 'date','["null", "string"]', 
 			IIF( data_type = 'time','["null", "string"]','["null", "string"]' ))))))

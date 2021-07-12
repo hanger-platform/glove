@@ -41,7 +41,7 @@ SELECT * FROM (
 			ELSE column_name
 		END AS casting,
 			CASE data_type
-			WHEN 'bit'      	THEN 'smallint'
+			WHEN 'bit'          THEN 'smallint'
 			WHEN 'tinyint'      THEN 'smallint'
 			WHEN 'smallint'     THEN 'smallint'
 			WHEN 'int'          THEN 'int'
@@ -57,9 +57,9 @@ SELECT * FROM (
 			WHEN 'numeric'      THEN  CONCAT('numeric','(', IIF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ,',',NUMERIC_SCALE,')')
 			WHEN 'real'         THEN 'double precision'
 			WHEN 'float'        THEN 'double precision'            
-			WHEN 'char'         THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + CEILING( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
-			WHEN 'varchar'      THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + CEILING( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
-			WHEN 'nvarchar'     THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + CEILING( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
+			WHEN 'char'         THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + ABS( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
+			WHEN 'varchar'      THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + ABS( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
+			WHEN 'nvarchar'     THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + ABS( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
 			ELSE 'varchar(255)'
 		END AS field_type,
 		'' AS json,
@@ -78,13 +78,13 @@ SELECT * FROM (
 	UNION ALL
 	
 	SELECT
-        999 AS ordinal_position,
-        CONCAT('CONCAT(','FORMAT(GETDATE(),','''','yyyy-MM-dd HH:mm:ss', '''','),', '''' ,' ${TIMEZONE_OFFSET}', '''',') AS etl_load_date') AS fields,
+		999 AS ordinal_position,
+		CONCAT('CONCAT(','FORMAT(GETDATE(),','''','yyyy-MM-dd HH:mm:ss', '''','),', '''' ,' ${TIMEZONE_OFFSET}', '''',') AS etl_load_date') AS fields,
 		CONCAT('CONCAT(','FORMAT(GETDATE(),','''','yyyy-MM-dd HH:mm:ss', '''','),', '''' ,' ${TIMEZONE_OFFSET}', '''',')') AS casting,
-        'timestamp' AS field_type,
-  		'' AS json,
-        'etl_load_date' AS column_name,
-        0 AS column_key,
+		'timestamp' AS field_type,
+		'' AS json,
+		'etl_load_date' AS column_name,
+		0 AS column_key,
 		'encode ${ENCODE}' AS encoding 	
 ) x
 ORDER BY x.ordinal_position
