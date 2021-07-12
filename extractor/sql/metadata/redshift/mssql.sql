@@ -57,9 +57,9 @@ SELECT * FROM (
 			WHEN 'numeric'      THEN  CONCAT('numeric','(', IIF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ,',',NUMERIC_SCALE,')')
 			WHEN 'real'         THEN 'double precision'
 			WHEN 'float'        THEN 'double precision'            
-			WHEN 'char'         THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + ROUND( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
-			WHEN 'varchar'      THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + ROUND( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
-			WHEN 'nvarchar'     THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + ROUND( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
+			WHEN 'char'         THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + CEILING( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
+			WHEN 'varchar'      THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + CEILING( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
+			WHEN 'nvarchar'     THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + CEILING( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
 			ELSE 'varchar(255)'
 		END AS field_type,
 		'' AS json,
