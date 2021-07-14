@@ -17,44 +17,56 @@ DATA_FILE="${SCHEMA}_${TABLE}"
 partition_load()
 {
 	echo "Running partition load!"
-	cd ${RAWFILE_QUEUE_PATH}
+	cd ${RAWFILE_QUEUE_PATH}	
 
-	#Particiona o arquivo contendo os dados. 
-	echo "Partitioning data file delimited by ${DELIMITER}!"
-	if [ ${IS_PARALLEL} = 1 ]; then
-		echo "Paralle actived"	
-			
-		if [ ${DELIMITER} == ";" ]; then
-			cat ${RAWFILE_QUEUE_FILE} | parallel --no-notice --pipe -L1000 --jobs 4 awk \'BEGIN{ FS=OFS=\"\;\" } { gsub\(/\\W/, \"\", \$1\)\; gsub\( \"\\042\", \"\", \$2\)\; print\>\$1\"_tmp_{#}\" }\'
+	FILE_INDEX=0
+
+	echo "Merging input files!"
+
+	# Une os dados em um único arquivo.  
+	for i in `ls ${RAWFILE_QUEUE_PATH}*`
+	do
+		if [ ${FILE_INDEX} = 0 ]; then	
+			cat ${i}	>> ${RAWFILE_QUEUE_PATH}merged.csv
+			error_check
 		else
-			cat ${RAWFILE_QUEUE_FILE} | parallel --no-notice --pipe -L1000 --jobs 4 awk \'BEGIN{ FS=OFS=\"\,\" } { gsub\(/\\W/, \"\", \$1\)\; gsub\( \"\\042\", \"\", \$2\)\; print\>\$1\"_tmp_{#}\" }\'
+			sed '1d' ${i} >> ${RAWFILE_QUEUE_PATH}merged.csv
+			error_check	
 		fi
-		error_check 	
-	else
-		if [ ${DELIMITER} == ";" ]; then
-			awk 'BEGIN{ FS=OFS=";" } { gsub(/\W/, "", $1); gsub( "\042", "", $2); print>$1".csv" }' ${RAWFILE_QUEUE_FILE}
-		else
-			awk 'BEGIN{ FS=OFS="," } { gsub(/\W/, "", $1); gsub( "\042", "", $2); print>$1".csv" }' ${RAWFILE_QUEUE_FILE}
+
+		# Remove o arquivo já mergeado.
+		if [ ${DEBUG} = 1 ] ; then
+			echo "Removing just merged file ${i}."
 		fi
+		rm -f ${i}
 		error_check
-	fi
 
-    # Remove o arquivo original, mantendo apenas as partições. 
-	echo "Removing file ${RAWFILE_QUEUE_FILE}!"
-	rm -f ${RAWFILE_QUEUE_FILE}
+		FILE_INDEX=$(( $FILE_INDEX + 1 ))
+	done
+
+	echo "Partitioning data file delimited by ${DELIMITER}!"
+
+	# Particiona o arquivo em single thread (thread=1) para preservar os dados e nome das partições.  
+	# TODO - A geração de um único arquivo de saída deve ser suportada pelo conversor de dados nativamente sem a necessidade do merge anterior. 
+	java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
+		--folder=${RAWFILE_QUEUE_PATH} \
+		--filename=merged.csv \
+		--delimiter=${DELIMITER} \
+		--target=csv \
+		--splitStrategy=${SPLIT_STRATEGY} \
+		--partition=0 \
+		--thread=1 \
+		--escape=${QUOTE_ESCAPE} \
+		--header \
+		--readable \
+		--replace \
+		--debug=${DEBUG}
 	error_check
 
-	# Une os fragmentos da partição criados por cada executor do parallel. 
-	if [ ${IS_PARALLEL} = 1 ]; then
-		echo "Removing temporary files!"
-		
-		for i in `ls | cut -d"_" -f1 | uniq`
-		do 
-			cat ${i}_tmp_* > ${i}.csv
-			rm -f ${i}_tmp_*
-		done
-		error_check	
-	fi		
+    # Remove o arquivo original, mantendo apenas as partições. 
+	echo "Removing file ${RAWFILE_QUEUE_PATH}merged.csv!"
+	rm -f ${RAWFILE_QUEUE_PATH}merged.csv
+	error_check
 	
 	# Compacta o arquivo de cada partição. 
 	echo "Compacting csv files!"
@@ -74,7 +86,7 @@ partition_load()
 	echo "Loading data to ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} from ${STORAGE_QUEUE_PATH}"
 	bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} 
 	bq mk --project_id=${BIG_QUERY_PROJECT_ID} ${CUSTOM_SCHEMA}${SCHEMA_NAME}
-	bq load --project_id=${BIG_QUERY_PROJECT_ID} --field_delimiter="${DELIMITER}" ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} ${STORAGE_QUEUE_PATH}* ${METADATA_JSON_FILE}
+	bq load --project_id=${BIG_QUERY_PROJECT_ID} --skip_leading_rows=1 --field_delimiter="${DELIMITER}" ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} ${STORAGE_QUEUE_PATH}* ${METADATA_JSON_FILE}
 	error_check
 	
     # Percorre o arquivo de cada partição. 
@@ -82,34 +94,53 @@ partition_load()
     do
         # Identifica a partição. 
         PARTITION=`echo $i | cut -d '.' -f 1`
+		PARTITION_LENGTH=
         error_check
 
-        # Identifica se a partição existe no BigQuery. 
-        echo "Cheking partition ${PARTITION}!"
-		bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}_${PARTITION}
-		bq query --allow_large_results --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false "SELECT COUNT(1) AS TOTAL_ROWS_IN_PARTITION FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION}"
-
-		if [ $? -eq 0 ]; then
-			PARTITION_EXISTS=1
-		else
-			PARTITION_EXISTS=0
-		fi		
+		# Partição a ser analisada.
+		echo "Cheking partition ${PARTITION}!"
 		
-		# Atualiza/Cria a partição no BigQuery. 
-		if [ "${PARTITION_EXISTS}" -eq "1" ]; then 
-			bq query --allow_large_results --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --destination_table=${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}_${PARTITION} "SELECT R.* FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION} R LEFT JOIN ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} S ON R.CUSTOM_PRIMARY_KEY=S.CUSTOM_PRIMARY_KEY  WHERE S.CUSTOM_PRIMARY_KEY IS NULL AND R.PARTITION_FIELD = ${PARTITION};"  
-			error_check
-			
-			bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION}
-			bq query --allow_large_results --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --destination_table=${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION} "SELECT R.* FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}_${PARTITION} R UNION ALL SELECT S.* FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} S WHERE S.PARTITION_FIELD = ${PARTITION};"
-			
-			error_check
+		# Identifica se a partição é por dia, mês ou ano.
+		if [ "${#PARTITION}" -eq "8" ]; then
+			PARTITION_LENGTH=8
+		elif [ "${#PARTITION}" -eq "6" ]; then
+			PARTITION_LENGTH=6
+			PARTITION="${PARTITION}01"
+		elif [ "${#PARTITION}" -eq "4" ]; then
+			PARTITION_LENGTH=4
+			PARTITION="${PARTITION}0101"
+		else 
+			echo "Partition '${PARTITION}' is invalid, allowed partition format are: yyyyMMdd, yyyyMM or yyyy"
+		fi
+		
+		# Identifica se a partição foi definida.
+		if [ ${#PARTITION_LENGTH} -gt 0 ]; then
+			# Identifica se a partição existe no BigQuery. 			
 			bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}_${PARTITION}
-		else
-			bq query --allow_large_results --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --destination_table=${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION} "SELECT * FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} WHERE PARTITION_FIELD = ${PARTITION};"  
-			error_check
-		fi			
-    done	
+			bq query --allow_large_results --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false "SELECT COUNT(1) AS TOTAL_ROWS_IN_PARTITION FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION}"
+
+			if [ $? -eq 0 ]; then
+				PARTITION_EXISTS=1
+			else
+				PARTITION_EXISTS=0
+			fi		
+			
+			# Atualiza/Cria a partição no BigQuery. 
+			if [ "${PARTITION_EXISTS}" -eq "1" ]; then 
+				bq query --allow_large_results --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --destination_table=${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}_${PARTITION} "SELECT R.* FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION} R LEFT JOIN ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} S ON R.CUSTOM_PRIMARY_KEY=S.CUSTOM_PRIMARY_KEY  WHERE S.CUSTOM_PRIMARY_KEY IS NULL AND CAST(R.PARTITION_FIELD AS STRING) = LEFT('${PARTITION}',${PARTITION_LENGTH});"  
+				error_check
+				
+				bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION}
+				bq query --allow_large_results --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --destination_table=${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION} "SELECT R.* FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}_${PARTITION} R UNION ALL SELECT S.* FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} S WHERE CAST(S.PARTITION_FIELD AS STRING) = LEFT('${PARTITION}',${PARTITION_LENGTH});"
+				
+				error_check
+				bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}_${PARTITION}
+			else
+				bq query --allow_large_results --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --destination_table=${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_${PARTITION} "SELECT * FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} WHERE CAST(PARTITION_FIELD AS STRING) = LEFT('${PARTITION}',${PARTITION_LENGTH});"  
+				error_check
+			fi
+		fi
+    done
 
     # Remove os arquivos temporários.
     if [ ${DEBUG} = 0 ] ; then
@@ -154,7 +185,7 @@ delta_load()
 	echo "Loading table ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} from ${STORAGE_QUEUE_PATH}"
 	bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} 
 	bq mk --project_id=${BIG_QUERY_PROJECT_ID} ${CUSTOM_SCHEMA}${SCHEMA_NAME}
-	bq load --project_id=${BIG_QUERY_PROJECT_ID} --field_delimiter="${DELIMITER}" ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} ${STORAGE_QUEUE_PATH}* ${METADATA_JSON_FILE}
+	bq load --project_id=${BIG_QUERY_PROJECT_ID} --field_delimiter="${DELIMITER}" --skip_leading_rows=1 ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} ${STORAGE_QUEUE_PATH}* ${METADATA_JSON_FILE}
 	error_check
 	
 	# Monta a tabela temporária.
@@ -217,7 +248,7 @@ full_load()
 	echo "Loading table ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE} from ${STORAGE_QUEUE_PATH}"
 	bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE} 
 	bq mk --project_id=${BIG_QUERY_PROJECT_ID} ${CUSTOM_SCHEMA}${SCHEMA_NAME}
-	bq load --project_id=${BIG_QUERY_PROJECT_ID} --field_delimiter="${DELIMITER}" ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE} ${STORAGE_QUEUE_PATH}* ${METADATA_JSON_FILE}
+	bq load --project_id=${BIG_QUERY_PROJECT_ID} --field_delimiter="${DELIMITER}" --skip_leading_rows=1 ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE} ${STORAGE_QUEUE_PATH}* ${METADATA_JSON_FILE}
 	error_check	
 	
 	# Remove a tabela principal.
@@ -268,6 +299,24 @@ error_check()
 	fi
 }
 
+# Dropa uma tabela particionada.
+drop_partitioned_table()
+{
+	# Dropa todas as partições da tabela.
+	echo "Removing table ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}_ partitions!"
+	
+	for i in $(bq ls -n 9999 ${CUSTOM_SCHEMA}${SCHEMA_NAME} | grep ${TABLE}_ | awk '{print $1}'); 	
+	do 
+		# Identifica se a partição termina com uma data após nome da tabela.
+		pattern="^${TABLE}_[0-9]{8}"
+
+		if [[ $i =~ $pattern ]]; then
+			echo "Removing partition ${i}!"		
+			bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${i}
+		fi		
+	done;
+}
+
 # Identifica o tamanho do diretório de trabalho.
 QUEUE_FOLDER_SIZE=`du -s ${RAWFILE_QUEUE_PATH} | cut -f1`
 
@@ -283,13 +332,6 @@ if [ ${QUEUE_FOLDER_SIZE} -gt ${QUEUE_FILES_SIZE_LIMIT} ]; then
 	exit 1
 else
 	echo "${QUEUE_FOLDER_SIZE} KB of data will be processed ( ${QUEUE_FILES_SIZE_LIMIT} KB is the limit )!"
-fi
-
-# Identifica se deve recriar a tabela.
-if [ ${IS_RECREATE} = 1 ]; then
-    # Dropa a tabela para que possa ser recriada.
-	echo "Removing table ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}!"
-	bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} 
 fi
 
 # Identifica a quantidade de arquivos a serem processados.
@@ -333,22 +375,48 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 			else
 				echo "EXPORT_BUCKET was not defined!"
 			fi
-		fi 
-		
-		# Remove o header do csv intermediário.
-		echo "Removing header from ${RAWFILE_QUEUE_FILE}!"
-		tail -n +2 ${RAWFILE_QUEUE_FILE} > ${RAWFILE_QUEUE_FILE}.tmp
-		mv -f ${RAWFILE_QUEUE_FILE}.tmp ${RAWFILE_QUEUE_FILE};
+		fi
     fi
 
-	# Identifica o tipo de carga que será realizado.
-	if [ "${#PARTITION_FIELD}" -gt "0" ]; then
-		partition_load		
-	else
-		if [ "${#DELTA_FIELD_IN_METADATA}" -gt "0" ]; then
-			delta_load			
+	# Identifica se a fonte é arquivo.
+    if [ ${MODULE} == "file" ]; then
+		# Identifica o tipo de carga que será realizado.
+		if [ ${FILE_INPUT_PARTITONED} == 1 ]; then
+			# Identifica se deve recriar a tabela.
+			if [ ${IS_RECREATE} = 1 ]; then
+				drop_partitioned_table			
+			fi
+			partition_load
 		else
+			# Identifica se deve recriar a tabela.
+			if [ ${IS_RECREATE} = 1 ]; then
+				# Dropa a tabela para que possa ser recriada.
+				echo "Removing table ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}!"
+				bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} 
+			fi
 			full_load
+		fi
+    else
+		# Identifica o tipo de carga que será realizado.
+		if [ "${#PARTITION_FIELD}" -gt "0" ]; then
+			# Identifica se deve recriar a tabela.
+			if [ ${IS_RECREATE} = 1 ]; then
+				drop_partitioned_table			
+			fi		
+			partition_load		
+		else	
+			# Identifica se deve recriar a tabela.
+			if [ ${IS_RECREATE} = 1 ]; then
+				# Dropa a tabela para que possa ser recriada.
+				echo "Removing table ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}!"
+				bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} 
+			fi
+		
+			if [ "${#DELTA_FIELD_IN_METADATA}" -gt "0" ]; then
+				delta_load			
+			else
+				full_load
+			fi
 		fi
 	fi
 else

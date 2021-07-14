@@ -76,7 +76,8 @@ public class S3 {
                     .addParameter("b", "bucket", "S3 Bucket name", "", true, false)
                     .addParameter("p", "prefix", "Object prefix (folder/subfolder/ or folder/subfolder/key.csv)", "", true, true)
                     .addParameter("f", "field", "Fields to be extracted from the file", "", true, false)
-                    .addParameter("pf", "profile", "(Optional) Profile name.", "default")
+                    .addParameter("pf", "profile", "(Optional) AWS credentials profile name", "default")
+                    .addParameter("rg", "region", "(Optional) AWS region", "us-east-1")
                     .addParameter("sd", "start_date", "(Optional) Object modified date since", "")
                     .addParameter("st", "start_time", "(Optional) Object modified time since", "00:00:00")
                     .addParameter("ed", "end_date", "(Optional) Object modified date to", "")
@@ -106,6 +107,7 @@ public class S3 {
             AmazonS3 amazonS3Client = AmazonS3ClientBuilder
                     .standard()
                     .withCredentials(new ProfileCredentialsProvider(cli.getParameter("profile")))
+                    .withRegion(cli.getParameter("region"))
                     .build();
 
             //Lists objects of a folder.
@@ -115,7 +117,6 @@ public class S3 {
 
             while (listing.isTruncated()) {
                 listing = amazonS3Client.listNextBatchOfObjects(listing);
-
                 s3ObjectSummaries.addAll(listing.getObjectSummaries());
             }
 
@@ -163,12 +164,24 @@ public class S3 {
                         File outputFile = new File(outputPath.toString() + "/" + s3ObjectSummary.getKey().replaceAll("/", "_"));
 
                         //Transfer a file to local filesystem.               
-                        TransferState transferState = downloadObject(cli.getParameter("bucket"), s3ObjectSummary.getKey(), outputFile, cli.getParameter("profile"));
+                        TransferState transferState = downloadObject(
+                                cli.getParameter("bucket"),
+                                s3ObjectSummary.getKey(),
+                                outputFile,
+                                cli.getParameter("profile"),
+                                cli.getParameter("region")
+                        );
 
                         //Identifies if should retry.
                         if (!transferState.equals(TransferState.Completed)) {
                             for (int i = 0; i < cli.getParameterAsInteger("retries"); i++) {
-                                transferState = downloadObject(cli.getParameter("bucket"), s3ObjectSummary.getKey(), outputFile, cli.getParameter("profile"));
+                                transferState = downloadObject(
+                                        cli.getParameter("bucket"),
+                                        s3ObjectSummary.getKey(),
+                                        outputFile,
+                                        cli.getParameter("profile"),
+                                        cli.getParameter("region")
+                                );
 
                                 if (transferState.equals(TransferState.Completed)) {
                                     break;
@@ -226,20 +239,28 @@ public class S3 {
      * @param bucket Bucket name.
      * @param object Object path name.
      * @param outputFile Output file.
-     * @param profile String profile.
+     * @param profile String AWS credentials profile.
+     * @param region AWS Region.
      * @return TransferState.
      * @throws InterruptedException
      */
-    public static TransferState downloadObject(String bucket, String object, File outputFile, String profile)
-            throws AmazonServiceException, AmazonClientException, InterruptedException {
+    public static TransferState downloadObject(
+            String bucket,
+            String object,
+            File outputFile,
+            String profile,
+            String region) throws AmazonServiceException, AmazonClientException, InterruptedException {
 
-        //Defines a S3 client
-        AmazonS3 client = AmazonS3ClientBuilder
+        TransferManager transferManager = TransferManagerBuilder
                 .standard()
-                .withCredentials(new ProfileCredentialsProvider(profile))
-                .build();
+                .withS3Client(
+                        AmazonS3ClientBuilder
+                                .standard()
+                                .withCredentials(new ProfileCredentialsProvider(profile))
+                                .withRegion(region)
+                                .build()
+                ).build();
 
-        TransferManager transferManager = TransferManagerBuilder.standard().withS3Client(client).build();
         Download download = transferManager.download(bucket, object, outputFile);
         download.waitForCompletion();
         transferManager.shutdownNow();

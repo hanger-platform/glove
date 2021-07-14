@@ -4,7 +4,9 @@
 
 ## How it works
 
-O **S3 Extractor** permite a extração de dados de arquivos armazendos em buckets do S3.
+O **S3 Extractor** permite a extração de dados de arquivos armazendos em buckets do S3, para o correto funcionamento é importante que o AWS CLI esteja configurado corretamente:
+
+[AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html)
 
 ## Instalação
 
@@ -35,7 +37,8 @@ java -jar s3.jar  \
 	--bucket=<AWS S3 Bucket name> \
 	--prefix=<(Optional) Object prefix> \
 	--field=<Fields of ouput file> \
-	--profile=<(Optional) Profile name in AWS Credentials file> \
+	--profile=<(Optional) AWS credentials profile name. 'default' as default> \
+	--region=<(Optional) AWS region. 'us-east-1' as default> \
 	--start_date=<(Optional) Object modified date since as YYYY-MM-DD> \
 	--start_time=<(Optional) Object modified time since as HH:MM:SS. Default 00:00:00> \
 	--end_date=<(Optional) Object modified date to as YYYY-MM-DD>  \ 
@@ -64,8 +67,36 @@ java -jar s3.jar  \
 	--prefix="folder/subfolder/" \
 	--start_date="..." \
 	--end_date="..."  \ 
-	--field="..." \
+	--field="..." 
 ```
+
+Supondo que as credenciais do bucket desejado esteja em um perfil específico do AWS Credentiais, este pode ser informado da seguinte forma:
+
+```bash
+java -jar s3.jar  \
+	--output="..." \
+	--bucket="bucket-name" \
+	--prefix="folder/subfolder/" \
+	--start_date="..." \
+	--end_date="..."  \ 
+	--field="..." \
+	--profile="other_profile" 
+```
+
+A região não é recuperada dos arquivos de configuração, e caso seja necessário utilizar uma região diferente da us-east-1, esta deve ser informada explicitamente para o extrator, da seguinte forma:
+
+```bash
+java -jar s3.jar  \
+	--output="..." \
+	--bucket="bucket-name" \
+	--prefix="folder/subfolder/" \
+	--start_date="..." \
+	--end_date="..."  \ 
+	--field="..." \
+	--profile="other_profile" \
+	--region="us-east-2" 
+```
+
 
 ## Contributing, Bugs, Questions
 Contributions are more than welcome! If you want to propose new changes, fix bugs or improve something feel free to fork the repository and send us a Pull Request. You can also open new `Issues` for reporting bugs and general problems.
