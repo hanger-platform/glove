@@ -40,7 +40,7 @@ public class MittTest {
         mitt.setDebug(true);
 
         //Fields.
-        String field = "id+nome>>renamed+data+json";
+        String field = "id+nome>>renamed+data+json+value";
         mitt.getConfiguration().addField(Arrays.asList(field.split("\\+")));
 
         mitt.getConfiguration().addCustomField("farmfingerprint::farmfingerprint([[nome]])");
@@ -52,7 +52,7 @@ public class MittTest {
         mitt.getConfiguration().addCustomField("rownumber::RowNumber()");
         mitt.getConfiguration().addCustomField("rownumberfield::RowNumber([[data]])");
         mitt.getConfiguration().addCustomField("at::at(0)");
-
+        mitt.getConfiguration().addCustomField("numberFormat::numberFormat(value,pt,BR)");
         //Parameters. 
         mitt.getConfiguration().addParameter("a", "primeiro", "Primeiro parâmetro", "xxx");
         mitt.getConfiguration().addParameter("b", "segundo", "Segundo parâmetro");
@@ -72,7 +72,7 @@ public class MittTest {
             data.add("A" + i);
             data.add("2019-01-01 00:00:00");
             data.add("[{\"conversions\":0,\"revenue\":0.0,\"conversions1_by_send_time\":0,\"conversions_by_send_time\":0,\"conversions2_by_send_time\":0,\"conversions1\":0,\"messages\":{\"ios_push\":[{\"conversions\":0,\"variation_api_id\":\"ec6d3b1a-ad57-4f21-bdbc-76522e891133\",\"conversions1_by_send_time\":0,\"conversions_by_send_time\":0,\"variation_name\":\"Variant 1\",\"conversions2_by_send_time\":0,\"direct_opens\":0,\"sent\":0,\"revenue\":0.0,\"total_opens\":0,\"body_clicks\":0,\"conversions1\":0,\"conversions2\":0,\"conversions3\":0,\"bounces\":0,\"conversions3_by_send_time\":0,\"unique_recipients\":0},{\"conversions\":0,\"variation_api_id\":\"93aaf479-3f90-404c-a469-7a659a3a7991\",\"conversions1_by_send_time\":0,\"conversions_by_send_time\":0,\"variation_name\":\"Control Group\",\"conversions2_by_send_time\":0,\"revenue\":0.0,\"conversions1\":0,\"conversions2\":0,\"conversions3\":0,\"conversions3_by_send_time\":0,\"enrolled\":0,\"unique_recipients\":0}]},\"conversions2\":0,\"conversions3\":0,\"time\":\"2021-03-18\",\"conversions3_by_send_time\":0,\"unique_recipients\":0}]");
-
+            data.add("-1.066,68");
             mitt.write(data);
         }
 
