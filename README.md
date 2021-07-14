@@ -80,6 +80,7 @@ As fontes de dados suportadas são as seguintes:
 *  Redshift
 *  Athena
 *  Sisense
+*  SQL Server 
 
 O destino de dados suportados são os seguintes:
 
