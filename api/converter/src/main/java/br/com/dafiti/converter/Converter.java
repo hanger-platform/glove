@@ -304,7 +304,7 @@ public class Converter {
                 if (target.equalsIgnoreCase("parquet")) {
                     Schema schema = new Parser(new File(schemaFile)).getAvroSchema();
 
-                    System.out.println("Parquet 1.11.0");
+                    System.out.println("Parquet 1.12.0");
 
                     for (File file : files) {
                         if (file.isDirectory() || "csv".equals(FilenameUtils.getExtension(file.getName()))) {

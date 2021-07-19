@@ -343,6 +343,8 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 
     # Identifica se o APPEND está habilitado no módulo de arquivo.
 	if [ ${MODULE} == "file" ] && [ ${FILE_OUTPUT_MODE} == "append" ]; then
+		delta_load	
+	elif [ ${MODULE} == "query" ] && [ "${#PARTITION_FIELD}" -gt "0" ]; then
 		delta_load
 	else
         # Identifica o tipo de carga que será realizado.

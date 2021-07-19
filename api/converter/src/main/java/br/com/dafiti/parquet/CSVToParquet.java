@@ -37,13 +37,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import org.apache.avro.Conversions;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.generic.GenericRecordBuilder;
+import org.apache.avro.Conversions;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.BooleanUtils;
@@ -287,70 +287,68 @@ public class CSVToParquet implements Runnable {
             GenericData genericData = new GenericData();
             genericData.addLogicalTypeConversion(new Conversions.DecimalConversion());
 
-            //Define the writer.
-            ParquetWriter<GenericRecord> parquetWriter = AvroParquetWriter.<GenericRecord>builder(new Path(transientFile.getAbsolutePath()))
+            //Convert to parquet.
+            try (ParquetWriter<GenericRecord> parquetWriter = AvroParquetWriter.<GenericRecord>builder(new Path(transientFile.getAbsolutePath()))
                     .withSchema(schema)
                     .withDataModel(genericData)
                     .withCompressionCodec(this.compression)
                     .withDictionaryEncoding(true)
-                    .build();
+                    .build()) {
 
-            //Convert to parquet.
-            if (inputFile.isDirectory()) {
-                File[] files = inputFile.listFiles();
+                //Convert to parquet.
+                if (inputFile.isDirectory()) {
+                    File[] files = inputFile.listFiles();
 
-                for (File file : files) {
-                    this.toParquet(file, parquetWriter, key, statistics);
+                    for (File file : files) {
+                        this.toParquet(file, parquetWriter, key, statistics);
+                    }
+                } else {
+                    this.toParquet(inputFile, parquetWriter, key, statistics);
                 }
-            } else {
-                this.toParquet(inputFile, parquetWriter, key, statistics);
-            }
 
-            //Identifies if merge is necessary.
-            if (merge) {
-                String object = parquetFile.getName();
+                //Identifies if merge is necessary.
+                if (merge) {
+                    String object = parquetFile.getName();
 
-                //Download the original object. 
-                new S3().downloadObject(bucketPath, object, mode, originalFile);
+                    //Download the original object.
+                    new S3().downloadObject(bucketPath, object, mode, originalFile);
 
-                //Identify if the original file was downloaded. 
-                if (originalFile.exists()) {
-                    //Define the reader.
-                    ParquetReader<GenericRecord> parquetReader = AvroParquetReader.<GenericRecord>builder(new Path(originalFile.getAbsolutePath()))
-                            .withDataModel(genericData)
-                            .disableCompatibility()
-                            .build();
+                    //Identify if the original file was downloaded.
+                    if (originalFile.exists()) {
+                        //Define the reader.
+                        ParquetReader<GenericRecord> parquetReader = AvroParquetReader.<GenericRecord>builder(new Path(originalFile.getAbsolutePath()))
+                                .withDataModel(genericData)
+                                .disableCompatibility()
+                                .build();
 
-                    //Parquet row.
-                    GenericRecord row;
+                        //Parquet row.
+                        GenericRecord row;
 
-                    //Read a parquet file.
-                    while ((row = parquetReader.read()) != null) {
-                        boolean add = true;
+                        //Read a parquet file.
+                        while ((row = parquetReader.read()) != null) {
+                            boolean add = true;
 
-                        //Identify merge file records.
-                        statistics.incrementOutputRows();
+                            //Identify merge file records.
+                            statistics.incrementOutputRows();
 
-                        //Identify if can add a record.
-                        if (fieldKey >= 0 && !duplicated) {
-                            add = !key.contains(String.valueOf(row.get(fieldKey)));
+                            //Identify if can add a record.
+                            if (fieldKey >= 0 && !duplicated) {
+                                add = !key.contains(String.valueOf(row.get(fieldKey)));
+                            }
+
+                            if (add) {
+                                //Write date into parquet file.
+                                parquetWriter.write(row);
+                            } else {
+                                statistics.incrementOutputUpdatedRows();
+                            }
+
+                            //Identify the record being processed.
+                            statistics.incrementRowNumber();
                         }
-
-                        if (add) {
-                            //Write date into parquet file.
-                            parquetWriter.write(row);
-                        } else {
-                            statistics.incrementOutputUpdatedRows();
-                        }
-
-                        //Identify the record being processed.
-                        statistics.incrementRowNumber();
                     }
                 }
             }
-
-            //Close the parquet file.
-            parquetWriter.close();
 
             //Identifies if the csv file is empty.
             if (statistics.getRowNumber() == 0) {

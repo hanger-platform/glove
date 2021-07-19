@@ -242,6 +242,7 @@ São suportados os seguintes tipos de carga:
 | STATICPARTITIONED, STATICPARTITION  | O comportamento será o mesmo do parâmetro PARTITIONED, porém os arquivos de cada partição serão substituídos ao invés de serem atualizados.                                                                                                                                                                                                                                                                                                                                                                                            |
 | SCRIPT                              | Será executada uma instrução sql no database de destino sem que seja retornado nenhum valor.                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 
+
 ###### EXEMPLO (Materialização)
 
 **1.integration_layer.product_costs.redshift.full.sql**
