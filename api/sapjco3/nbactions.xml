@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>run</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-classpath %classpath br.com.dafiti.sapjco3.Sapjco3 --credentials="/home/helio.leal/credentials/bw_dev.json" --output="/tmp/sapjco3/bw_dev/BI0/PMATERIAL_ROW_COUNT/BI0_PMATERIAL.csv" --function="ZRFC_READ_TABLE" --field="MATERIAL+/BIC/ZMAT0012+/BIC/ZMAT0016+/BIC/ZPRECOVD2" --table="/BI0/PMATERIAL" --key='MATERIAL' --partition="::dateformat(/BIC/ZMAT0016,yyyyMMdd,yyyy)" --row_count=100000</exec.args>
+                <exec.executable>java</exec.executable>
+            </properties>
+        </action>
+        <action>
+            <actionName>debug</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.sapjco3.Sapjco3 --credentials="/home/helio.leal/credentials/bw_dev.json" --output="/tmp/sapjco3/bw_dev/BI0/PMATERIAL_ROW_COUNT/BI0_PMATERIAL.csv" --function="ZRFC_READ_TABLE" --field="MATERIAL+/BIC/ZMAT0012+/BIC/ZMAT0016+/BIC/ZPRECOVD2" --table="/BI0/PMATERIAL" --key='MATERIAL' --partition="::dateformat(/BIC/ZMAT0016,yyyyMMdd,yyyy)" --row_count=100000</exec.args>
+                <exec.executable>java</exec.executable>
+                <jpda.listen>true</jpda.listen>
+            </properties>
+        </action>
+        <action>
+            <actionName>profile</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-classpath %classpath br.com.dafiti.sapjco3.Sapjco3 --credentials="/home/helio.leal/credentials/bw_dev.json" --output="/tmp/sapjco3/bw_dev/BI0/PMATERIAL_ROW_COUNT/BI0_PMATERIAL.csv" --function="ZRFC_READ_TABLE" --field="MATERIAL+/BIC/ZMAT0012+/BIC/ZMAT0016+/BIC/ZPRECOVD2" --table="/BI0/PMATERIAL" --key='MATERIAL' --partition="::dateformat(/BIC/ZMAT0016,yyyyMMdd,yyyy)" --row_count=100000</exec.args>
+                <exec.executable>java</exec.executable>
+            </properties>
+        </action>
+    </actions>
