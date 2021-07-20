@@ -217,6 +217,8 @@ public class TiktokAds {
      * Send GET request
      *
      * @param jsonStr:Args in JSON format
+     * @param access_token Access Token
+     * @param path Request path
      * @return Response in JSON format
      */
     private static String get(String jsonStr, String access_token, String path) throws IOException, URISyntaxException {
