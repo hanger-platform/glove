@@ -120,9 +120,9 @@ SELECT * FROM (
 			WHEN 'numeric'   THEN CONCAT('decimal','(', IIF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ,',',NUMERIC_SCALE,')')			
             WHEN 'real'      THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
             WHEN 'float'     THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
-            WHEN 'char'      THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + ABS( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')            
-            WHEN 'varchar'   THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + ABS( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
-            WHEN 'nvarchar'  THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + ABS( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
+			WHEN 'char'         THEN CONCAT('varchar','(', IIF( CHARACTER_MAXIMUM_LENGTH <= 0, 1, CHARACTER_MAXIMUM_LENGTH + ABS( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 )),')')
+			WHEN 'varchar'      THEN CONCAT('varchar','(', IIF( CHARACTER_MAXIMUM_LENGTH <= 0, 1, CHARACTER_MAXIMUM_LENGTH + ABS( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 )),')')
+			WHEN 'nvarchar'     THEN CONCAT('varchar','(', IIF( CHARACTER_MAXIMUM_LENGTH <= 0, 1, CHARACTER_MAXIMUM_LENGTH + ABS( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 )),')')
 			ELSE 'varchar(255)' 
 		END AS field_type,
 		CONCAT('{"name": "', LOWER( REPLACE(column_name,' ','_') ), '","type":',
