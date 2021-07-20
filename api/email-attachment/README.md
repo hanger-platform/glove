@@ -89,7 +89,7 @@ O Gmail suporta o protocolo IMAP, e a conexão com o servidor poderia ser feita 
 }
 ```
 
->>Para o correto funcionamento do extrator utilizando o Gmail, é necessário que sua conta esteja habilitada para suportar a conexão de "Apps menos seguros": https://support.google.com/accounts/answer/6010255?hl=pt
+>Para o correto funcionamento do extrator utilizando o Gmail, é necessário que sua conta esteja habilitada para suportar a conexão de "Apps menos seguros": https://support.google.com/accounts/answer/6010255?hl=pt
 
 ###### Script
 
