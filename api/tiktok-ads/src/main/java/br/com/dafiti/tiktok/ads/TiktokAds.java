@@ -74,8 +74,8 @@ public class TiktokAds {
                     .addParameter("c", "credentials", "Credentials file", "", true, false)
                     .addParameter("o", "output", "Output file", "", true, false)
                     .addParameter("f", "field", "Fields to be retrieved from an endpoint in a JsonPath fashion", "", true, false)
-                    .addParameter("pt", "path", "Path", "", true, false)
-                    .addParameter("pr", "parameters", "Endpoint parameters", "", true, false)
+                    .addParameter("pt", "path", "Request address", "", true, false)
+                    .addParameter("pr", "parameters", "Request parameters. Json format", "", true, false)
                     .addParameter("pa", "partition", "(Optional)  Partition, divided by + if has more than one field", "")
                     .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "");
 
