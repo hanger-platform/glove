@@ -37,6 +37,14 @@ Utilizando o [Maven](https://maven.apache.org/):
 }
 ```
 
+* As propriedades de conexão para cada protocolo são diferentes:
+
+**imap** -> https://javaee.github.io/javamail/docs/api/com/sun/mail/imap/package-summary.html
+
+**pop3** -> https://javaee.github.io/javamail/docs/api/com/sun/mail/pop3/package-summary.html
+
+**smtp** -> https://javaee.github.io/javamail/docs/api/com/sun/mail/smtp/package-summary.html
+
 ## Utilização
 
 ```bash
