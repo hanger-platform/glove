@@ -96,12 +96,12 @@ O Gmail suporta o protocolo IMAP, e a conexão com o servidor poderia ser feita 
 Tento o arquivo de credenciais configurado e estando apto para estabelecer uma conexão com o servidor de e-mail, o extrator seria configurado da seguinte forma:
 
 ```bash
-java -jar email-attachment.jar  \
+java -jar email-attachment.jar \
 	--credentials="/home/valdiney.gomes/credentials/email.json" \
 	--output="/tmp/export.csv" \
-	--field="id+name" \	
-	--start_date="2021-07-20" \	
-	--end_date="2021-07-20" \		
+	--field="id+name" \
+	--start_date="2021-07-20" \
+	--end_date="2021-07-20" \
 	--subject="export"
 ```
 

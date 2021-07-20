@@ -93,7 +93,7 @@ public class EmailAttachment {
 					.addParameter("et", "end_time", "(Optional) E-mail received time to, default: 23:59:59", "23:59:59")
 					.addParameter("fr", "from", "(Optional) E-mail from condition", "")
 					.addParameter("s", "subject", "(Optional) E-mail subject condition", "")
-					.addParameter("p", "pattern", "(Optional)  Attachment file name pattern in a RegExp fashion, default: .csv|.xls|.xlsx|.avro|.gz|.zip")
+					.addParameter("p", "pattern", "(Optional)  Attachment file name pattern in a RegExp fashion, default: .csv|.xls|.xlsx|.avro|.gz|.zip", ".csv|.xls|.xlsx|.avro|.gz|.zip")
 					.addParameter("a", "partition", "Partition field, concatenated by +", "")
 					.addParameter("k", "key", "(Unique key field, concatenated by +", "")
 					.addParameter("d", "delimiter", "(Optional) File delimiter, default ;", ";")
