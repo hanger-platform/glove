@@ -23,7 +23,7 @@ Utilizando o [Maven](https://maven.apache.org/):
 
 ##### CONFIGURAÇÃO
 
-* Crie um arquivo com as chaves fornecidas pela API SimilarWeb, este será o seu **credentials file**:
+* Crie um arquivo contendo suas credenciais de e-mail e as propriedades de conexão, este será o seu **credentials file**:
 
 ```
 {
@@ -97,7 +97,7 @@ Tento o arquivo de credenciais configurado e estando apto para estabelecer uma c
 
 ```bash
 java -jar email-attachment.jar \
-	--credentials="/home/valdiney.gomes/credentials/email.json" \
+	--credentials="/home/valdiney.gomes/credentials/gmail.json" \
 	--output="/tmp/export.csv" \
 	--field="id+name" \
 	--start_date="2021-07-20" \
