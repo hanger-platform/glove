@@ -365,6 +365,7 @@ O metadado possui os seguintes atributos obrigatórios:
 * **PS**: Os exemplos acima podem ser utilizados tanto no arquivo de .manifest quanto no parâmetro MANIFEST (Explicação na seção Parâmetros Adicionais).
 
 
+
 ##### PARÂMETROS ADICIONAIS
 
 | Tecnologia         | Parâmetro                  | Descrição                                                                                                                                                                                                                                                                                                                                                                          | Valor padrão |
