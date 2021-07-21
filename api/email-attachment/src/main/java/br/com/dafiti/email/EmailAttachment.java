@@ -53,6 +53,7 @@ import javax.mail.search.ReceivedDateTerm;
 import javax.mail.search.SearchTerm;
 import javax.mail.search.SubjectTerm;
 
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -98,6 +99,7 @@ public class EmailAttachment {
 					.addParameter("k", "key", "(Unique key field, concatenated by +", "")
 					.addParameter("d", "delimiter", "(Optional) File delimiter, default ;", ";")
 					.addParameter("pr", "properties", "(Optional) MITT reader propertiess", "")
+					.addParameter("n", "no_header", "(Optional) File has no header, default false", false)
 					.addParameter("b", "backup", "(Optional) Original attachment backup folder", "");
 
 			// Reads the command line interface.
@@ -109,6 +111,11 @@ public class EmailAttachment {
 			// Defines the delimiter.
 			mitt.getReaderSettings().setDelimiter(cli.getParameter("delimiter").charAt(0));
 
+           //Identifies if the input file has header. 
+			if (cli.hasParameter("no_header")) {
+				mitt.getWriterSettings().setHeader(mitt.getConfiguration().getOriginalFieldName());
+			}
+		
 			// Defines the reader properties.
 			if (cli.getParameter("properties") != null) {
 				mitt.getReaderSettings().setProperties(cli.getParameter("properties"));
@@ -159,7 +166,7 @@ public class EmailAttachment {
 				searchTerm.add(new FromStringTerm(cli.getParameter("from")));
 			}
 
-			// Message from condition.
+			// Message subject condition.
 			if (cli.getParameter("subject") != null) {
 				searchTerm.add(new SubjectTerm(cli.getParameter("subject")));
 			}
@@ -186,6 +193,8 @@ public class EmailAttachment {
 
 			// Search messages that meet the search conditions.
 			Message[] messages = folder.search(new AndTerm(searchTerm.toArray(new SearchTerm[searchTerm.size()])));
+			
+			LOG.info("GLOVE - " + messages.length + " e-mails found");
 
 			for (int i = 0; i < messages.length; i++) {
 				Message message = messages[i];
@@ -200,30 +209,26 @@ public class EmailAttachment {
 							Date date = message.getReceivedDate();
 							String from = message.getFrom()[0].toString();
 							String subject = message.getSubject();
-							String filename = mimeBodyPart.getFileName();
+							String file = mimeBodyPart.getFileName();
 
 							// Identifies if a attachment matches the defined filename pattern.
-							Matcher matcher = pattern.matcher(filename);
+							Matcher matcher = pattern.matcher(file);
 
-							if (matcher.find()) {
-								mimeBodyPart
-										.saveFile(outputPath + File.separator + date + "_" + subject + "_" + filename);
+							if (matcher.find()) {		
+								String name = (DateFormatUtils.format(date, "yyyyMMddHHmmSS") + "_" + subject + "_" + file).replaceAll(" ", "_").toLowerCase();						
+								
+								mimeBodyPart.saveFile(outputPath + File.separator + name);
 
 								// Identifies if should do a copy.
 								if (cli.getParameter("backup") != null) {
-									Files.copy(
-											Paths.get(outputPath + File.separator + date + "_" + subject + "_"
-													+ filename),
-											Paths.get(
-													cli.getParameter("backup") + date + "_" + subject + "_" + filename),
+									Files.copy(Paths.get(outputPath + File.separator + name),
+											Paths.get(cli.getParameter("backup") + File.separator + name),
 											StandardCopyOption.REPLACE_EXISTING);
 								}
 
-								LOG.info("GLOVE - Downloading attachment " + filename + " of message " + subject
-										+ " from " + from + " at " + date);
+								LOG.info("GLOVE - Downloading attachment " + file + " of message " + subject + " from " + from + " at " + date);
 							} else {
-								LOG.info("GLOVE - Skipping not allowed attachment " + filename + " of message "
-										+ subject + " from " + from + " at " + date);
+								LOG.info("GLOVE - Skipping attachment " + file + " of message "	+ subject + " from " + from + " at " + date);
 							}
 						}
 					}

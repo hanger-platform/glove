@@ -62,7 +62,8 @@ java -jar email-attachment.jar  \
 	--pattern=<(Optional) Attachment file name pattern in a RegExp fashion, default: .csv|.xls|.xlsx|.avro|.gz|.zip> \	
 	--partition=<(Optional)  Partition field, concatenated by +> \	
 	--key=<(Optional) Unique key field, concatenated by +> \	
-	--delimiter=<(Optional) File delimiter, default ;> \		
+	--delimiter=<(Optional) File delimiter, default ;> \	
+	--no_header=<(Optional) File has no header, default false> \
 	--properties=<(Optional) MITT reader properties> \	
 	--backup=<(Optional) Original attachment backup folder> 
 ```
