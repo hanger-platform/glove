@@ -315,15 +315,15 @@ O metadado possui os seguintes atributos obrigatórios:
             "field":"id",
             "type":"integer"
          },
-		 {
-			"field":"name",
-			"type":"string",
-			"length":10
-		 },
-		 {
-			"field":"gtv",
-			"type":"number"
-		 }
+         {
+            "field":"name",
+            "type":"string",
+            "length":10
+         },
+         {
+            "field":"gtv",
+            "type":"number"
+         }
       ]
    }
 ]
