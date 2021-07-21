@@ -1,4 +1,4 @@
-# Email attachment extractor
+# Email attachment extractor [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ### Extrator de dados provenientes de anexos de e-mail.
 
 ## How it works
