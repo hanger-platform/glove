@@ -296,12 +296,12 @@ Permite parametrizar cada **step** individualmente, de modo que além dos atribu
 
 O metadado possui os seguintes atributos obrigatórios:
 
-| Atributo | Valor                                            |
-|----------|--------------------------------------------------|
-| FIELD    | Nome do campo                                    |
-| TYPE     | string, integer, number, timestamp,date, boolean |
-| LENGTH   | Tamanho                                          |
-| DECIMAL  | Decimal                                          |
+| Atributo | Valor                                             |
+|----------|---------------------------------------------------| 
+| FIELD    | Nome do campo                                     |
+| TYPE     | string, integer, number, timestamp, date, boolean |
+| LENGTH   | Tamanho                                           |
+| DECIMAL  | Decimal                                           |
 
 ###### EXEMPLO (Metadado)
 
@@ -313,14 +313,58 @@ O metadado possui os seguintes atributos obrigatórios:
       "metadata":[ 
          { 
             "field":"id",
-            "type":"Integer",
-            "length":9,
-            "decimal":0
+            "type":"integer"
+         },
+         {
+            "field":"name",
+            "type":"string",
+            "length":10
+         },
+         {
+            "field":"gtv",
+            "type":"number"
          }
       ]
    }
 ]
 ```
+
+###### EXEMPLO (Export s3)
+
+```
+[ 
+   { 
+      "order":0,
+      "export_bucket":"s3://nome-do-bucket/caminho-de-export/"
+   },
+   { 
+      "order":1,
+      "export_bucket":"s3://nome-do-bucket-2/caminho-de-export-2/"
+   }
+]
+```
+
+###### EXEMPLO (Export Google Sheets)
+
+```
+[ 
+	{ 
+		"order": 1, 
+		"export_sheet": "nome_aba_1", 
+		"export_spreadsheet": "id_spreadsheet" 
+	}, 
+	{ 
+		"order": 2, 
+		"export_sheet": "nome_aba_2", 
+		"export_spreadsheet": "id_spreadsheet_2" 
+	} 
+]
+
+```
+
+* **PS**: Os exemplos acima podem ser utilizados tanto no arquivo de .manifest quanto no parâmetro MANIFEST (Explicação na seção Parâmetros Adicionais).
+
+
 
 ##### PARÂMETROS ADICIONAIS
 
