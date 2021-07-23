@@ -31,7 +31,10 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -39,7 +42,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -63,6 +68,7 @@ public class WorkbookDecoder implements Decoder {
 
         try {
             String sheetName = properties.getProperty("sheet");
+            String dateFormat = properties.getProperty("dateFormat", "yyyy-MM-dd");
             int skip = NumberUtils.toInt(properties.getProperty("skip", "0"));
             int scale = NumberUtils.toInt(properties.getProperty("scale", "2"));
 
@@ -98,11 +104,19 @@ public class WorkbookDecoder implements Decoder {
                                 record.add(cell.getBooleanCellValue());
                                 break;
                             case NUMERIC:
-                                //Identify if number has decimal scale.
-                                if ((cell.getNumericCellValue() - (int) cell.getNumericCellValue()) != 0) {
-                                    record.add(new BigDecimal(cell.getNumericCellValue()).setScale(scale, RoundingMode.HALF_EVEN).toPlainString());
+                                //Identify if cell is a date.
+                                if (DateUtil.isCellDateFormatted(cell)) {
+                                    DateFormat df = new SimpleDateFormat(dateFormat);
+                                    Date date = cell.getDateCellValue();
+                                    record.add(df.format(date));
+
                                 } else {
-                                    record.add(new BigDecimal(cell.getNumericCellValue()).toPlainString());
+                                    //Identify if number has decimal scale.
+                                    if ((cell.getNumericCellValue() - (int) cell.getNumericCellValue()) != 0) {
+                                        record.add(new BigDecimal(cell.getNumericCellValue()).setScale(scale, RoundingMode.HALF_EVEN).toPlainString());
+                                    } else {
+                                        record.add(new BigDecimal(cell.getNumericCellValue()).toPlainString());
+                                    }
                                 }
 
                                 break;
