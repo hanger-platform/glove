@@ -27,8 +27,10 @@ import br.com.dafiti.mitt.settings.WriterSettings;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -42,6 +44,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  *
@@ -87,10 +90,8 @@ public class WorkbookDecoder implements Decoder {
                 Row row = rowIterator.next();
 
                 if (row.getRowNum() > (skip - 1)) {
-                    Iterator<Cell> cellIterator = row.cellIterator();
-
-                    while (cellIterator.hasNext()) {
-                        Cell cell = cellIterator.next();
+                    for (int column = 0; column < row.getLastCellNum(); column++) {
+                        Cell cell = row.getCell(column, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
 
                         switch (cell.getCellType()) {
                             case BOOLEAN:
