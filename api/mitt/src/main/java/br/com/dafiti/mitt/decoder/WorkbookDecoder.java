@@ -28,6 +28,8 @@ import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -62,6 +64,7 @@ public class WorkbookDecoder implements Decoder {
         try {
             String sheetName = properties.getProperty("sheet");
             int skip = NumberUtils.toInt(properties.getProperty("skip", "0"));
+            int scale = NumberUtils.toInt(properties.getProperty("scale", "2"));
 
             //Defines the output file write settings.
             WriterSettings writerSettings = new WriterSettings();
@@ -95,7 +98,13 @@ public class WorkbookDecoder implements Decoder {
                                 record.add(cell.getBooleanCellValue());
                                 break;
                             case NUMERIC:
-                                record.add(cell.getNumericCellValue());
+                                //Identify if number has decimal scale.
+                                if ((cell.getNumericCellValue() - (int) cell.getNumericCellValue()) != 0) {
+                                    record.add(new BigDecimal(cell.getNumericCellValue()).setScale(scale, RoundingMode.HALF_EVEN).toPlainString());
+                                } else {
+                                    record.add(new BigDecimal(cell.getNumericCellValue()).toPlainString());
+                                }
+
                                 break;
                             case STRING:
                                 record.add(cell.getStringCellValue());
