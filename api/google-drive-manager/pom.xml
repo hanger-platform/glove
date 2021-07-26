@@ -10,13 +10,13 @@
         <dependency>
             <groupId>com.google.api-client</groupId>
             <artifactId>google-api-client</artifactId>
-            <version>1.31.2</version>
+            <version>1.32.1</version>
             <type>jar</type>
         </dependency>        
         <dependency>
             <groupId>com.google.oauth-client</groupId>
             <artifactId>google-oauth-client-jetty</artifactId>
-            <version>1.31.4</version>
+            <version>1.31.5</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -27,7 +27,7 @@
         <dependency>
             <groupId>com.google.http-client</groupId>
             <artifactId>google-http-client-jackson2</artifactId>
-            <version>1.38.1</version>
+            <version>1.39.2-sp.1</version>
             <type>jar</type>
         </dependency>
         <dependency>
