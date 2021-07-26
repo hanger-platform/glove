@@ -69,7 +69,7 @@ public class WorkbookDecoder implements Decoder {
             String sheetName = properties.getProperty("sheet");
             String dateFormat = properties.getProperty("dateFormat", "yyyy-MM-dd");
             int skip = NumberUtils.toInt(properties.getProperty("skip", "0"));
-            int scale = NumberUtils.toInt(properties.getProperty("scale", "2"));
+            int scale = NumberUtils.toInt(properties.getProperty("scale", "4"));
 
             //Defines the output file write settings.
             WriterSettings writerSettings = new WriterSettings();
