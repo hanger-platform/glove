@@ -165,7 +165,7 @@ O extrator que implementar esse parâmetro deverá colocar a seguinte linha de c
  mitt.getReaderSettings().setProperties(properties);
 ```
 
-O conteúdo da varíaval properties é um _json_:
+O conteúdo da varíavel properties é um _json_:
 
 ```json
 {
