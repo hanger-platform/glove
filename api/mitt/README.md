@@ -33,7 +33,7 @@ O MITT trabalha com dois tipos de entrada, _stream_ ou _file_, estes são explic
 
 Nessa opção é possível efetuar a gravação de forma iterativa através de um _loop_.
 
-**Exemplo**: Neste caso, é apresentada a gravação de dados de stream em uma aplicação de linha de comando. 
+Exemplo: Neste caso, é apresentada a gravação de dados de stream em uma aplicação de linha de comando. 
 
 ```java
 public static void main(String[] args){       
@@ -95,7 +95,7 @@ Nessa opção é possível efetuar a gravação do arquivo de saída no padrão 
 * xls
 * xlsx
 
-**Exemplo**: Neste caso, é apresentado um arquivo csv de entrada e a gravação no arquivo de saída é feito em uma aplicação de linha de comando. 
+Exemplo: Neste caso, é apresentado um arquivo csv de entrada e a gravação no arquivo de saída é feito em uma aplicação de linha de comando. 
 
 ```java
 public static void main(String[] args) throws DuplicateEntityException, IOException {
@@ -113,12 +113,12 @@ public static void main(String[] args) throws DuplicateEntityException, IOExcept
         mitt.setOutputFile("/tmp/output_file.csv");
 
         //Defines default output fields. 
-        mitt.getConfiguration()
-                .addField("hash::checksum()")
-                .addField("year::dateformat(birthday,yyyy-MM-dd,yyyy)")
+        mitt.getConfiguration()                
                 .addField("id")
                 .addField("name")
-                .addField("birthday");
+                .addField("birthday")
+                .addField("hash::checksum()")
+                .addField("year::dateformat(birthday,yyyy-MM-dd,yyyy)");
 
         //Defines custom fields, based on transformations. 
         mitt.getConfiguration().addCustomField("etl_load_date", new Now());
@@ -142,15 +142,37 @@ id;name;birthday
 Arquivo de saída:
 
 ```
-hash;year;id;name;birthday;etl_load_date
-1E6B9BBEA2C6F69C9E642AB2639CAA6F;1990;1;helio;1990-11-27;2021-07-27 11:52:21
-FD9353CCE431917E26D3D3F76017DA0D;1984;2;val;1984-02-17;2021-07-27 11:52:21
-7E23C75C9A6E0A02F26A32F1AB910B04;1987;3;saga;1987-03-15;2021-07-27 11:52:21
+id;name;birthday;hash;year;etl_load_date
+1;helio;1990-11-27;7DEF5C3AA1079D124693826AE37F293F;1990;2021-07-27 11:58:41
+2;val;1984-02-17;FE392F46C579B9CE4CC0088C136D86EA;1984;2021-07-27 11:58:41
+3;saga;1987-03-15;2B3F28D62D07E78FEC28DFCEC75C82FC;1987;2021-07-27 11:58:41
 
 ```
 
+PS: Os campos hash, year e etl_load_date não são originais do arquivo de entrada, eles receberam transformações no arquivo de saída, essas transformações são explicadas na seção **_Transformations_**.
 
+**Arquivo de entrada com formato xls/xlsx**:
 
+Como dito anteriormente, é possível definir arquivo xls/xlsx como entrada para os extratores. Para este formato há um parâmetro chamado _properties_  que pode ser implementado no extrator, ele permite especificar alguns detalhes do arquivo de entrada, os detalhes disponíveis são:
+* **sheet**: Nome da planilha (aba) que será extraída; _default_ é a planilha 0.
+* **skip**: Começar a extrair a partir de qual linha; _default_ é 0.
+* **scale**: Para células numéricas com casas decimais, quantas casas decimais o arquivo de saída terá; _default_ é 4.
+* **dataFormat**: Para células _date_ qual será o formato de saída; _default_ é _yyyy-MM-dd_.
+
+O extrator que implementar esse parâmetro deverá colocar a seguinte linha de código na sua aplicação:
+
+```java
+ mitt.getReaderSettings().setProperties(properties);
+```
+
+O conteúdo da varíaval properties é um _json_:
+
+```json
+{
+	"sheet":"Planilha1",
+	"skip":"2"
+}
+```
 
 ## Transformations
 
