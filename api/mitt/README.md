@@ -11,7 +11,7 @@ O **MITT** é reponsável por encapsular a maioria das tarefas repetitivas envol
 - Geração de *command line interface* simplificada.
 - Definição de valores default para os parâmetros passados para a *command line interface*. 
 - Passagem de função como parâmetro na chamada do *command line interface*.
-- Suporte para arquivos csv, gz, zip ou avro.
+- Suporte para arquivos csv, zip, gz, avro ou xls/xlsx.
 
 ## Instalação
 
@@ -27,45 +27,130 @@ O MITT deve ser importado como dependência nos projetos de extratores para o Gl
 
 ## Utilização
 
-1. Neste exemplo, é apresentada a gravação de dados de stream em uma aplicação de linha de comando. 
+O MITT trabalha com dois tipos de entrada, _stream_ ou _file_, estes são explicados adiante. 
+
+#### Stream
+
+Nessa opção é possível efetuar a gravação de forma iterativa através de um _loop_.
+
+**Exemplo**: Neste caso, é apresentada a gravação de dados de stream em uma aplicação de linha de comando. 
 
 ```java
- public static void main(String[] args){       
-	    Mitt mitt = new Mitt();
+public static void main(String[] args){       
+		Mitt mitt = new Mitt();
 		
 		//Defines the command line interface expected parameters. 
-        mitt
-	        .getConfiguration()
-		        .addParameter("p", "pais", "Pais", "brasil");
+		mitt.getConfiguration().addParameter("p", "pais", "Pais", "brasil");
 		
 		//Gets a instance of MITT CommandLineInterface class. 
-        CommandLineInterface cli = mitt.getCommandLineInterface(args);
+		CommandLineInterface cli = mitt.getCommandLineInterface(args);
 		
 		//Defines the output file. 
 		mitt.setOutputFile("/tmp/mitt.csv");
 
-        //Defines default output fields. 
-        mitt
-	        .getConfiguration()
-			    .addField("id")
-			    .addField("nome")
-				.addField("pais");
+		//Defines default output fields. 
+		mitt.getConfiguration()
+			.addField("id")
+			.addField("nome")
+			.addField("pais");
 		
 		//Defines custom fields, based on a transformation. 
-        mitt.getConfiguration().addCustomField("etl_load_date", new Now());
+		mitt.getConfiguration().addCustomField("etl_load_date", new Now());
 
 		//Writes to the output file. 
-        for (int i = 0; i < 10; i++) {
-            List data = new ArrayList();
-            data.add(i);
-            data.add("nome do " + i );
+		for (int i = 0; i < 10; i++) {
+			List data = new ArrayList();
+			data.add(i);
+			data.add("nome do " + i );
 			data.add(cli.getParameter("pais"));
 			
-            mitt.write(data);
-        }
-        mitt.close();
+			mitt.write(data);
+		}
+		mitt.close();
 }
 ```
+
+No exemplo acima o arquivo de saída seria:
+
+```
+0;nome do 0;brasil;2021-07-27 10:54:56
+1;nome do 1;brasil;2021-07-27 10:54:56
+2;nome do 2;brasil;2021-07-27 10:54:56
+3;nome do 3;brasil;2021-07-27 10:54:56
+4;nome do 4;brasil;2021-07-27 10:54:56
+5;nome do 5;brasil;2021-07-27 10:54:56
+6;nome do 6;brasil;2021-07-27 10:54:56
+7;nome do 7;brasil;2021-07-27 10:54:56
+8;nome do 8;brasil;2021-07-27 10:54:56
+9;nome do 9;brasil;2021-07-27 10:54:56
+```
+
+#### File
+
+Nessa opção é possível efetuar a gravação do arquivo de saída no padrão Glove a partir de um arquivo de entrada. Tipos de arquivos aceitos são:
+* csv 
+* zip 
+* gz 
+* avro 
+* xls
+* xlsx
+
+**Exemplo**: Neste caso, é apresentado um arquivo csv de entrada e a gravação no arquivo de saída é feito em uma aplicação de linha de comando. 
+
+```java
+public static void main(String[] args) throws DuplicateEntityException, IOException {
+        //Write an input csv file.
+        FileWriter inputFile = new FileWriter("/tmp/mitt_test/input_file.csv");
+        inputFile.write("id;name;birthday\n");
+        inputFile.write("1;helio;1990-11-27\n");
+        inputFile.write("2;val;1984-02-17\n");
+        inputFile.write("3;saga;1987-03-15\n");
+        inputFile.close();
+
+        Mitt mitt = new Mitt();
+
+        //Defines the output file. 
+        mitt.setOutputFile("/tmp/output_file.csv");
+
+        //Defines default output fields. 
+        mitt.getConfiguration()
+                .addField("hash::checksum()")
+                .addField("year::dateformat(birthday,yyyy-MM-dd,yyyy)")
+                .addField("id")
+                .addField("name")
+                .addField("birthday");
+
+        //Defines custom fields, based on transformations. 
+        mitt.getConfiguration().addCustomField("etl_load_date", new Now());
+
+        //Writes output file.
+        mitt.write(new File("/tmp/mitt_test/"));
+
+        mitt.close();
+    }
+```
+
+Arquivo de entrada:
+
+```
+id;name;birthday
+1;helio;1990-11-27
+2;val;1984-02-17
+3;saga;1987-03-15
+```
+
+Arquivo de saída:
+
+```
+hash;year;id;name;birthday;etl_load_date
+1E6B9BBEA2C6F69C9E642AB2639CAA6F;1990;1;helio;1990-11-27;2021-07-27 11:52:21
+FD9353CCE431917E26D3D3F76017DA0D;1984;2;val;1984-02-17;2021-07-27 11:52:21
+7E23C75C9A6E0A02F26A32F1AB910B04;1987;3;saga;1987-03-15;2021-07-27 11:52:21
+
+```
+
+
+
 
 ## Transformations
 
