@@ -334,7 +334,7 @@ public class CSVToParquet implements Runnable {
                             //Identify if can add a record.
                             if (fieldKey >= 0 && !duplicated) {
                                 add = !key.contains(String.valueOf(row.get(fieldKey)));
-                            }
+                            }                           
 
                             if (add) {
                                 //Write date into parquet file.

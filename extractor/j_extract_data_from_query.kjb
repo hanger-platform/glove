@@ -917,6 +917,7 @@ if [ ${HAS_RECORD} -gt 1 ]; then
 		--sample=${SAMPLE} \
 		--header \
 		--delimiter="${DELIMITER}" \
+		--escape=${QUOTE_ESCAPE} \
 		--filename=${SCHEMA_NAME}_${TABLE}.csv  \
 		--target=metadata \
 		--dialect=${DIALECT} \
@@ -1242,6 +1243,7 @@ TARGET                      == ${TARGET}
       <attributes/>
       <script>parent_job.setVariable("PARTITION_FIELD", "");
 parent_job.setVariable("PARTITION_MERGE", "0");
+parent_job.setVariable("MULTIPLE_FILE", "1");
 true;</script>
       <parallel>N</parallel>
       <draw>Y</draw>
