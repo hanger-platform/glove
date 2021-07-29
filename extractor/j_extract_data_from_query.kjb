@@ -691,7 +691,6 @@ DATABASE_TYPE                   == ${DATABASE_TYPE}
 SAMPLE                          == ${SAMPLE}
 SQL                             == ${INPUT_DATA_STATEMENT}
 METADATA                        == ${METADATA} 
-QUOTE_ESCAPE                    == ${QUOTE_ESCAPE}
 #-----------------------------------------------------------
 # OUTPUT 
 #-----------------------------------------------------------
