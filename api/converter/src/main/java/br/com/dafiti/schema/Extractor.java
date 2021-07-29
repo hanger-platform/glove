@@ -63,6 +63,7 @@ public class Extractor implements Runnable {
     private final String dialect;
     private final boolean hasHeader;
     private int sample;
+    private String rowOnTheFly;
 
     /**
      * Constructor.
@@ -105,6 +106,7 @@ public class Extractor implements Runnable {
         this.dialect = dialect;
         this.hasHeader = csvField.isEmpty();
         this.reserverWordsFile = reserverWordsFile;
+        this.rowOnTheFly = "";
 
         //Limit the data sample.
         if (sample > MAX_SAMPLE) {
@@ -225,6 +227,8 @@ public class Extractor implements Runnable {
                 if (!hasMetadata) {
                     //Process each record of each column.
                     for (int content = 0; content < fieldContent.size(); content++) {
+                    	rowOnTheFly = String.join(" | ", fieldContent.get(content));
+                    	
                         //Get the field value. 
                         String value = fieldContent.get(content)[column] == null ? "" : fieldContent.get(content)[column];
 
@@ -495,11 +499,8 @@ public class Extractor implements Runnable {
             } else {
                 Logger.getLogger(Extractor.class).info("CSV file is empty");
             }
-
-        } catch (IOException | JSONException ex) {
-            Logger.getLogger(this.getClass()).error(ex);
-            Logger.getLogger(this.getClass()).error(ex.getStackTrace());
-
+        } catch (Exception  ex) {
+        	System.out.println(ex + " on row: " + rowOnTheFly);
             System.exit(1);
         }
     }
