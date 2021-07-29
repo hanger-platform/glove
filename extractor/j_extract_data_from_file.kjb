@@ -598,7 +598,7 @@ if [ ${HAS_RECORD} -gt 1 ]; then
 		--sample=${SAMPLE} \
 		--header \
 		--delimiter="${DELIMITER}" \
-		--escape="\${QUOTE_ESCAPE}" \
+		--escape='${QUOTE_ESCAPE}' \
 		--filename=${SCHEMA_NAME}_${TABLE_NAME}.csv  \
 		--target=metadata \
 		--dialect=${DIALECT} \

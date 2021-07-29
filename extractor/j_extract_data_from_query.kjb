@@ -691,7 +691,7 @@ DATABASE_TYPE                   == ${DATABASE_TYPE}
 SAMPLE                          == ${SAMPLE}
 SQL                             == ${INPUT_DATA_STATEMENT}
 METADATA                        == ${METADATA} 
-QUOTE_ESCAPE			== ${QUOTE_ESCAPE}
+QUOTE_ESCAPE                    == ${QUOTE_ESCAPE}
 #-----------------------------------------------------------
 # OUTPUT 
 #-----------------------------------------------------------
@@ -700,7 +700,7 @@ OUTPUT_FORMAT                   == ${OUTPUT_FORMAT}
 OUTPUT_COMPRESSION              == ${OUTPUT_COMPRESSION}
 STORAGE_BUCKET                  == ${STORAGE_BUCKET}
 ALLOW_DUPLICATED                == ${ALLOW_DUPLICATED}
-ALLOW_RECREATE                 == ${ALLOW_RECREATE}
+ALLOW_RECREATE                  == ${ALLOW_RECREATE}
 #-----------------------------------------------------------
 # OUTPUT EXPORT
 #-----------------------------------------------------------
@@ -918,7 +918,7 @@ if [ ${HAS_RECORD} -gt 1 ]; then
 		--sample=${SAMPLE} \
 		--header \
 		--delimiter="${DELIMITER}" \
-		--escape="\${QUOTE_ESCAPE}" \
+		--escape='${QUOTE_ESCAPE}' \
 		--filename=${SCHEMA_NAME}_${TABLE}.csv  \
 		--target=metadata \
 		--dialect=${DIALECT} \
