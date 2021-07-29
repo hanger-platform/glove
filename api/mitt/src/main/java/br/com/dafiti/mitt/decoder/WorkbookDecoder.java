@@ -110,11 +110,13 @@ public class WorkbookDecoder implements Decoder {
                                     record.add(df.format(date));
 
                                 } else {
+                                    BigDecimal value = new BigDecimal(cell.getNumericCellValue());
+
                                     //Identify if number has decimal scale.
-                                    if ((cell.getNumericCellValue() - (int) cell.getNumericCellValue()) != 0) {
-                                        record.add(new BigDecimal(cell.getNumericCellValue()).setScale(scale, RoundingMode.HALF_EVEN).toPlainString());
+                                    if (value.scale() > 0) {
+                                        record.add(value.setScale(scale, RoundingMode.HALF_EVEN).toPlainString());
                                     } else {
-                                        record.add(new BigDecimal(cell.getNumericCellValue()).toPlainString());
+                                        record.add(value.toPlainString());
                                     }
                                 }
 
