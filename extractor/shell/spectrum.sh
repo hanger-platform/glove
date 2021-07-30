@@ -556,8 +556,15 @@ if [ ${IS_RECREATE} = 1 -o ${IS_RELOAD} = 1 ]; then
 	# Cria o arquivo de recuperação a partir dos arquivos do processo.
 	if [ ${IS_RECREATE} = 1 ]; then
 		echo "IS_RECREATE ACTIVED!"
-		echo "Moving files to recovery folder ${STORAGE_DISASTER_RECOVERY_QUEUE_PATH}!"
-		aws s3 mv ${STORAGE_QUEUE_PATH} ${STORAGE_DISASTER_RECOVERY_QUEUE_PATH}${DATE}/ --recursive --only-show-errors
+
+		# Identifica se recria a tabela mantendo os arquivos no diretório.
+		if [ ${IS_SCHEMA_EVOLUTION} = 1 ]; then
+			echo "Copying files to recovery folder ${STORAGE_DISASTER_RECOVERY_QUEUE_PATH}!"
+			aws s3 cp ${STORAGE_QUEUE_PATH} ${STORAGE_DISASTER_RECOVERY_QUEUE_PATH}${DATE}/ --recursive --only-show-errors
+		else
+			echo "Moving files to recovery folder ${STORAGE_DISASTER_RECOVERY_QUEUE_PATH}!"
+			aws s3 mv ${STORAGE_QUEUE_PATH} ${STORAGE_DISASTER_RECOVERY_QUEUE_PATH}${DATE}/ --recursive --only-show-errors
+		fi
 	fi
 
 	if [ ${IS_RELOAD} = 0 ]; then
