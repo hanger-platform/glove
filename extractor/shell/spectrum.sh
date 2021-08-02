@@ -557,7 +557,7 @@ if [ ${IS_RECREATE} = 1 -o ${IS_RELOAD} = 1 ]; then
 	if [ ${IS_RECREATE} = 1 ]; then
 		echo "IS_RECREATE ACTIVED!"
 
-		# Identifica se recria a tabela mantendo os arquivos no diretório.
+		# Identifica se deve manter os arquivos caso houver mudanças no metadado.
 		if [ ${IS_SCHEMA_EVOLUTION} = 1 ]; then
 			echo "Copying files to recovery folder ${STORAGE_DISASTER_RECOVERY_QUEUE_PATH}!"
 			aws s3 cp ${STORAGE_QUEUE_PATH} ${STORAGE_DISASTER_RECOVERY_QUEUE_PATH}${DATE}/ --recursive --only-show-errors

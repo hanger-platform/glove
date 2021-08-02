@@ -199,7 +199,7 @@
     <parameter>
       <name>IS_SCHEMA_EVOLUTION</name>
       <default_value>0</default_value>
-      <description>Identifica se deve recriar a estrutura da tabela mantendo os dados.</description>
+      <description>Identifica se deve manter os dados caso houver mudanças no metadado.</description>
     </parameter>
     <parameter>
       <name>IS_SPECTRUM</name>
