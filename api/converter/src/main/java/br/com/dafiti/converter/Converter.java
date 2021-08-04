@@ -331,7 +331,7 @@ public class Converter {
                 } else if (target.equalsIgnoreCase("orc")) {
                     TypeDescription schema = new Parser(new File(schemaFile)).getOrcSchema();
 
-                    System.out.println("ORC 1.5.6");
+                    System.out.println("ORC 1.6.9");
 
                     for (File file : files) {
                         if (file.isDirectory() || "csv".equals(FilenameUtils.getExtension(file.getName()))) {
