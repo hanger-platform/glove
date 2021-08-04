@@ -51,7 +51,7 @@ java -jar jdbc.jar  \
 	--partition=<(Optional)  Partition field, concatenated by +> \	
 	--key=<(Optional) Unique key field, concatenated by +> \
 	--parameter=<(Optional) Credentials and SQL SELECT statement replacement variable, in a bash fashion> \
-	[--no_header] Identifies if output file should have a header
+	--no_header=<Identifies if output file should have a header>
 ```
 
 ###### Credentials file:
@@ -72,7 +72,7 @@ Para utilizar o extrator de dados com o MySQL, a seguinte configuração poderia
 
 ##### EXEMPLO 1
 
-Para recuperar todos os dados da tabela **customers** do schema **bob** de um banco de dado **Mysql**, uma das alternativas seria: 
+Para recuperar todos os dados da tabela **customers** do schema **bob** de um banco de dados **Mysql**, uma das alternativas seria: 
 
 ###### Script
 
@@ -129,7 +129,7 @@ java -jar jdbc.jar \
 	--parameter='{"date":"2021-08-02"}'
 ```
 
-Para definir valores defalt para qualquer variável, pode ser utilizado o delimitador ":-" da seguinte forma:
+Para definir valores _default_ para qualquer variável, pode ser utilizado o delimitador **":-"** da seguinte forma:
 
 ###### SQL
 
