@@ -36,6 +36,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.MissingOptionException;
+import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
@@ -96,13 +97,15 @@ public final class CommandLineInterface {
             }
         } catch (ParseException ex) {
             this.help();
-            List missingOptions = new ArrayList();
 
             if (ex instanceof MissingOptionException) {
-                missingOptions = ((MissingOptionException) ex).getMissingOptions();
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Missing parameters! {0}", ((MissingOptionException) ex).getMissingOptions().toString());
             }
 
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Missing parameters! {0}", missingOptions.toString());
+            if (ex instanceof UnrecognizedOptionException) {
+            	Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Unrecognized parameters! {0}", ((UnrecognizedOptionException) ex).getOption());
+            }          
+                      
             System.exit(1);
         }
     }
