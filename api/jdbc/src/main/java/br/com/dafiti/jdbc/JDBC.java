@@ -223,7 +223,7 @@ public class JDBC {
 
 				// Identifies if a column exists in the table or is a transformation.
 				for (int i = 1; i <= metaData.getColumnCount(); i++) {
-					String field = metaData.getColumnName(i);
+					String field = metaData.getColumnLabel(i);
 
 					if (configuration.getOriginalFieldName().contains(field) || all) {
 						fields.add(field);
