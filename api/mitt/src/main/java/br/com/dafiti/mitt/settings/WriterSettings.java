@@ -33,45 +33,53 @@ import java.util.List;
  */
 public class WriterSettings extends Settings<WriterSettings> {
 
-    private List<String> header;
-    private int threadPool;
-    private File outputFile;
+	private List<String> header;
+	private int threadPool;
+	private File outputFile;
+	private boolean headerEnabled;
 
-    public WriterSettings() {
-        this.outputFile = null;
-        this.header = new ArrayList();
-        this.threadPool = 4;
-    }
+	public WriterSettings() {
+		this.outputFile = null;
+		this.header = new ArrayList<String>();
+		this.threadPool = 4;
+		this.headerEnabled = true;
+	}
 
-    public File getOutputFile() {
-        return outputFile;
-    }
+	public File getOutputFile() {
+		return outputFile;
+	}
 
-    public void setOutputFile(File outputFile) {
-        if (!outputFile.exists()) {
-            outputFile
-                    .getParentFile()
-                    .mkdirs();
-        }
+	public void setOutputFile(File outputFile) {
+		if (!outputFile.exists()) {
+			outputFile.getParentFile().mkdirs();
+		}
 
-        this.outputFile = outputFile;
-    }
+		this.outputFile = outputFile;
+	}
 
-    public List<String> getHeader() {
-        return new ArrayList(header);
-    }
+	public List<String> getHeader() {
+		return new ArrayList<String>(header);
+	}
 
-    public WriterSettings setHeader(List<String> header) {
-        this.header = header;
-        return this;
-    }
+	public WriterSettings setHeader(List<String> header) {
+		this.header = header;
+		return this;
+	}
 
-    public int getThreadPool() {
-        return threadPool;
-    }
+	public int getThreadPool() {
+		return threadPool;
+	}
 
-    public WriterSettings setThreadPool(int threadPool) {
-        this.threadPool = threadPool;
-        return this;
-    }
+	public WriterSettings setThreadPool(int threadPool) {
+		this.threadPool = threadPool;
+		return this;
+	}
+
+	public boolean isHeaderEnabled() {
+		return headerEnabled;
+	}
+
+	public void setHeaderEnabled(boolean headerEnabled) {
+		this.headerEnabled = headerEnabled;
+	}
 }

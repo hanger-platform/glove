@@ -108,7 +108,7 @@ public class OutputProcessor implements Runnable {
         setting.getFormat().setQuoteEscape(writerSettings.getQuoteEscape());
         setting.setNullValue("");
         setting.setMaxCharsPerColumn(-1);
-        setting.setHeaderWritingEnabled(true);
+        setting.setHeaderWritingEnabled(writerSettings.isHeaderEnabled());
         setting.setHeaders(parser.getConfiguration().getFieldName(true).toArray(new String[0]));
 
         return setting;
