@@ -12,9 +12,7 @@ import br.com.dafiti.mitt.transformation.embedded.Concat;
 import br.com.dafiti.mitt.transformation.embedded.Now;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
-import java.io.FileInputStream;
 import java.io.FileReader;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -45,7 +43,7 @@ public class Blue {
 
         int page = 0;
         int retries = 0;
-        boolean process = true;
+        //boolean process = true;
         boolean paginate = false;
         boolean retry = false;
         JSONObject parameters = null;
@@ -61,6 +59,7 @@ public class Blue {
                     .addParameter("f", "field", "Fields to be retrieved from an endpoint in JsonPath fashion", "", true, false)
                     .addParameter("a", "app", "App name", "", true, false)
                     .addParameter("p", "parameters", "(Optional) Endpoint parameters", "")
+                    .addParameter("g", "paginate", "(Optional) Identifies if the endpoint has pagination", false)
                     .addParameter("r", "partition", "(Optional)  Partition, divided by + if has more than one field", "");
 
             //Reads the command line interface. 
@@ -135,30 +134,53 @@ public class Blue {
                     //Executes a request. 
                     CloseableHttpResponse response = client.execute(httpGet);
 
-                    //Http response status code.
-                    response.getStatusLine().getStatusCode();
-
                     //Gets a reponse entity. 
                     String entity = EntityUtils.toString(response.getEntity(), "UTF-8");
                     if (!entity.isEmpty()) {
-                      
+
                         JSONArray obj = (JSONArray) new JSONParser().parse(entity);
-                         
+
                         if (!obj.isEmpty()) {
 
-                            for (Object json : obj) {
-                                List record = new ArrayList();
+                            switch ((int) response.getStatusLine().getStatusCode()) {
 
-                                mitt.getConfiguration()
-                                        .getOriginalFieldName()
-                                        .forEach(field -> {
-                                            try {
-                                                record.add(JsonPath.read(json, "$." + field));
-                                            } catch (PathNotFoundException ex) {
-                                                record.add("");
-                                            }
-                                        });
-                                mitt.write(record);
+                                case 200:
+                                    for (Object json : obj) {
+                                        List record = new ArrayList();
+
+                                        mitt.getConfiguration()
+                                                .getOriginalFieldName()
+                                                .forEach(field -> {
+                                                    try {
+                                                        record.add(JsonPath.read(json, "$." + field));
+                                                    } catch (PathNotFoundException ex) {
+                                                        record.add("");
+                                                    }
+                                                });
+                                        mitt.write(record);
+                                    }
+                                    
+                                    //Identifies that retry is not needed.
+                                    retry = false;
+                                    
+                                    break;
+                                            
+                                case 403:
+                                    retries++;
+
+                                    //Identifies that is a retry.
+                                    retry = true;
+                                    
+                                    if (retries > MAX_RETRY) {
+                                        throw new Exception("HTTP Exception " + response.getStatusLine().getStatusCode());
+                                    } else {
+                                        Thread.sleep(retries * 10000);
+                                        LOG.log(Level.INFO, "Authentication error, retry {0}", retries);
+                                    }
+                                    break;
+
+                                default:
+                                    throw new Exception("HTTP Exception " + response.getStatusLine().getStatusCode());
                             }
 
                         }
@@ -166,7 +188,7 @@ public class Blue {
                         throw new Exception("Empty response entity for request " + httpGet.getURI());
                     }
                 }
-            } while (paginate && process);
+            } while (paginate);
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "GLOVE - Blue API extractor fail: ", ex);
             System.exit(1);
