@@ -67,8 +67,8 @@ A API fornece apenas 3 endpoints, sendo eles:
 
 ##### Resultado das campanhas
 
-- http://getblue.io/rest/report/api/campaign/<campaignID>
-- http://getblue.io/rest/report/api/campaign/<campaignID>?date=YYYY-MM-DD
+- http://getblue.io/rest/report/api/campaign/<campaignID\>
+- http://getblue.io/rest/report/api/campaign/<campaignID\>?date=YYYY-MM-DD
 
 ```javascript
 [
