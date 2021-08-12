@@ -18,9 +18,9 @@ O **Blue API Extractor** permite a extração de dados de campanhas da API dispo
 
 Utilizando o [Maven](https://maven.apache.org/):
 
-- Acesse o diretório no qual os fontes do **braze** se localizam.
+- Acesse o diretório no qual os fontes do **blue** se localizam.
 - Digite o comando _**mvn package**_.
-- O arquivo **braze.jar** será gerado no subdiretório **_target_**.
+- O arquivo **blue.jar** será gerado no subdiretório **_target_**.
 
 ##### CONFIGURAÇÂO
 
@@ -40,9 +40,9 @@ java -jar blue.jar  \
 	--app=<App name supplied by Blue> \
 	--output=<Output file> \
 	--field=<Fields to be retrieved from an endpoint in JsonPath fashion> \
-  	--campaign=<(Optional) Campaign ID> \
-  	--date=<(Optional) Campaign Date> \
-  	--parameters=<(Optional) Endpoint parameters in a JSON fashion> \
+  --campaign=<(Optional) Campaign ID> \
+  --date=<(Optional) Campaign Date> \
+  --parameters=<(Optional) Endpoint parameters in a JSON fashion> \
 	--partition=<(Optional) Partition, divided by + if has more than one field> 
 ```
 
