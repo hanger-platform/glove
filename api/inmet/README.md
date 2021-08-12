@@ -30,10 +30,10 @@ Utilizando o [Maven](https://maven.apache.org/):
 
 ```bash
 java -jar inmet.jar  \
-	--output=<Output file> 
-	--field=<Fields to be retrieved in a JsonPath fashion>
-	--endpoint=<Endpoint name>
-	--partition=<(Optional) Partition, divided by + if has more than one field>
+	--output=<Output file> \
+	--field=<Fields to be retrieved in a JsonPath fashion> \
+	--endpoint=<Endpoint name> \
+	--partition=<(Optional) Partition, divided by + if has more than one field> \
 	--key=<(Optional) Unique key, divided by + if has more than one field>
 ```
 
@@ -43,8 +43,16 @@ Para recuperação de dados da API de **condições de tempo registrado nas capi
 
 É importante conhecer a estrutura do dado que será extraído, esta informação pode ser obtida na URL: https://portal.inmet.gov.br/manual selecionando a API desejada. 
 
-```javascrit
-[{"CAPITAL":"ARACAJU","TMIN18":"21.2*","TMAX18":"28.3*","UMIN18":"*","PMAX12":"0*"}...]
+```javascript
+[
+   {
+      "CAPITAL":"ARACAJU",
+      "TMIN18":"21.2*",
+      "TMAX18":"28.3*",
+      "UMIN18":"*",
+      "PMAX12":"0*"
+   },...
+]
 ```
 
 ## Extractor
@@ -56,7 +64,9 @@ java -jar inmet.jar  \
 	--endpoint="condicao/capitais/2021-08-11"
 ```
 	
-> É importante observar dois pontos. A data faz parte do endpoint e a API não retorna a data no JSON, desta forma, caso seja necessário, é importante que ela seja incluída utilizando as funções do MITT.
+> É importante observar dois pontos. 
+> 1. A data faz parte do endpoint.
+> 2. A API não retorna a data no JSON, desta forma, caso seja necessário, é importante que ela seja incluída utilizando as funções do MITT.
 
 
 ## Contributing, Bugs, Questions
