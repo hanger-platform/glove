@@ -37,27 +37,85 @@ Utilizando o [Maven](https://maven.apache.org/):
 ```bash
 java -jar blue.jar  \
 	--credentials=<Credentials file>  \
+	--app=<App name supplied by Blue> \
 	--output=<Output file> \
 	--field=<Fields to be retrieved from an endpoint in JsonPath fashion> \
-  --app=<App name> \
-  --parameters=<(Optional) Endpoint parameters> \
-  --paginate=<(Optional) Identifies if the endpoint has pagination> \
+  	--campaign=<(Optional) Campaign ID> \
+  	--date=<(Optional) Campaign Date> \
+  	--parameters=<(Optional) Endpoint parameters in a JSON fashion> \
 	--partition=<(Optional) Partition, divided by + if has more than one field> 
 ```
 
 ## Exemplos
 
-##### Exemplo de tipo 'list detail' (Padrão)
+A API fornece apenas 3 endpoints, sendo eles:
+
+##### Lista de campanhas
+
+- http://getblue.io/rest/report/api/campaigns
+
+```javascript
+[
+    {
+        "CAMPANIGNID": 0,
+        "TRACKING": "blue",
+        "TYPE": "REV",
+        "CAMPAIGN": "Dafiti"
+    },...
+]
+```
+
+##### Resultado das campanhas
+
+- http://getblue.io/rest/report/api/campaign/<campaignID>
+- http://getblue.io/rest/report/api/campaign/<campaignID>?date=YYYY-MM-DD
+
+```javascript
+[
+    {
+        "DATE": "2021-08-12",
+        "MEDIACOST": 0.00,
+        "CAMPANIGNID": 0,
+        "ACTIONS": 0,
+        "RESULTSURL": "http://getblue.io/rest/report/api/campaign/0",
+        "CLICKS": 0,
+        "IMPRESSIONS": 0
+    },...
+]
+```
+
+Desta forma, para extração de todas as campanhas, a seguinte configuração poderia ser utilizada: 
 
 ```bash
 java -jar /<path>/blue.jar \
   --credentials="/home/etl/credentials/blue.json"  \
-  --output=/tmp/blue/search_results.csv \
-  --field="CAMPANIGNID+TRACKING+TYPE+CAMPAIGN" \
   --app="REPORTS_API" \
-  --parameters=<(Optional) Endpoint parameters> \
-  --partition=<(Optional) Partition, divided by + if has more than one field> 
-  --paginate 
+  --output="/tmp/blue/search_results.csv" \
+  --field="CAMPANIGNID+TRACKING+TYPE+CAMPAIGN" 
+```
+
+Para obter os resultados de uma campanha:
+
+```bash
+java -jar /<path>/blue.jar \
+  --credentials="/home/etl/credentials/blue.json"  \
+  --app="REPORTS_API" \
+  --campaign="0" \
+  --output="/tmp/blue/search_results.csv" \
+  --field="CAMPANIGNID+DATE+MEDIACOST+ACTIONS+CLICKS+IMPRESSIONS" 
+```
+
+Para obter o resultado de uma campanha para uma data específica:
+
+
+```bash
+java -jar /<path>/blue.jar \
+  --credentials="/home/etl/credentials/blue.json"  \
+  --app="REPORTS_API" \
+  --campaign="0" \
+  --date="2021-07-22" \
+  --output="/tmp/blue/search_results.csv" \
+  --field="CAMPANIGNID+DATE+MEDIACOST+ACTIONS+CLICKS+IMPRESSIONS" 
 ```
 
 ## Contributing, Bugs, Questions
