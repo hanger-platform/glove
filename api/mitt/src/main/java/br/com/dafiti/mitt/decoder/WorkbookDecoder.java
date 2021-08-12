@@ -28,8 +28,13 @@ import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Files;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -38,6 +43,7 @@ import java.util.logging.Logger;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -61,7 +67,9 @@ public class WorkbookDecoder implements Decoder {
 
         try {
             String sheetName = properties.getProperty("sheet");
+            String dateFormat = properties.getProperty("dateFormat", "yyyy-MM-dd");
             int skip = NumberUtils.toInt(properties.getProperty("skip", "0"));
+            int scale = NumberUtils.toInt(properties.getProperty("scale", "4"));
 
             //Defines the output file write settings.
             WriterSettings writerSettings = new WriterSettings();
@@ -87,17 +95,31 @@ public class WorkbookDecoder implements Decoder {
                 Row row = rowIterator.next();
 
                 if (row.getRowNum() > (skip - 1)) {
-                    Iterator<Cell> cellIterator = row.cellIterator();
-
-                    while (cellIterator.hasNext()) {
-                        Cell cell = cellIterator.next();
+                    for (int column = 0; column < row.getLastCellNum(); column++) {
+                        Cell cell = row.getCell(column, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
 
                         switch (cell.getCellType()) {
                             case BOOLEAN:
                                 record.add(cell.getBooleanCellValue());
                                 break;
                             case NUMERIC:
-                                record.add(cell.getNumericCellValue());
+                                //Identify if cell is a date.
+                                if (DateUtil.isCellDateFormatted(cell)) {
+                                    DateFormat df = new SimpleDateFormat(dateFormat);
+                                    Date date = cell.getDateCellValue();
+                                    record.add(df.format(date));
+
+                                } else {
+                                    BigDecimal value = new BigDecimal(cell.getNumericCellValue());
+
+                                    //Identify if number has decimal scale.
+                                    if (value.scale() > 0) {
+                                        record.add(value.setScale(scale, RoundingMode.HALF_EVEN).toPlainString());
+                                    } else {
+                                        record.add(value.toPlainString());
+                                    }
+                                }
+
                                 break;
                             case STRING:
                                 record.add(cell.getStringCellValue());

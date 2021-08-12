@@ -88,7 +88,7 @@ java -jar /home/user_name/glove/extractor/lib/google-drive-manager.jar \
   --properties="{\"skip\":\"1\",\"sheet\":\"sheet_name\"}"
 ```
 
-* **Properties** parameter is used for xls files when you need to skip some lines or need to specify the sheet to be extracted.
+* **Properties** parameter is used for XLS files, when you want to specify some file detail. Available properties can be found on [mitt doc](https://github.com/dafiti-group/glove/tree/master/api/mitt).
 * **Field** parameter is used to specify the fields of the output csv file.
 
 ##### UPLOAD

@@ -11,7 +11,7 @@ O **MITT** é reponsável por encapsular a maioria das tarefas repetitivas envol
 - Geração de *command line interface* simplificada.
 - Definição de valores default para os parâmetros passados para a *command line interface*. 
 - Passagem de função como parâmetro na chamada do *command line interface*.
-- Suporte para arquivos csv, gz, zip ou avro.
+- Suporte para arquivos csv, zip, gz, avro ou xls/xlsx.
 
 ## Instalação
 
@@ -27,43 +27,150 @@ O MITT deve ser importado como dependência nos projetos de extratores para o Gl
 
 ## Utilização
 
-1. Neste exemplo, é apresentada a gravação de dados de stream em uma aplicação de linha de comando. 
+O MITT trabalha com dois tipos de entrada, _stream_ ou _file_, estes são explicados adiante. 
+
+#### Stream
+
+Nessa opção é possível efetuar a gravação de forma iterativa através de um _loop_.
+
+Exemplo: Neste caso, é apresentada a gravação de dados de stream em uma aplicação de linha de comando. 
 
 ```java
- public static void main(String[] args){       
-	    Mitt mitt = new Mitt();
+public static void main(String[] args){       
+		Mitt mitt = new Mitt();
 		
 		//Defines the command line interface expected parameters. 
-        mitt
-	        .getConfiguration()
-		        .addParameter("p", "pais", "Pais", "brasil");
+		mitt.getConfiguration().addParameter("p", "pais", "Pais", "brasil");
 		
 		//Gets a instance of MITT CommandLineInterface class. 
-        CommandLineInterface cli = mitt.getCommandLineInterface(args);
+		CommandLineInterface cli = mitt.getCommandLineInterface(args);
 		
 		//Defines the output file. 
 		mitt.setOutputFile("/tmp/mitt.csv");
 
-        //Defines default output fields. 
-        mitt
-	        .getConfiguration()
-			    .addField("id")
-			    .addField("nome")
-				.addField("pais");
+		//Defines default output fields. 
+		mitt.getConfiguration()
+			.addField("id")
+			.addField("nome")
+			.addField("pais");
 		
 		//Defines custom fields, based on a transformation. 
-        mitt.getConfiguration().addCustomField("etl_load_date", new Now());
+		mitt.getConfiguration().addCustomField("etl_load_date", new Now());
 
 		//Writes to the output file. 
-        for (int i = 0; i < 10; i++) {
-            List data = new ArrayList();
-            data.add(i);
-            data.add("nome do " + i );
+		for (int i = 0; i < 10; i++) {
+			List data = new ArrayList();
+			data.add(i);
+			data.add("nome do " + i );
 			data.add(cli.getParameter("pais"));
 			
-            mitt.write(data);
-        }
+			mitt.write(data);
+		}
+		mitt.close();
+}
+```
+
+No exemplo acima o arquivo de saída seria:
+
+```
+0;nome do 0;brasil;2021-07-27 10:54:56
+1;nome do 1;brasil;2021-07-27 10:54:56
+2;nome do 2;brasil;2021-07-27 10:54:56
+3;nome do 3;brasil;2021-07-27 10:54:56
+4;nome do 4;brasil;2021-07-27 10:54:56
+5;nome do 5;brasil;2021-07-27 10:54:56
+6;nome do 6;brasil;2021-07-27 10:54:56
+7;nome do 7;brasil;2021-07-27 10:54:56
+8;nome do 8;brasil;2021-07-27 10:54:56
+9;nome do 9;brasil;2021-07-27 10:54:56
+```
+
+#### File
+
+Nessa opção é possível efetuar a gravação do arquivo de saída no padrão Glove a partir de um arquivo de entrada. Tipos de arquivos aceitos são:
+* csv 
+* zip 
+* gz 
+* avro 
+* xls
+* xlsx
+
+Exemplo: Neste caso, é apresentado um arquivo csv de entrada e a gravação no arquivo de saída é feito em uma aplicação de linha de comando. 
+
+```java
+public static void main(String[] args) throws DuplicateEntityException, IOException {
+        //Write an input csv file.
+        FileWriter inputFile = new FileWriter("/tmp/mitt_test/input_file.csv");
+        inputFile.write("id;name;birthday\n");
+        inputFile.write("1;helio;1990-11-27\n");
+        inputFile.write("2;val;1984-02-17\n");
+        inputFile.write("3;saga;1987-03-15\n");
+        inputFile.close();
+
+        Mitt mitt = new Mitt();
+
+        //Defines the output file. 
+        mitt.setOutputFile("/tmp/output_file.csv");
+
+        //Defines default output fields. 
+        mitt.getConfiguration()                
+                .addField("id")
+                .addField("name")
+                .addField("birthday")
+                .addField("hash::checksum()")
+                .addField("year::dateformat(birthday,yyyy-MM-dd,yyyy)");
+
+        //Defines custom fields, based on transformations. 
+        mitt.getConfiguration().addCustomField("etl_load_date", new Now());
+
+        //Writes output file.
+        mitt.write(new File("/tmp/mitt_test/"));
+
         mitt.close();
+    }
+```
+
+Arquivo de entrada:
+
+```
+id;name;birthday
+1;helio;1990-11-27
+2;val;1984-02-17
+3;saga;1987-03-15
+```
+
+Arquivo de saída:
+
+```
+id;name;birthday;hash;year;etl_load_date
+1;helio;1990-11-27;7DEF5C3AA1079D124693826AE37F293F;1990;2021-07-27 11:58:41
+2;val;1984-02-17;FE392F46C579B9CE4CC0088C136D86EA;1984;2021-07-27 11:58:41
+3;saga;1987-03-15;2B3F28D62D07E78FEC28DFCEC75C82FC;1987;2021-07-27 11:58:41
+
+```
+
+PS: Os campos hash, year e etl_load_date não são originais do arquivo de entrada, eles receberam transformações no arquivo de saída, essas transformações são explicadas na seção **_Transformations_**.
+
+**Arquivo de entrada com formato xls/xlsx**:
+
+Como dito anteriormente, é possível definir arquivo xls/xlsx como entrada para os extratores. Para este formato há um parâmetro chamado _properties_  que pode ser implementado no extrator, ele permite especificar alguns detalhes do arquivo de entrada, os detalhes disponíveis são:
+* **sheet**: Nome da planilha (aba) que será extraída; _default_ é a planilha 0.
+* **skip**: Começar a extrair a partir de qual linha; _default_ é 0.
+* **scale**: Para células numéricas com casas decimais, quantas casas decimais o arquivo de saída terá; _default_ é 4.
+* **dataFormat**: Para células _date_ qual será o formato de saída; _default_ é _yyyy-MM-dd_.
+
+O extrator que implementar esse parâmetro deverá colocar a seguinte linha de código na sua aplicação:
+
+```java
+ mitt.getReaderSettings().setProperties(properties);
+```
+
+O conteúdo da varíavel properties é um _json_:
+
+```json
+{
+	"sheet":"Planilha1",
+	"skip":"2"
 }
 ```
 

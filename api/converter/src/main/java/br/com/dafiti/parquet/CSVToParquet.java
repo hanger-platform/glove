@@ -315,6 +315,11 @@ public class CSVToParquet implements Runnable {
 
                     //Identify if the original file was downloaded.
                     if (originalFile.exists()) {
+                        GenericRecordBuilder builder = new GenericRecordBuilder(schema);
+
+                        //Identifies parquet fields.
+                        List<Field> fields = schema.getFields();
+
                         //Define the reader.
                         ParquetReader<GenericRecord> parquetReader = AvroParquetReader.<GenericRecord>builder(new Path(originalFile.getAbsolutePath()))
                                 .withDataModel(genericData)
@@ -337,8 +342,17 @@ public class CSVToParquet implements Runnable {
                             }
 
                             if (add) {
+                                for (Field field : fields) {
+                                    //Reset the field.
+                                    builder.clear(field);
+
+                                    if (row.getSchema().getFields().contains(field)) {
+                                        builder.set(field, row.get(field.name()));
+                                    }
+                                }
+
                                 //Write date into parquet file.
-                                parquetWriter.write(row);
+                                parquetWriter.write(builder.build());
                             } else {
                                 statistics.incrementOutputUpdatedRows();
                             }
