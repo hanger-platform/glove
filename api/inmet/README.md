@@ -1,6 +1,6 @@
 
 
-# INMET API extractor
+# INMET API extractor [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ### Extrator de dados da API do Instituto Nacional de Meteorologia. 
 
 ## How it works
@@ -49,10 +49,12 @@ Para recuperação de dados da API de **condições de tempo registrado nas capi
 
 ## Extractor
 
+```bash
 java -jar inmet.jar  \
 	--output="/tmp/inmet/capitais.csv" \
 	--field="CAPITAL+TMIN18+TMAX18+UMIN18+PMAX12+data::Fixed(20210811)" \
 	--endpoint="condicao/capitais/2021-08-11"
+```
 	
 > É importante observar dois pontos. A data faz parte do endpoint e a API não retorna a data no JSON, desta forma, caso seja necessário, é importante que ela seja incluída utilizando as funções do MITT.
 
