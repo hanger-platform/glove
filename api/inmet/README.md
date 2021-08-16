@@ -37,9 +37,11 @@ java -jar inmet.jar  \
 	--key=<(Optional) Unique key, divided by + if has more than one field>
 ```
 
+EXEMPLO 1
+
 Para recuperação de dados da API de **condições de tempo registrado nas capitais** no dia **2021-08-11**, podemos utilizar a seguinte configuração: 
 
-## JSON
+###### API
 
 É importante conhecer a estrutura do dado que será extraído, esta informação pode ser obtida na URL: https://portal.inmet.gov.br/manual selecionando a API desejada. 
 
@@ -55,7 +57,7 @@ Para recuperação de dados da API de **condições de tempo registrado nas capi
 ]
 ```
 
-## Extractor
+###### Script
 
 ```bash
 java -jar inmet.jar  \
