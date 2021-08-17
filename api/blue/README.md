@@ -40,9 +40,9 @@ java -jar blue.jar  \
 	--app=<App name supplied by Blue> \
 	--output=<Output file> \
 	--field=<Fields to be retrieved from an endpoint in JsonPath fashion> \
-  --campaign=<(Optional) Campaign ID> \
-  --date=<(Optional) Campaign Date> \
-  --parameters=<(Optional) Endpoint parameters in a JSON fashion> \
+	--campaign=<(Optional) Campaign ID> \
+	--date=<(Optional) Campaign Date> \
+	--parameters=<(Optional) Endpoint parameters in a JSON fashion> \
 	--partition=<(Optional) Partition, divided by + if has more than one field> 
 ```
 
@@ -90,7 +90,7 @@ Desta forma, para extração de todas as campanhas, a seguinte configuração po
 java -jar /<path>/blue.jar \
   --credentials="/home/etl/credentials/blue.json"  \
   --app="REPORTS_API" \
-  --output="/tmp/blue/search_results.csv" \
+  --output="/tmp/blue/campaign.csv" \
   --field="CAMPANIGNID+TRACKING+TYPE+CAMPAIGN" 
 ```
 
@@ -101,7 +101,7 @@ java -jar /<path>/blue.jar \
   --credentials="/home/etl/credentials/blue.json"  \
   --app="REPORTS_API" \
   --campaign="0" \
-  --output="/tmp/blue/search_results.csv" \
+  --output="/tmp/blue/campaign.csv" \
   --field="CAMPANIGNID+DATE+MEDIACOST+ACTIONS+CLICKS+IMPRESSIONS" 
 ```
 
@@ -114,7 +114,7 @@ java -jar /<path>/blue.jar \
   --app="REPORTS_API" \
   --campaign="0" \
   --date="2021-07-22" \
-  --output="/tmp/blue/search_results.csv" \
+  --output="/tmp/blue/campaign.csv" \
   --field="CAMPANIGNID+DATE+MEDIACOST+ACTIONS+CLICKS+IMPRESSIONS" 
 ```
 
