@@ -190,6 +190,8 @@ fi
 
 # Executa o processo de carga e criação de entidades.
 if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
+	cd ${RAWFILE_QUEUE_PATH}
+
 	echo "Work area:"
 	echo "${RAWFILE_QUEUE_PATH}"
 	
