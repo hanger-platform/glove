@@ -1271,10 +1271,10 @@ if( parent_job.getVariable("MODE").indexOf("static") !== -1 ) {
 
 // Identifica se deve ser gerado um único arquivo de dados temporário. 
 
-if( parent_job.getVariable("DATABASE_TYPE").indexOf("redshift") !== -1 ) {
-	parent_job.setVariable("MULTIPLE_FILE", "0");
-}else{
+if( parent_job.getVariable("TARGET").indexOf("spectrum") !== -1 ) {
 	parent_job.setVariable("MULTIPLE_FILE", "1");
+}else{
+	parent_job.setVariable("MULTIPLE_FILE", "0"); 
 }
 
 true;</script>

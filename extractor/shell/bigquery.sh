@@ -95,7 +95,7 @@ delta_load()
 	bq query --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false  << EOF
 BEGIN TRANSACTION;	
 	DELETE FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} t WHERE custom_primary_key IN (SELECT custom_primary_key FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE});		
-	MERGE ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} t USING ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} s ON 	t.custom_primary_key = s.custom_primary_key WHEN NOT MATCHED THEN INSERT ROW;
+	MERGE ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} t USING ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} s ON t.custom_primary_key = s.custom_primary_key WHEN NOT MATCHED THEN INSERT ROW;
 	COMMIT TRANSACTION;	
 EOF
 	error_check	
@@ -179,7 +179,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 	
 	table_check
 
-	echo "Data sample!"
+	echo "Data sample:"
 	tail ${RAWFILE_QUEUE_FILE}
 
 	echo "Splitting csv file!"
