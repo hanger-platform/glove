@@ -93,29 +93,11 @@ delta_load()
 	echo "Appending to table ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE} from ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE}"
 	bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE} 
 	bq query --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false  << EOF
-		BEGIN TRANSACTION;
-		
-		DELETE FROM 
-			${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} t 
-		WHERE 
-			custom_primary_key 
-		IN (
-			SELECT 
-				custom_primary_key 
-			FROM 
-				${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE}
-		);		
-
-		MERGE 
-			${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} t 
-			USING ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} s
-		ON 
-			t.custom_primary_key = s.custom_primary_key
-		WHEN NOT MATCHED THEN INSERT ROW;
-		
-		COMMIT TRANSACTION;	
+BEGIN TRANSACTION;	
+	DELETE FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} t WHERE custom_primary_key IN (SELECT custom_primary_key FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE});		
+	MERGE ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} t USING ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} s ON 	t.custom_primary_key = s.custom_primary_key WHEN NOT MATCHED THEN INSERT ROW;
+	COMMIT TRANSACTION;	
 EOF
-	
 	error_check	
 
     # Remove os arquivos temporários.
@@ -197,19 +179,17 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 	
 	table_check
 
-	# Particiona o arquivo intermediário.
+	echo "Data sample!"
+	tail ${RAWFILE_QUEUE_FILE}
+
 	echo "Splitting csv file!"
 	split -l ${PARTITION_LENGTH} -a 4 --numeric-suffixes=1 --additional-suffix=.csv ${RAWFILE_QUEUE_FILE} ${DATA_FILE}_
 	error_check
-	
-	cat ${RAWFILE_QUEUE_FILE}
-	
-	# Remove o arquivo original.
+
 	echo "Removing file ${RAWFILE_QUEUE_FILE}!"
 	rm -f ${RAWFILE_QUEUE_FILE}
 	error_check	
 
-   	# Remove o header do csv intermediário.
     if [ ${MODULE} == "query" ] || [ ${MODULE} == "file" ]; then
     	echo "Removing header from ${DATA_FILE}_0001.csv!"
     	tail -n +2 ${DATA_FILE}_0001.csv > ${DATA_FILE}_0001.tmp
@@ -219,7 +199,6 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 		error_check
     fi
 
-	# Compacta os arquivos particionados.
 	echo "Compacting csv files!"
 	for i in `ls *.csv`
 	do

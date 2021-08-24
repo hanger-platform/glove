@@ -497,10 +497,6 @@ else
         echo "MULTIPLE FILE DISABLED!"
 fi
 
-echo ${MULTIPLE_FILE} 
-echo ${RAWFILE_QUEUE_FILE} 
-echo ${PARTITION_FIELD} 
-
 for i in `ls ${RAWFILE_QUEUE_STAGING_PATH}*`
 do
 	if [ ${FILE_INDEX} = 0 ]; then	
