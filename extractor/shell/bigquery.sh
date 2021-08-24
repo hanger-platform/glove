@@ -19,6 +19,7 @@ table_check()
 	bq mk --project_id=${BIG_QUERY_PROJECT_ID} ${CUSTOM_SCHEMA}${SCHEMA_NAME}
 
 	if [ "${#TIME_PARTITIONING_FIELD}" -gt "0" ] && [ "${#TIME_PARTITIONING_TYPE}" -gt "0" ] ; then
+		echo "Preparing partitioned table ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} by ${TIME_PARTITIONING_FIELD} of type ${TIME_PARTITIONING_TYPE}"	
 		bq mk --table \
 			--project_id=${BIG_QUERY_PROJECT_ID} \
 			--time_partitioning_field ${TIME_PARTITIONING_FIELD} \
@@ -26,12 +27,14 @@ table_check()
 	  		--schema ${METADATA_JSON_FILE} \
 			 ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}
 	elif [ "${#CLUSTER_COLUMNS}" -gt "0" ] ; then
+		echo "Preparing clusterized table ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} by ${CLUSTER_COLUMNS}"	
 		bq mk --table \
 			--project_id=${BIG_QUERY_PROJECT_ID} \
 			--clustering_fields ${CLUSTER_COLUMNS} \
 	  		--schema ${METADATA_JSON_FILE} \
 			 ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}
 	else
+		echo "Preparing table ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}"
 		bq mk --table \
 			--project_id=${BIG_QUERY_PROJECT_ID} \
 	  		--schema ${METADATA_JSON_FILE} \
