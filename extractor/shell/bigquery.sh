@@ -197,15 +197,19 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 	
 	table_check
 
-	echo "Splitting csv file delimited by ${DELIMITER}!"
-	split -l 1000000 --numeric-suffixes=1 --additional-suffix=.csv ${RAWFILE_QUEUE_FILE} ${DATA_FILE}
-	error_check	
+	# Particiona o arquivo intermediário.
+	echo "Splitting csv file!"
+	split -l ${PARTITION_LENGTH} -a 4 --numeric-suffixes=1 --additional-suffix=.csv ${RAWFILE_QUEUE_FILE} ${DATA_FILE}_
+	error_check
 	
+	cat ${RAWFILE_QUEUE_FILE}
+	
+	# Remove o arquivo original.
 	echo "Removing file ${RAWFILE_QUEUE_FILE}!"
 	rm -f ${RAWFILE_QUEUE_FILE}
 	error_check	
-	
-	echo "Removing file header!"
+
+   	# Remove o header do csv intermediário.
     if [ ${MODULE} == "query" ] || [ ${MODULE} == "file" ]; then
     	echo "Removing header from ${DATA_FILE}_0001.csv!"
     	tail -n +2 ${DATA_FILE}_0001.csv > ${DATA_FILE}_0001.tmp
@@ -213,14 +217,15 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 
     	mv -f ${DATA_FILE}_0001.tmp ${DATA_FILE}_0001.csv;
 		error_check
-    fi	
-	
+    fi
+
+	# Compacta os arquivos particionados.
 	echo "Compacting csv files!"
 	for i in `ls *.csv`
 	do
 		pigz $i
 		error_check
-	done	
+	done
 
 	# Identifica se deve exportar o csv intermediário para o storage.
     if [ ${MODULE} == "query" ]; then
