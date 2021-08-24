@@ -25,7 +25,7 @@ table_check()
 	  		--time_partitioning_type ${TIME_PARTITIONING_TYPE} \
 	  		--schema ${METADATA_JSON_FILE} \
 			 ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}
-	elif [ "${#CLUSTER_COLUMNS}" -gt "0" ]
+	elif [ "${#CLUSTER_COLUMNS}" -gt "0" ] ; then
 		bq mk --table \
 			--project_id=${BIG_QUERY_PROJECT_ID} \
 			--clustering_fields ${CLUSTER_COLUMNS} \
