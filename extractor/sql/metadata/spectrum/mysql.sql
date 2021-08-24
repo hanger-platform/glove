@@ -51,7 +51,7 @@ SELECT * FROM (
 	        WHEN '${PARTITION_TYPE}' = 'id' THEN CONCAT('(( floor( COALESCE(CAST(`',column_name,'` AS SIGNED ),1) / ( ${PARTITION_LENGTH} + 0.01 ) ) + 1 ) * ${PARTITION_LENGTH})')
 	    END AS casting,
 	    'bigint' AS field_type,
-		'{"name": "partition_field","type":["null", "bigint"], "default": null}' AS json,
+		'{"name": "partition_field","type":["null", "long"], "default": null}' AS json,
 	    'partition_field' 							 	AS column_name,
 	    0 											 	AS column_key,
 		'' 												AS encoding
