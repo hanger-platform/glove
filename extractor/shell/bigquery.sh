@@ -19,22 +19,31 @@ table_check()
 	bq mk --project_id=${BIG_QUERY_PROJECT_ID} ${CUSTOM_SCHEMA}${SCHEMA_NAME}
 
 	if [ "${#TIME_PARTITIONING_FIELD}" -gt "0" ] && [ "${#TIME_PARTITIONING_TYPE}" -gt "0" ] ; then
-		echo "Preparing partitioned table ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} by ${TIME_PARTITIONING_FIELD} of type ${TIME_PARTITIONING_TYPE}"	
+		echo "Preparing partitioned table by ${TIME_PARTITIONING_FIELD} of type ${TIME_PARTITIONING_TYPE}"	
 		bq mk --table \
 			--project_id=${BIG_QUERY_PROJECT_ID} \
 			--time_partitioning_field ${TIME_PARTITIONING_FIELD} \
 	  		--time_partitioning_type ${TIME_PARTITIONING_TYPE} \
 	  		--schema ${METADATA_JSON_FILE} \
 			 ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}
+	elif [ "${#TIME_PARTITIONING_FIELD}" -gt "0" ] && [ "${#TIME_PARTITIONING_TYPE}" -gt "0" ] && [ "${#CLUSTER_COLUMNS}" -gt "0" ] ; then
+		echo "Preparing partitioned table by ${TIME_PARTITIONING_FIELD} of type ${TIME_PARTITIONING_TYPE} clusterized by ${CLUSTER_COLUMNS}"	
+		bq mk --table \
+			--project_id=${BIG_QUERY_PROJECT_ID} \
+			--time_partitioning_field ${TIME_PARTITIONING_FIELD} \
+	  		--time_partitioning_type ${TIME_PARTITIONING_TYPE} \
+	  		--clustering_fields ${CLUSTER_COLUMNS} \
+	  		--schema ${METADATA_JSON_FILE} \
+			 ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}
 	elif [ "${#CLUSTER_COLUMNS}" -gt "0" ] ; then
-		echo "Preparing clusterized table ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} by ${CLUSTER_COLUMNS}"	
+		echo "Preparing clusterized table by ${CLUSTER_COLUMNS}"	
 		bq mk --table \
 			--project_id=${BIG_QUERY_PROJECT_ID} \
 			--clustering_fields ${CLUSTER_COLUMNS} \
 	  		--schema ${METADATA_JSON_FILE} \
 			 ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}
 	else
-		echo "Preparing table ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}"
+		echo "Preparing table"
 		bq mk --table \
 			--project_id=${BIG_QUERY_PROJECT_ID} \
 	  		--schema ${METADATA_JSON_FILE} \
@@ -209,36 +218,6 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 		error_check
 	done
 
-	# Identifica se deve exportar o csv intermediário para o storage.
-    if [ ${MODULE} == "query" ]; then
-		if [ ${IS_EXPORT} = 1 ]; then
-		
-			# Compacta o arquivo csv.
-			pigz -c ${RAWFILE_QUEUE_FILE} > ${RAWFILE_QUEUE_FILE}.gz
-
-			# Define o storage de exportação.
-			if [ "${#EXPORT_BUCKET}" -gt "0" ]; then
-				# Envia o arquivo para o storage.
-				echo "Exporting resultset to ${EXPORT_BUCKET}!"
-				gsutil -q -m rm ${EXPORT_BUCKET}*
-				gsutil -q -m cp ${RAWFILE_QUEUE_FILE}.gz ${EXPORT_BUCKET}
-				error_check	
-
-				# Remove o arquivo compactado do diretório.
-				rm -rf ${RAWFILE_QUEUE_FILE}.gz
-				
-				# Finaliza o processo de exportação.
-				if [ ${ONLY_EXPORT} = 1 ]; then
-					echo "Exporting finished!"
-					exit 0
-				fi
-			else
-				echo "EXPORT_BUCKET was not defined!"
-			fi
-		fi
-    fi
-    
-    
     # Identifica o tipo de carga que será realizado.
 	if [ ${MODULE} == "file" ] && [ ${FILE_OUTPUT_MODE} == "append" ]; then
 		delta_load	

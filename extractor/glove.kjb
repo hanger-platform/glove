@@ -29,7 +29,7 @@
     <parameter>
       <name>CLUSTER_COLUMNS</name>
       <default_value/>
-      <description/>
+      <description>Identifica quais colunas serão usadas para clusterizar uma tabela no BigQuery.</description>
     </parameter>
     <parameter>
       <name>CONNECTION_NAME</name>
@@ -384,12 +384,12 @@
     <parameter>
       <name>TIME_PARTITIONING_FIELD</name>
       <default_value/>
-      <description/>
+      <description>Identifica a coluna [INT, TIMESTAMP, DATETIME ou DATE] que será usada para particionar uma tabela no BigQuery.</description>
     </parameter>
     <parameter>
       <name>TIME_PARTITIONING_TYPE</name>
       <default_value>DAY</default_value>
-      <description/>
+      <description>Identifica o tipo de partição que será criada no BigQuery [DAY, HOUR, MONTH ou YEAR]</description>
     </parameter>
     <parameter>
       <name>WHERE_CONDITION_TO_DELTA</name>
