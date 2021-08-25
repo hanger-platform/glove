@@ -72,12 +72,14 @@ full_load()
 	bq load --project_id=${BIG_QUERY_PROJECT_ID} --field_delimiter="${DELIMITER}" ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE} ${STORAGE_QUEUE_PATH}* ${METADATA_JSON_FILE}
 	error_check	
 	
-	echo "Removing table ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} from ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}"
-	bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} 	
-	
-	echo "Loading data to table ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} from ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}"
-	bq cp --project_id=${BIG_QUERY_PROJECT_ID} ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE} ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} 
-	error_check
+	echo "Updating from ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}"
+	bq query --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false  << EOF
+BEGIN TRANSACTION;	
+	DELETE FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE};		
+	MERGE ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} t USING ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE} s ON t.custom_primary_key = s.custom_primary_key WHEN NOT MATCHED THEN INSERT ROW;
+	COMMIT TRANSACTION;	
+EOF
+	error_check	
 	
     # Remove os arquivos temporários.
     if [ ${DEBUG} = 0 ] ; then
