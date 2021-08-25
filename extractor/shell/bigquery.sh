@@ -75,7 +75,7 @@ full_load()
 	echo "Updating from ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}"
 	bq query --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false  << EOF
 BEGIN TRANSACTION;	
-	TRUNCATE TABLE ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE};		
+	DELETE FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} WHERE true;	
 	MERGE ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} t USING ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE} s ON t.custom_primary_key = s.custom_primary_key WHEN NOT MATCHED THEN INSERT ROW;
 	COMMIT TRANSACTION;	
 EOF
