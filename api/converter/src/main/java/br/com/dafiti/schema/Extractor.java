@@ -404,7 +404,7 @@ public class Extractor implements Runnable {
                                     fieldDataType.add(field + " " + "varchar(19) ENCODE ZSTD");
                                     break;
                                 case "bigquery":
-                                    fieldSchema.add("{\"name\":\"" + field + "\",\"type\":\"DATETIME\"}");
+                                    fieldSchema.add("{\"name\":\"" + field + "\",\"type\":\"TIMESTAMP\"}");
                                     break;
                             }
 

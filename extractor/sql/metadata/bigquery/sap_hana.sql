@@ -19,7 +19,7 @@ SELECT * FROM (
 				WHEN '${PARTITION_TYPE}' = 'date' OR '${PARTITION_TYPE}' = 'timestamp' THEN 'TO_CHAR( TO_DATE( TO_BIGINT( CASE WHEN TO_BIGINT("' || COLUMN_NAME || '") = 0 THEN ''19000101'' ELSE "' || COLUMN_NAME || '" END ) ), ''${PARTITION_FORMAT}'' )'
           		WHEN '${PARTITION_TYPE}' = 'id' THEN '( ( FLOOR( COALESCE( TO_BIGINT("' || COLUMN_NAME || '"), 1 ) / ( ${PARTITION_LENGTH} + 0.01 ) ) + 1 ) * ${PARTITION_LENGTH} )'
            	END AS casting,
-            'int' 											AS field_type,
+            '' 												AS field_type,
 			'{"name": "partition_field","type":"INTEGER"}' 	AS json,
             'partition_field' 							 	AS column_name,
             0 											 	AS column_key,
@@ -74,7 +74,7 @@ SELECT * FROM (
             CASE
             	WHEN '${CUSTOM_PRIMARY_KEY}' != '' THEN CONCAT( 'CONCAT(', '${CUSTOM_PRIMARY_KEY}' ) ELSE STRING_AGG( '"' || dd03l.fieldname || '"', '||' ORDER BY dd03l.POSITION )
             END AS casting,
-            'varchar(255)' 										AS field_type,
+            '' 													AS field_type,
             '{"name": "custom_primary_key","type":"STRING"}' 	AS json,
             'custom_primary_key' 								AS column_name,
             1 													AS column_key,
@@ -110,7 +110,7 @@ SELECT * FROM (
                     WHEN DATA_TYPE_NAME IN ( 'VARCHAR', 'VARBINARY', 'NVARCHAR', 'CHAR', 'BLOB', 'CLOB', 'NCLOB', 'TEXT' ) 	THEN '"STRING"'
                     WHEN DATA_TYPE_NAME IN ( 'REAL', 'DOUBLE', 'SMALLDECIMAL', 'DECIMAL' ) 									THEN '"FLOAT"'
                     WHEN DATA_TYPE_NAME IN ( 'TIME', 'SECONDDATE') 															THEN '"STRING"'
-                    WHEN DATA_TYPE_NAME IN ( 'TIMESTAMP' ) 																	THEN '"DATETIME"'
+                    WHEN DATA_TYPE_NAME IN ( 'TIMESTAMP' ) 																	THEN '"TIMESTAMP"'
                     WHEN DATA_TYPE_NAME IN ( 'DATE' ) 																		THEN '"DATE"'
                  	WHEN DATA_TYPE_NAME = 'BOOLEAN' 																		THEN '"BOOLEAN"'
                 end || ' }' ) 												AS json,
@@ -160,7 +160,7 @@ SELECT * FROM (
             998 AS POSITION,
 			'CONCAT( TO_CHAR( now(),' || '''' || 'YYYY-MM-DD HH24:MI:SS' || '''' || '),' || '''' || '${TIMEZONE_OFFSET}' || '''' || ') as etl_load_date' as fields,
             'CONCAT( TO_CHAR( now(),' || '''' || 'YYYY-MM-DD HH24:MI:SS' || '''' || '),' || '''' || '${TIMEZONE_OFFSET}' || '''' || ')' AS casting,
-            'varchar(19)' 									AS field_type,
+            '' 												AS field_type,
             '{"name": "etl_load_date","type":"STRING"}' 	AS json,
             'etl_load_date' 								AS column_name,
             0 												AS column_key,
