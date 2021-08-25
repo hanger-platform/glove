@@ -392,6 +392,23 @@ public class Extractor implements Runnable {
 
                             break;
                         case "timestamp":
+                            fieldMetadata.add("{\"field\":\"" + field + "\",\"type\":\"string\",\"length\":19}");
+
+                            switch (dialect) {
+                                case "spectrum":
+                                case "athena":
+                                    fieldSchema.add("{\"name\":\"" + field + "\",\"type\":[\"null\",\"string\"],\"default\":null}");
+                                    fieldDataType.add(field + " " + "varchar(19)");
+                                    break;
+                                case "redshift":
+                                    fieldDataType.add(field + " " + "varchar(19) ENCODE ZSTD");
+                                    break;
+                                case "bigquery":
+                                    fieldSchema.add("{\"name\":\"" + field + "\",\"type\":\"DATETIME\"}");
+                                    break;
+                            }
+
+                            break;
                         case "date":
                             fieldMetadata.add("{\"field\":\"" + field + "\",\"type\":\"string\",\"length\":19}");
 
@@ -405,7 +422,7 @@ public class Extractor implements Runnable {
                                     fieldDataType.add(field + " " + "varchar(19) ENCODE ZSTD");
                                     break;
                                 case "bigquery":
-                                    fieldSchema.add("{\"name\":\"" + field + "\",\"type\":\"STRING\"}");
+                                    fieldSchema.add("{\"name\":\"" + field + "\",\"type\":\"DATE\"}");
                                     break;
                             }
 

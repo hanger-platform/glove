@@ -58,7 +58,7 @@ SELECT * FROM (
                 WHEN data_type IN ( 'smallint', 'integer', 'bigint' ) 																THEN '"INTEGER"'
 				WHEN data_type IN ( 'real', 'double precision', 'numeric' ) 														THEN '"FLOAT"'
                 WHEN data_type IN ( '"char"', 'character varying', 'text' ) 														THEN '"STRING"'                
-                WHEN data_type IN ( 'date', 'timestamp with time zone', 'timestamp without time zone', 'time without time zone' ) 	THEN '"STRING"'
+                WHEN data_type IN ( 'timestamp with time zone', 'timestamp without time zone', 'time without time zone' ) 			THEN '"DATETIME"'
 				WHEN data_type IN ( 'date' ) 																						THEN '"DATE"'				
                 WHEN data_type = 'boolean' 																							THEN '"BOOLEAN"'
             END::varchar(255) ||' }' ) 						AS json,

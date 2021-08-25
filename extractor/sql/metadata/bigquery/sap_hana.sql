@@ -109,7 +109,9 @@ SELECT * FROM (
                 	WHEN DATA_TYPE_NAME IN ( 'TINYINT', 'SMALLINT', 'INTEGER', 'BIGINT' ) 									THEN '"INTEGER"'
                     WHEN DATA_TYPE_NAME IN ( 'VARCHAR', 'VARBINARY', 'NVARCHAR', 'CHAR', 'BLOB', 'CLOB', 'NCLOB', 'TEXT' ) 	THEN '"STRING"'
                     WHEN DATA_TYPE_NAME IN ( 'REAL', 'DOUBLE', 'SMALLDECIMAL', 'DECIMAL' ) 									THEN '"FLOAT"'
-                    WHEN DATA_TYPE_NAME IN ( 'DATE', 'TIME', 'SECONDDATE', 'TIMESTAMP' ) 									THEN '"STRING"'
+                    WHEN DATA_TYPE_NAME IN ( 'TIME', 'SECONDDATE') 															THEN '"STRING"'
+                    WHEN DATA_TYPE_NAME IN ( 'TIMESTAMP' ) 																	THEN '"DATETIME"'
+                    WHEN DATA_TYPE_NAME IN ( 'DATE' ) 																		THEN '"DATE"'
                  	WHEN DATA_TYPE_NAME = 'BOOLEAN' 																		THEN '"BOOLEAN"'
                 end || ' }' ) 												AS json,
             LOWER( REPLACE_REGEXPR( '\/\w+\/' IN COLUMN_NAME WITH '' ) ) 	AS column_name,

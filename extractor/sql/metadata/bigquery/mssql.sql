@@ -119,7 +119,7 @@ SELECT * FROM (
 		CONCAT('{"name": "', LOWER( REPLACE(column_name,' ','_') ), '","type":',
 			IIF( data_type IN ('tinyint','smallint','int','bit','bigint'),'"INTEGER"', 			
 			IIF( data_type IN ('float','real','decimal','numeric'),'"FLOAT"', 
-			IIF( data_type = 'datetime','"STRING"', 
+			IIF( data_type = 'datetime','"DATETIME"', 
 			IIF( data_type = 'date','"DATE"', 
 			IIF( data_type = 'time','"TIME"','"STRING"' ))))
 			), ' }')

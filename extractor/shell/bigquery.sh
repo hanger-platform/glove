@@ -26,6 +26,8 @@ table_check()
 	  		--time_partitioning_type ${TIME_PARTITIONING_TYPE} \
 	  		--schema ${METADATA_JSON_FILE} \
 			 ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}
+		error_check
+			 
 	elif [ "${#TIME_PARTITIONING_FIELD}" -gt "0" ] && [ "${#TIME_PARTITIONING_TYPE}" -gt "0" ] && [ "${#CLUSTER_COLUMNS}" -gt "0" ] ; then
 		echo "Preparing partitioned table by ${TIME_PARTITIONING_FIELD} of type ${TIME_PARTITIONING_TYPE} clusterized by ${CLUSTER_COLUMNS}"	
 		bq mk --table \
@@ -35,6 +37,8 @@ table_check()
 	  		--clustering_fields ${CLUSTER_COLUMNS} \
 	  		--schema ${METADATA_JSON_FILE} \
 			 ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}
+		error_check
+			 
 	elif [ "${#CLUSTER_COLUMNS}" -gt "0" ] ; then
 		echo "Preparing clusterized table by ${CLUSTER_COLUMNS}"	
 		bq mk --table \
@@ -42,12 +46,14 @@ table_check()
 			--clustering_fields ${CLUSTER_COLUMNS} \
 	  		--schema ${METADATA_JSON_FILE} \
 			 ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}
+		error_check
 	else
 		echo "Preparing table"
 		bq mk --table \
 			--project_id=${BIG_QUERY_PROJECT_ID} \
 	  		--schema ${METADATA_JSON_FILE} \
-			 ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}	
+			 ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}
+		error_check	
 	fi
 }
 
@@ -57,23 +63,19 @@ full_load()
 	echo "Running full load!"
     cd ${RAWFILE_QUEUE_PATH}
 
-	# Envia os arquivos para o storage.
-	echo "Copying files to ${STORAGE_QUEUE_PATH} from ${RAWFILE_QUEUE_PATH}"
+	echo "Uploading files to ${STORAGE_QUEUE_PATH} from ${RAWFILE_QUEUE_PATH}"
 	gsutil -q -m rm ${STORAGE_QUEUE_PATH}*
 	gsutil -q -m cp ${RAWFILE_QUEUE_PATH}* ${STORAGE_QUEUE_PATH}
 	error_check
 	
-	# Envia os dados para a tabela temporária.
 	echo "Loading table ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE} from ${STORAGE_QUEUE_PATH}"
 	bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE} 
 	bq load --project_id=${BIG_QUERY_PROJECT_ID} --field_delimiter="${DELIMITER}" ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE} ${STORAGE_QUEUE_PATH}* ${METADATA_JSON_FILE}
 	error_check	
 	
-	# Remove a tabela principal.
 	echo "Removing table ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} from ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}"
 	bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} 	
 	
-	# Copia os dados da tabela temporária para a tabela principal.
 	echo "Loading data to table ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} from ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE}"
 	bq cp --project_id=${BIG_QUERY_PROJECT_ID} ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE} ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} 
 	error_check
@@ -89,25 +91,21 @@ delta_load()
 {
 	cd ${RAWFILE_QUEUE_PATH}
 		
-	# Envia os arquivos para o storage.
-	echo "Copying files to ${STORAGE_QUEUE_PATH} from ${RAWFILE_QUEUE_PATH}"
+	echo "Uploading files to ${STORAGE_QUEUE_PATH} from ${RAWFILE_QUEUE_PATH}"
 	gsutil -q -m rm ${STORAGE_QUEUE_PATH}*
 	gsutil -q -m cp ${RAWFILE_QUEUE_PATH}* ${STORAGE_QUEUE_PATH}
 	error_check
 	
-	# Envia os dados para a staging area.
-	echo "Loading table ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} from ${STORAGE_QUEUE_PATH}"
-	bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} 
-	bq load --project_id=${BIG_QUERY_PROJECT_ID} --field_delimiter="${DELIMITER}" ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} ${STORAGE_QUEUE_PATH}* ${METADATA_JSON_FILE}
+	echo "Loading table ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE} from ${STORAGE_QUEUE_PATH}"
+	bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE} 
+	bq load --project_id=${BIG_QUERY_PROJECT_ID} --field_delimiter="${DELIMITER}" ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE} ${STORAGE_QUEUE_PATH}* ${METADATA_JSON_FILE}
 	error_check
 	
-	# Monta a tabela temporária.
-	echo "Appending to table ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE} from ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE}"
-	bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE} 
+	echo "Updating from ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}"
 	bq query --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false  << EOF
 BEGIN TRANSACTION;	
-	DELETE FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} t WHERE custom_primary_key IN (SELECT custom_primary_key FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE});		
-	MERGE ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} t USING ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} s ON t.custom_primary_key = s.custom_primary_key WHEN NOT MATCHED THEN INSERT ROW;
+	DELETE FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} t WHERE custom_primary_key IN (SELECT custom_primary_key FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE});		
+	MERGE ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} t USING ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE} s ON t.custom_primary_key = s.custom_primary_key WHEN NOT MATCHED THEN INSERT ROW;
 	COMMIT TRANSACTION;	
 EOF
 	error_check	
@@ -121,7 +119,7 @@ EOF
 # Realiza a limpeza dos arquivos temporários.
 clean_up()
 {
-	bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} 
+	bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE} 
 	gsutil -q -m rm ${STORAGE_QUEUE_PATH}*
 
     if [ ${MODULE} != "file" ]; then
@@ -140,10 +138,6 @@ error_check()
         # Remove os arquivos temporários.
         if [ ${DEBUG} = 0 ] ; then
             clean_up
-            
-			bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.stg_${TABLE} 
-			bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE} 
-			gsutil -q -m rm ${STORAGE_QUEUE_PATH}*
         fi
 
 		exit 1
