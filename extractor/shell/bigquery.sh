@@ -55,6 +55,8 @@ table_check()
 			 ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}
 		error_check	
 	fi
+	
+	bq show --project_id=${BIG_QUERY_PROJECT_ID} ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}
 }
 
 # Executa a carga full.
