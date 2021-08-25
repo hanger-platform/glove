@@ -19,8 +19,8 @@ SELECT * FROM (
 				WHEN '${PARTITION_TYPE}' = 'date' OR '${PARTITION_TYPE}' = 'timestamp' THEN 'TO_CHAR( TO_DATE( TO_BIGINT( CASE WHEN TO_BIGINT("' || COLUMN_NAME || '") = 0 THEN ''19000101'' ELSE "' || COLUMN_NAME || '" END ) ), ''${PARTITION_FORMAT}'' )'
           		WHEN '${PARTITION_TYPE}' = 'id' THEN 'TO_BIGINT ( ( FLOOR( COALESCE( TO_BIGINT("' || COLUMN_NAME || '"), 1 ) / ( ${PARTITION_LENGTH} + 0.01 ) ) + 1 ) * ${PARTITION_LENGTH} )'
            	END AS casting,
-            'int' AS field_type,
-			'{"name": "partition_field","type":["null", "int"], "default": null}' AS json,
+            'bigint' AS field_type,
+			'{"name": "partition_field","type":["null", "long"], "default": null}' AS json,
             'partition_field' 							 AS column_name,
             0 											 AS column_key,
 			''                                           AS encoding
