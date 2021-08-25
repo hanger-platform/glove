@@ -18,7 +18,7 @@ table_check()
 {
 	bq mk --project_id=${BIG_QUERY_PROJECT_ID} ${CUSTOM_SCHEMA}${SCHEMA_NAME}
 
-	echo "Infered JSON schema"
+	echo "INFERRED METADATA"
 	cat ${METADATA_JSON_FILE}	
 
 	if [ "${#TIME_PARTITIONING_FIELD}" -gt "0" ] && [ "${#TIME_PARTITIONING_TYPE}" -gt "0" ] ; then
