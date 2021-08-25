@@ -110,11 +110,10 @@ SELECT * FROM (
 		CONCAT('{"name": "', LOWER( column_name ), '","type":', 
 			IF( data_type IN ("tinyint","smallint","mediumint", "int", "bit", "bigint"),'"INTEGER"', 
 			IF( data_type IN ("float","double", "decimal"),'"FLOAT"', 
-			IF( data_type IN ("timestamp","datetime"),'"DATETIME"',
-			IF( data_type = "datetime",'"STRING"', 
+			IF( data_type IN ("timestamp","datetime"),'"TIMESTAMP"',
 			IF( data_type = "date",'"DATE"', 
 			IF( data_type = "boolean",'"BOOLEAN"', 
-			IF( data_type = "time",'"TIME"','"STRING"' ))))))), ' }'
+			IF( data_type = "time",'"TIME"','"STRING"' )))))), ' }'
 		) AS json,
 		LOWER( column_name ) AS column_name,
         0 AS column_key,
