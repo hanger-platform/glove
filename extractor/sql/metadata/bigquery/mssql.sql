@@ -100,7 +100,7 @@ SELECT * FROM (
     SELECT DISTINCT
         ordinal_position,
 		CASE
-            WHEN data_type IN ('datetime') THEN CONCAT('COALESCE(FORMAT(IIF(',column_name,' IS NULL', ',' , '''1900-01-01 00:00:00''', ',', column_name, '),', '''yyyy-MM-dd HH:mm:ss', ' ${TIMEZONE_OFFSET}', '''), ', '''1900-01-01 00:00:00''', ') AS ',column_name,'')
+            WHEN data_type IN ('datetime') THEN CONCAT('COALESCE(FORMAT(IIF(',column_name,' IS NULL', ',' , '''1900-01-01 00:00:00''', ',', column_name, '),', '''yyyy-MM-dd HH:mm:ss', '${TIMEZONE_OFFSET}', '''), ', '''1900-01-01 00:00:00''', ') AS ',column_name,'')
             WHEN data_type = 'date' THEN CONCAT('COALESCE(FORMAT(IIF(',column_name,' IS NULL', ',' , '''1900-01-01''', ',', column_name, '),', '''yyyy-MM-dd', '''), ', '''1900-01-01''', ') AS ',REPLACE(column_name,' ','_'),'')
 			WHEN data_type IN ('bit','tinyint','smallint','int') THEN CONCAT('CAST(',column_name,' AS int) AS ',REPLACE(column_name,' ','_'),'')
 			WHEN data_type IN ('bigint') THEN CONCAT('CAST(',column_name,' AS bigint) AS ',REPLACE(column_name,' ','_'),'')
@@ -108,7 +108,7 @@ SELECT * FROM (
             ELSE CONCAT('',column_name,'')
         END AS fields,
         CASE
-            WHEN data_type IN ('datetime') THEN CONCAT('COALESCE(FORMAT(IIF(',column_name,' IS NULL', ',' , '''1900-01-01 00:00:00''', ',', column_name, '),', '''yyyy-MM-dd HH:mm:ss', ' ${TIMEZONE_OFFSET}', '''), ', '''1900-01-01 00:00:00''', ')')
+            WHEN data_type IN ('datetime') THEN CONCAT('COALESCE(FORMAT(IIF(',column_name,' IS NULL', ',' , '''1900-01-01 00:00:00''', ',', column_name, '),', '''yyyy-MM-dd HH:mm:ss', '${TIMEZONE_OFFSET}', '''), ', '''1900-01-01 00:00:00''', ')')
             WHEN data_type = 'date' THEN CONCAT('COALESCE(FORMAT(IIF(',column_name,' IS NULL', ',' , '''1900-01-01''', ',', column_name, '),', '''yyyy-MM-dd', '''), ', '''1900-01-01''', ')' )
 			WHEN data_type IN ('bit','tinyint','smallint', 'int') THEN CONCAT('CAST(',column_name,' AS int)')
 			WHEN data_type IN ('bigint') THEN CONCAT('CAST(',column_name,' AS bigint)')
@@ -138,8 +138,8 @@ SELECT * FROM (
 	
 	SELECT
         999 AS ordinal_position,
-        CONCAT('CONCAT(','FORMAT(GETDATE(),','''','yyyy-MM-dd HH:mm:ss', '''','),', '''' ,' ${TIMEZONE_OFFSET}', '''',') AS etl_load_date') AS fields,
-		CONCAT('CONCAT(','FORMAT(GETDATE(),','''','yyyy-MM-dd HH:mm:ss', '''','),', '''' ,' ${TIMEZONE_OFFSET}', '''',')') AS casting,
+        CONCAT('CONCAT(','FORMAT(GETDATE(),','''','yyyy-MM-dd HH:mm:ss', '''','),', '''' ,'${TIMEZONE_OFFSET}', '''',') AS etl_load_date') AS fields,
+		CONCAT('CONCAT(','FORMAT(GETDATE(),','''','yyyy-MM-dd HH:mm:ss', '''','),', '''' ,'${TIMEZONE_OFFSET}', '''',')') AS casting,
         'varchar(19)' AS field_type,
   		'{"name": "etl_load_date","type":"STRING"}' 	AS json,
         'etl_load_date' AS column_name,

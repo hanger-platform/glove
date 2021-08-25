@@ -93,13 +93,13 @@ SELECT * FROM (
             POSITION,
             CASE
                 WHEN DATA_TYPE_NAME = 'DATE' THEN 'TO_CHAR ( ' || COLUMN_NAME || ' , ' || '''' || 'YYYY-MM-DD' ||  '''' || ') AS ' || REPLACE_REGEXPR( '\/\w+\/' IN COLUMN_NAME WITH '' )
-                WHEN DATA_TYPE_NAME IN  ( 'TIME', 'SECONDDATE', 'TIMESTAMP' ) THEN 'CONCAT( TO_CHAR ( ' || COLUMN_NAME || ' , ' || '''' || 'YYYY-MM-DD HH24:MI:SS' || '''' || '),' || '''' || ' ${TIMEZONE_OFFSET}' || '''' || ') AS ' || REPLACE_REGEXPR( '\/\w+\/' IN COLUMN_NAME WITH '' )
+                WHEN DATA_TYPE_NAME IN  ( 'TIME', 'SECONDDATE', 'TIMESTAMP' ) THEN 'CONCAT( TO_CHAR ( ' || COLUMN_NAME || ' , ' || '''' || 'YYYY-MM-DD HH24:MI:SS' || '''' || '),' || '''' || '${TIMEZONE_OFFSET}' || '''' || ') AS ' || REPLACE_REGEXPR( '\/\w+\/' IN COLUMN_NAME WITH '' )
                 WHEN DATA_TYPE_NAME in ( 'VARCHAR', 'NVARCHAR', 'ALPHANUM', 'SHORTTEXT', 'BLOB', 'CLOB', 'NCLOB', 'TEXT' ) then '"' || COLUMN_NAME || '"' || ' as ' || REPLACE_REGEXPR( '\/\w+\/' IN COLUMN_NAME WITH '' )
                 ELSE '"' || COLUMN_NAME || '"' || ' AS ' || REPLACE_REGEXPR( '\/\w+\/' IN COLUMN_NAME WITH '' )
             END AS fields,
             CASE
                 WHEN DATA_TYPE_NAME = 'DATE' THEN 'TO_CHAR ( ' || COLUMN_NAME || ' , ' || '''' || 'YYYY-MM-DD' ||  '''' || ')'
-                WHEN DATA_TYPE_NAME IN  ( 'TIME', 'SECONDDATE', 'TIMESTAMP' ) THEN 'CONCAT( TO_CHAR ( ' || COLUMN_NAME || ' , ' || '''' || 'YYYY-MM-DD HH24:MI:SS' || '''' || '),' || '''' || ' ${TIMEZONE_OFFSET}' || '''' || ')'
+                WHEN DATA_TYPE_NAME IN  ( 'TIME', 'SECONDDATE', 'TIMESTAMP' ) THEN 'CONCAT( TO_CHAR ( ' || COLUMN_NAME || ' , ' || '''' || 'YYYY-MM-DD HH24:MI:SS' || '''' || '),' || '''' || '${TIMEZONE_OFFSET}' || '''' || ')'
                 WHEN DATA_TYPE_NAME IN ( 'VARCHAR', 'NVARCHAR', 'ALPHANUM', 'SHORTTEXT', 'BLOB', 'CLOB', 'NCLOB', 'TEXT' ) then '"' || COLUMN_NAME || '"'
                 ELSE '"' || COLUMN_NAME || '"'
             END AS casting,
@@ -158,8 +158,8 @@ SELECT * FROM (
 
         SELECT
             998 AS POSITION,
-			'CONCAT( TO_CHAR( now(),' || '''' || 'YYYY-MM-DD HH24:MI:SS' || '''' || '),' || '''' || ' ${TIMEZONE_OFFSET}' || '''' || ') as etl_load_date' as fields,
-            'CONCAT( TO_CHAR( now(),' || '''' || 'YYYY-MM-DD HH24:MI:SS' || '''' || '),' || '''' || ' ${TIMEZONE_OFFSET}' || '''' || ')' AS casting,
+			'CONCAT( TO_CHAR( now(),' || '''' || 'YYYY-MM-DD HH24:MI:SS' || '''' || '),' || '''' || '${TIMEZONE_OFFSET}' || '''' || ') as etl_load_date' as fields,
+            'CONCAT( TO_CHAR( now(),' || '''' || 'YYYY-MM-DD HH24:MI:SS' || '''' || '),' || '''' || '${TIMEZONE_OFFSET}' || '''' || ')' AS casting,
             'varchar(19)' 									AS field_type,
             '{"name": "etl_load_date","type":"STRING"}' 	AS json,
             'etl_load_date' 								AS column_name,
