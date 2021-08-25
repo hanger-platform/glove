@@ -184,9 +184,6 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 	
 	table_check
 
-	echo "Data sample:"
-	tail ${RAWFILE_QUEUE_FILE}
-
 	echo "Splitting csv file!"
 	split -l ${PARTITION_LENGTH} -a 4 --numeric-suffixes=1 --additional-suffix=.csv ${RAWFILE_QUEUE_FILE} ${DATA_FILE}_
 	error_check
