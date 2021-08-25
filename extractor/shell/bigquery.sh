@@ -189,6 +189,87 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 	
 	table_check
 
+    if [ ${MODULE} == "query" ] && [ ${IS_EXPORT} = 1 ]; then
+		if [ "${#EXPORT_BUCKET}" -gt "0" ]; then
+			if [ "${#PARTITION_FIELD}" -gt "0" ]; then
+				echo "Partitioning data file delimited by ${DELIMITER}!"
+				cat ${RAWFILE_QUEUE_FILE} >> ${RAWFILE_QUEUE_PATH}merged.csv
+				
+				java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
+					--folder=${RAWFILE_QUEUE_PATH} \
+					--filename=merged.csv \
+					--delimiter=${DELIMITER} \
+					--target=csv \
+					--splitStrategy=${SPLIT_STRATEGY} \
+					--partition=0 \
+					--thread=1 \
+					--escape=${QUOTE_ESCAPE} \
+					--header \
+					--readable \
+					--replace \
+					--debug=${DEBUG}
+				error_check
+			fi
+
+			BUCKETS=(`echo ${EXPORT_BUCKET} | tr -d ' ' | tr ',' ' '`)
+
+			if [ ${EXPORT_TYPE} == "gz" ]  || [ ${EXPORT_TYPE} == "zip" ]; then
+				echo "Compacting files at ${RAWFILE_QUEUE_PATH} to ${EXPORT_TYPE}!"
+
+				if [ ${EXPORT_TYPE} == "gz" ]; then
+					pigz -k ${RAWFILE_QUEUE_PATH}*
+				else
+					find ${RAWFILE_QUEUE_PATH} -type f -not -name "${DATA_FILE}*" -execdir zip '{}.zip' '{}' \;
+				fi 	
+
+				for index in "${!BUCKETS[@]}"
+				do
+					echo "Exporting resultset to ${BUCKETS[index]} using profile ${EXPORT_PROFILE}!"
+
+					if [ "${#PARTITION_FIELD}" -gt "0" ]; then
+						aws s3 cp ${RAWFILE_QUEUE_PATH} ${BUCKETS[index]} --profile ${EXPORT_PROFILE} --recursive --exclude "${DATA_FILE}*" --exclude "*.csv" --only-show-errors --acl bucket-owner-full-control
+					else
+						aws s3 cp ${RAWFILE_QUEUE_FILE}.${EXPORT_TYPE} ${BUCKETS[index]} --profile ${EXPORT_PROFILE} --only-show-errors --acl bucket-owner-full-control
+					fi
+					error_check
+				done
+			else
+				for index in "${!BUCKETS[@]}"
+				do
+					echo "Exporting resultset to ${BUCKETS[index]} using profile ${EXPORT_PROFILE}!"
+					
+					if [ "${#PARTITION_FIELD}" -gt "0" ]; then
+						aws s3 cp ${RAWFILE_QUEUE_PATH} ${BUCKETS[index]} --profile ${EXPORT_PROFILE} --recursive --exclude "${DATA_FILE}*" --only-show-errors --acl bucket-owner-full-control
+					else
+						aws s3 cp ${RAWFILE_QUEUE_FILE} ${BUCKETS[index]} --profile ${EXPORT_PROFILE} --only-show-errors --acl bucket-owner-full-control
+					fi
+					error_check
+				done
+			fi
+			
+			# Remove os arquivos temporários.
+			find ${RAWFILE_QUEUE_PATH} -not -name "${DATA_FILE}*.csv" -delete
+		elif [ "${#EXPORT_SPREADSHEET}" -gt "0" ]; then
+			java -jar ${GLOVE_HOME}/extractor/lib/google-sheets-export.jar \
+				--credentials=${GLOVE_SPREADSHEET_CREDENTIALS} \
+				--spreadsheet=${EXPORT_SPREADSHEET} \
+				--input=${RAWFILE_QUEUE_FILE} \
+				--sheet=${EXPORT_SHEET} \
+				--method=${EXPORT_SHEETS_METHOD} \
+				--debug=${DEBUG} \
+				--delimiter=${DELIMITER}
+			error_check
+		else
+			echo "EXPORT_BUCKET_DEFAULT or EXPORT_SPREADSHEET_DEFAULT was not defined!"
+		fi
+
+		# Finaliza o processo de exportação.
+		if [ ${ONLY_EXPORT} = 1 ]; then
+			echo "Exporting finished!"
+			exit 0
+		fi
+    fi
+
 	echo "Splitting csv file!"
 	split -l ${PARTITION_LENGTH} -a 4 --numeric-suffixes=1 --additional-suffix=.csv ${RAWFILE_QUEUE_FILE} ${DATA_FILE}_
 	error_check
