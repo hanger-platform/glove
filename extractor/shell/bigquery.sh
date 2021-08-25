@@ -26,7 +26,6 @@ table_check()
 	  		--time_partitioning_type ${TIME_PARTITIONING_TYPE} \
 	  		--schema ${METADATA_JSON_FILE} \
 			 ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}
-		error_check
 			 
 	elif [ "${#TIME_PARTITIONING_FIELD}" -gt "0" ] && [ "${#TIME_PARTITIONING_TYPE}" -gt "0" ] && [ "${#CLUSTER_COLUMNS}" -gt "0" ] ; then
 		echo "Preparing partitioned table by ${TIME_PARTITIONING_FIELD} of type ${TIME_PARTITIONING_TYPE} clusterized by ${CLUSTER_COLUMNS}"	
@@ -37,7 +36,6 @@ table_check()
 	  		--clustering_fields ${CLUSTER_COLUMNS} \
 	  		--schema ${METADATA_JSON_FILE} \
 			 ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}
-		error_check
 			 
 	elif [ "${#CLUSTER_COLUMNS}" -gt "0" ] ; then
 		echo "Preparing clusterized table by ${CLUSTER_COLUMNS}"	
@@ -46,17 +44,16 @@ table_check()
 			--clustering_fields ${CLUSTER_COLUMNS} \
 	  		--schema ${METADATA_JSON_FILE} \
 			 ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}
-		error_check
 	else
 		echo "Preparing table"
 		bq mk --table \
 			--project_id=${BIG_QUERY_PROJECT_ID} \
 	  		--schema ${METADATA_JSON_FILE} \
 			 ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}
-		error_check	
 	fi
 	
 	bq show --project_id=${BIG_QUERY_PROJECT_ID} ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}
+	error_check
 }
 
 # Executa a carga full.
