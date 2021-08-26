@@ -279,7 +279,7 @@
     <parameter>
       <name>PARTITION_FIELD</name>
       <default_value/>
-      <description>Identifica o campo de negócio que será utilizado para o particinamento dos dados, para o BigQuery deve ser um campo do tipo [INT, TIMESTAMP, DATETIME ou DATE]</description>
+      <description>Identifica o campo de negócio que será utilizado para o particinamento dos dados, para o BigQuery deve ser um campo do tipo [TIMESTAMP, DATETIME ou DATE]</description>
     </parameter>
     <parameter>
       <name>PARTITION_FORMAT</name>
