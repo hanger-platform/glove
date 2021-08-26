@@ -279,12 +279,12 @@
     <parameter>
       <name>PARTITION_FIELD</name>
       <default_value/>
-      <description>Identifica o campo de negócio que será utilizado para o particinamento dos dados.</description>
+      <description>Identifica o campo de negócio que será utilizado para o particinamento dos dados, para o BigQuery deve ser um campo do tipo [INT, TIMESTAMP, DATETIME ou DATE]</description>
     </parameter>
     <parameter>
       <name>PARTITION_FORMAT</name>
       <default_value>yyyymm</default_value>
-      <description>Identifica o formato da partição quando o particionamento for feito por data [yyyy, yyyymm, yyyymmdd].</description>
+      <description>Identifica o formato da partição quando o particionamento for feito por data [yyyy, yyyymm, yyyymmdd]</description>
     </parameter>
     <parameter>
       <name>PARTITION_HAS_PREFIX</name>
@@ -314,7 +314,7 @@
     <parameter>
       <name>PARTITION_TYPE</name>
       <default_value>timestamp</default_value>
-      <description>Identifica o tipo da partição [id, date, timestamp].</description>
+      <description>Identifica o tipo da partição [id, date, timestamp], para o BigQuery [DAY, HOUR, MONTH ou YEAR]</description>
     </parameter>
     <parameter>
       <name>QUEUE_FILES_SIZE_LIMIT</name>
@@ -380,16 +380,6 @@
       <name>TIMEZONE_OFFSET</name>
       <default_value/>
       <description>Identifica o timezone offset para os campos do tipo timestamp.</description>
-    </parameter>
-    <parameter>
-      <name>TIME_PARTITIONING_FIELD</name>
-      <default_value/>
-      <description>Identifica a coluna [INT, TIMESTAMP, DATETIME ou DATE] que será usada para particionar uma tabela no BigQuery.</description>
-    </parameter>
-    <parameter>
-      <name>TIME_PARTITIONING_TYPE</name>
-      <default_value>DAY</default_value>
-      <description>Identifica o tipo de partição que será criada no BigQuery [DAY, HOUR, MONTH ou YEAR]</description>
     </parameter>
     <parameter>
       <name>WHERE_CONDITION_TO_DELTA</name>

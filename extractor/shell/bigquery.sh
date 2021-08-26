@@ -21,21 +21,21 @@ table_check()
 	echo "INFERRED METADATA"
 	cat ${METADATA_JSON_FILE}	
 
-	if [ "${#TIME_PARTITIONING_FIELD}" -gt "0" ] && [ "${#TIME_PARTITIONING_TYPE}" -gt "0" ] ; then
-		echo "Preparing partitioned table by ${TIME_PARTITIONING_FIELD} of type ${TIME_PARTITIONING_TYPE}"	
+	if [ "${#PARTITION_FIELD}" -gt "0" ] && [ "${#PARTITION_TYPE}" -gt "0" ] ; then
+		echo "Preparing partitioned table by ${PARTITION_FIELD} of type ${PARTITION_TYPE}"	
 		bq mk --table \
 			--project_id=${BIG_QUERY_PROJECT_ID} \
-			--time_partitioning_field ${TIME_PARTITIONING_FIELD} \
-	  		--time_partitioning_type ${TIME_PARTITIONING_TYPE} \
+			--time_partitioning_field ${PARTITION_FIELD} \
+	  		--time_partitioning_type ${PARTITION_TYPE} \
 	  		--schema ${METADATA_JSON_FILE} \
 			 ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}
 			 
-	elif [ "${#TIME_PARTITIONING_FIELD}" -gt "0" ] && [ "${#TIME_PARTITIONING_TYPE}" -gt "0" ] && [ "${#CLUSTER_COLUMNS}" -gt "0" ] ; then
-		echo "Preparing partitioned table by ${TIME_PARTITIONING_FIELD} of type ${TIME_PARTITIONING_TYPE} clusterized by ${CLUSTER_COLUMNS}"	
+	elif [ "${#PARTITION_FIELD}" -gt "0" ] && [ "${#PARTITION_TYPE}" -gt "0" ] && [ "${#CLUSTER_COLUMNS}" -gt "0" ] ; then
+		echo "Preparing partitioned table by ${PARTITION_FIELD} of type ${PARTITION_TYPE} clusterized by ${CLUSTER_COLUMNS}"	
 		bq mk --table \
 			--project_id=${BIG_QUERY_PROJECT_ID} \
-			--time_partitioning_field ${TIME_PARTITIONING_FIELD} \
-	  		--time_partitioning_type ${TIME_PARTITIONING_TYPE} \
+			--time_partitioning_field ${PARTITION_FIELD} \
+	  		--time_partitioning_type ${PARTITION_TYPE} \
 	  		--clustering_fields ${CLUSTER_COLUMNS} \
 	  		--schema ${METADATA_JSON_FILE} \
 			 ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}
