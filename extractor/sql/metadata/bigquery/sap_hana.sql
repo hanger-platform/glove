@@ -8,40 +8,6 @@ SELECT * FROM (
         column_key,
 		encoding
     FROM (
-
-        SELECT
-            -1 AS POSITION,
-           	CASE
-				WHEN '${PARTITION_TYPE}' = 'date' OR '${PARTITION_TYPE}' = 'timestamp' THEN 'TO_CHAR( TO_DATE( TO_BIGINT( CASE WHEN TO_BIGINT("' || COLUMN_NAME || '") = 0 THEN ''19000101'' ELSE "' || COLUMN_NAME || '" END ) ), ''${PARTITION_FORMAT}'' ) AS partition_field'
-          		WHEN '${PARTITION_TYPE}' = 'id' THEN '( ( FLOOR( COALESCE( TO_BIGINT("' || COLUMN_NAME || '"), 1 ) / ( ${PARTITION_LENGTH} + 0.01 ) ) + 1 ) * ${PARTITION_LENGTH} ) AS partition_field'
-           	END AS fields,
-     		CASE
-				WHEN '${PARTITION_TYPE}' = 'date' OR '${PARTITION_TYPE}' = 'timestamp' THEN 'TO_CHAR( TO_DATE( TO_BIGINT( CASE WHEN TO_BIGINT("' || COLUMN_NAME || '") = 0 THEN ''19000101'' ELSE "' || COLUMN_NAME || '" END ) ), ''${PARTITION_FORMAT}'' )'
-          		WHEN '${PARTITION_TYPE}' = 'id' THEN '( ( FLOOR( COALESCE( TO_BIGINT("' || COLUMN_NAME || '"), 1 ) / ( ${PARTITION_LENGTH} + 0.01 ) ) + 1 ) * ${PARTITION_LENGTH} )'
-           	END AS casting,
-            '' 												AS field_type,
-			'{"name": "partition_field","type":"INTEGER"}' 	AS json,
-            'partition_field' 							 	AS column_name,
-            0 											 	AS column_key,
-			''                                              AS encoding
-        FROM
-            (
-		
-		SELECT
-			 SCHEMA_NAME
-			,TABLE_NAME
-			,COLUMN_NAME
-			,DATA_TYPE_NAME
-			,POSITION
-			,LENGTH
-			,SCALE
-		FROM TABLE_COLUMNS
-		WHERE
-		LOWER( SCHEMA_NAME ) = LOWER( REPLACE( '${INPUT_TABLE_SCHEMA}', '"', '' ) )
-		AND 
-		LOWER( TABLE_NAME ) = LOWER( REPLACE( '${INPUT_TABLE_NAME}', '"', '' ) )
-		
-		UNION ALL
 		
 		SELECT
 			 SCHEMA_NAME

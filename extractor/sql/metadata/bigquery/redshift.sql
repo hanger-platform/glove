@@ -1,31 +1,5 @@
 SELECT * FROM (
 
-     SELECT DISTINCT
-        -1 AS ordinal_position,
-        CASE
-            WHEN '${PARTITION_TYPE}' = 'date' OR '${PARTITION_TYPE}' = 'timestamp' THEN 'TO_CHAR( CASE WHEN ' || COLUMN_NAME || ' IS NULL THEN ''1900-01-01'' ELSE ' || COLUMN_NAME || ' END, ''${PARTITION_FORMAT}'' ) AS partition_field'
-            WHEN '${PARTITION_TYPE}' = 'id' THEN '( ( FLOOR( COALESCE( "' || COLUMN_NAME || '", 1 ) / ( ${PARTITION_LENGTH} + 0.01 ) ) + 1 ) * ${PARTITION_LENGTH} ) AS partition_field'
-        END::varchar(255) AS fields,
-        CASE
-            WHEN '${PARTITION_TYPE}' = 'date' OR '${PARTITION_TYPE}' = 'timestamp' THEN 'TO_CHAR( CASE WHEN ' || COLUMN_NAME || ' IS NULL THEN ''1900-01-01'' ELSE ' || COLUMN_NAME || ' END, ''${PARTITION_FORMAT}'' )'
-            WHEN '${PARTITION_TYPE}' = 'id' THEN '( ( FLOOR( COALESCE( "' || COLUMN_NAME || '", 1 ) / ( ${PARTITION_LENGTH} + 0.01 ) ) + 1 ) * ${PARTITION_LENGTH} )'
-        END::varchar(255) 												AS casting,
-        '' 																AS field_type,
-        '{"name": "partition_field","type":"INTEGER"}'::varchar(255) 	AS json,
-        'partition_field'::varchar(50) 									AS column_name,
-        0 																AS column_key,
-		''                                          					AS encoding
-    FROM
-        information_schema.columns c
-	WHERE 
-		LOWER( c.table_schema ) = LOWER('${INPUT_TABLE_SCHEMA}')
-		AND
-		LOWER( c.table_name ) = LOWER('${INPUT_TABLE_NAME}')
-		AND
-		LOWER( c.column_name ) = LOWER('${PARTITION_FIELD}')
-
-    UNION ALL
-
     SELECT DISTINCT
         0 AS ordinal_position,
         CASE WHEN '${CUSTOM_PRIMARY_KEY}' != '' THEN '${CUSTOM_PRIMARY_KEY}' || ' AS custom_primary_key' ELSE  '1' || ' as custom_primary_key'  END::varchar(255) AS fields,
