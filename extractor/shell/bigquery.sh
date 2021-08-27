@@ -109,7 +109,7 @@ delta_load()
 	bq query --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false  << EOF
 	BEGIN TRANSACTION;
 		DELETE FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} t
-		WHERE custom_primary_key IN (SELECT custom_primary_key FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE});
+		WHERE custom_primary_key IN (SELECT DISTINCT custom_primary_key FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE});
 		
 		MERGE ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} t USING ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE} s
 		ON FALSE
