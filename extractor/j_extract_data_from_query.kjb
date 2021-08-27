@@ -700,6 +700,8 @@ OUTPUT_COMPRESSION              == ${OUTPUT_COMPRESSION}
 STORAGE_BUCKET                  == ${STORAGE_BUCKET}
 ALLOW_DUPLICATED                == ${ALLOW_DUPLICATED}
 ALLOW_RECREATE                  == ${ALLOW_RECREATE}
+PARTITION_FIELD                 == ${PARTITION_FIELD}
+PARTITION_TYPE                  == ${PARTITION_TYPE}
 #-----------------------------------------------------------
 # OUTPUT EXPORT
 #-----------------------------------------------------------
