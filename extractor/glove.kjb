@@ -277,6 +277,11 @@
       <description>Identifica se deve extrair todo o dado, quando 1, ou uma partição por vez, quando 0.</description>
     </parameter>
     <parameter>
+      <name>PARTITION_EXPIRATION</name>
+      <default_value>0</default_value>
+      <description>Identifica a vida útil padrão (em segundos) para as partições da tabela. Não há valor mínimo. O prazo de validade é avaliado para a data da partição acrescida deste valor.</description>
+    </parameter>
+    <parameter>
       <name>PARTITION_FIELD</name>
       <default_value/>
       <description>Identifica o campo de negócio que será utilizado para o particinamento dos dados, para o BigQuery deve ser um campo do tipo [TIMESTAMP, DATETIME ou DATE]</description>

@@ -19,14 +19,15 @@ table_check()
 	bq mk --project_id=${BIG_QUERY_PROJECT_ID} ${CUSTOM_SCHEMA}${SCHEMA_NAME}
 
 	echo "INFERRED METADATA"
-	cat ${METADATA_JSON_FILE}	
-
+	cat ${METADATA_JSON_FILE}
+	
 	if [ "${#PARTITION_FIELD}" -gt "0" ] && [ "${#PARTITION_TYPE}" -gt "0" ] && [ "${#CLUSTER_COLUMNS}" -gt "0" ] ; then
 		echo "Preparing partitioned table by ${PARTITION_FIELD} of type ${PARTITION_TYPE} clusterized by ${CLUSTER_COLUMNS}"	
 		bq mk --table \
 			--project_id=${BIG_QUERY_PROJECT_ID} \
 			--time_partitioning_field ${PARTITION_FIELD} \
 	  		--time_partitioning_type ${PARTITION_TYPE} \
+	  		--time_partitioning_expiration ${PARTITION_EXPIRATION} \
 	  		--clustering_fields ${CLUSTER_COLUMNS} \
 	  		--schema ${METADATA_JSON_FILE} \
 			 ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}
@@ -37,6 +38,7 @@ table_check()
 			--project_id=${BIG_QUERY_PROJECT_ID} \
 			--time_partitioning_field ${PARTITION_FIELD} \
 	  		--time_partitioning_type ${PARTITION_TYPE} \
+	  		--time_partitioning_expiration ${PARTITION_EXPIRATION} \
 	  		--schema ${METADATA_JSON_FILE} \
 			 ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}
 	 
