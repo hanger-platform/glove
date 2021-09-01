@@ -749,7 +749,6 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 		fi
     fi
 
-
     # Identifica se a fonte é arquivo.
     if [ ${MODULE} == "file" ]; then
 		# Identifica o tipo de carga que será realizado.

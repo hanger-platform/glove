@@ -500,7 +500,7 @@ fi
 for i in `ls ${RAWFILE_QUEUE_STAGING_PATH}*`
 do
 	if [ ${FILE_INDEX} = 0 ]; then	
-		cat ${i}	>> 	${RAWFILE_QUEUE_FILE}
+		cat ${i}	>>  ${RAWFILE_QUEUE_FILE}
 		error_check
 	else
 		if [ "${#PARTITION_FIELD}" -gt "0" ] &amp;&amp; [ ${MULTIPLE_FILE} = 1 ]; then
