@@ -48,6 +48,7 @@ import org.joda.time.LocalDate;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import java.util.UUID;
 
 /**
  *
@@ -135,7 +136,7 @@ public class SFTP {
             Vector<ChannelSftp.LsEntry> list = channelSftp.ls(cli.getParameter("pattern"));
 
             //Defines the output path.
-            outputPath = Files.createTempDirectory("sftp_");
+            outputPath = Files.createTempDirectory("sftp_" + UUID.randomUUID());
 
             //Transfers a file.
             for (ChannelSftp.LsEntry entry : list) {
