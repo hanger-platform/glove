@@ -465,118 +465,118 @@ public class CSVToParquet implements Runnable {
                 add = key.add(record[fieldKey]);
             }
 
-            //Identify duplicated key.
-            if (!add) {
-                if (debug) {
-                    System.out.println("Duplicated key in file: [" + record[fieldKey] + "]");
-                }
-                statistics.incrementDuplicatedRows();
-            } else {
-                statistics.incrementInputRows();
-            }
-
             //Ignore the header.
-            if (!(statistics.getRowNumber() == 0 && header) && add) {
-                for (Field field : fields) {
-                    value = "";
-
-                    //Get field type.
-                    Type type = this.getType(field);
-
-                    //Get logical type.
-                    String logicalType = this.getLogicalType(field);
-
-                    //Get field value.
-                    if ((record.length - 1) >= field.pos()) {
-                        value = record[field.pos()];
+            if (!(statistics.getRowNumber() == 0 && header)) {
+                //Identify duplicated key.
+                if (!add) {
+                    if (debug) {
+                        System.out.println("Duplicated key in file: [" + record[fieldKey] + "]");
                     }
+                    statistics.incrementDuplicatedRows();
+                } else {
+                    statistics.incrementInputRows();
 
-                    //Identify if the field is empty.
-                    if (value == null || value.isEmpty()) {
-                        value = null;
-                    }
+                    for (Field field : fields) {
+                        value = "";
 
-                    //Reset the field.
-                    builder.clear(field);
+                        //Get field type.
+                        Type type = this.getType(field);
 
-                    //Identify if the value is null.
-                    if (value != null) {
-                        try {
-                            //Convert values to fit avro type.
-                            switch (type) {
-                                case BOOLEAN:
-                                    builder.set(field, BooleanUtils.toBoolean(value));
-                                    break;
-                                case INT:
-                                    if (logicalType == null) {
-                                        builder.set(field, NumberUtils.toInt(value, 0));
-                                    } else if (logicalType.equals("date")) {
-                                        //A date logical type annotates an Avro int, where the int stores the number of days from the unix epoch.
-                                        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                        //Get logical type.
+                        String logicalType = this.getLogicalType(field);
 
-                                        Date date = format.parse(value);
-                                        Calendar calendar = Calendar.getInstance();
-                                        calendar.setTime(date);
+                        //Get field value.
+                        if ((record.length - 1) >= field.pos()) {
+                            value = record[field.pos()];
+                        }
 
-                                        Long timeInMillis = calendar.getTimeInMillis();
-                                        Long timeZoneOffset = (long) calendar.getTimeZone().getOffset(calendar.getTimeInMillis());
+                        //Identify if the field is empty.
+                        if (value == null || value.isEmpty()) {
+                            value = null;
+                        }
 
-                                        builder.set(field, timeInMillis + timeZoneOffset / (1000 * 60 * 60 * 24));
-                                    }
+                        //Reset the field.
+                        builder.clear(field);
 
-                                    break;
-                                case LONG:
-                                    if (logicalType == null) {
-                                        builder.set(field, NumberUtils.toLong(value, 0));
-                                    } else if (logicalType.equals("timestamp-millis")) {
-                                        //A timestamp-millis logical type annotates an Avro long, where the long stores the number of milliseconds from the unix epoch.
-                                        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                        //Identify if the value is null.
+                        if (value != null) {
+                            try {
+                                //Convert values to fit avro type.
+                                switch (type) {
+                                    case BOOLEAN:
+                                        builder.set(field, BooleanUtils.toBoolean(value));
+                                        break;
+                                    case INT:
+                                        if (logicalType == null) {
+                                            builder.set(field, NumberUtils.toInt(value, 0));
+                                        } else if (logicalType.equals("date")) {
+                                            //A date logical type annotates an Avro int, where the int stores the number of days from the unix epoch.
+                                            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
-                                        Date date = format.parse(value);
-                                        Calendar calendar = Calendar.getInstance();
-                                        calendar.setTime(date);
+                                            Date date = format.parse(value);
+                                            Calendar calendar = Calendar.getInstance();
+                                            calendar.setTime(date);
 
-                                        Long timeInMillis = calendar.getTimeInMillis();
-                                        Long timeZoneOffset = (long) calendar.getTimeZone().getOffset(calendar.getTimeInMillis());
+                                            Long timeInMillis = calendar.getTimeInMillis();
+                                            Long timeZoneOffset = (long) calendar.getTimeZone().getOffset(calendar.getTimeInMillis());
 
-                                        builder.set(field, timeInMillis + timeZoneOffset);
-                                    }
+                                            builder.set(field, timeInMillis + timeZoneOffset / (1000 * 60 * 60 * 24));
+                                        }
 
-                                    break;
-                                case FLOAT:
-                                    builder.set(field, NumberUtils.toFloat(value, 0));
-                                    break;
-                                case DOUBLE:
-                                    builder.set(field, NumberUtils.toDouble(value, 0));
-                                    break;
-                                case BYTES:
-                                case FIXED:
-                                    if (logicalType == null) {
-                                        builder.set(field, value.getBytes());
-                                    } else if (logicalType.equals("decimal")) {
-                                        //A decimal logical type annotates Avro bytes or fixed types.
-                                        //The byte array must contain the two's-complement representation of the unscaled integer value in big-endian byte order.
-                                        //The scale is fixed, and is specified using an attribute.
-                                        int scale = this.getDecimalScale(field);
+                                        break;
+                                    case LONG:
+                                        if (logicalType == null) {
+                                            builder.set(field, NumberUtils.toLong(value, 0));
+                                        } else if (logicalType.equals("timestamp-millis")) {
+                                            //A timestamp-millis logical type annotates an Avro long, where the long stores the number of milliseconds from the unix epoch.
+                                            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
-                                        builder.set(field, new BigDecimal(value).setScale(scale, BigDecimal.ROUND_UP));
-                                    }
+                                            Date date = format.parse(value);
+                                            Calendar calendar = Calendar.getInstance();
+                                            calendar.setTime(date);
 
-                                    break;
-                                case STRING:
-                                    builder.set(field, value);
-                                    break;
-                                default:
-                                    break;
+                                            Long timeInMillis = calendar.getTimeInMillis();
+                                            Long timeZoneOffset = (long) calendar.getTimeZone().getOffset(calendar.getTimeInMillis());
+
+                                            builder.set(field, timeInMillis + timeZoneOffset);
+                                        }
+
+                                        break;
+                                    case FLOAT:
+                                        builder.set(field, NumberUtils.toFloat(value, 0));
+                                        break;
+                                    case DOUBLE:
+                                        builder.set(field, NumberUtils.toDouble(value, 0));
+                                        break;
+                                    case BYTES:
+                                    case FIXED:
+                                        if (logicalType == null) {
+                                            builder.set(field, value.getBytes());
+                                        } else if (logicalType.equals("decimal")) {
+                                            //A decimal logical type annotates Avro bytes or fixed types.
+                                            //The byte array must contain the two's-complement representation of the unscaled integer value in big-endian byte order.
+                                            //The scale is fixed, and is specified using an attribute.
+                                            int scale = this.getDecimalScale(field);
+
+                                            builder.set(field, new BigDecimal(value).setScale(scale, BigDecimal.ROUND_UP));
+                                        }
+
+                                        break;
+                                    case STRING:
+                                        builder.set(field, value);
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            } catch (NumberFormatException | ParseException ex) {
+                                throw new Exception(ex.getMessage() + " on record " + String.join("|", record) + " at field " + field.name() + " with value " + value);
                             }
-                        } catch (NumberFormatException | ParseException ex) {
-                            throw new Exception(ex.getMessage() + " on record " + String.join("|", record) + " at field " + field.name() + " with value " + value);
                         }
                     }
-                }
 
-                //Write date into parquet file.
-                parquetWriter.write(builder.build());
+                    //Write date into parquet file.
+                    parquetWriter.write(builder.build());
+                }
             }
 
             //Identify the record being processed.
