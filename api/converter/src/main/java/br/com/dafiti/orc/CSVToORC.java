@@ -448,45 +448,45 @@ public class CSVToORC implements Runnable {
                 add = key.add(record[fieldKey]);
             }
 
-            //Identify duplicated key.
-            if (!add) {
-                if (debug) {
-                    System.out.println("Duplicated key in file: [" + record[fieldKey] + "]");
-                }
-                statistics.incrementDuplicatedRows();
-            } else {
-                statistics.incrementInputRows();
-            }
-
             //Ignore the header.
-            if (!(statistics.getRowNumber() == 0 && header) && add) {
-                //Identify the batch size. 
-                int row = rowBatchWriter.size++;
+            if (!(statistics.getRowNumber() == 0 && header)) {
+                //Identify duplicated key.
+                if (!add) {
+                    if (debug) {
+                        System.out.println("Duplicated key in file: [" + record[fieldKey] + "]");
+                    }
+                    statistics.incrementDuplicatedRows();
+                } else {
+                    statistics.incrementInputRows();
 
-                for (int column = 0; column < schema.getFieldNames().size(); column++) {
-                    String value = "";
+                    //Identify the batch size. 
+                    int row = rowBatchWriter.size++;
 
-                    //Get field category.
-                    Category category = schema.getChildren().get(column).getCategory();
+                    for (int column = 0; column < schema.getFieldNames().size(); column++) {
+                        String value = "";
 
-                    //Get field value.
-                    if ((record.length - 1) >= column) {
-                        value = record[column];
+                        //Get field category.
+                        Category category = schema.getChildren().get(column).getCategory();
+
+                        //Get field value.
+                        if ((record.length - 1) >= column) {
+                            value = record[column];
+                        }
+
+                        //Identify if the field is empty.
+                        if (value == null || value.isEmpty()) {
+                            value = null;
+                        }
+
+                        //Write data into a row batch. 
+                        this.rowBatchAppend(value, category, row, column, rowBatchWriter);
                     }
 
-                    //Identify if the field is empty.
-                    if (value == null || value.isEmpty()) {
-                        value = null;
+                    //Write data into orc file.
+                    if (rowBatchWriter.size == rowBatchWriter.getMaxSize()) {
+                        orcWriter.addRowBatch(rowBatchWriter);
+                        rowBatchWriter.reset();
                     }
-
-                    //Write data into a row batch. 
-                    this.rowBatchAppend(value, category, row, column, rowBatchWriter);
-                }
-
-                //Write data into orc file.
-                if (rowBatchWriter.size == rowBatchWriter.getMaxSize()) {
-                    orcWriter.addRowBatch(rowBatchWriter);
-                    rowBatchWriter.reset();
                 }
             }
 
