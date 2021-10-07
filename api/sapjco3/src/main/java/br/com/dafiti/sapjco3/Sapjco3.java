@@ -90,6 +90,7 @@ public class Sapjco3 {
                     .addParameter("r", "row_count", "(Optional) how many records will return at once; '0' as default and means return everything", "0")
                     .addParameter("r", "row_skips", "(Optional) starts getting data at what record index; '0' as default", "0")
                     .addParameter("d", "delimiter", "(Optional) SAPJCO3 function resultset return delimiter; '|' as default", "\\|")
+                    .addParameter("l", "id", "(Optional) identifies if table has id with lraw type", "")
                     .addParameter("de", "debug", "(Optional) debug mode; 'false' as default", "false");
 
             //Reads the command line interface. 
@@ -163,6 +164,10 @@ public class Sapjco3 {
                     //Defines RFC import parameters.
                     function.getImportParameterList().setValue("QUERY_TABLE", cli.getParameter("table"));
                     function.getImportParameterList().setValue("DELIMITER", cli.getParameter("input_delimiter"));
+
+                    if (cli.hasParameter("id")) {
+                        function.getImportParameterList().setValue("ID", cli.getParameterAsInteger("id"));
+                    }
 
                     //Identifies how many rows will retrieve at once.
                     if (rowCount > 0) {
