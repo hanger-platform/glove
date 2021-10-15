@@ -625,7 +625,12 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
         backup
     fi
 
-	schema_check
+	# Identifica se o schema e tabela existem. 
+	if [ "${#PARTITION_FIELD}" -gt "0" ]; then
+		partitioned_table_check
+	else
+		table_check
+	fi
 
     # Identifica se é uma named query.
     if [ ${MODULE} == "query" ]; then
