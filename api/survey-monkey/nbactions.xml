@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.survey.monkey.SurveyMonkey --credentials="/home/helio.leal/credentials/surveymonkey.json" --output="/tmp/surveymonkey/survey.csv" --endpoint="surveys/292292993/responses/bulk" --parameters='{"per_page":"100","start_modified_at":"2021-10-11"}' --object='data'</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.survey.monkey.SurveyMonkey --credentials="/home/helio.leal/credentials/surveymonkey.json" --output="/tmp/surveymonkey/survey_responses/survey_responses.csv" --endpoint="surveys/292292993/responses/bulk" --parameters='{"per_page":"100","start_modified_at":"2021-10-11"}' --field="data_id+data_survey_id&gt;&gt;survey_id+data_date_modified+data_date_created+data_custom_variables_E&gt;&gt;user_email+data_ip_address+data_pages_questions_id&gt;&gt;questions_id+data_pages_questions_answers_choice_id&gt;&gt;choice_id"</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.survey.monkey.SurveyMonkey --credentials="/home/helio.leal/credentials/surveymonkey.json" --output="/tmp/surveymonkey/survey.csv" --endpoint="surveys/292292993/responses/bulk" --parameters='{"per_page":"100","start_modified_at":"2021-10-11"}' --object='data'</exec.args>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.survey.monkey.SurveyMonkey --credentials="/home/helio.leal/credentials/surveymonkey.json" --output="/tmp/surveymonkey/survey_responses/survey_responses.csv" --endpoint="surveys/292292993/responses/bulk" --parameters='{"per_page":"100","start_modified_at":"2021-10-11"}' --field="data_id+data_survey_id&gt;&gt;survey_id+data_date_modified+data_date_created+data_custom_variables_E&gt;&gt;user_email+data_ip_address+data_pages_questions_id&gt;&gt;questions_id+data_pages_questions_answers_choice_id&gt;&gt;choice_id"</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.survey.monkey.SurveyMonkey --credentials="/home/helio.leal/credentials/surveymonkey.json" --output="/tmp/surveymonkey/survey.csv" --endpoint="surveys/292292993/responses/bulk" --parameters='{"per_page":"100","start_modified_at":"2021-10-11"}' --object='data'</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.survey.monkey.SurveyMonkey --credentials="/home/helio.leal/credentials/surveymonkey.json" --output="/tmp/surveymonkey/survey_responses/survey_responses.csv" --endpoint="surveys/292292993/responses/bulk" --parameters='{"per_page":"100","start_modified_at":"2021-10-11"}' --field="data_id+data_survey_id&gt;&gt;survey_id+data_date_modified+data_date_created+data_custom_variables_E&gt;&gt;user_email+data_ip_address+data_pages_questions_id&gt;&gt;questions_id+data_pages_questions_answers_choice_id&gt;&gt;choice_id"</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
