@@ -29,11 +29,13 @@ import br.com.dafiti.mitt.model.Configuration;
 import br.com.dafiti.mitt.transformation.embedded.Concat;
 import br.com.dafiti.mitt.transformation.embedded.Now;
 import com.github.opendevl.JFlat;
+import com.google.gson.JsonPrimitive;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 import java.io.FileReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -71,9 +73,6 @@ public class SurveyMonkey {
         boolean paginate = false;
         boolean process = true;
         JSONObject parameters = null;
-
-        //Path where temporary files will stored.
-        Path outputPath = null;
 
         //Define the mitt.
         Mitt mitt = new Mitt();
@@ -131,11 +130,11 @@ public class SurveyMonkey {
                 }
             }
 
-            //Defines the output path.
-            outputPath = Files.createTempDirectory("survey_monkey_" + UUID.randomUUID());
-
             //Identifies if endpoint is paginated.
             paginate = cli.getParameterAsBoolean("paginate");
+
+            // Gets original fields.
+            List originalFields = mitt.getConfiguration().getOriginalFieldName();
 
             do {
                 //Increments page.
@@ -206,17 +205,32 @@ public class SurveyMonkey {
                     JFlat jFlat = new JFlat(json);
 
                     //get the 2D representation of JSON document.
-                    List<Object[]> jsonFlattened = jFlat.json2Sheet().getJsonAsSheet();
+                    List<Object[]> values = jFlat.json2Sheet().headerSeparator(".").getJsonAsSheet();
 
-                    //write the 2D representation in csv format.
-                    jFlat.headerSeparator("_")
-                            .write2csv(outputPath.toString() + "/page_" + page + "_" + UUID.randomUUID() + ".csv", ';');
+                    //Starts at 1 to ignore header.
+                    for (int line = 1; line < values.size(); line++) {
+                        List record = new ArrayList();
 
+                        //Fetchs columns
+                        for (int column = 0; column < values.get(0).length; column++) {
+
+                            //Identifies header position.
+                            if (originalFields.contains(values.get(0)[column])) {
+                                if (values.get(line)[column] != null) {
+                                    record.add(((JsonPrimitive) values.get(line)[column]).getAsString());
+                                } else {
+                                    record.add("");
+                                }
+                            }
+                        }
+
+                        mitt.write(record);
+                    }
                 }
             } while (paginate && process);
 
-            mitt.write(outputPath.toFile());
-            FileUtils.deleteDirectory(outputPath.toFile());
+            //   mitt.write(outputPath.toFile());
+            //FileUtils.deleteDirectory(outputPath.toFile());
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "GLOVE - SurveyMonkey API extractor fail: ", ex);
             System.exit(1);
