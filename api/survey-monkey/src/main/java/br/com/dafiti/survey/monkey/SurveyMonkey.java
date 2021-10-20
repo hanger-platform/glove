@@ -39,6 +39,8 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
+import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
@@ -83,7 +85,7 @@ public class SurveyMonkey {
                     .addParameter("o", "output", "Output file", "", true, false)
                     .addParameter("f", "field", "Fields to be retrieved from an endpoint in a JsonPath format", "", true, false)
                     .addParameter("e", "endpoint", "Endpoint uri", "", true, false)
-                    .addParameter("g", "paginate", "(Optional) Identifies if the endpoint has pagination", false)
+                    .addParameter("pa", "paginate", "(Optional) Identifies if the endpoint has pagination", "false", true, true)
                     .addParameter("p", "parameters", "(Optional) Endpoint parameters", "", true, true)
                     .addParameter("a", "partition", "(Optional)  Partition, divided by + if has more than one field", "")
                     .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "");
@@ -131,7 +133,7 @@ public class SurveyMonkey {
 
             //Defines the output path.
             outputPath = Files.createTempDirectory("survey_monkey_" + UUID.randomUUID());
-            
+
             //Identifies if endpoint is paginated.
             paginate = cli.getParameterAsBoolean("paginate");
 
@@ -139,8 +141,49 @@ public class SurveyMonkey {
                 //Increments page.
                 page++;
 
-                String json = call(cli.getParameter("endpoint"), token, parameters, paginate, page);
-                
+                String json = null;
+
+                //Accept standard cookies
+                RequestConfig requestConfig = RequestConfig.custom()
+                        .setCookieSpec(CookieSpecs.STANDARD)
+                        .build();
+
+                //Connect to the API. 
+                try (CloseableHttpClient client = HttpClients.createDefault()) {
+                    HttpGet httpGet = new HttpGet(SURVEYMONKEY_ENDPOINT + cli.getParameter("endpoint"));
+
+                    //Sets header.
+                    httpGet.setHeader("Content-Type", "application/json");
+                    httpGet.setHeader("Authorization", token);
+
+                    //Sets http configurations.
+                    httpGet.setConfig(requestConfig);
+
+                    //Sets default URI parameters. 
+                    URIBuilder uriBuilder = new URIBuilder(httpGet.getURI());
+
+                    //Identifies if endpoint has pagination.
+                    if (paginate) {
+                        uriBuilder.addParameter("page", String.valueOf(page));
+                    }
+
+                    //Sets endpoint URI parameters. 
+                    if (parameters != null && !parameters.isEmpty()) {
+                        for (Object key : parameters.keySet()) {
+                            uriBuilder.addParameter((String) key, (String) parameters.get(key));
+                        }
+                    }
+
+                    //Sets URI parameters. 
+                    httpGet.setURI(uriBuilder.build());
+
+                    //Executes a request. 
+                    CloseableHttpResponse response = client.execute(httpGet);
+
+                    //Gets a reponse entity. 
+                    json = EntityUtils.toString(response.getEntity(), "UTF-8");
+                }
+
                 if (json != null && !json.isEmpty()) {
 
                     //Display page statistics.
@@ -159,13 +202,15 @@ public class SurveyMonkey {
                         }
                     }
 
-                    JFlat flatMe = new JFlat(json);
+                    //Defines jFlat to flatten json.
+                    JFlat jFlat = new JFlat(json);
 
-                    //get the 2D representation of JSON document
-                    List<Object[]> json2csv = flatMe.json2Sheet().getJsonAsSheet();
+                    //get the 2D representation of JSON document.
+                    List<Object[]> jsonFlattened = jFlat.json2Sheet().getJsonAsSheet();
 
-                    //write the 2D representation in csv format
-                    flatMe.headerSeparator("_").write2csv(outputPath.toString() + "/page_" + page + "_" + UUID.randomUUID() + ".csv", ';');
+                    //write the 2D representation in csv format.
+                    jFlat.headerSeparator("_")
+                            .write2csv(outputPath.toString() + "/page_" + page + "_" + UUID.randomUUID() + ".csv", ';');
 
                 }
             } while (paginate && process);
@@ -180,45 +225,5 @@ public class SurveyMonkey {
         }
 
         LOG.info("GLOVE - SurveyMonkey API extractor finalized");
-    }
-
-    public static String call(String uri, String token, JSONObject parameters, boolean paginate, int page) throws Exception {
-        String json = null;
-        String entity = null;
-
-        //Connect to the API. 
-        try (CloseableHttpClient client = HttpClients.createDefault()) {
-            HttpGet httpGet = new HttpGet(SURVEYMONKEY_ENDPOINT + uri);
-
-            //Sets header.
-            httpGet.setHeader("Content-Type", "application/json");
-            httpGet.setHeader("Authorization", token);
-
-            //Sets default URI parameters. 
-            URIBuilder uriBuilder = new URIBuilder(httpGet.getURI());
-
-            //Identifies if endpoint has pagination.
-            if (paginate) {
-                uriBuilder.addParameter("page", String.valueOf(page));
-            }
-
-            //Sets endpoint URI parameters. 
-            if (parameters != null && !parameters.isEmpty()) {
-                for (Object key : parameters.keySet()) {
-                    uriBuilder.addParameter((String) key, (String) parameters.get(key));
-                }
-            }
-
-            //Sets URI parameters. 
-            httpGet.setURI(uriBuilder.build());
-
-            //Executes a request. 
-            CloseableHttpResponse response = client.execute(httpGet);
-
-            //Gets a reponse entity. 
-            entity = EntityUtils.toString(response.getEntity(), "UTF-8");
-        }
-
-        return entity;
     }
 }
