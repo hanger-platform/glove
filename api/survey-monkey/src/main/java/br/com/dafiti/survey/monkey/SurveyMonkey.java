@@ -33,14 +33,10 @@ import com.google.gson.JsonPrimitive;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 import java.io.FileReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.io.FileUtils;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -215,7 +211,7 @@ public class SurveyMonkey {
                         for (String field : originalFields) {
 
                             //Fetchs all field to get only originals.
-                            for (int column = 0; column < values.get(0).length; column++) {                                    
+                            for (int column = 0; column < values.get(0).length; column++) {
                                 if (field.toLowerCase().equals(values.get(0)[column].toString().toLowerCase())) {
                                     if (values.get(line)[column] != null) {
                                         record.add(((JsonPrimitive) values.get(line)[column]).getAsString());
@@ -231,8 +227,6 @@ public class SurveyMonkey {
                 }
             } while (paginate && process);
 
-            //   mitt.write(outputPath.toFile());
-            //FileUtils.deleteDirectory(outputPath.toFile());
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "GLOVE - SurveyMonkey API extractor fail: ", ex);
             System.exit(1);
