@@ -134,7 +134,7 @@ public class SurveyMonkey {
             paginate = cli.getParameterAsBoolean("paginate");
 
             // Gets original fields.
-            List originalFields = mitt.getConfiguration().getOriginalFieldName();
+            List<String> originalFields = mitt.getConfiguration().getOriginalFieldName();
 
             do {
                 //Increments page.
@@ -211,15 +211,17 @@ public class SurveyMonkey {
                     for (int line = 1; line < values.size(); line++) {
                         List record = new ArrayList();
 
-                        //Fetchs columns
-                        for (int column = 0; column < values.get(0).length; column++) {
+                        //Fetchs original fields.
+                        for (String field : originalFields) {
 
-                            //Identifies header position.
-                            if (originalFields.contains(values.get(0)[column])) {
-                                if (values.get(line)[column] != null) {
-                                    record.add(((JsonPrimitive) values.get(line)[column]).getAsString());
-                                } else {
-                                    record.add("");
+                            //Fetchs all field to get only originals.
+                            for (int column = 0; column < values.get(0).length; column++) {                                    
+                                if (field.toLowerCase().equals(values.get(0)[column].toString().toLowerCase())) {
+                                    if (values.get(line)[column] != null) {
+                                        record.add(((JsonPrimitive) values.get(line)[column]).getAsString());
+                                    } else {
+                                        record.add("");
+                                    }
                                 }
                             }
                         }
