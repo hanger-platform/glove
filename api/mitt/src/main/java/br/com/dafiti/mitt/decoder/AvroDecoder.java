@@ -27,7 +27,6 @@ import br.com.dafiti.mitt.settings.WriterSettings;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -136,7 +135,7 @@ public class AvroDecoder implements Decoder {
 
             //Removes original file.
             Files.delete(file.toPath());
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             Logger.getLogger(AvroDecoder.class.getName()).log(Level.SEVERE, "Fail decoding AVRO file " + file.getName(), ex);
         }
 
