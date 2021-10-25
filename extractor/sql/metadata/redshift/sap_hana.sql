@@ -68,6 +68,7 @@ SELECT * FROM (
 				WHEN 'SMALLDECIMAL'	THEN 'decimal'||'('|| "LENGTH" ||','|| "SCALE" ||')'
 				WHEN 'DECIMAL'		THEN 'decimal'||'('|| "LENGTH" ||','|| "SCALE" ||')'
 				WHEN 'BOOLEAN' 		THEN 'boolean'
+				ELSE 'varchar(255)'
 			END	AS field_type,
             '' AS json,
             LOWER( REPLACE_REGEXPR( '\/\w+\/' IN COLUMN_NAME WITH '' ) ) AS column_name,

@@ -60,7 +60,8 @@ SELECT * FROM (
             WHEN 'enum'         THEN 'varchar(255)'
             WHEN 'char'         THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + ROUND( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
             WHEN 'varchar'      THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + ROUND( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
-        END AS field_type,
+			ELSE 'varchar(255)'
+		END AS field_type,
 		'' AS json,
 		LOWER( column_name ) AS column_name,
         0 AS column_key,

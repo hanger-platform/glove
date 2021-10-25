@@ -40,6 +40,7 @@ SELECT * FROM (
             WHEN 'real'	                         THEN 'double precision'
             WHEN 'numeric'		                 THEN 'decimal'||'('|| COALESCE(  numeric_precision, 16 ) ||','|| COALESCE(  numeric_scale, 4 ) ||')'
             WHEN 'boolean' 		                 THEN 'boolean'
+            ELSE 'varchar(255)'
         END::varchar(50) AS field_type,
 		'' AS json,
 		LOWER( column_name::varchar(50) ) AS column_name,
