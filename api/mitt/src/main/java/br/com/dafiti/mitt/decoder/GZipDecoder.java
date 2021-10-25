@@ -25,7 +25,6 @@ package br.com.dafiti.mitt.decoder;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.Properties;
@@ -59,7 +58,7 @@ public class GZipDecoder implements Decoder {
             }
 
             Files.delete(file.toPath());
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             Logger.getLogger(GZipDecoder.class.getName()).log(Level.SEVERE, "Fail decoding GZIP file " + file.getName(), ex);
         }
 

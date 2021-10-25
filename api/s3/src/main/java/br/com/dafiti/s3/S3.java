@@ -50,6 +50,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 import org.joda.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * S3 File Extractor
@@ -121,7 +122,7 @@ public class S3 {
             }
 
             //Defines the output path. 
-            Path outputPath = Files.createTempDirectory("s3_");
+            Path outputPath = Files.createTempDirectory("s3_" + UUID.randomUUID());
 
             Logger.getLogger(S3.class.getName()).log(Level.INFO, "Downloading files from: {0}/{1}", new Object[]{cli.getParameter("bucket"), cli.getParameter("prefix")});
 

@@ -143,6 +143,8 @@ public class Criteo {
             client.setPassword(credentials.get("client_secret").toString());
             client.setDebugging(cli.hasParameter("debug"));
             client.setDateFormat(DateFormat.getDateInstance(DateFormat.SHORT));
+            client.setConnectTimeout(60000);
+            client.setReadTimeout(60000);
 
             do {
                 try {

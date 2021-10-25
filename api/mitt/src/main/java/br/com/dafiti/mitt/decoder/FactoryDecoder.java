@@ -34,7 +34,7 @@ public class FactoryDecoder {
 
     public static Decoder getDecoder(File file) {
         Decoder decoder = null;
-        String extension = FilenameUtils.getExtension(file.getName());
+        String extension = FilenameUtils.getExtension(file.getName()).toLowerCase();
 
         switch (extension) {
             case "zip":
