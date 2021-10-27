@@ -1,10 +1,11 @@
-# SAPJCO3 Extractor [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-### Extrator de dados de sistemas SAP. 
+# SurveyMonkey Extractor [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+### Extrator de dados da SurveyMonkey. 
 
 ## How it works
 
-O **SAPJCO3 Extractor** é uma ferramenta que possibilita extrair dados de sistemas SAP (BW, ECC, EWM) no padrão do MITT. Esse extrator utiliza a biblioteca SAPJCO3 que tem como recurso o protocolo RFC.
-Para informações mais detalhadas, consulte: https://sap.github.io/cloud-sdk/docs/java/features/bapi-and-rfc/bapi-and-rfc-overview/
+A empresa **SurveyMonkey** tem como objetivo efetuar o desenvolvimento de pesquisas online, com essa plataforma de pesquisa, fica fácil medir e entender feedback de clientes a fim de poder impulsionar o crescimento e a inovação dos negócios.
+
+O **SurveyMonkey Extractor** é uma ferramenta desenvolvida utilizando o framework _mitt_ e possibilita extrair dados da _api_ do _surveymonkey_ (https://developer.surveymonkey.com/). Com ela é possível extrair diversos dados disponíveis na api de maneira bem simplificada (como por exemplo _surveys_ disponíves, detalhes de uma campanha, respostas do clientes em uma campanha etc.), gerando no final um arquivo csv simplificado com o conteúdo desejado.
 
 ## Instalação
 
@@ -13,140 +14,161 @@ Para informações mais detalhadas, consulte: https://sap.github.io/cloud-sdk/do
 - Java 8 +
 - Maven
 - Git
-- Download da biblioteca SAPJCO3 direto do site da SAP, em caso de dúvidas consulte: https://sap.github.io/cloud-sdk/docs/java/features/bapi-and-rfc/bapi-and-rfc-overview/
-- A biblioteca deve estar instalada na classpath do java
-	- Linux:
-		- Arquivo libsapjco3.so 
-	- Windows:
-		- Arquivo sapjco3.dll
-
+- Criação de um app na seção My apps (detalhes em https://developer.surveymonkey.com/api/v3/)
+- Deploy
 
 ##### CONSTRUÇÃO
 
 - Utilizando o [Maven](https://maven.apache.org/): 
-    - Acesse o diretório no qual os fontes do **_SAPJCO3_ **se localizam.
+    - Acesse o diretório no qual os fontes do **_survey-monkey_ **se localizam.
     - Digite o comando _**mvn package**_.
-    - O arquivo **sapjco3.jar** será gerado no subdiretório **_target_**.
+    - O arquivo **survey-monkey.jar** será gerado no subdiretório **_target_**.
 
 ##### CONFIGURAÇÂO
 
-* Crie um arquivo com as credencias para acessar o ambiente SAP, este será o seu **credentials file**:
+* Crie um arquivo com as credencias para acessar a _api_ através do _access token_ do _app_ criado, este será o seu **credentials file**:
 
 ```
 {
-	"host":"<IP do servidor SAP>",
-	"sysnr":"<Número do sistema para se conectar>",
-	"client":"<ID Mandante do ambiente>",
-	"user":"<Usuário>",
-	"passwd":"<Senha>",
-	"lang":"<Idioma do sistemas. exemplo: PT>"
+	"authorization":"bearer <access token>"
 }
-
 ```
 
 ## Utilização
 
-```bash
-java -jar sapjco3.jar \
+```bash  
+java -jar survey-monkey.jar  \
   --credentials="<Identifica o caminho onde o arquivo secreto com as credenciais está localizado>" \
   --output="<Identifica o caminho e nome do arquivo que será gerado>" \
-  --function="<Identifica o nome da função a ser chamada no sistema SAP, exemplo: RFC_READ_TABLE>" \
-  --table="<Nome da tabela a ser retornada>" \
-  --field="<Opcional, Identifica o nome dos campos que serão extraídos, senão for passado o processo tentará pegar os campos automaticamente>" \
-  --where="<Opcional, Identifca a condição where>" \
-  --partition="<Opcional, Identifica o campo que será utilizado para particionamento dos dados>" \
-  --key="<Opcional, Identifica a chave primária>" \
-  --input_delimiter="<Opcional, Delimitador do resultado vindo da função chamada; '|' é o padrão>" \
-  --row_count="<Opcional, quantidade de registros que serão trazidos por vez; '0' é o padrão e significar trazer tudo de uma vez>" \
-  --row_skips="<Opcional, Começa a trazer registros a partir de qual índice; '0' é o padrão>" \
-  --delimiter="<Opcional, esse é o delimitador usado no mitt; '|' é o padrão>" \
-  --debug="Opcional, Identifica se é modo debug ou não; 'false' é o padrão>"  
+  --field="<Identifica o nome dos campos que serão extraídos, esse nome de campo deve ser passado com ponto (.) quando for json aninhado, nos exemplos explicado melhor essa questão>" \
+  --endpoint="<Identifica qual api será chamada, considerar somente a URI, caminho inicial padrão fixo é: https://api.surveymonkey.com/v3/>" \
+  --paginate="<(Opcional) aceita os valores true ou false, o padrão é false | Nessa opção você deve informar se o endpoint tem ou não paginação, caso tenha paginação, ele irá percorrer todas as páginas do serviço, se baseando no nó per_page do json>" \
+  --parameters="<(Opcional) os parâmetros do serviço deve ser informado nesse parâmetro, deve ser informado em json. Olhar exemplos.>" \
+  --partition=<(Opcional) Partição, dividos por + quando for mais de um> \
+  --key=<(Opcional) Chave única, dividos por + quando for mais de um>
 ```
 
 ## Exemplos
 
-##### Chamada simples
+##### Exemplo 1: Pegar surveys (https://developer.surveymonkey.com/api/v3/#api-endpoints-get-surveys)
 
 ```bash
-java -jar /home/etl/lib/sapjco3.jar \
-  --credentials="/<credentials_path>/<credentials_file>.json" \
-  --output="/tmp/sapjco3/bw/ZBW000016/ZBW000016.csv" \
-  --function="ZRFC_READ_TABLE" \
-  --table="ZBW000016" \
-  --key='::checksum()' \
-  --partition='::fixed(FULL)'
+java -jar /home/etl/lib/survey-monkey.jar  \
+  --credentials="/<location>/surveymonkey.json" \
+  --output="/tmp/surveymonkey/surveys/surveys.csv" \
+  --endpoint="surveys" \
+  --field="data.id+data.title" \
+  --key="::checksum()" \
+  --partition="::fixed(full)" \
+  --paginate="true"
 ```
-* No exemplo acima não especificamos os campos que desejamos de retorno, desta maneira, todos os campos serão extraídos para o arquivo de saída.
 
-#### Chamada com filtro e especificação de campos
+* No exemplo acima informamos no parâmetro _field_ dois campos que queremos o retorno separados por ponto, isso é feito pois o retorno da _api_ é um _json_ aninhado, então informamos o ponto como um caminho até chegar no resultado desejado. A _Api_ retorna um _json_ da seguinte maneira:
+
+```json
+{
+  "data": [
+    {
+      "id": "1234",
+      "title": "My Survey",
+      "nickname": "",
+      "href": "https://api.surveymonkey.com/v3/surveys/1234"
+    }
+  ],
+  "per_page": 50,
+  "page": 1,
+  "total": 1,
+  "links": {
+    "self": "https://api.surveymonkey.com/v3/surveys?page=1&per_page=50",
+    "next": "https://api.surveymonkey.com/v3/surveys?page=2&per_page=50",
+    "last": "https://api.surveymonkey.com/v3/surveys?page=5&per_page=50"
+  }
+}
+```
+
+* Perceba que para pegar por exemplo, o **id** da _survey_ inicia no _array_ _"data"_ e depois _"id"_, por isso colocamos _data.id_, mesma coisa para pegar o título da _survey_, o _array_ inicia com _"data"_, depois _"title"_, por isso _data.title_.
+
+
+##### Exemplo 2: Pegar detalhes de uma survey (https://developer.surveymonkey.com/api/v3/#api-endpoints-get-surveys-id-details)
+
+* A partir desses detalhes, é possível pegar as questões criadas e opções de respostas disponíveis.
 
 ```bash
-java -jar /home/etl/lib/sapjco3.jar \
-  --credentials="/<credentials_path>/<credentials_file>.json" \
-  --output="/tmp/sapjco3/bw/ZBW000029/ZBW000029.csv" \
-  --function="ZRFC_READ_TABLE" \
-  --field="MANDT+DELIV_NUMB+AMOUNT+CURRENCY+MOTIVO+/BIC/ZUPDATED" \
-  --table="ZBW000029" \
-  --where='AMOUNT > 1 OR DELIV_NUMB = '"'"'8043143930'"'"'' \
-  --key='::checksum()' \
-  --partition='::fixed(FULL)'
+java -jar /home/etl/lib/survey-monkey.jar  \
+  --credentials="/location/surveymonkey.json" \
+  --output="/tmp/surveymonkey/survey_details/survey_details_others.csv" \
+  --endpoint="surveys/292292993/details" \
+  --field="title+id+pages.id+pages.questions.id+pages.questions.answers.choices.id>>choice_id+pages.questions.headings.heading+pages.questions.answers.choices.text>>choice_text" \
+  --key="::md5([[id,pages.id,pages.questions.id,pages.questions.answers.choices.id]])" \
+  --partition="id"
 ```
-* No exemplo acima especificamos os campos que queremos de retorno no parâmetro _field_ e colocamos uma **condição** para a extração dos dados no parâmetro _where_
 
-#### Chamada com filtro e quantidade de linhas por 'lote'
+* Perceba que no exemplo acima estamos pegando os detalhes específicos de uma _survey_, no caso a _survey_ com id 292292993.
+* Esse endpoint também não possui paginação, então não foi informado o parâmetro _paginate_
+* Perceba que tem um campo da seguinte forma: **pages.questions.answers.choices.id>>choice_id**, esse '>>' foi adicionado pois o nome do campo está sendo renomeado para _choice_id_ para ficar mais intuitivo.
+
+* Um Resultado exemplo em formato json do endpoint citado é o seguinte:
+
+```json
+{
+  "title": "New Survey",
+  "nickname": "",
+  "language": "en",
+  "folder_id": "0",
+  "category": "",
+  "question_count": 0,
+  "page_count": 1,
+  "response_count": 0,
+  "date_created": "2021-07-26T18:09:00",
+  "date_modified": "2021-07-26T19:32:00",
+  "id": "1",
+  "buttons_text": {
+    "next_button": "Next",
+    "prev_button": "Prev",
+    "done_button": "Done",
+    "exit_button": "Exit"
+  },
+  "is_owner": true,
+  "footer": true,
+  "custom_variables": {},
+  "href": "https://api.surveymonkey.com/v3/surveys/1",
+  "analyze_url": "https://www.surveymonkey.com/analyze/gel_2BAICXZEi4rH4ITcFzAin50QyBg8dHsw877lCBjYlk_3D",
+  "edit_url": "https://www.surveymonkey.com/create/?sm=gl_2BAICXZEi4rH4ITcFzAAin50QyBg8dHsw877lCBjYlk_3D",
+  "collect_url": "https://www.surveymonkey.com/collect/list?sm=gl_2BAICXZEi4rH4ITcFzAAin50QyBg8dHsw877lCBjYlk_3D",
+  "summary_url": "https://www.surveymonkey.com/summary/gl_2BAICCXZEi4rH4ITcFzAin50QyBg8dHsw877lCBjYlk_3D",
+  "preview": "https://www.surveymonkey.com/r/Preview/?sm=UY_2BlACesAm789uYe_2B0Zln_2Fs_2F9GndhH015uffhkTaxfBCBn3Gcj_2BTQrIRea7upQwrz",
+  "pages": [
+    {
+      "title": "",
+      "description": "",
+      "position": 1,
+      "question_count": 0,
+      "id": "1",
+      "href": "https://api.surveymonkey.com/v3/surveys/1/pages/1",
+      "questions": []
+    }
+  ]
+}
+```
+
+
+##### Exemplo 3: Pegar respostas de uma survey (https://developer.surveymonkey.com/api/v3/#api-endpoints-survey-responses)
 
 ```bash
-java -jar /home/etl/lib/sapjco3.jar \
-  --credentials="/<credentials_path>/<credentials_file>.json" \
-  --output="/tmp/sapjco3/bw/B1H/ASD_D1100/BI0_ASD_D1100.csv" \
-  --function="ZRFC_READ_TABLE" \
-  --table="/B1H/ASD_D1100" \
-  --key='::checksum()' \
-  --where=' /BIC/ZUPDATED >= '"'"'020210601000000'"'"' ' \
-  --partition="::dateformat(/BIC/ZUPDATED,yyyyMMdd,yyyy)" \
-  --debug="true" \
-  --row_count=300000
+  java -jar /home/etl/lib/survey-monkey.jar  \
+    --credentials="/location/surveymonkey.json" \
+    --output="/tmp/surveymonkey/survey_responses/survey_responses.csv" \
+    --endpoint="surveys/292292993/responses/bulk" \
+    --paginate="true" \
+    --parameters='{"per_page":"100","start_modified_at":"2021-10-01","end_modified_at":"2021-10-27"}' \
+    --field="data.id+data.survey_id+data.date_modified+data.date_created+data.custom_variables.E>>user_email+data.ip_address+data.pages.questions.id+data.pages.questions.answers.choice_id+data.pages.id+data.pages.questions.answers.text" \
+    --key="::md5([[data.survey_id,data.id,data.pages.questions.id,data.pages.id,data.pages.questions.answers.choice_id]])" \
+    --partition="::dateformat(data.date_created,yyyy-MM-dd,yyyyMM)"
 ```
 
-* No exemplo acima especificamos uma **condição** para a extração dos dados no parâmetro _where_ e no parâmetro **row_count** colocamos o número 300.000 que será responsável por fazer a extração dos dados por partes de 300.000, ou seja, irá trazer os dados de 0 a 300.000, depois de 300.000 até 600.000 até que atinja o tamanho total de registros.
-* Também colocamos o parâmetro **debug** com o valor true para efetuarmos um acompanhamento do que está acontecendo no processo, dessa maneira conseguimos traquear onde o processo está através de um log bem detalhado. Esse log apresenta a quantidade de registros por chamada e também é possível acompanhar o tempo de chamada de ida e vinda do servidor SAP e também é possível acompanhar o tempo de escrita do mitt.
+* No exemplo acima passado o parâmetro _parameters_ em formato _json_ para informar parametrizações específicas do _endpoint_, no exemplo acima queremos pegar 100 registros por página e uma data de início e fim de resposta específico.
 
-#### Exemplo de Log da aplicação com o modo _debug_ ativado
 
-```javascript
-2021-06-09 09:39:04 INFO  GLOVE - SAPJCO3 extractor started
-Jun 09, 2021 9:39:04 AM br.com.dafiti.mitt.Mitt <init>
-INFO: MITT v1.0.7
-2021-06-09 09:39:38 DEBUG Before ZRFC_GET_TABLE_COUNT execute.
-2021-06-09 09:39:40 DEBUG After ZRFC_GET_TABLE_COUNT execute.
-2021-06-09 09:39:40 INFO  Table /B1H/ASD_D1100 has 1328376 records [WHERE CONDITION:  /BIC/ZUPDATED >= '020210601000000' ].
-2021-06-09 09:39:40 DEBUG Before ZRFC_READ_TABLE execute
-2021-06-09 09:45:55 DEBUG After ZRFC_READ_TABLE execute
-2021-06-09 09:45:55 INFO  This request returned 300000 rows [ROWCOUNT: 300000, ROWSKIPS: 0].
-2021-06-09 09:45:55 DEBUG Before mitt write.
-2021-06-09 09:46:15 DEBUG After mitt write.
-2021-06-09 09:46:15 DEBUG Before ZRFC_READ_TABLE execute
-2021-06-09 09:50:09 DEBUG After ZRFC_READ_TABLE execute
-2021-06-09 09:50:09 INFO  This request returned 300000 rows [ROWCOUNT: 300000, ROWSKIPS: 300000].
-2021-06-09 09:50:09 DEBUG Before mitt write.
-2021-06-09 09:50:29 DEBUG After mitt write.
-2021-06-09 09:50:29 DEBUG Before ZRFC_READ_TABLE execute
-2021-06-09 09:55:22 DEBUG After ZRFC_READ_TABLE execute
-2021-06-09 09:55:22 INFO  This request returned 300000 rows [ROWCOUNT: 300000, ROWSKIPS: 600000].
-2021-06-09 09:55:22 DEBUG Before mitt write.
-2021-06-09 09:55:39 DEBUG After mitt write.
-2021-06-09 09:55:39 DEBUG Before ZRFC_READ_TABLE execute
-2021-06-09 09:58:57 DEBUG After ZRFC_READ_TABLE execute
-2021-06-09 09:58:57 INFO  This request returned 300000 rows [ROWCOUNT: 300000, ROWSKIPS: 900000].
-2021-06-09 09:58:57 DEBUG Before mitt write.
-2021-06-09 09:59:14 DEBUG After mitt write.
-2021-06-09 09:59:14 DEBUG Before ZRFC_READ_TABLE execute
-2021-06-09 10:01:17 DEBUG After ZRFC_READ_TABLE execute
-2021-06-09 10:01:17 INFO  This request returned 134061 rows [ROWCOUNT: 300000, ROWSKIPS: 1200000].
-2021-06-09 10:01:17 DEBUG Before mitt write.
-2021-06-09 10:01:22 DEBUG After mitt write.
-2021-06-09 10:01:22 INFO  GLOVE - SAPJCO3 extractor finalized
-```
 
 ## Contributing, Bugs, Questions
 Contributions are more than welcome! If you want to propose new changes, fix bugs or improve something feel free to fork the repository and send us a Pull Request. You can also open new `Issues` for reporting bugs and general problems.
