@@ -50,7 +50,7 @@ java -jar survey-monkey.jar  \
 
 ## Exemplos
 
-##### Pegar surveys (https://developer.surveymonkey.com/api/v3/#api-endpoints-get-surveys)
+##### Exemplo 1: Pegar surveys (https://developer.surveymonkey.com/api/v3/#api-endpoints-get-surveys)
 
 ```bash
 java -jar /home/etl/lib/survey-monkey.jar  \
@@ -89,6 +89,40 @@ java -jar /home/etl/lib/survey-monkey.jar  \
 * Perceba que para pegar por exemplo, o **id** da _survey_ inicia no _array_ _"data"_ e depois _"id"_, por isso colocamos _data.id_, mesma coisa para pegar o título da _survey_, o _array_ inicia com _"data"_, depois _"title"_, por isso _data.title_.
 
 
+##### Exemplo 2: Pegar detalhes de uma survey (https://developer.surveymonkey.com/api/v3/#api-endpoints-get-surveys-id-details)
+
+* A partir desses detalhes, é possível pegar as questões criadas e opções de respostas disponíveis.
+
+```bash
+java -jar /home/etl/lib/survey-monkey.jar  \
+  --credentials="/location/surveymonkey.json" \
+  --output="/tmp/surveymonkey/survey_details/survey_details_others.csv" \
+  --endpoint="surveys/292292993/details" \
+  --field="title+id+pages.id+pages.questions.id+pages.questions.answers.choices.id>>choice_id+pages.questions.headings.heading+pages.questions.answers.choices.text>>choice_text" \
+  --key="::md5([[id,pages.id,pages.questions.id,pages.questions.answers.choices.id]])" \
+  --partition="id"
+```
+
+* Perceba que no exemplo acima estamos pegando os detalhes específicos de uma _survey_, no caso a _survey_ com id 292292993.
+* Esse endpoint também não possui paginação, então não foi informado o parâmetro _paginate_
+* Perceba que tem um campo da seguinte forma: **pages.questions.answers.choices.id>>choice_id**, esse '>>' foi adicionado pois o nome do campo está sendo renomeado para _choice_id_ para ficar mais intuitivo.
+
+
+##### Exemplo 3: Pegar respostas de uma survey (https://developer.surveymonkey.com/api/v3/#api-endpoints-survey-responses)
+
+```bash
+  java -jar /home/etl/lib/survey-monkey.jar  \
+    --credentials="/location/surveymonkey.json" \
+    --output="/tmp/surveymonkey/survey_responses/survey_responses.csv" \
+    --endpoint="surveys/292292993/responses/bulk" \
+    --paginate="true" \
+    --parameters='{"per_page":"100","start_modified_at":"2021-10-01","end_modified_at":"2021-10-27"}' \
+    --field="data.id+data.survey_id+data.date_modified+data.date_created+data.custom_variables.E>>user_email+data.ip_address+data.pages.questions.id+data.pages.questions.answers.choice_id+data.pages.id+data.pages.questions.answers.text" \
+    --key="::md5([[data.survey_id,data.id,data.pages.questions.id,data.pages.id,data.pages.questions.answers.choice_id]])" \
+    --partition="::dateformat(data.date_created,yyyy-MM-dd,yyyyMM)"
+```
+
+* No exemplo acima passado o parâmetro _parameters_ em formato _json_ para informar parametrizações específicas do _endpoint_, no exemplo acima queremos pegar 100 registros por página e uma data de início e fim de resposta específico.
 
 
 
