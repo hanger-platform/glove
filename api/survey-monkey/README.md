@@ -63,7 +63,7 @@ java -jar /home/etl/lib/survey-monkey.jar  \
   --paginate="true"
 ```
 
-* No exemplo acima informamos no parâmetro field dois campos que queremos o retorno separados por ponto, isso é feito pois o retorno da api é um json aninhado, então informamos o ponto como um caminho até chegar no resultado desejado. A Api retorna um json da seguinte maneira:
+* No exemplo acima informamos no parâmetro _field_ dois campos que queremos o retorno separados por ponto, isso é feito pois o retorno da _api_ é um _json_ aninhado, então informamos o ponto como um caminho até chegar no resultado desejado. A _Api_ retorna um _json_ da seguinte maneira:
 
 ```json
 {
@@ -85,7 +85,8 @@ java -jar /home/etl/lib/survey-monkey.jar  \
   }
 }
 ```
- 
+
+* Perceba que para pegar por exemplo, o **id** da _survey_ inicia no _array_ _"data"_ e depois _"id"_, por isso colocamos _data.id_, mesma coisa para pegar o título da _survey_, o _array_ inicia com _"data"_, depois _"title"_, por isso _data.title_.
 
 
 
