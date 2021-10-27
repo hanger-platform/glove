@@ -32,77 +32,64 @@ O **SurveyMonkey Extractor** é uma ferramenta desenvolvida utilizando o framewo
 {
 	"authorization":"bearer <access token>"
 }
-
 ```
 
 ## Utilização
 
-```bash
-java -jar sapjco3.jar \
+```bash  
+java -jar survey-monkey.jar  \
   --credentials="<Identifica o caminho onde o arquivo secreto com as credenciais está localizado>" \
   --output="<Identifica o caminho e nome do arquivo que será gerado>" \
-  --function="<Identifica o nome da função a ser chamada no sistema SAP, exemplo: RFC_READ_TABLE>" \
-  --table="<Nome da tabela a ser retornada>" \
-  --field="<Opcional, Identifica o nome dos campos que serão extraídos, senão for passado o processo tentará pegar os campos automaticamente>" \
-  --where="<Opcional, Identifca a condição where>" \
-  --partition="<Opcional, Identifica o campo que será utilizado para particionamento dos dados>" \
-  --key="<Opcional, Identifica a chave primária>" \
-  --input_delimiter="<Opcional, Delimitador do resultado vindo da função chamada; '|' é o padrão>" \
-  --row_count="<Opcional, quantidade de registros que serão trazidos por vez; '0' é o padrão e significar trazer tudo de uma vez>" \
-  --row_skips="<Opcional, Começa a trazer registros a partir de qual índice; '0' é o padrão>" \
-  --delimiter="<Opcional, esse é o delimitador usado no mitt; '|' é o padrão>" \
-  --debug="Opcional, Identifica se é modo debug ou não; 'false' é o padrão>"  
+  --field="<Identifica o nome dos campos que serão extraídos, esse nome de campo deve ser passado com ponto (.) quando for json aninhado, nos exemplos explicado melhor essa questão>" \
+  --endpoint="<Identifica qual api será chamada, considerar somente a URI, caminho inicial padrão fixo é: https://api.surveymonkey.com/v3/>" \
+  --paginate="<(Opcional) aceita os valores true ou false, o padrão é false | Nessa opção você deve informar se o endpoint tem ou não paginação, caso tenha paginação, ele irá percorrer todas as páginas do serviço, se baseando no nó per_page do json>" \
+  --parameters="<(Opcional) os parâmetros do serviço deve ser informado nesse parâmetro, deve ser informado em json. Olhar exemplos.>" \
+  --partition=<(Opcional) Partição, dividos por + quando for mais de um> \
+  --key=<(Opcional) Chave única, dividos por + quando for mais de um>
 ```
 
 ## Exemplos
 
-##### Chamada simples
+##### Pegar surveys (https://developer.surveymonkey.com/api/v3/#api-endpoints-get-surveys)
 
 ```bash
-java -jar /home/etl/lib/sapjco3.jar \
-  --credentials="/<credentials_path>/<credentials_file>.json" \
-  --output="/tmp/sapjco3/bw/ZBW000016/ZBW000016.csv" \
-  --function="ZRFC_READ_TABLE" \
-  --table="ZBW000016" \
-  --key='::checksum()' \
-  --partition='::fixed(FULL)'
-```
-* No exemplo acima não especificamos os campos que desejamos de retorno, desta maneira, todos os campos serão extraídos para o arquivo de saída.
-
-#### Chamada com filtro e especificação de campos
-
-```bash
-java -jar /home/etl/lib/sapjco3.jar \
-  --credentials="/<credentials_path>/<credentials_file>.json" \
-  --output="/tmp/sapjco3/bw/ZBW000029/ZBW000029.csv" \
-  --function="ZRFC_READ_TABLE" \
-  --field="MANDT+DELIV_NUMB+AMOUNT+CURRENCY+MOTIVO+/BIC/ZUPDATED" \
-  --table="ZBW000029" \
-  --where='AMOUNT > 1 OR DELIV_NUMB = '"'"'8043143930'"'"'' \
-  --key='::checksum()' \
-  --partition='::fixed(FULL)'
-```
-* No exemplo acima especificamos os campos que queremos de retorno no parâmetro _field_ e colocamos uma **condição** para a extração dos dados no parâmetro _where_
-
-#### Chamada com filtro e quantidade de linhas por 'lote'
-
-```bash
-java -jar /home/etl/lib/sapjco3.jar \
-  --credentials="/<credentials_path>/<credentials_file>.json" \
-  --output="/tmp/sapjco3/bw/B1H/ASD_D1100/BI0_ASD_D1100.csv" \
-  --function="ZRFC_READ_TABLE" \
-  --table="/B1H/ASD_D1100" \
-  --key='::checksum()' \
-  --where=' /BIC/ZUPDATED >= '"'"'020210601000000'"'"' ' \
-  --partition="::dateformat(/BIC/ZUPDATED,yyyyMMdd,yyyy)" \
-  --debug="true" \
-  --row_count=300000
+java -jar /home/etl/lib/survey-monkey.jar  \
+  --credentials="/<location>/surveymonkey.json" \
+  --output="/tmp/surveymonkey/surveys/surveys.csv" \
+  --endpoint="surveys" \
+  --field="data.id+data.title" \
+  --key="::checksum()" \
+  --partition="::fixed(full)" \
+  --paginate="true"
 ```
 
-* No exemplo acima especificamos uma **condição** para a extração dos dados no parâmetro _where_ e no parâmetro **row_count** colocamos o número 300.000 que será responsável por fazer a extração dos dados por partes de 300.000, ou seja, irá trazer os dados de 0 a 300.000, depois de 300.000 até 600.000 até que atinja o tamanho total de registros.
-* Também colocamos o parâmetro **debug** com o valor true para efetuarmos um acompanhamento do que está acontecendo no processo, dessa maneira conseguimos traquear onde o processo está através de um log bem detalhado. Esse log apresenta a quantidade de registros por chamada e também é possível acompanhar o tempo de chamada de ida e vinda do servidor SAP e também é possível acompanhar o tempo de escrita do mitt.
+* No exemplo acima informamos no parâmetro field dois campos que queremos o retorno separados por ponto, isso é feito pois o retorno da api é um json aninhado, então informamos o ponto como um caminho até chegar no resultado desejado. A Api retorna um json da seguinte maneira:
 
+```json
+{
+  "data": [
+    {
+      "id": "1234",
+      "title": "My Survey",
+      "nickname": "",
+      "href": "https://api.surveymonkey.com/v3/surveys/1234"
+    }
+  ],
+  "per_page": 50,
+  "page": 1,
+  "total": 1,
+  "links": {
+    "self": "https://api.surveymonkey.com/v3/surveys?page=1&per_page=50",
+    "next": "https://api.surveymonkey.com/v3/surveys?page=2&per_page=50",
+    "last": "https://api.surveymonkey.com/v3/surveys?page=5&per_page=50"
+  }
+}
 ```
+ 
+
+
+
+
 
 ## Contributing, Bugs, Questions
 Contributions are more than welcome! If you want to propose new changes, fix bugs or improve something feel free to fork the repository and send us a Pull Request. You can also open new `Issues` for reporting bugs and general problems.
