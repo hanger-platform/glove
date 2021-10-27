@@ -107,6 +107,50 @@ java -jar /home/etl/lib/survey-monkey.jar  \
 * Esse endpoint também não possui paginação, então não foi informado o parâmetro _paginate_
 * Perceba que tem um campo da seguinte forma: **pages.questions.answers.choices.id>>choice_id**, esse '>>' foi adicionado pois o nome do campo está sendo renomeado para _choice_id_ para ficar mais intuitivo.
 
+* Um Resultado exemplo em formato json do endpoint citado é o seguinte:
+
+```json
+{
+  "title": "New Survey",
+  "nickname": "",
+  "language": "en",
+  "folder_id": "0",
+  "category": "",
+  "question_count": 0,
+  "page_count": 1,
+  "response_count": 0,
+  "date_created": "2021-07-26T18:09:00",
+  "date_modified": "2021-07-26T19:32:00",
+  "id": "1",
+  "buttons_text": {
+    "next_button": "Next",
+    "prev_button": "Prev",
+    "done_button": "Done",
+    "exit_button": "Exit"
+  },
+  "is_owner": true,
+  "footer": true,
+  "custom_variables": {},
+  "href": "https://api.surveymonkey.com/v3/surveys/1",
+  "analyze_url": "https://www.surveymonkey.com/analyze/gel_2BAICXZEi4rH4ITcFzAin50QyBg8dHsw877lCBjYlk_3D",
+  "edit_url": "https://www.surveymonkey.com/create/?sm=gl_2BAICXZEi4rH4ITcFzAAin50QyBg8dHsw877lCBjYlk_3D",
+  "collect_url": "https://www.surveymonkey.com/collect/list?sm=gl_2BAICXZEi4rH4ITcFzAAin50QyBg8dHsw877lCBjYlk_3D",
+  "summary_url": "https://www.surveymonkey.com/summary/gl_2BAICCXZEi4rH4ITcFzAin50QyBg8dHsw877lCBjYlk_3D",
+  "preview": "https://www.surveymonkey.com/r/Preview/?sm=UY_2BlACesAm789uYe_2B0Zln_2Fs_2F9GndhH015uffhkTaxfBCBn3Gcj_2BTQrIRea7upQwrz",
+  "pages": [
+    {
+      "title": "",
+      "description": "",
+      "position": 1,
+      "question_count": 0,
+      "id": "1",
+      "href": "https://api.surveymonkey.com/v3/surveys/1/pages/1",
+      "questions": []
+    }
+  ]
+}
+```
+
 
 ##### Exemplo 3: Pegar respostas de uma survey (https://developer.surveymonkey.com/api/v3/#api-endpoints-survey-responses)
 
