@@ -1,10 +1,11 @@
-# SAPJCO3 Extractor [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-### Extrator de dados de sistemas SAP. 
+# SurveyMonkey Extractor [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+### Extrator de dados da SurveyMonkey. 
 
 ## How it works
 
-O **SAPJCO3 Extractor** é uma ferramenta que possibilita extrair dados de sistemas SAP (BW, ECC, EWM) no padrão do MITT. Esse extrator utiliza a biblioteca SAPJCO3 que tem como recurso o protocolo RFC.
-Para informações mais detalhadas, consulte: https://sap.github.io/cloud-sdk/docs/java/features/bapi-and-rfc/bapi-and-rfc-overview/
+A empresa **SurveyMonkey** tem como objetivo efetuar o desenvolvimento de pesquisas online, com essa plataforma de pesquisa, fica fácil medir e entender feedback de clientes a fim de poder impulsionar o crescimento e a inovação dos negócios.
+
+O **SurveyMonkey Extractor** é uma ferramenta desenvolvida utilizando o framework _mitt_ e possibilita extrair dados da _api_ do _surveymonkey_ (https://developer.surveymonkey.com/). Com ela é possível extrair diversos dados disponíveis na api de maneira bem simplificada (como por exemplo _surveys_ disponíves, detalhes de uma campanha, respostas do clientes em uma campanha etc.), gerando no final um arquivo csv simplificado com o conteúdo desejado.
 
 ## Instalação
 
@@ -13,33 +14,23 @@ Para informações mais detalhadas, consulte: https://sap.github.io/cloud-sdk/do
 - Java 8 +
 - Maven
 - Git
-- Download da biblioteca SAPJCO3 direto do site da SAP, em caso de dúvidas consulte: https://sap.github.io/cloud-sdk/docs/java/features/bapi-and-rfc/bapi-and-rfc-overview/
-- A biblioteca deve estar instalada na classpath do java
-	- Linux:
-		- Arquivo libsapjco3.so 
-	- Windows:
-		- Arquivo sapjco3.dll
-
+- Criação de um app na seção My apps (detalhes em https://developer.surveymonkey.com/api/v3/)
+- Deploy
 
 ##### CONSTRUÇÃO
 
 - Utilizando o [Maven](https://maven.apache.org/): 
-    - Acesse o diretório no qual os fontes do **_SAPJCO3_ **se localizam.
+    - Acesse o diretório no qual os fontes do **_survey-monkey_ **se localizam.
     - Digite o comando _**mvn package**_.
-    - O arquivo **sapjco3.jar** será gerado no subdiretório **_target_**.
+    - O arquivo **survey-monkey.jar** será gerado no subdiretório **_target_**.
 
 ##### CONFIGURAÇÂO
 
-* Crie um arquivo com as credencias para acessar o ambiente SAP, este será o seu **credentials file**:
+* Crie um arquivo com as credencias para acessar a _api_ através do _access token_ do _app_ criado, este será o seu **credentials file**:
 
 ```
 {
-	"host":"<IP do servidor SAP>",
-	"sysnr":"<Número do sistema para se conectar>",
-	"client":"<ID Mandante do ambiente>",
-	"user":"<Usuário>",
-	"passwd":"<Senha>",
-	"lang":"<Idioma do sistemas. exemplo: PT>"
+	"authorization":"bearer <access token>"
 }
 
 ```
@@ -111,41 +102,6 @@ java -jar /home/etl/lib/sapjco3.jar \
 * No exemplo acima especificamos uma **condição** para a extração dos dados no parâmetro _where_ e no parâmetro **row_count** colocamos o número 300.000 que será responsável por fazer a extração dos dados por partes de 300.000, ou seja, irá trazer os dados de 0 a 300.000, depois de 300.000 até 600.000 até que atinja o tamanho total de registros.
 * Também colocamos o parâmetro **debug** com o valor true para efetuarmos um acompanhamento do que está acontecendo no processo, dessa maneira conseguimos traquear onde o processo está através de um log bem detalhado. Esse log apresenta a quantidade de registros por chamada e também é possível acompanhar o tempo de chamada de ida e vinda do servidor SAP e também é possível acompanhar o tempo de escrita do mitt.
 
-#### Exemplo de Log da aplicação com o modo _debug_ ativado
-
-```javascript
-2021-06-09 09:39:04 INFO  GLOVE - SAPJCO3 extractor started
-Jun 09, 2021 9:39:04 AM br.com.dafiti.mitt.Mitt <init>
-INFO: MITT v1.0.7
-2021-06-09 09:39:38 DEBUG Before ZRFC_GET_TABLE_COUNT execute.
-2021-06-09 09:39:40 DEBUG After ZRFC_GET_TABLE_COUNT execute.
-2021-06-09 09:39:40 INFO  Table /B1H/ASD_D1100 has 1328376 records [WHERE CONDITION:  /BIC/ZUPDATED >= '020210601000000' ].
-2021-06-09 09:39:40 DEBUG Before ZRFC_READ_TABLE execute
-2021-06-09 09:45:55 DEBUG After ZRFC_READ_TABLE execute
-2021-06-09 09:45:55 INFO  This request returned 300000 rows [ROWCOUNT: 300000, ROWSKIPS: 0].
-2021-06-09 09:45:55 DEBUG Before mitt write.
-2021-06-09 09:46:15 DEBUG After mitt write.
-2021-06-09 09:46:15 DEBUG Before ZRFC_READ_TABLE execute
-2021-06-09 09:50:09 DEBUG After ZRFC_READ_TABLE execute
-2021-06-09 09:50:09 INFO  This request returned 300000 rows [ROWCOUNT: 300000, ROWSKIPS: 300000].
-2021-06-09 09:50:09 DEBUG Before mitt write.
-2021-06-09 09:50:29 DEBUG After mitt write.
-2021-06-09 09:50:29 DEBUG Before ZRFC_READ_TABLE execute
-2021-06-09 09:55:22 DEBUG After ZRFC_READ_TABLE execute
-2021-06-09 09:55:22 INFO  This request returned 300000 rows [ROWCOUNT: 300000, ROWSKIPS: 600000].
-2021-06-09 09:55:22 DEBUG Before mitt write.
-2021-06-09 09:55:39 DEBUG After mitt write.
-2021-06-09 09:55:39 DEBUG Before ZRFC_READ_TABLE execute
-2021-06-09 09:58:57 DEBUG After ZRFC_READ_TABLE execute
-2021-06-09 09:58:57 INFO  This request returned 300000 rows [ROWCOUNT: 300000, ROWSKIPS: 900000].
-2021-06-09 09:58:57 DEBUG Before mitt write.
-2021-06-09 09:59:14 DEBUG After mitt write.
-2021-06-09 09:59:14 DEBUG Before ZRFC_READ_TABLE execute
-2021-06-09 10:01:17 DEBUG After ZRFC_READ_TABLE execute
-2021-06-09 10:01:17 INFO  This request returned 134061 rows [ROWCOUNT: 300000, ROWSKIPS: 1200000].
-2021-06-09 10:01:17 DEBUG Before mitt write.
-2021-06-09 10:01:22 DEBUG After mitt write.
-2021-06-09 10:01:22 INFO  GLOVE - SAPJCO3 extractor finalized
 ```
 
 ## Contributing, Bugs, Questions
