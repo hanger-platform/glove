@@ -777,6 +777,12 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 	    fi
     fi
 
+	# Identifica se deve recarregar as partições da tabela.
+	if [ ${IS_RECREATE} = 1 ] && [ ${IS_SCHEMA_EVOLUTION} = 1 ] && [ "${#PARTITION_FIELD}" -gt "0" ]; then
+		echo "Repairing table partitions"
+		run_on_athena "MSCK REPAIR TABLE ${SCHEMA}.${TABLE};"
+	fi
+
 	# Identifica a quantidade de registros na tabela.
     ATHENA_QUERY_ID=`aws athena start-query-execution --query-string "select count(1) from ${SCHEMA}.${TABLE};" --output text --result-configuration OutputLocation=${STORAGE_STAGING_QUEUE_PATH}`
     error_check
