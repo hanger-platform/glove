@@ -58,7 +58,7 @@ table_check(){
         if [ ${TABLE_EXISTS} -eq 0 ]; then
             schema_check
             # Identifica a estratégia para criação da tabela no Spectrum. 
-            if [ ${TABLE_STRATEGY} -eq "partitioned" ]; then
+            if [ ${TABLE_STRATEGY} == "partitioned" ]; then
                 psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} << EOF
                     CREATE EXTERNAL TABLE "${SCHEMA}"."${TABLE}"
                     (  ${FIELD_NAME_AND_TYPE_LIST}  )
