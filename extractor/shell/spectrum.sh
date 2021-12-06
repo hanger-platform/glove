@@ -608,13 +608,6 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
         backup
     fi
 
-	# Identifica se o schema e tabela existem. 
-	if [ "${#PARTITION_FIELD}" -gt "0" ]; then
-		table_check "partitioned"
-	else
-		table_check "simple"
-	fi
-
     # Identifica se é uma named query.
     if [ ${MODULE} == "query" ]; then
 
@@ -736,6 +729,13 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 			fi
 		fi
     fi
+
+	# Identifica se o schema e tabela existem. 
+	if [ "${#PARTITION_FIELD}" -gt "0" ]; then
+		table_check "partitioned"
+	else
+		table_check "simple"
+	fi
 
     # Identifica se a fonte é arquivo.
     if [ ${MODULE} == "file" ]; then
