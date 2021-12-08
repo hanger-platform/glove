@@ -603,7 +603,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
         echo "Password provided by kettle.properties parameter"
     fi
 
-    # Identifica se será feito bachup dos arquivos de dados.
+    # Identifica se será feito backup dos arquivos de dados.
     if [ "${#STORAGE_BUCKET_BACKUP}" -gt "0" ]; then
         backup
     fi
@@ -766,7 +766,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
     fi
 
 	# Identifica se deve recarregar as partições da tabela.
-	if [ ${IS_RECREATE} = 1 ] && [ ${IS_SCHEMA_EVOLUTION} = 1 ] && [ "${#PARTITION_FIELD}" -gt "0" ]; then
+	if [ ${IS_RECREATE} = 1 ] && [ ${IS_SCHEMA_EVOLUTION} = 1 ] && [ "${#PARTITION_FIELD}" -gt "0" ] && [ ${PARTITION_MODE} == "real" ]; then
 		echo "Repairing table partitions"
 		run_on_athena "MSCK REPAIR TABLE ${SCHEMA}.${TABLE};"
 	fi
