@@ -46,62 +46,45 @@ EOF
     fi
 }
 
-# Cria uma tabela sem particionamento.
+# Cria uma tabela no spectrum.
+# o parâmetro TABLE_STRATEGY pode ser PARTITIONED ou SIMPLE. 
 table_check(){
-    echo "Preparing table to store ${OUTPUT_FORMAT} files!"
-
+    TABLE_STRATEGY=$1
+    echo "Preparing ${TABLE_STRATEGY} table to store ${OUTPUT_FORMAT} files!"
     if [ ${IS_SPECTRUM} = 1 ] && [ ${HAS_ATHENA} = 0 ]; then
         # Verifica se a tabela existe.
         TABLE_EXISTS=`psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} -c "SELECT SUM(N) FROM ( SELECT DISTINCT 1 AS N FROM SVV_EXTERNAL_TABLES WHERE SCHEMANAME='${SCHEMA}' AND TABLENAME='${TABLE}' UNION ALL SELECT 0 AS N);" | sed '1,2d' | head -n 1`
-
         # Cria a tabela e o schema.
         if [ ${TABLE_EXISTS} -eq 0 ]; then
             schema_check
-
-            psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} << EOF
-                CREATE EXTERNAL TABLE "${SCHEMA}"."${TABLE}"
-                (${FIELD_NAME_AND_TYPE_LIST})
-                STORED AS ${OUTPUT_FORMAT}
-                LOCATION '${STORAGE_QUEUE_PATH}';
+            # Identifica a estratégia para criação da tabela no Spectrum. 
+            if [ ${TABLE_STRATEGY} == "partitioned" ]; then
+                psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} << EOF
+                    CREATE EXTERNAL TABLE "${SCHEMA}"."${TABLE}"
+                    (  ${FIELD_NAME_AND_TYPE_LIST}  )
+                    PARTITIONED BY ( PARTITION_VALUE INT )
+                    STORED AS ${OUTPUT_FORMAT}
+                    LOCATION '${STORAGE_QUEUE_PATH}';
 EOF
+            else
+                psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} << EOF
+                    CREATE EXTERNAL TABLE "${SCHEMA}"."${TABLE}"
+                    (${FIELD_NAME_AND_TYPE_LIST})
+                    STORED AS ${OUTPUT_FORMAT}
+                    LOCATION '${STORAGE_QUEUE_PATH}';
+EOF
+            fi
         fi
         error_check
     else
         # Cria o database.
         schema_check
-
         # Cria a tabela.
-        run_on_athena "CREATE EXTERNAL TABLE IF NOT EXISTS ${SCHEMA}.${TABLE} (${FIELD_NAME_AND_TYPE_LIST}) STORED AS ${OUTPUT_FORMAT} LOCATION '${STORAGE_QUEUE_PATH}';"
-    fi
-}
-
-# Cria uma tabela particionada.
-partitioned_table_check(){
-    echo "Preparing partitioned table to store ${OUTPUT_FORMAT} files!"
-
-    if [ ${IS_SPECTRUM} = 1 ] && [ ${HAS_ATHENA} = 0 ]; then
-        # Verifica se a tabela existe.
-        TABLE_EXISTS=`psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} -c "SELECT SUM(N)FROM (SELECT DISTINCT 1 AS N FROM SVV_EXTERNAL_TABLES WHERE SCHEMANAME='${SCHEMA}' AND TABLENAME='${TABLE}' UNION ALL SELECT 0 AS N);"|sed '1,2d'| head -n 1`
-
-        # Cria a tabela e o schema.
-        if [ ${TABLE_EXISTS} -eq 0 ]; then
-            schema_check
-
-            psql -h ${REDSHIFT_URL} -U ${REDSHIFT_USER} -w -d ${REDSHIFT_DATASET} -p ${REDSHIFT_PORT} << EOF
-                CREATE EXTERNAL TABLE "${SCHEMA}"."${TABLE}"
-                (  ${FIELD_NAME_AND_TYPE_LIST}	)
-                PARTITIONED BY ( PARTITION_VALUE INT )
-                STORED AS ${OUTPUT_FORMAT}
-                LOCATION '${STORAGE_QUEUE_PATH}';
-EOF
+        if [ ${TABLE_STRATEGY} -eq "partitioned" ]; then
+            run_on_athena "CREATE EXTERNAL TABLE IF NOT EXISTS ${SCHEMA}.${TABLE} (${FIELD_NAME_AND_TYPE_LIST}) PARTITIONED BY ( partition_value int ) STORED AS ${OUTPUT_FORMAT} LOCATION '${STORAGE_QUEUE_PATH}';"
+        else
+            run_on_athena "CREATE EXTERNAL TABLE IF NOT EXISTS ${SCHEMA}.${TABLE} (${FIELD_NAME_AND_TYPE_LIST}) STORED AS ${OUTPUT_FORMAT} LOCATION '${STORAGE_QUEUE_PATH}';"
         fi
-        error_check
-    else
-        # Cria o database.
-        schema_check
-
-        # Cria a tabela.
-        run_on_athena "CREATE EXTERNAL TABLE IF NOT EXISTS ${SCHEMA}.${TABLE} (${FIELD_NAME_AND_TYPE_LIST}) PARTITIONED BY ( partition_value int ) STORED AS ${OUTPUT_FORMAT} LOCATION '${STORAGE_QUEUE_PATH}';"
     fi
 }
 
@@ -583,12 +566,12 @@ EOF
 		# Realiza a verificação da estrutura das tabelas.
 		if [ "${#PARTITION_FIELD}" -gt "0" ] || [ ${FILE_INPUT_PARTITONED} -eq 1 ]; then
 			if [ ${PARTITION_MODE} == "real" ]; then
-				partitioned_table_check
+				table_check "partitioned"
 			else
-				table_check
+				table_check "simple"
 			fi
 		else
-			table_check
+			table_check "simple"
 		fi
 	else
 		echo "IS_RELOAD ACTIVED!"
@@ -624,8 +607,6 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
     if [ "${#STORAGE_BUCKET_BACKUP}" -gt "0" ]; then
         backup
     fi
-
-	schema_check
 
     # Identifica se é uma named query.
     if [ ${MODULE} == "query" ]; then
@@ -749,6 +730,13 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 		fi
     fi
 
+	# Identifica se o schema e tabela existem. 
+	if [ "${#PARTITION_FIELD}" -gt "0" ]; then
+		table_check "partitioned"
+	else
+		table_check "simple"
+	fi
+
     # Identifica se a fonte é arquivo.
     if [ ${MODULE} == "file" ]; then
 		# Identifica o tipo de carga que será realizado.
@@ -776,6 +764,12 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 		    fi
 	    fi
     fi
+
+	# Identifica se deve recarregar as partições da tabela.
+	if [ ${IS_RECREATE} = 1 ] && [ ${IS_SCHEMA_EVOLUTION} = 1 ] && [ "${#PARTITION_FIELD}" -gt "0" ]; then
+		echo "Repairing table partitions"
+		run_on_athena "MSCK REPAIR TABLE ${SCHEMA}.${TABLE};"
+	fi
 
 	# Identifica a quantidade de registros na tabela.
     ATHENA_QUERY_ID=`aws athena start-query-execution --query-string "select count(1) from ${SCHEMA}.${TABLE};" --output text --result-configuration OutputLocation=${STORAGE_STAGING_QUEUE_PATH}`

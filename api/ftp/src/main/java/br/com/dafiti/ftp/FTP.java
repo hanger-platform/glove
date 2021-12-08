@@ -46,6 +46,7 @@ import org.joda.time.LocalDate;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import java.util.UUID;
 
 /**
  *
@@ -126,7 +127,7 @@ public class FTP {
             FTPFile[] ftpFiles = ftpClient.listFiles(cli.getParameter("pattern"));
 
             //Defines the output path.
-            outputPath = Files.createTempDirectory("ftp_");
+            outputPath = Files.createTempDirectory("ftp_" + UUID.randomUUID());
 
             for (FTPFile ftpFile : ftpFiles) {
                 if (ftpFile.getSize() > 0) {

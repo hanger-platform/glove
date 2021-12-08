@@ -209,7 +209,7 @@ public class TiktokAds {
      * @return Request URL
      */
     private static String buildUrl(String path) throws URISyntaxException {
-        URI uri = new URI("https", "ads.tiktok.com", path, "", "");
+        URI uri = new URI("https", "business-api.tiktok.com", path, "", "");
         return uri.toString();
     }
 

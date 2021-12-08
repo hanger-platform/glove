@@ -27,7 +27,6 @@ import br.com.dafiti.mitt.settings.WriterSettings;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
@@ -56,14 +55,15 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 public class WorkbookDecoder implements Decoder {
 
     /**
+     * Decode XLS and XLSX files.
      *
-     * @param file
-     * @param properties
-     * @return
+     * @param file Workbook file.
+     * @param properties Reader properties.
+     * @return CSV File.
      */
     @Override
     public File decode(File file, Properties properties) {
-        File decoded = new File(file.getParent() + "/" + FilenameUtils.removeExtension(file.getName()) + ".csv");
+        File decoded = new File(file.getParent() + File.separator + FilenameUtils.removeExtension(file.getName()) + ".csv");
 
         try {
             String sheetName = properties.getProperty("sheet");
@@ -87,51 +87,27 @@ public class WorkbookDecoder implements Decoder {
 
             //Reads the workbook. 
             Workbook workbook = WorkbookFactory.create(file);
-            Sheet sheet = workbook.getSheetAt(workbook.getSheetIndex(sheetName) == -1 ? 0 : workbook.getSheetIndex(sheetName));
-            Iterator<Row> rowIterator = sheet.iterator();
 
-            while (rowIterator.hasNext()) {
-                List<Object> record = new ArrayList();
-                Row row = rowIterator.next();
-
-                if (row.getRowNum() > (skip - 1)) {
-                    for (int column = 0; column < row.getLastCellNum(); column++) {
-                        Cell cell = row.getCell(column, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-
-                        switch (cell.getCellType()) {
-                            case BOOLEAN:
-                                record.add(cell.getBooleanCellValue());
-                                break;
-                            case NUMERIC:
-                                //Identify if cell is a date.
-                                if (DateUtil.isCellDateFormatted(cell)) {
-                                    DateFormat df = new SimpleDateFormat(dateFormat);
-                                    Date date = cell.getDateCellValue();
-                                    record.add(df.format(date));
-
-                                } else {
-                                    BigDecimal value = new BigDecimal(cell.getNumericCellValue());
-
-                                    //Identify if number has decimal scale.
-                                    if (value.scale() > 0) {
-                                        record.add(value.setScale(scale, RoundingMode.HALF_EVEN).toPlainString());
-                                    } else {
-                                        record.add(value.toPlainString());
-                                    }
-                                }
-
-                                break;
-                            case STRING:
-                                record.add(cell.getStringCellValue());
-                                break;
-                            default:
-                                record.add("");
-                                break;
-                        }
-                    }
-
-                    csvWriter.writeRow(record);
+            //Identifies if should read all sheets or only a specific one. 
+            if (sheetName == null) {
+                for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+                    this.writer(
+                            workbook.getSheetAt(i),
+                            csvWriter,
+                            dateFormat,
+                            (i == 0 ? skip : skip + 1),
+                            scale);
                 }
+            } else {
+                this.writer(
+                        workbook.getSheetAt(
+                                workbook.getSheetIndex(sheetName) == -1
+                                ? workbook.getActiveSheetIndex()
+                                : workbook.getSheetIndex(sheetName)),
+                        csvWriter,
+                        dateFormat,
+                        skip,
+                        scale);
             }
 
             //Flush and close writer.
@@ -140,10 +116,73 @@ public class WorkbookDecoder implements Decoder {
 
             //Removes original file.
             Files.delete(file.toPath());
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             Logger.getLogger(WorkbookDecoder.class.getName()).log(Level.SEVERE, "Fail decoding XLS/XLSX file " + file.getName(), ex);
         }
 
         return decoded;
+    }
+
+    /**
+     * Write XLS and XLSX data to a CSV file.
+     *
+     * @param sheet Sheet
+     * @param csvWriter CSV Writer
+     * @param dateFormat Date format default
+     * @param skip Rows to skip default
+     * @param scale Number scale default
+     */
+    private void writer(
+            Sheet sheet,
+            CsvWriter csvWriter,
+            String dateFormat,
+            int skip,
+            int scale) {
+
+        Iterator<Row> rowIterator = sheet.iterator();
+
+        while (rowIterator.hasNext()) {
+            List<Object> record = new ArrayList<>();
+            Row row = rowIterator.next();
+
+            if (row.getRowNum() > (skip - 1)) {
+                for (int column = 0; column < row.getLastCellNum(); column++) {
+                    Cell cell = row.getCell(column, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+
+                    switch (cell.getCellType()) {
+                        case BOOLEAN:
+                            record.add(cell.getBooleanCellValue());
+                            break;
+                        case NUMERIC:
+                            // Identify if cell is a date.
+                            if (DateUtil.isCellDateFormatted(cell)) {
+                                DateFormat df = new SimpleDateFormat(dateFormat);
+                                Date date = cell.getDateCellValue();
+                                record.add(df.format(date));
+
+                            } else {
+                                BigDecimal value = new BigDecimal(cell.getNumericCellValue());
+
+                                // Identify if number has decimal scale.
+                                if (value.scale() > 0) {
+                                    record.add(value.setScale(scale, RoundingMode.HALF_EVEN).toPlainString());
+                                } else {
+                                    record.add(value.toPlainString());
+                                }
+                            }
+
+                            break;
+                        case STRING:
+                            record.add(cell.getStringCellValue());
+                            break;
+                        default:
+                            record.add("");
+                            break;
+                    }
+                }
+
+                csvWriter.writeRow(record);
+            }
+        }
     }
 }

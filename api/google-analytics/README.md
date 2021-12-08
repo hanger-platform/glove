@@ -1,5 +1,5 @@
 # Google Analytics Extractor [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-### Extrator de dados armazenados em servidores SFTP 
+### Extrator de dados da API do Google Analytics
 
 ## How it works
 
