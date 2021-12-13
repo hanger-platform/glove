@@ -132,8 +132,8 @@ SELECT * FROM (
             WHEN 'float'        THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
             WHEN 'set'          THEN 'varchar(255)'
             WHEN 'enum'         THEN 'varchar(255)'
-            WHEN 'char'         THEN CONCAT('varchar','(', IF( CHARACTER_MAXIMUM_LENGTH + ROUND( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ) > 65000, 65000, CHARACTER_MAXIMUM_LENGTH + ROUND( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ) ),')')
-            WHEN 'varchar'      THEN CONCAT('varchar','(', IF( CHARACTER_MAXIMUM_LENGTH + ROUND( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ) > 65000, 65000, CHARACTER_MAXIMUM_LENGTH + ROUND( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ) ),')')
+            WHEN 'char'         THEN CONCAT('varchar','(', IF( CHARACTER_MAXIMUM_LENGTH + ROUND( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ) > 65535, 65535, CHARACTER_MAXIMUM_LENGTH + ROUND( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ) ),')')
+            WHEN 'varchar'      THEN CONCAT('varchar','(', IF( CHARACTER_MAXIMUM_LENGTH + ROUND( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ) > 65535, 65535, CHARACTER_MAXIMUM_LENGTH + ROUND( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ) ),')')
             WHEN 'boolean' 		THEN 'boolean'
             ELSE 'varchar(255)'
         END AS field_type,
