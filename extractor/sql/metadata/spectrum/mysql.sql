@@ -122,20 +122,20 @@ SELECT * FROM (
            	WHEN 'longtext'     THEN 'varchar(65535)'
             WHEN 'blob'         THEN 'varchar(65535)'
             WHEN 'mediumblob'   THEN 'varchar(65535)'
-	        WHEN 'longblob'   	THEN 'varchar(65535)'	
+            WHEN 'longblob'   	THEN 'varchar(65535)'	
             WHEN 'date'         THEN 'varchar(10)'
             WHEN 'datetime'     THEN 'varchar(19)'
             WHEN 'time'         THEN 'varchar(17)'
             WHEN 'timestamp'    THEN 'varchar(19)'
-			WHEN 'decimal'      THEN CONCAT('decimal','(', IF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ,',',NUMERIC_SCALE,')')
+            WHEN 'decimal'      THEN CONCAT('decimal','(', IF( NUMERIC_PRECISION > 38, 38, NUMERIC_PRECISION ) ,',',NUMERIC_SCALE,')')
             WHEN 'double'       THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
             WHEN 'float'        THEN CASE '${IS_SPECTRUM}' WHEN '1' THEN CASE '${HAS_ATHENA}' WHEN '1' THEN 'double' ELSE 'double precision' END ELSE 'double precision' END
             WHEN 'set'          THEN 'varchar(255)'
             WHEN 'enum'         THEN 'varchar(255)'
-            WHEN 'char'         THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + ROUND( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
-            WHEN 'varchar'      THEN CONCAT('varchar','(', CHARACTER_MAXIMUM_LENGTH + ROUND( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ),')')
-			WHEN 'boolean' 		THEN 'boolean'
-			ELSE 'varchar(255)'
+            WHEN 'char'         THEN CONCAT('varchar','(', IF( CHARACTER_MAXIMUM_LENGTH + ROUND( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ) > 65535, 65535, CHARACTER_MAXIMUM_LENGTH + ROUND( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ) ),')')
+            WHEN 'varchar'      THEN CONCAT('varchar','(', IF( CHARACTER_MAXIMUM_LENGTH + ROUND( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ) > 65535, 65535, CHARACTER_MAXIMUM_LENGTH + ROUND( ( CHARACTER_MAXIMUM_LENGTH - 1 ) / 2 ) ),')')
+            WHEN 'boolean' 		THEN 'boolean'
+            ELSE 'varchar(255)'
         END AS field_type,
 		CONCAT('{"name": "', LOWER( REPLACE(column_name,' ','_') ), '","type":', 
 			IF( data_type IN ("tinyint","smallint","mediumint", "bit"), '["null", "int"]', 
