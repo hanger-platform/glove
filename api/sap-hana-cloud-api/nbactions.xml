@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.sapbtp.Sapbtp --credentials="/home/helio.leal/credentials/sapbtp.json" --output="/tmp/sapbtp/integracao.csv" --field="xxx" --partition="" --key=""</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.sap.hana.cloud.api.SapHanaCloudApi --credentials="/home/helio.leal/credentials/sap_hana_cloud_api.json" --output="/tmp/sap_hana_cloud_api/getintegracao.csv" --field="xx"</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.sapbtp.Sapbtp --credentials="/home/helio.leal/credentials/sapbtp.json" --output="/tmp/sapbtp/integracao.csv" --field="xxx" --partition="" --key=""</exec.args>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.sap.hana.cloud.api.SapHanaCloudApi --credentials="/home/helio.leal/credentials/sap_hana_cloud_api.json" --output="/tmp/sap_hana_cloud_api/getintegracao.csv" --field="xx"</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.sapbtp.Sapbtp --credentials="/home/helio.leal/credentials/sapbtp.json" --output="/tmp/sapbtp/integracao.csv" --field="xxx" --partition="" --key=""</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.sap.hana.cloud.api.SapHanaCloudApi --credentials="/home/helio.leal/credentials/sap_hana_cloud_api.json" --output="/tmp/sap_hana_cloud_api/getintegracao.csv" --field="xx"</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>

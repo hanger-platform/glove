@@ -21,7 +21,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
  */
-package br.com.dafiti.sapbtp;
+package br.com.dafiti.sap.hana.cloud.api;
 
 import br.com.dafiti.mitt.Mitt;
 import br.com.dafiti.mitt.cli.CommandLineInterface;
@@ -46,11 +46,11 @@ import org.json.simple.parser.JSONParser;
  *
  * @author Helio Leal
  */
-public class Sapbtp {
+public class SapHanaCloudApi {
 
-    private static final Logger LOG = Logger.getLogger(Sapbtp.class.getName());
-    private static final String SAPBTP_TOKEN_URL = "https://hdbprd.authentication.us10.hana.ondemand.com/oauth/token";
-    private static final String SAPBTP_ENDPOINT = "https://gfg-monitor-prd.cfapps.us10.hana.ondemand.com/";
+    private static final Logger LOG = Logger.getLogger(SapHanaCloudApi.class.getName());
+    private static final String SAP_HANA_CLOUD_API_TOKEN_URL = "https://hdbprd.authentication.us10.hana.ondemand.com/oauth/token";
+    private static final String SAP_HANA_CLOUD_API_ENDPOINT = "https://gfg-monitor-prd.cfapps.us10.hana.ondemand.com/";
 
     /**
      *
@@ -108,7 +108,7 @@ public class Sapbtp {
 
             //Connect to the API. 
             try (CloseableHttpClient client = HttpClients.createDefault()) {
-                HttpGet httpGet = new HttpGet(SAPBTP_TOKEN_URL);
+                HttpGet httpGet = new HttpGet(SAP_HANA_CLOUD_API_TOKEN_URL);
 
                 //Sets default URI parameters. 
                 URIBuilder uriBuilder = new URIBuilder(httpGet.getURI())
@@ -117,9 +117,9 @@ public class Sapbtp {
 
                 //Sets URI parameters. 
                 httpGet.setURI(uriBuilder.build());
-                
+
                 String encoding = Base64.getEncoder().encodeToString((username + ":" + password).getBytes("UTF-8"));
-                
+
                 //Sets Headers
                 httpGet.addHeader("Authorization", "Basic " + encoding);
 
@@ -130,24 +130,13 @@ public class Sapbtp {
                 String entity = EntityUtils.toString(response.getEntity(), "UTF-8");
 
                 if (!entity.isEmpty()) {
-                    
+
                     System.out.println("entity: " + entity);
 
                 } else {
                     throw new Exception("Empty response entity for request " + httpGet.getURI());
                 }
-
             }
-
-            /*   HttpResponse<String> response = Unirest.get("https://hdbprd.authentication.us10.hana.ondemand.com/oauth/token?grant_type=client_credentials&response_type=token")
-                    .header("Authorization", "Basic c2ItR0ZHX1hTVUFBX0NMT1VEIXQxMTk3NzowaE5HUWEyZXFOTHlVbVdBREd2UUpRdUlNUUk9")
-                    .header("cache-control", "no-cache")
-                    .header("Postman-Token", "7986206d-a7fd-4ba0-a5fb-f1a62e917fe6")
-                    .asString();
-
-            if (!token.getBody().isEmpty()) {
-
-            }*/
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "GLOVE - SAPBTP API extractor fail: ", ex);
             System.exit(1);
