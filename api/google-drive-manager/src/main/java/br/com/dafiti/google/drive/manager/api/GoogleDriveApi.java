@@ -238,6 +238,25 @@ public class GoogleDriveApi {
     }
 
     /**
+     * Export google Drive file by its ID and Mimetype.
+     *
+     * @param fileId Google Drive file
+     * @param mimeType if not null, set the format of the file.
+     * @param output output file path name.
+     */
+    public void export(String fileId, String mimeType, String output) {
+        try {
+            //Download file to local station.
+            try (final OutputStream outputStream = java.nio.file.Files.newOutputStream(new java.io.File(output).toPath())) {
+                this.service.files().export(fileId, mimeType)
+                        .executeMediaAndDownloadTo(outputStream);
+            }
+        } catch (IOException ex) {
+            System.err.println("Error on export: " + ex.getMessage());
+        }
+    }
+
+    /**
      * *
      * Uploads a file on google Drive by its local path.
      *
