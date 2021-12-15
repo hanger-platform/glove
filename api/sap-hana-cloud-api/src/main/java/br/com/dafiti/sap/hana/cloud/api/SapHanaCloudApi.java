@@ -28,8 +28,10 @@ import br.com.dafiti.mitt.cli.CommandLineInterface;
 import br.com.dafiti.mitt.model.Configuration;
 import br.com.dafiti.mitt.transformation.embedded.Concat;
 import br.com.dafiti.mitt.transformation.embedded.Now;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 import java.io.FileReader;
-import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.logging.Level;
@@ -40,9 +42,9 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 /**
  *
@@ -59,11 +61,9 @@ public class SapHanaCloudApi {
      * @param args cli parameteres provided by command line.
      */
     public static void main(String[] args) {
-        LOG.info("GLOVE - SAPBTP API extractor started");
+        LOG.info("GLOVE - SAP HANA CLOUD API extractor started");
 
-        JSONObject parameters = null;
-
-        //Define the mitt.
+        //Defines the mitt.
         Mitt mitt = new Mitt();
 
         try {
@@ -72,10 +72,8 @@ public class SapHanaCloudApi {
                     .addParameter("c", "credentials", "Credentials file", "", true, false)
                     .addParameter("o", "output", "Output file", "", true, false)
                     .addParameter("f", "field", "Fields to be retrieved from an endpoint", "", true, false)
-                    .addParameter("e", "endpoint", "Endpoint name", "", true, false)
-                    .addParameter("p", "parameters", "(Optional) Endpoint parameters", "", true, true)
+                    .addParameter("e", "uri", "URI", "", true, false)
                     .addParameter("b", "object", "(Optional) Json object", "", true, true)
-                    //.addParameter("g", "paginate", "(Optional) Identifies if the endpoint has pagination", false)
                     .addParameter("a", "partition", "(Optional)  Partition, divided by + if has more than one field", "")
                     .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "");
 
@@ -112,6 +110,8 @@ public class SapHanaCloudApi {
 
             //Connect to the API. 
             try (CloseableHttpClient client = HttpClients.createDefault()) {
+                LOG.log(Level.INFO, "Retrieving token from: {0}", SAP_HANA_CLOUD_API_TOKEN_URL);
+
                 //Retrieves API Token.
                 HttpGet httpGet = new HttpGet(SAP_HANA_CLOUD_API_TOKEN_URL);
 
@@ -123,7 +123,7 @@ public class SapHanaCloudApi {
                 //Sets URI parameters. 
                 httpGet.setURI(tokenUriBuilder.build());
 
-                //Encode username and password to make api call.
+                //Encode user and password for api call.
                 String encoding = Base64.getEncoder().encodeToString((username + ":" + password).getBytes("UTF-8"));
 
                 //Sets Headers
@@ -140,92 +140,106 @@ public class SapHanaCloudApi {
                     JSONObject tokenJson = (JSONObject) new JSONParser().parse(tokenEntity);
 
                     if (!tokenJson.isEmpty()) {
-                        LOG.log(Level.INFO, "Token was received successfully");
+                        //Identifies if the endpoint has pagination. 
+                        boolean paginate = true;
 
-                        //Identifies endpoint parameters. 
-                        String endpointParameter = cli.getParameter("parameters");
+                        //Identifies the uri.
+                        String uri = cli.getParameter("uri").replaceAll(" ", "%20");
 
-                        if (endpointParameter != null && !endpointParameter.isEmpty()) {
-                            try {
-                                parameters = (JSONObject) parser.parse("{\"$filter\":\"DT_HORA_INICIO_EXECUCAO ge 2021-12-13T16:17:00Z\"}");
-                            } catch (ParseException ex) {
-                                LOG.log(Level.INFO, "Fail parsing endpoint parameters: {0}", endpointParameter);
+                        do {
+                            //Idenfities if the endpoint has pagination. 
+                            if (paginate) {
+                                LOG.log(Level.INFO, "Retrieving data from URL: {0}", SAP_HANA_CLOUD_API_ENDPOINT + uri);
                             }
-                        }
 
-                        //Retrieves endpoint Token.
-                        HttpGet endPoint = new HttpGet(SAP_HANA_CLOUD_API_ENDPOINT + URLEncoder.encode(cli.getParameter("endpoint")));
+                            paginate = false;
 
-                        //Sets default URI parameters. 
-                        URIBuilder uriBuilder = new URIBuilder(endPoint.getURI());
+                            //API call for endpoint.
+                            HttpGet url = new HttpGet(SAP_HANA_CLOUD_API_ENDPOINT + uri);
 
-                        //Sets endpoint URI parameters. 
-                        if (parameters != null && !parameters.isEmpty()) {
-                            for (Object k : parameters.keySet()) {
-                                uriBuilder.addParameter((String) k, (String) parameters.get(k));
-                            }
-                        }
+                            //Set Headers.
+                            url.addHeader("Authorization", "Bearer " + tokenJson.get("access_token").toString());
 
-                        //Sets URI parameters. 
-                        httpGet.setURI(uriBuilder.build());
+                            //Executes a request. 
+                            CloseableHttpResponse responseHttp = client.execute(url);
 
-                        //Set Headers.
-                        endPoint.addHeader("Authorization", "Bearer " + tokenJson.get("access_token").toString());
+                            //Gets a reponse entity. 
+                            String entity = EntityUtils.toString(responseHttp.getEntity(), "UTF-8");
 
-                        //Executes a request. 
-                        CloseableHttpResponse responseHttp = client.execute(endPoint);
+                            //Identifies if there are payload to process. 
+                            if (!entity.isEmpty()) {
+                                JSONObject json = (JSONObject) new JSONParser().parse(entity);
 
-                        //Gets a reponse entity. 
-                        String entity = EntityUtils.toString(responseHttp.getEntity(), "UTF-8");
+                                //Identifies the response status code.
+                                switch ((int) responseHttp.getStatusLine().getStatusCode()) {
+                                    case 200 /*OK*/:
+                                        Object object;
 
-                        //Identifies if there are payload to process. 
-                        if (!entity.isEmpty()) {
-                            JSONObject json = (JSONObject) new JSONParser().parse(entity);
-
-                            //Identifies the response status code.
-                            switch ((int) responseHttp.getStatusLine().getStatusCode()) {
-                                case 200 /*OK*/:
-                                    Object object;
-
-                                    //Identifies which object should be picked up from the payload.
-                                    if (cli.getParameter("object") == null || cli.getParameter("object").isEmpty()) {
-                                        object = json.get("value");
-                                    } else {
-                                        if ("*".equals(cli.getParameter("object"))) {
-                                            object = json;
+                                        //Identifies which object should be picked up from the payload.
+                                        if (cli.getParameter("object") == null || cli.getParameter("object").isEmpty()) {
+                                            object = json.get("value");
                                         } else {
-                                            object = json.get(cli.getParameter("object"));
+                                            if ("*".equals(cli.getParameter("object"))) {
+                                                object = json;
+                                            } else {
+                                                object = json.get(cli.getParameter("object"));
+                                            }
                                         }
-                                    }
 
-                                    break;
-                                case 400 /*BAD REQUEST*/:
-                                    LOG.log(Level.INFO, "Bad Request");
-                                    break;
-                                case 403 /*FORBIDDEN*/:
-                                    LOG.log(Level.INFO, "Forbidden");
-                                    break;
-                                default:
-                                    throw new Exception("HTTP Exception " + responseHttp.getStatusLine().getStatusCode());
+                                        //Identifies if the payload is an array or an object.
+                                        if (object instanceof JSONArray) {
+
+                                            ((JSONArray) object).forEach(item -> {
+                                                List record = new ArrayList();
+
+                                                mitt.getConfiguration()
+                                                        .getOriginalFieldName()
+                                                        .forEach(field -> {
+                                                            try {
+                                                                record.add(JsonPath.read(item, "$." + field));
+                                                            } catch (PathNotFoundException ex) {
+                                                                record.add("");
+                                                            }
+                                                        });
+
+                                                mitt.write(record);
+                                            });
+
+                                        }
+
+                                        //Identifies if there is next page.
+                                        if (json.containsKey("@odata.nextLink")) {
+                                            uri = json.get("@odata.nextLink").toString();
+                                            paginate = true;
+                                        }
+
+                                        break;
+                                    case 400 /*BAD REQUEST*/:
+                                        LOG.log(Level.INFO, "[Bad Request]: {0}", json.toJSONString());
+                                        break;
+                                    case 403 /*FORBIDDEN*/:
+                                        LOG.log(Level.INFO, "[Forbidden]: {0}", json.toJSONString());
+                                        break;
+                                    default:
+                                        throw new Exception("HTTP Exception " + responseHttp.getStatusLine().getStatusCode());
+                                }
+                            } else {
+                                throw new Exception("Empty response for data request " + httpGet.getURI());
                             }
-
-                        } else {
-                            throw new Exception("Empty response for data request " + httpGet.getURI());
-                        }
+                        } while (paginate);
                     }
-
                 } else {
-                    throw new Exception("Empty response for token request " + httpGet.getURI());
+                    throw new Exception("Empty response for token request: " + httpGet.getURI());
                 }
             }
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "GLOVE - SAPBTP API extractor fail: ", ex);
+            LOG.log(Level.SEVERE, "GLOVE - SAP HANA CLOUD API extractor fail: ", ex);
             System.exit(1);
         } finally {
             mitt.close();
         }
 
-        LOG.info("GLOVE - SAPBTP API extractor finalized");
+        LOG.info("GLOVE - SAP HANA CLOUD API extractor finalized");
 
     }
 
