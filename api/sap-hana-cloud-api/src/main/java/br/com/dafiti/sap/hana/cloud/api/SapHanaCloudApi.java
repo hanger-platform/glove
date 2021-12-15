@@ -204,7 +204,6 @@ public class SapHanaCloudApi {
 
                                                 mitt.write(record);
                                             });
-
                                         }
 
                                         //Identifies if there is next page.
@@ -238,9 +237,6 @@ public class SapHanaCloudApi {
         } finally {
             mitt.close();
         }
-
         LOG.info("GLOVE - SAP HANA CLOUD API extractor finalized");
-
     }
-
 }
