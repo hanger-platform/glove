@@ -726,18 +726,16 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 					mkdir ${RAWFILE_QUEUE_PATH}export
 				
 					#if [ ${DEBUG} = 1 ] ; then
-						echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/google-drive-manager.jar --credentials=${GLOVE_GOOGLE_DRIVE_CREDENTIALS} --action='export' --id=${EXPORT_SPREADSHEET} --output=${RAWFILE_QUEUE_PATH}export/${EXPORT_SPREADSHEET}.xls --mimetype=${EXPORT_MIME_TYPE}"
+						echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/google-drive-manager.jar --credentials='${GLOVE_GOOGLE_DRIVE_CREDENTIALS}' --action='export' --id=${EXPORT_SPREADSHEET} --output=${RAWFILE_QUEUE_PATH}export/${EXPORT_SPREADSHEET}.xls --mimetype=${EXPORT_MIME_TYPE}"
 					#fi
 
 					java -jar ${GLOVE_HOME}/extractor/lib/google-drive-manager.jar
-						--credentials=${GLOVE_GOOGLE_DRIVE_CREDENTIALS} \
+						--credentials='${GLOVE_GOOGLE_DRIVE_CREDENTIALS}' \
 						--action='export' \
 						--id=${EXPORT_SPREADSHEET} \
 						--output=${RAWFILE_QUEUE_PATH}export/${EXPORT_SPREADSHEET} \
 						--mimetype=${EXPORT_MIME_TYPE}
 					error_check
-					
-					
 				fi				
 			else
 				echo "EXPORT_BUCKET_DEFAULT or EXPORT_SPREADSHEET_DEFAULT was not defined!"
