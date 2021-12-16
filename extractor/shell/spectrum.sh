@@ -731,7 +731,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 					# Nome do arquivo de exportação.
 					EXPORT_FILE_NAME="${EXPORT_SPREADSHEET}.xls"
 					
-					# Local no s3 onde o arquivo será exportado.
+					# Local no S3 onde o arquivo será exportado.
 					STORAGE_EXPORT_FILE_PATH="${STORAGE_STAGING_QUEUE_PATH}/${EXPORT_SPREADSHEET}/${NOW}/"
 
 					# Cria um diretório temporário de exportação.
@@ -753,10 +753,19 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 						--output=${RAWFILE_QUEUE_PATH_EXPORT}/${EXPORT_FILE_NAME}
 					error_check
 					
-					### LINK PRESIGN ABAIXO.
+					# Sobe o arquivo exportado para o S3.
 					aws s3 cp ${RAWFILE_QUEUE_PATH_EXPORT}/${EXPORT_FILE_NAME} ${STORAGE_EXPORT_FILE_PATH}
 					
-					echo 'Arquivo exportado via GLOVE' | mutt -s 'EXPORT de planilha' ${EXPORT_SHEETS_RECIPIENTS} -a ${RAWFILE_QUEUE_PATH_EXPORT}/${EXPORT_FILE_NAME}
+					# Gera o link pre sign para ser enviado por e-mail.
+					LINK_PRESIGN=`aws s3 presign ${STORAGE_EXPORT_FILE_PATH}${EXPORT_FILE_NAME} --expires-in 604800`
+
+					echo 'Presign createad expires in 604800 seconds:'
+					echo $LINK_PRESIGN
+
+					echo 'Arquivo foi exportado e está disponível para download em: ${LINK_PRESIGN}' | mutt -s 'EXPORT de planilha' ${EXPORT_SHEETS_RECIPIENTS}
+					
+					### TODO
+					###	Efetuar as limpezas abaixo
 				fi				
 			else
 				echo "EXPORT_BUCKET_DEFAULT or EXPORT_SPREADSHEET_DEFAULT was not defined!"
