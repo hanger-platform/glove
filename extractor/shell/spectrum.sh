@@ -720,24 +720,30 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 				error_check
 				
 				# Identifica se deve exportar a spreadsheet.
-				if [ "${#EXPORT_MIME_TYPE}" -gt "0" ]; then
+				if [ "${#EXPORT_SHEETS_RECIPIENTS}" -gt "0" ]; then
 				
+					###TO DO tirar mkdir e testar
 					# Cria um diretório temporário de exportação.
 					mkdir ${RAWFILE_QUEUE_PATH}export
 				
 					#if [ ${DEBUG} = 1 ] ; then
-						echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/google-drive-manager.jar --credentials=${GLOVE_GOOGLE_DRIVE_CREDENTIALS} --action='export' --id=${EXPORT_SPREADSHEET} --output=${RAWFILE_QUEUE_PATH}export/${EXPORT_SPREADSHEET}.xls --mimetype=${EXPORT_MIME_TYPE}"
+						echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/google-drive-manager.jar \
+						--credentials=${GLOVE_GOOGLE_DRIVE_CREDENTIALS} \
+						--action='export' \
+						--id=${EXPORT_SPREADSHEET} \
+						--output=${RAWFILE_QUEUE_PATH}export/${EXPORT_SPREADSHEET}.xls"
 					#fi
 
 					java -jar ${GLOVE_HOME}/extractor/lib/google-drive-manager.jar \
 						--credentials=${GLOVE_GOOGLE_DRIVE_CREDENTIALS} \
 						--action='export' \
 						--id=${EXPORT_SPREADSHEET} \
-						--output=${RAWFILE_QUEUE_PATH}export/${EXPORT_SPREADSHEET} \
-						--mimetype=${EXPORT_MIME_TYPE}
+						--output=${RAWFILE_QUEUE_PATH}export/${EXPORT_SPREADSHEET}.xls
 					error_check
 					
-					echo 'Arquivo exportado via GLOVE' | mutt -s 'EXPORT de planilha' helio.leal@dafiti.com.br -a ${RAWFILE_QUEUE_PATH}export/${EXPORT_SPREADSHEET}
+					### LINK PRESIGN ABAIXO.
+					
+					echo 'Arquivo exportado via GLOVE' | mutt -s 'EXPORT de planilha' ${EXPORT_SHEETS_RECIPIENTS} -a ${RAWFILE_QUEUE_PATH}export/${EXPORT_SPREADSHEET}.xls
 				fi				
 			else
 				echo "EXPORT_BUCKET_DEFAULT or EXPORT_SPREADSHEET_DEFAULT was not defined!"
