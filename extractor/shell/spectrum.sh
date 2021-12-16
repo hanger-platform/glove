@@ -721,24 +721,31 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 				
 				# Identifica se deve exportar a spreadsheet.
 				if [ "${#EXPORT_SHEETS_RECIPIENTS}" -gt "0" ]; then
+
+					RAWFILE_QUEUE_PATH_EXPORT="${RAWFILE_QUEUE_PATH}export"
+
+					# Cria um diretório temporário de exportação.
+					mkdir ${RAWFILE_QUEUE_PATH_EXPORT}
+				
 					if [ ${DEBUG} = 1 ] ; then
 						echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/google-drive-manager.jar \
 						--credentials=${GLOVE_GOOGLE_DRIVE_CREDENTIALS} \
 						--action='export' \
 						--id=${EXPORT_SPREADSHEET} \
-						--output=${RAWFILE_QUEUE_PATH}export/${EXPORT_SPREADSHEET}.xls"
+						--output=${RAWFILE_QUEUE_PATH_EXPORT}/${EXPORT_SPREADSHEET}.xls"
 					fi
 
 					java -jar ${GLOVE_HOME}/extractor/lib/google-drive-manager.jar \
 						--credentials=${GLOVE_GOOGLE_DRIVE_CREDENTIALS} \
 						--action='export' \
 						--id=${EXPORT_SPREADSHEET} \
-						--output=${RAWFILE_QUEUE_PATH}export/${EXPORT_SPREADSHEET}.xls
+						--output=${RAWFILE_QUEUE_PATH_EXPORT}/${EXPORT_SPREADSHEET}.xls
 					error_check
 					
 					### LINK PRESIGN ABAIXO.
+					#aws s3 cp ${RAWFILE_QUEUE_PATH_EXPORT}/${EXPORT_SPREADSHEET}.xls ${STORAGE_STAGING_QUEUE_PATH}/${EXPORT_SPREADSHEET}/
 					
-					echo 'Arquivo exportado via GLOVE' | mutt -s 'EXPORT de planilha' ${EXPORT_SHEETS_RECIPIENTS} -a ${RAWFILE_QUEUE_PATH}export/${EXPORT_SPREADSHEET}.xls
+					echo 'Arquivo exportado via GLOVE' | mutt -s 'EXPORT de planilha' ${EXPORT_SHEETS_RECIPIENTS} -a ${RAWFILE_QUEUE_PATH_EXPORT}/${EXPORT_SPREADSHEET}.xls
 				fi				
 			else
 				echo "EXPORT_BUCKET_DEFAULT or EXPORT_SPREADSHEET_DEFAULT was not defined!"
