@@ -730,7 +730,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 						--credentials=${GLOVE_GOOGLE_DRIVE_CREDENTIALS} \
 						--action=export \
 						--id=${EXPORT_SPREADSHEET} \
-						--output=${RAWFILE_QUEUE_PATH}export/${EXPORT_SPREADSHEET}.${EXPORT_MIME_TYPE} \
+						--output=${RAWFILE_QUEUE_PATH}export/${EXPORT_SPREADSHEET}.xls \
 						--mimetype=${EXPORT_MIME_TYPE}"
 					#fi
 
@@ -738,10 +738,8 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 						--credentials=${GLOVE_GOOGLE_DRIVE_CREDENTIALS} \
 						--action=export \
 						--id=${EXPORT_SPREADSHEET} \
-						--output=${RAWFILE_QUEUE_PATH}export/${EXPORT_SPREADSHEET}.${EXPORT_MIME_TYPE} \
+						--output=${RAWFILE_QUEUE_PATH}export/${EXPORT_SPREADSHEET} \
 						--mimetype=${EXPORT_MIME_TYPE}
-						
-					head -n 10 ${RAWFILE_QUEUE_PATH}export/${EXPORT_SPREADSHEET}.${EXPORT_MIME_TYPE}
 				fi				
 			else
 				echo "EXPORT_BUCKET_DEFAULT or EXPORT_SPREADSHEET_DEFAULT was not defined!"
