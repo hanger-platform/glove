@@ -82,6 +82,11 @@
       <description>Identifica o bucket default para exportação de dados. </description>
     </parameter>
     <parameter>
+      <name>EXPORT_MIME_TYPE</name>
+      <default_value />
+      <description>Identifica o formato que uma planilha do Google spreadsheets será exportado.</description>
+    </parameter>
+    <parameter>
       <name>EXPORT_PROFILE</name>
       <default_value>default</default_value>
       <description>Identifica o perfil do S3 que será utilizado na exportação dos dados.</description>
