@@ -719,10 +719,20 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 					--delimiter=${DELIMITER}
 				error_check
 				
-				# Identifica se deve exportar a spreadsheet.
+				# Identifica se deve exportar a spreadsheet para xls.
 				if [ "${#EXPORT_SHEETS_RECIPIENTS}" -gt "0" ]; then
-
+					
+					# Data e hora atual.
+					NOW=`date '+%Y%m%d%H%M%S'`
+					
+					# Local para armazenar arquivo de exportação.
 					RAWFILE_QUEUE_PATH_EXPORT="${RAWFILE_QUEUE_PATH}export"
+					
+					# Nome do arquivo de exportação.
+					EXPORT_FILE_NAME="${EXPORT_SPREADSHEET}.xls"
+					
+					# Local no s3 onde o arquivo será exportado.
+					STORAGE_EXPORT_FILE_PATH="${STORAGE_STAGING_QUEUE_PATH}/${EXPORT_SPREADSHEET}/${NOW}/"
 
 					# Cria um diretório temporário de exportação.
 					mkdir ${RAWFILE_QUEUE_PATH_EXPORT}
@@ -732,20 +742,21 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 						--credentials=${GLOVE_GOOGLE_DRIVE_CREDENTIALS} \
 						--action='export' \
 						--id=${EXPORT_SPREADSHEET} \
-						--output=${RAWFILE_QUEUE_PATH_EXPORT}/${EXPORT_SPREADSHEET}.xls"
+						--output=${RAWFILE_QUEUE_PATH_EXPORT}/${EXPORT_FILE_NAME}"
 					fi
-
+					
+					# Exporta a planilha para o formato xls.
 					java -jar ${GLOVE_HOME}/extractor/lib/google-drive-manager.jar \
 						--credentials=${GLOVE_GOOGLE_DRIVE_CREDENTIALS} \
 						--action='export' \
 						--id=${EXPORT_SPREADSHEET} \
-						--output=${RAWFILE_QUEUE_PATH_EXPORT}/${EXPORT_SPREADSHEET}.xls
+						--output=${RAWFILE_QUEUE_PATH_EXPORT}/${EXPORT_FILE_NAME}
 					error_check
 					
 					### LINK PRESIGN ABAIXO.
-					#aws s3 cp ${RAWFILE_QUEUE_PATH_EXPORT}/${EXPORT_SPREADSHEET}.xls ${STORAGE_STAGING_QUEUE_PATH}/${EXPORT_SPREADSHEET}/
+					aws s3 cp ${RAWFILE_QUEUE_PATH_EXPORT}/${EXPORT_FILE_NAME} ${STORAGE_EXPORT_FILE_PATH}
 					
-					echo 'Arquivo exportado via GLOVE' | mutt -s 'EXPORT de planilha' ${EXPORT_SHEETS_RECIPIENTS} -a ${RAWFILE_QUEUE_PATH_EXPORT}/${EXPORT_SPREADSHEET}.xls
+					echo 'Arquivo exportado via GLOVE' | mutt -s 'EXPORT de planilha' ${EXPORT_SHEETS_RECIPIENTS} -a ${RAWFILE_QUEUE_PATH_EXPORT}/${EXPORT_FILE_NAME}
 				fi				
 			else
 				echo "EXPORT_BUCKET_DEFAULT or EXPORT_SPREADSHEET_DEFAULT was not defined!"
