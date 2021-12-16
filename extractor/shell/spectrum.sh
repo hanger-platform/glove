@@ -718,6 +718,31 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 					--debug=${DEBUG} \
 					--delimiter=${DELIMITER}
 				error_check
+				
+				# Identifica se deve exportar a spreadsheet.
+				if [ "${#EXPORT_MIME_TYPE}" -gt "0" ]; then
+				
+					# Cria um diretório temporário de exportação.
+					mkdir ${RAWFILE_QUEUE_PATH}export
+				
+					#if [ ${DEBUG} = 1 ] ; then
+						echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/google-drive-manager.jar
+						--credentials=${GLOVE_GOOGLE_DRIVE_CREDENTIALS} \
+						--action=export \
+						--id=${EXPORT_SPREADSHEET} \
+						--output=${RAWFILE_QUEUE_PATH}export/${EXPORT_SPREADSHEET}.${EXPORT_MIME_TYPE} \
+						--mimetype=${EXPORT_MIME_TYPE}"
+					#fi
+
+					java -jar ${GLOVE_HOME}/extractor/lib/google-drive-manager.jar
+						--credentials=${GLOVE_GOOGLE_DRIVE_CREDENTIALS} \
+						--action=export \
+						--id=${EXPORT_SPREADSHEET} \
+						--output=${RAWFILE_QUEUE_PATH}export/${EXPORT_SPREADSHEET}.${EXPORT_MIME_TYPE} \
+						--mimetype=${EXPORT_MIME_TYPE}
+						
+					head -n 10 ${RAWFILE_QUEUE_PATH}export/${EXPORT_SPREADSHEET}.${EXPORT_MIME_TYPE}
+				fi				
 			else
 				echo "EXPORT_BUCKET_DEFAULT or EXPORT_SPREADSHEET_DEFAULT was not defined!"
 			fi
