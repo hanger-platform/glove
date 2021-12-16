@@ -713,8 +713,7 @@ EXPORT_PROFILE                  == ${EXPORT_PROFILE}
 EXPORT_SHEETS_METHOD            == ${EXPORT_SHEETS_METHOD}
 EXPORT_SHEET                    == ${EXPORT_SHEET}
 EXPORT_SPREADSHEET              == ${EXPORT_SPREADSHEET}
-EXPORT_MIME_TYPE                == ${EXPORT_MIME_TYPE}
-MAIL_LIST                       == ${MAIL_LIST}</logmessage>
+EXPORT_SHEETS_RECIPIENTS        == ${EXPORT_SHEETS_RECIPIENTS}</logmessage>
       <loglevel>Basic</loglevel>
       <logsubject>LOG</logsubject>
       <parallel>N</parallel>

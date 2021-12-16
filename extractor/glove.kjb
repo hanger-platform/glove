@@ -82,11 +82,6 @@
       <description>Identifica o bucket default para exportação de dados. </description>
     </parameter>
     <parameter>
-      <name>EXPORT_MIME_TYPE</name>
-      <default_value />
-      <description>Identifica o formato que uma planilha do Google spreadsheets será exportado.</description>
-    </parameter>
-    <parameter>
       <name>EXPORT_PROFILE</name>
       <default_value>default</default_value>
       <description>Identifica o perfil do S3 que será utilizado na exportação dos dados.</description>
@@ -95,6 +90,11 @@
       <name>EXPORT_SHEETS_METHOD</name>
       <default_value>0</default_value>
       <description>Identifica o tipo de atualização da planilha [0: FULL, 1:APPEND]</description>
+    </parameter>
+    <parameter>
+      <name>EXPORT_SHEETS_RECIPIENTS</name>
+      <default_value />
+      <description>Identifica a lista de e-mails que receberá a exportação do arquivo gerado a partir da spreadsheet</description>
     </parameter>
     <parameter>
       <name>EXPORT_SHEET_DEFAULT</name>
@@ -215,11 +215,6 @@
       <name>IS_SPECTRUM</name>
       <default_value>1</default_value>
       <description>Identifica se o AWS Redshift Spectrum está configurado.</description>
-    </parameter>
-    <parameter>
-      <name>MAIL_LIST</name>
-      <default_value />
-      <description>Identifica a lista de e-mails que receberá a exportação do arquivo gerado a partir da spreadsheet</description>
     </parameter>
     <parameter>
       <name>MANIFEST</name>
