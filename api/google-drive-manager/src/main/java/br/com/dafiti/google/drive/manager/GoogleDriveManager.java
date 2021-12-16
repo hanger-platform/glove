@@ -67,7 +67,7 @@ public class GoogleDriveManager {
                 .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "")
                 .addParameter("h", "input", "(Optional) Input file; Required for UPLOAD", "")
                 .addParameter("n", "notification", "(Optional) Send notification email; COPY only; FALSE is default", "false")
-                .addParameter("m", "mimetype", "(Optional) download file format; DOWNLOAD only; text/csv is default", "text/csv");
+                .addParameter("m", "mimetype", "(Optional) download file format; DOWNLOAD only; application/vnd.openxmlformats-officedocument.spreadsheetml.sheet is default", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 
         //Command Line.
         CommandLineInterface cli = mitt.getCommandLineInterface(args);
