@@ -736,6 +736,8 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 						--output=${RAWFILE_QUEUE_PATH}export/${EXPORT_SPREADSHEET} \
 						--mimetype=${EXPORT_MIME_TYPE}
 					error_check
+					
+					echo 'Arquivo exportado via GLOVE' | mutt -s 'EXPORT de planilha' helio.leal@dafiti.com.br -a ${RAWFILE_QUEUE_PATH}export/${EXPORT_SPREADSHEET}
 				fi				
 			else
 				echo "EXPORT_BUCKET_DEFAULT or EXPORT_SPREADSHEET_DEFAULT was not defined!"
