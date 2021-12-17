@@ -97,6 +97,11 @@
       <description>Identifica a lista de e-mails que receberá a exportação do arquivo gerado a partir da spreadsheet</description>
     </parameter>
     <parameter>
+      <name>EXPORT_SHEETS_SUBJECT</name>
+      <default_value />
+      <description>Identifica o assunto do e-mail com o arquivo gerado a partir da spreadsheet.</description>
+    </parameter>
+    <parameter>
       <name>EXPORT_SHEET_DEFAULT</name>
       <default_value />
       <description>Identifica o nome da página (guia)</description>
