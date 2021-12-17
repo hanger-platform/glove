@@ -20,6 +20,7 @@ SCHEMA_HASH=`echo -n ${SCHEMA} | md5sum | awk '{print substr($1,1,6)}'`
 STORAGE_QUEUE_PATH="s3://${STORAGE_BUCKET}/${SCHEMA_HASH}_${SCHEMA}/${ENTITY_HASH}_${TABLE}/rawfile/queue/"
 STORAGE_DISASTER_RECOVERY_QUEUE_PATH="s3://${GLOVE_STORARE_BUCKET_DISASTER_RECOVERY}/disaster_recovery/${SCHEMA_HASH}_${SCHEMA}/${ENTITY_HASH}_${TABLE}/rawfile/queue/"
 STORAGE_STAGING_QUEUE_PATH="s3://${GLOVE_STORARE_BUCKET_STAGING}/staging"
+STORAGE_EXPORT_QUEUE_PATH="s3://${GLOVE_STORARE_BUCKET_STAGING}/export"
 
 # Arquivo de dados.
 DATA_FILE="${SCHEMA}_${TABLE}"
@@ -732,7 +733,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 					EXPORT_FILE_NAME="${EXPORT_SPREADSHEET}.xls"
 					
 					# Local temporário no S3 onde o arquivo será colocado.
-					STORAGE_EXPORT_FILE_PATH="${STORAGE_STAGING_QUEUE_PATH}/${EXPORT_SPREADSHEET}/${NOW}/"
+					STORAGE_EXPORT_FILE_PATH="${STORAGE_EXPORT_QUEUE_PATH}/${EXPORT_SPREADSHEET}/${NOW}/"
 
 					# Cria diretório temporário de exportação.
 					mkdir ${RAWFILE_QUEUE_PATH_EXPORT}
