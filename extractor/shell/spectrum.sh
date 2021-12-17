@@ -764,7 +764,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 
 					echo "Sending e-mail with presign link to recipients: ${EXPORT_SHEETS_RECIPIENTS}"					
 
-					echo "File has been exported and is available for download at: ${LINK_PRESIGN}" | mutt -s "${EXPORT_SHEETS_SUBJECT}" -b ${EXPORT_SHEETS_RECIPIENTS}
+					echo "File has been exported with GLOVE and is available for download at: ${LINK_PRESIGN}" | mutt -s "${EXPORT_SHEETS_SUBJECT}" -b ${EXPORT_SHEETS_RECIPIENTS}
 					
 					# Efetua a limpeza do arquivo temporário do S3.
 					echo "Removing staging files of ${STORAGE_EXPORT_FILE_PATH}"
