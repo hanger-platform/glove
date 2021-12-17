@@ -720,8 +720,8 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 				error_check
 				
 				# Identifica se deve exportar a spreadsheet para xls.
-				if [ "${#EXPORT_SHEETS_RECIPIENTS}" -gt "0" ]; then
-					
+				if [ "${#EXPORT_SHEETS_RECIPIENTS}" -gt "0" ] && [ "${#EXPORT_SHEETS_SUBJECT}" -gt "0" ]; then
+
 					# Data e hora atual.
 					NOW=`date '+%Y%m%d%H%M%S'`
 					
@@ -761,14 +761,14 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 
 					echo 'Presign link expires in 604800 seconds:'
 					echo $LINK_PRESIGN	
+
+					echo "Sending e-mail with presign link to recipients: ${EXPORT_SHEETS_RECIPIENTS}"					
+
+					echo "File has been exported and is available for download at: ${LINK_PRESIGN}" | mutt -s "${EXPORT_SHEETS_SUBJECT}" -b ${EXPORT_SHEETS_RECIPIENTS}
 					
-					echo "Sending e-mail with presign link to recipients: ${EXPORT_SHEETS_RECIPIENTS}"	
-		
-					echo "Arquivo foi exportado e está disponível para download em: ${LINK_PRESIGN}" | mutt -s 'EXPORT de planilha' -b ${EXPORT_SHEETS_RECIPIENTS}
-					
-					### TODO
-					###	Efetuar as limpezas abaixo
-					
+					# Efetua a limpeza do arquivo temporário do S3.
+					echo "Removing staging files of ${STORAGE_EXPORT_FILE_PATH}"
+					aws s3 rm ${STORAGE_EXPORT_FILE_PATH} --recursive --only-show-errors
 				fi				
 			else
 				echo "EXPORT_BUCKET_DEFAULT or EXPORT_SPREADSHEET_DEFAULT was not defined!"
