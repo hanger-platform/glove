@@ -762,7 +762,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 					echo 'Presign link expires in 604800 seconds:'
 					echo $LINK_PRESIGN	
 					
-					echo 'Sending e-mail with presign link to recipients: ${EXPORT_SHEETS_RECIPIENTS}'	
+					echo "Sending e-mail with presign link to recipients: ${EXPORT_SHEETS_RECIPIENTS}"	
 		
 					echo "Arquivo foi exportado e está disponível para download em: ${LINK_PRESIGN}" | mutt -s 'EXPORT de planilha' -b ${EXPORT_SHEETS_RECIPIENTS}
 					
