@@ -731,12 +731,12 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 					# Nome do arquivo de exportação.
 					EXPORT_FILE_NAME="${EXPORT_SPREADSHEET}.xls"
 					
-					# Local no S3 onde o arquivo será exportado.
+					# Local temporário no S3 onde o arquivo será colocado.
 					STORAGE_EXPORT_FILE_PATH="${STORAGE_STAGING_QUEUE_PATH}/${EXPORT_SPREADSHEET}/${NOW}/"
 
-					# Cria um diretório temporário de exportação.
+					# Cria diretório temporário de exportação.
 					mkdir ${RAWFILE_QUEUE_PATH_EXPORT}
-				
+
 					if [ ${DEBUG} = 1 ] ; then
 						echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/google-drive-manager.jar \
 						--credentials=${GLOVE_GOOGLE_DRIVE_CREDENTIALS} \
@@ -744,28 +744,31 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 						--id=${EXPORT_SPREADSHEET} \
 						--output=${RAWFILE_QUEUE_PATH_EXPORT}/${EXPORT_FILE_NAME}"
 					fi
-					
-					# Exporta a planilha para o formato xls.
+
+					# Exporta a spreadsheet para formato xls.
 					java -jar ${GLOVE_HOME}/extractor/lib/google-drive-manager.jar \
 						--credentials=${GLOVE_GOOGLE_DRIVE_CREDENTIALS} \
 						--action='export' \
 						--id=${EXPORT_SPREADSHEET} \
 						--output=${RAWFILE_QUEUE_PATH_EXPORT}/${EXPORT_FILE_NAME}
 					error_check
-					
+
 					# Sobe o arquivo exportado para o S3.
 					aws s3 cp ${RAWFILE_QUEUE_PATH_EXPORT}/${EXPORT_FILE_NAME} ${STORAGE_EXPORT_FILE_PATH}
 					
-					# Gera o link pre sign para ser enviado por e-mail.
+					# Gera link presign a ser enviado por e-mail.
 					LINK_PRESIGN=`aws s3 presign ${STORAGE_EXPORT_FILE_PATH}${EXPORT_FILE_NAME} --expires-in 604800`
 
-					echo 'Presign createad expires in 604800 seconds:'
-					echo $LINK_PRESIGN
-
-					echo "Arquivo foi exportado e está disponível para download em: ${LINK_PRESIGN}" | mutt -s 'EXPORT de planilha' ${EXPORT_SHEETS_RECIPIENTS}
+					echo 'Presign link expires in 604800 seconds:'
+					echo $LINK_PRESIGN	
+					
+					echo 'Sending e-mail with presign link to recipients: ${EXPORT_SHEETS_RECIPIENTS}'	
+		
+					echo "Arquivo foi exportado e está disponível para download em: ${LINK_PRESIGN}" | mutt -s 'EXPORT de planilha' -b ${EXPORT_SHEETS_RECIPIENTS}
 					
 					### TODO
 					###	Efetuar as limpezas abaixo
+					
 				fi				
 			else
 				echo "EXPORT_BUCKET_DEFAULT or EXPORT_SPREADSHEET_DEFAULT was not defined!"
