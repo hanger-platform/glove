@@ -48,14 +48,6 @@ java -jar sap-hana-cloud-api.jar \
 ## Exemplo
 
 ```bash
-java -jar /home/etl/lib/sapjco3.jar \
-  --credentials="/<credentials_path>/<credentials_file>.json" \
-  --output="/tmp/sapjco3/bw/ZBW000016/ZBW000016.csv" \
-  --function="ZRFC_READ_TABLE" \
-  --table="ZBW000016" \
-  --key='::checksum()' \
-  --partition='::fixed(FULL)'
-  
 java -jar /home/etl/lib/sap-hana-cloud-api.jar \
 	--credentials="/<credentials_path>/<credentials_file>.json" \ 
 	--output=/tmp/sap_hana_cloud_api/getintegracao.csv \
