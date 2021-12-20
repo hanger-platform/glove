@@ -3,10 +3,11 @@
 
 ## How it works
 
-The **Google Drive Manager** is a tool that allows the user to manage and extract files from Google Drive. There are 3 actions available in this tool, they are:
+The **Google Drive Manager** is a tool that allows the user to manage and extract files from Google Drive. There are 4 actions available in this tool, they are:
 - **Copy**: Copy one file to another, if source file is shared with some people, these permissions will be copied either.
 - **Import**: Import files from google drive and turn them into a csv file processed by mitt.
 - **Upload**: Upload a local file into Google Drive.
+- **Export**: Download a Google Drive file (Sheets, Docs, slides) into local station in a desired format.
 
 ## Install
 
@@ -56,7 +57,8 @@ java -jar google-drive-manager.jar \
 	--partition=<(Optional)  Partition, divided by + if has more than one field> \
 	--key=<(Optional) Unique key, divided by + if has more than one field> \
 	--input=<(Optional) Input file; Required for UPLOAD> \
-  	--notification=<(Optional) Send notification email; COPY only; FALSE is default>
+  	--notification=<(Optional) Send notification email; COPY only; FALSE is default> \
+	--mimetype=<(Optional) download file format; EXPORT only; application/vnd.openxmlformats-officedocument.spreadsheetml.sheet is default>
 ```
 
 ##### COPY
@@ -102,6 +104,20 @@ java -jar /home/user_name/glove/extractor/lib/google-drive-manager.jar \
   --input="/tmp/anything/input_file_name.any_extesion" \
   --title="title_of_uploaded_file.any_extension"
 ```
+
+##### EXPORT
+This action will export and download locally a file of Google Docs, Sheets, Slides etc. in a mimetype chosen by you.
+
+```bash 
+java -jar /home/user_name/glove/extractor/lib/google-drive-manager.jar \
+	--credentials=/home/user_name/credentials/google_drive.json \
+	--action='EXPORT' \
+	--id="<id of the google drive file to be exported.>" \
+	--output="/tmp/anything/file_name" \
+	--mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+```
+
+* **Mimetype**: This is the format of your file, the default value is excel. The list of supported formats is on link: [Export Formats](https://developers.google.com/drive/api/v3/ref-export-formats).
 
 ## Contributing, Bugs, Questions
 Contributions are more than welcome! If you want to propose new changes, fix bugs or improve something feel free to fork the repository and send us a Pull Request. You can also open new `Issues` for reporting bugs and general problems.

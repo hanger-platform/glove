@@ -56,7 +56,7 @@ public class GoogleDriveManager {
         //Define parameters. 
         mitt.getConfiguration()
                 .addParameter("c", "credentials", "Credentials file", "", true, true)
-                .addParameter("s", "id", "(Optional) file id (can use google spreadsheet id); Required for COPY and IMPORT", "")
+                .addParameter("s", "id", "(Optional) file id (can use google spreadsheet id); Required for COPY, IMPORT and EXPORT", "")
                 .addParameter("t", "title", "(Optional)  New file title; Required for COPY and UPLOAD", "")
                 .addParameter("f", "folder", "(Optional) Folder id, if null save file in my drive.", "")
                 .addParameter("a", "action", "(Optional) Action on Google Drive; COPY is default", "COPY")
@@ -66,7 +66,8 @@ public class GoogleDriveManager {
                 .addParameter("pa", "partition", "(Optional)  Partition, divided by + if has more than one field")
                 .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "")
                 .addParameter("h", "input", "(Optional) Input file; Required for UPLOAD", "")
-                .addParameter("n", "notification", "(Optional) Send notification email; COPY only; FALSE is default", "false");
+                .addParameter("n", "notification", "(Optional) Send notification email; COPY only; FALSE is default", "false")
+                .addParameter("m", "mimetype", "(Optional) download file format; EXPORT only; application/vnd.openxmlformats-officedocument.spreadsheetml.sheet is default", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 
         //Command Line.
         CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -162,6 +163,23 @@ public class GoogleDriveManager {
                 File metadata = api.upload(cli.getParameter("title"), cli.getParameter("input"), cli.getParameterAsList("folder", "\\+"));
 
                 Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.INFO, "File successfully uploaded, new file id: {0}", metadata.getId());
+
+                break;
+            case "EXPORT":
+                if (Strings.isNullOrEmpty((cli.getParameter("id")))) {
+                    Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.SEVERE, "Parameter id is empty.");
+                    break;
+                }
+
+                if (Strings.isNullOrEmpty((cli.getParameter("output")))) {
+                    Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.SEVERE, "Parameter output is empty.");
+                    break;
+                }
+
+                //Export file of Google Drive.
+                api.export(cli.getParameter("id"), cli.getParameter("mimetype"), cli.getParameter("output"));
+
+                Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.INFO, "File exported successfully to {0}", cli.getParameter("output"));
 
                 break;
             default:

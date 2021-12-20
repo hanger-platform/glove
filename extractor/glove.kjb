@@ -92,6 +92,16 @@
       <description>Identifica o tipo de atualização da planilha [0: FULL, 1:APPEND]</description>
     </parameter>
     <parameter>
+      <name>EXPORT_SHEETS_RECIPIENTS</name>
+      <default_value />
+      <description>Identifica a lista de e-mails que receberá a exportação do arquivo gerado a partir da spreadsheet</description>
+    </parameter>
+    <parameter>
+      <name>EXPORT_SHEETS_SUBJECT</name>
+      <default_value />
+      <description>Identifica o assunto do e-mail com o arquivo gerado a partir da spreadsheet.</description>
+    </parameter>
+    <parameter>
       <name>EXPORT_SHEET_DEFAULT</name>
       <default_value />
       <description>Identifica o nome da página (guia)</description>
@@ -770,7 +780,7 @@ fi</script>
   / ____/   / /   / __ \| |  / /   / ____/
  / / __    / /   / / / /| | / /   / __/   
 / /_/ /   / /___/ /_/ / | |/ /   / /___   
-\____/   /_____/\____/  |___/   /_____/     Version 0.33.0
+\____/   /_____/\____/  |___/   /_____/     Version 0.34.0
                                     
 #-----------------------------------------------------------
 # PATH
