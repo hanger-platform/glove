@@ -3,10 +3,11 @@
 
 ## How it works
 
-The **Google Drive Manager** is a tool that allows the user to manage and extract files from Google Drive. There are 3 actions available in this tool, they are:
+The **Google Drive Manager** is a tool that allows the user to manage and extract files from Google Drive. There are 4 actions available in this tool, they are:
 - **Copy**: Copy one file to another, if source file is shared with some people, these permissions will be copied either.
 - **Import**: Import files from google drive and turn them into a csv file processed by mitt.
 - **Upload**: Upload a local file into Google Drive.
+- **Export**: Download a Google Drive file into the local station (Can even download files from Google Sheets, Google Docs, Google Slides etc).
 
 ## Install
 
@@ -56,7 +57,8 @@ java -jar google-drive-manager.jar \
 	--partition=<(Optional)  Partition, divided by + if has more than one field> \
 	--key=<(Optional) Unique key, divided by + if has more than one field> \
 	--input=<(Optional) Input file; Required for UPLOAD> \
-  	--notification=<(Optional) Send notification email; COPY only; FALSE is default>
+  	--notification=<(Optional) Send notification email; COPY only; FALSE is default> \
+	--mimetype=<(Optional) download file format; EXPORT only; application/vnd.openxmlformats-officedocument.spreadsheetml.sheet is default>
 ```
 
 ##### COPY
