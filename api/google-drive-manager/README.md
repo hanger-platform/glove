@@ -103,5 +103,19 @@ java -jar /home/user_name/glove/extractor/lib/google-drive-manager.jar \
   --title="title_of_uploaded_file.any_extension"
 ```
 
+##### EXPORT
+This action will export and download locally a file of Google Docs, Sheets, Slides etc. in a mimetype chosen by you.
+
+```bash 
+java -jar /home/user_name/glove/extractor/lib/google-drive-manager.jar \
+	--credentials=/home/user_name/credentials/google_drive.json \
+	--action='EXPORT' \
+	--id="<id of the google drive file to be exported.>" \
+	--output="/tmp/anything/file_name" \
+	--mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+```
+
+* **Mimetype**: This is the format of your file, the default value is excel. The list of supported formats is on link: [Export Formats](https://developers.google.com/drive/api/v3/ref-export-formats).
+
 ## Contributing, Bugs, Questions
 Contributions are more than welcome! If you want to propose new changes, fix bugs or improve something feel free to fork the repository and send us a Pull Request. You can also open new `Issues` for reporting bugs and general problems.
