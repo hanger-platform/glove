@@ -7,7 +7,7 @@ The **Google Drive Manager** is a tool that allows the user to manage and extrac
 - **Copy**: Copy one file to another, if source file is shared with some people, these permissions will be copied either.
 - **Import**: Import files from google drive and turn them into a csv file processed by mitt.
 - **Upload**: Upload a local file into Google Drive.
-- **Export**: Download a Google Drive file into local station (Can even download files from Google Sheets, Google Docs, Google Slides etc).
+- **Export**: Download a Google Drive file (Sheets, Docs, slides) into local station in a desired format.
 
 ## Install
 
