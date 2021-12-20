@@ -41,7 +41,7 @@ public class NumberFormat implements Transformable {
     private final String field;
     private final String language;
     private final String country;
-    private java.text.NumberFormat numberFormat;
+    private Locale locale;
 
     public NumberFormat(String field, String language, String country) {
         this.field = field;
@@ -51,7 +51,7 @@ public class NumberFormat implements Transformable {
 
     @Override
     public void init() {
-        numberFormat = java.text.NumberFormat.getInstance(new Locale(language, country));
+        locale = new Locale(language, country);
     }
 
     @Override
@@ -63,11 +63,12 @@ public class NumberFormat implements Transformable {
 
         try {
             if (!value.isEmpty()) {
-                value = String.valueOf(numberFormat.parse(value));
+                value = String.valueOf(
+                        java.text.NumberFormat.getInstance(locale).parse(value)
+                );
             }
-        } catch (ParseException ex) {
+        } catch (ParseException | NumberFormatException ex) {
             Logger.getLogger(NumberFormat.class.getName()).log(Level.SEVERE, "Error formatting value: " + value, ex);
-
         }
 
         return value;
