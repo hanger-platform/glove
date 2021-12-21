@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>run</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-classpath %classpath br.com.dafiti.sap.hana.cloud.api.SapHanaCloudApi --credentials="/home/helio.leal/credentials/sap_hana_cloud_api.json" --output="/tmp/sap_hana_cloud_api/getintegracao.csv" --field="CD_FLUXO+CD_PAIS+CD_CHAVE_EXTERNA" --uri="getIntegracaoSCP?$filter=DT_HORA_INICIO_EXECUCAO ge 2021-12-15T15:27:00.00Z"</exec.args>
+                <exec.executable>java</exec.executable>
+            </properties>
+        </action>
+        <action>
+            <actionName>debug</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.sap.hana.cloud.api.SapHanaCloudApi --credentials="/home/helio.leal/credentials/sap_hana_cloud_api.json" --output="/tmp/sap_hana_cloud_api/getintegracao.csv" --field="CD_FLUXO+CD_PAIS+CD_CHAVE_EXTERNA" --uri="getIntegracaoSCP?$filter=DT_HORA_INICIO_EXECUCAO ge 2021-12-15T15:27:00.00Z"</exec.args>
+                <exec.executable>java</exec.executable>
+                <jpda.listen>true</jpda.listen>
+            </properties>
+        </action>
+        <action>
+            <actionName>profile</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-classpath %classpath br.com.dafiti.sap.hana.cloud.api.SapHanaCloudApi --credentials="/home/helio.leal/credentials/sap_hana_cloud_api.json" --output="/tmp/sap_hana_cloud_api/getintegracao.csv" --field="CD_FLUXO+CD_PAIS+CD_CHAVE_EXTERNA" --uri="getIntegracaoSCP?$filter=DT_HORA_INICIO_EXECUCAO ge 2021-12-15T15:27:00.00Z"</exec.args>
+                <exec.executable>java</exec.executable>
+            </properties>
+        </action>
+    </actions>
