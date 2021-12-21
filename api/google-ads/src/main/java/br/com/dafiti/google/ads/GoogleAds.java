@@ -29,10 +29,10 @@ import br.com.dafiti.mitt.exception.DuplicateEntityException;
 import br.com.dafiti.mitt.transformation.embedded.Concat;
 import br.com.dafiti.mitt.transformation.embedded.Now;
 import com.google.ads.googleads.lib.GoogleAdsClient;
-import com.google.ads.googleads.v6.services.GoogleAdsRow;
-import com.google.ads.googleads.v6.services.GoogleAdsServiceClient;
-import com.google.ads.googleads.v6.services.SearchGoogleAdsStreamRequest;
-import com.google.ads.googleads.v6.services.SearchGoogleAdsStreamResponse;
+import com.google.ads.googleads.v9.services.GoogleAdsRow;
+import com.google.ads.googleads.v9.services.GoogleAdsServiceClient;
+import com.google.ads.googleads.v9.services.SearchGoogleAdsStreamRequest;
+import com.google.ads.googleads.v9.services.SearchGoogleAdsStreamResponse;
 import com.google.api.gax.rpc.ServerStream;
 import com.google.api.pathtemplate.ValidationException;
 import java.io.File;
@@ -87,7 +87,7 @@ public class GoogleAds {
                     .addField(cli.getParameterAsList("field", "\\,"));
 
             //Get original fields.
-            List<String> fields = mitt.getConfiguration().getOriginalFieldsName();
+            List<String> fields = mitt.getConfiguration().getOriginalFieldName();
 
             //Defines an authenticated client for Google ads api.
             GoogleAdsClient googleAdsClient = GoogleAdsClient
