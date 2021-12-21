@@ -55,9 +55,14 @@ GLOVE_SISENSE_TOKEN=<Sisense API Token>
 # Support buckets
 GLOVE_STORARE_BUCKET_STAGING=<S3 bucket para dados temporários>
 GLOVE_STORARE_BUCKET_DISASTER_RECOVERY=<S3 bucket para disaster recovery>
+
+GLOVE_SPREADSHEET_CREDENTIALS=<Path para o arquivo de Service account credentials no formato JSON>
+GLOVE_GOOGLE_DRIVE_CREDENTIALS=<Path para o arquivo de Service account credentials no formato JSON>
 ```
 
 Para configuração do Spectrum Role, consulte esta documentação:  [Utilização do Amazon Redshift Spectrum para consultar dados externos](https://docs.aws.amazon.com/pt_br/redshift/latest/dg/c-using-spectrum.html)   
+
+Para a criação do arquivo de credenciais de conta de serviço no formato JSON, acesso as seguintes documentações: [Google Sheets](https://github.com/dafiti-group/glove/tree/master/api/google-sheets-export#requisitos) e [Google Drive](https://github.com/dafiti-group/glove/tree/master/api/google-drive-manager#requirements)
 
 - Crie o arquivo ~/.kettle/connection.properties, inserindo o cabeçalho e uma nova linha para cada conexão:  
 
