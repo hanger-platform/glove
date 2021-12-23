@@ -507,38 +507,38 @@ send_email()
     RECIPIENTS=(`echo ${EXPORT_SHEETS_RECIPIENTS} | cut -d ","  --output-delimiter=" " -f 1-`)
 
     # Lista de e-mails válidos.
-    VALID_EMAILS=""
+    ALLOWED_EMAILS=""
 
     # Varre os destinatários.
     for RECIPIENT in ${RECIPIENTS[@]}; do 
-        IS_VALID=true
+        IS_ALLOWED=true
 
         # Identifica se existe lista de e-mails válidos.
         if [ "${#GLOVE_EXPORT_EMAIL_WHITELIST}" -gt "0" ]; then
-            IS_VALID=false
+            IS_ALLOWED=false
 
             # Varre lista de e-mails/domínios válidos.
             for EMAIL_PATTERN in $(cat ${GLOVE_EXPORT_EMAIL_WHITELIST}); do
 
                 # Identifica se destinatário é válido.
                 if [[ $RECIPIENT =~ $EMAIL_PATTERN ]] ; then
-                    IS_VALID=true
+                    IS_ALLOWED=true
                     break
                 fi
             done
         fi
 
-        # Adiciona destinatários válidos na lista de envio de e-mails.
-        if $IS_VALID ; then
-            VALID_EMAILS+="$RECIPIENT,"
+        # Adiciona destinatários permitidos na lista de envio de e-mails.
+        if $IS_ALLOWED ; then
+            ALLOWED_EMAILS+="$RECIPIENT,"
         else
-            echo "Recipient ${RECIPIENT} is not available on export e-mail whitelist"
+            echo "Recipient ${RECIPIENT} is not allowed to receive this export."
         fi
     done
     
-	echo "Sending e-mail with presign link to recipients: ${VALID_EMAILS::-1}"					
+	echo "Sending e-mail with presign link to recipients: ${ALLOWED_EMAILS::-1}"					
 
-	echo $1 | mutt -s "${EXPORT_SHEETS_SUBJECT}" -b ${VALID_EMAILS::-1}
+	echo $1 | mutt -s "${EXPORT_SHEETS_SUBJECT}" -b ${ALLOWED_EMAILS::-1}
 }
 
 # Identifica a ocorrência de erros e interrompe processo.
