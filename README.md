@@ -58,6 +58,7 @@ GLOVE_STORARE_BUCKET_DISASTER_RECOVERY=<S3 bucket para disaster recovery>
 
 GLOVE_SPREADSHEET_CREDENTIALS=<Path para o arquivo de Service account credentials no formato JSON>
 GLOVE_GOOGLE_DRIVE_CREDENTIALS=<Path para o arquivo de Service account credentials no formato JSON>
+GLOVE_EXPORT_EMAIL_WHITELIST=<Caminho e nome do arquivo com lista de e-mails/domínios permitidos a receber e-mails pelo processo de exportação>
 ```
 
 Para configuração do Spectrum Role, consulte esta documentação:  [Utilização do Amazon Redshift Spectrum para consultar dados externos](https://docs.aws.amazon.com/pt_br/redshift/latest/dg/c-using-spectrum.html)   
