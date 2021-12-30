@@ -80,7 +80,7 @@ public class DateFormat implements Transformable {
         if (date != null) {
             if (date instanceof Date) {
                 value = new SimpleDateFormat(outputFormat, locale).format(date);
-            } else {
+            } else if (!((String) date).isEmpty()) {
                 try {
                     if (inputFormat.equalsIgnoreCase("UNIXTIMEMILLIS")) {
                         value = new SimpleDateFormat(outputFormat, locale)
