@@ -58,7 +58,8 @@ java -jar google-drive-manager.jar \
 	--key=<(Optional) Unique key, divided by + if has more than one field> \
 	--input=<(Optional) Input file; Required for UPLOAD> \
   	--notification=<(Optional) Send notification email; COPY only; FALSE is default> \
-	--mimetype=<(Optional) download file format; EXPORT only; application/vnd.openxmlformats-officedocument.spreadsheetml.sheet is default>
+	--mimetype=<(Optional) download file format; EXPORT only; application/vnd.openxmlformats-officedocument.spreadsheetml.sheet is default> \
+    --delimiter=<(Optional) File delimiter; ';' as default>
 ```
 
 ##### COPY
