@@ -71,7 +71,7 @@ public class GoogleSheetsApi {
     private final boolean debug;
     private Sheets service;
     private Spreadsheet spreadsheet;
-    
+
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
 
     /**
@@ -135,6 +135,7 @@ public class GoogleSheetsApi {
         } catch (GeneralSecurityException
                 | IOException ex) {
             System.err.println("Error on authenticate: " + ex.getMessage());
+            System.exit(1);
         }
 
         return this;
@@ -177,6 +178,7 @@ public class GoogleSheetsApi {
 
         } catch (IOException ex) {
             System.err.println("Error clearing cells: " + ex.getMessage());
+            System.exit(1);
         }
     }
 
@@ -209,6 +211,7 @@ public class GoogleSheetsApi {
             batchUpdate.execute();
         } catch (IOException ex) {
             System.err.println("Error addings columns: " + ex.getMessage());
+            System.exit(1);
         }
     }
 
@@ -241,6 +244,7 @@ public class GoogleSheetsApi {
             batchUpdate.execute();
         } catch (IOException ex) {
             System.err.println("Error removing columns: " + ex.getMessage());
+            System.exit(1);
         }
     }
 
@@ -269,6 +273,7 @@ public class GoogleSheetsApi {
 
         } catch (IOException ex) {
             System.err.println("Error updating data: " + ex.getMessage());
+            System.exit(1);
         }
     }
 
@@ -394,6 +399,7 @@ public class GoogleSheetsApi {
 
         } catch (IOException ex) {
             System.err.println("Error getting cells values: " + ex.getMessage());
+            System.exit(1);
         }
 
         return false;
