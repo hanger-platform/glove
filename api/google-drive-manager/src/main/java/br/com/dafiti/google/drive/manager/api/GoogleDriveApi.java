@@ -38,7 +38,7 @@ import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
@@ -58,8 +58,9 @@ import java.util.List;
  */
 public class GoogleDriveApi {
 
-    private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private Drive service;
+
+    private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
 
     /**
      * Authenticate on Google Drive API.
@@ -93,6 +94,7 @@ public class GoogleDriveApi {
         } catch (GeneralSecurityException
                 | IOException ex) {
             System.err.println("Error on authenticate: " + ex.getMessage());
+            System.exit(1);
         }
 
         return this;
@@ -136,6 +138,7 @@ public class GoogleDriveApi {
 
         } catch (IOException ex) {
             System.err.println("Error on copy: " + ex.getMessage());
+            System.exit(1);
         }
 
         return metadata;
@@ -200,6 +203,7 @@ public class GoogleDriveApi {
 
         } catch (IOException ex) {
             System.err.println("Error on copy: " + ex.getMessage());
+            System.exit(1);
         }
     }
 
@@ -232,6 +236,7 @@ public class GoogleDriveApi {
 
         } catch (IOException ex) {
             System.err.println("Error on download: " + ex.getMessage());
+            System.exit(1);
         }
 
         return outputPath;
@@ -253,6 +258,7 @@ public class GoogleDriveApi {
             }
         } catch (IOException ex) {
             System.err.println("Error on export: " + ex.getMessage());
+            System.exit(1);
         }
     }
 
@@ -284,6 +290,7 @@ public class GoogleDriveApi {
                     .execute();
         } catch (IOException ex) {
             System.err.println("Error on upload: " + ex.getMessage());
+            System.exit(1);
         }
 
         return response;

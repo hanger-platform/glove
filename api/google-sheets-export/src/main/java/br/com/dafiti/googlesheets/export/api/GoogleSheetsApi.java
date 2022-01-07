@@ -34,7 +34,7 @@ import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.BackOff;
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.client.util.store.FileDataStoreFactory;
@@ -72,6 +72,8 @@ public class GoogleSheetsApi {
     private Sheets service;
     private Spreadsheet spreadsheet;
 
+    private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
+
     /**
      * Credentials file.
      *
@@ -96,13 +98,10 @@ public class GoogleSheetsApi {
             NetHttpTransport netHttpTransport
                     = GoogleNetHttpTransport.newTrustedTransport();
 
-            //Json instance.
-            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-
             //Load client secrets.
             GoogleClientSecrets googleClientSecrets
                     = GoogleClientSecrets.load(
-                            jsonFactory,
+                            JSON_FACTORY,
                             new InputStreamReader(
                                     new FileInputStream(
                                             credentials)));
@@ -111,7 +110,7 @@ public class GoogleSheetsApi {
             GoogleAuthorizationCodeFlow googleAuthorizationCodeFlow
                     = new GoogleAuthorizationCodeFlow.Builder(
                             netHttpTransport,
-                            jsonFactory,
+                            JSON_FACTORY,
                             googleClientSecrets,
                             Collections.singletonList(SheetsScopes.SPREADSHEETS))
                             .setDataStoreFactory(
@@ -124,7 +123,7 @@ public class GoogleSheetsApi {
             Credential credential = new AuthorizationCodeInstalledApp(googleAuthorizationCodeFlow, new LocalServerReceiver()).authorize("user");
 
             //Instance of sheets service.
-            this.service = new Sheets.Builder(netHttpTransport, jsonFactory, setHttpTimeout(credential, timeout))
+            this.service = new Sheets.Builder(netHttpTransport, JSON_FACTORY, setHttpTimeout(credential, timeout))
                     .setApplicationName("Google Sheets Export API")
                     .build();
 
@@ -136,6 +135,7 @@ public class GoogleSheetsApi {
         } catch (GeneralSecurityException
                 | IOException ex) {
             System.err.println("Error on authenticate: " + ex.getMessage());
+            System.exit(1);
         }
 
         return this;
@@ -178,6 +178,7 @@ public class GoogleSheetsApi {
 
         } catch (IOException ex) {
             System.err.println("Error clearing cells: " + ex.getMessage());
+            System.exit(1);
         }
     }
 
@@ -210,6 +211,7 @@ public class GoogleSheetsApi {
             batchUpdate.execute();
         } catch (IOException ex) {
             System.err.println("Error addings columns: " + ex.getMessage());
+            System.exit(1);
         }
     }
 
@@ -242,6 +244,7 @@ public class GoogleSheetsApi {
             batchUpdate.execute();
         } catch (IOException ex) {
             System.err.println("Error removing columns: " + ex.getMessage());
+            System.exit(1);
         }
     }
 
@@ -270,6 +273,7 @@ public class GoogleSheetsApi {
 
         } catch (IOException ex) {
             System.err.println("Error updating data: " + ex.getMessage());
+            System.exit(1);
         }
     }
 
@@ -395,6 +399,7 @@ public class GoogleSheetsApi {
 
         } catch (IOException ex) {
             System.err.println("Error getting cells values: " + ex.getMessage());
+            System.exit(1);
         }
 
         return false;

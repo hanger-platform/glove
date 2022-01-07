@@ -67,7 +67,8 @@ public class GoogleDriveManager {
                 .addParameter("k", "key", "(Optional) Unique key, divided by + if has more than one field", "")
                 .addParameter("h", "input", "(Optional) Input file; Required for UPLOAD", "")
                 .addParameter("n", "notification", "(Optional) Send notification email; COPY only; FALSE is default", "false")
-                .addParameter("m", "mimetype", "(Optional) download file format; EXPORT only; application/vnd.openxmlformats-officedocument.spreadsheetml.sheet is default", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+                .addParameter("m", "mimetype", "(Optional) download file format; EXPORT only; application/vnd.openxmlformats-officedocument.spreadsheetml.sheet is default", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                .addParameter("d", "delimiter", "(Optional) File delimiter; ';' as default", ";");
 
         //Command Line.
         CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -134,6 +135,9 @@ public class GoogleDriveManager {
                 Path outputPath = api.download(cli.getParameter("id"));
 
                 Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.INFO, "File downloaded successfully to {0}", outputPath.toString());
+
+                //Defines input delimiter.
+                mitt.getReaderSettings().setDelimiter(cli.getParameter("delimiter").charAt(0));
 
                 //Defines the file properties.
                 if (cli.getParameter("properties") != null) {
