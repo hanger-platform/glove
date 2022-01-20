@@ -70,7 +70,9 @@ public class FTP {
         Mitt mitt = new Mitt();
 
         //Defines a FTP client.
-        FTPClient ftpClient = new FTPClient();
+        FTPClient ftpClient = new FTPClient();        
+        ftpClient.setConnectTimeout(5 * 60000);
+        ftpClient.setDataTimeout(5 * 60000);        
 
         try {
             //Defines parameters.
@@ -158,11 +160,11 @@ public class FTP {
 
             //Write to the output.
             mitt.getReaderSettings().setDelimiter(cli.getParameter("delimiter").charAt(0));
-            
+
             if (cli.getParameter("properties") != null) {
                 mitt.getReaderSettings().setProperties(cli.getParameter("properties"));
             }
-            
+
             mitt.getReaderSettings().setEncode(cli.getParameter("encode"));
             mitt.write(outputPath.toFile(), "*");
             FileUtils.deleteDirectory(outputPath.toFile());
