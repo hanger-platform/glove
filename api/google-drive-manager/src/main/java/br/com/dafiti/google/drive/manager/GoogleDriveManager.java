@@ -149,7 +149,7 @@ public class GoogleDriveManager {
                 Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.INFO, "File successfully written to {0}", cli.getParameter("output"));
 
                 //Remove temporary path. 
-                Files.delete(outputPath);
+                Files.delete(outputPath); 
 
                 break;
             case "UPLOAD":
