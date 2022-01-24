@@ -72,8 +72,9 @@ public class FTP {
         //Defines a FTP client.
         FTPClient ftpClient = new FTPClient();        
         ftpClient.setConnectTimeout(5 * 60000);
-        ftpClient.setDataTimeout(5 * 60000);        
-
+        ftpClient.setDataTimeout(5 * 60000);
+        ftpClient.setDefaultTimeout(5 * 60000);
+        
         try {
             //Defines parameters.
             mitt.getConfiguration()
@@ -130,7 +131,7 @@ public class FTP {
 
             //Defines the output path.
             outputPath = Files.createTempDirectory("ftp_" + UUID.randomUUID());
-
+            
             for (FTPFile ftpFile : ftpFiles) {
                 if (ftpFile.getSize() > 0) {
                     LocalDate updatedDate = LocalDate
@@ -139,7 +140,7 @@ public class FTP {
                     //Identifies if the file modification date is between start_date and end_date.
                     if (updatedDate.compareTo(LocalDate.parse(cli.getParameter("start_date"))) >= 0
                             && updatedDate.compareTo(LocalDate.parse(cli.getParameter("end_date"))) <= 0) {
-
+                        
                         Logger.getLogger(FTP.class.getName()).log(Level.INFO, "Transfering: {0} of {1}", new Object[]{ftpFile.getName(), updatedDate});
 
                         //Defines output file.
@@ -155,28 +156,28 @@ public class FTP {
                     }
                 }
             }
-
+            
             Logger.getLogger(FTP.class.getName()).log(Level.INFO, "Writing output file to: {0}", cli.getParameter("output"));
 
             //Write to the output.
             mitt.getReaderSettings().setDelimiter(cli.getParameter("delimiter").charAt(0));
-
+            
             if (cli.getParameter("properties") != null) {
                 mitt.getReaderSettings().setProperties(cli.getParameter("properties"));
             }
-
+            
             mitt.getReaderSettings().setEncode(cli.getParameter("encode"));
             mitt.write(outputPath.toFile(), "*");
             FileUtils.deleteDirectory(outputPath.toFile());
         } catch (DuplicateEntityException
                 | IOException
                 | ParseException ex) {
-
+            
             Logger.getLogger(FTP.class.getName()).log(Level.SEVERE, "FTP Failure: ", ex);
             System.exit(1);
         } finally {
             mitt.close();
-
+            
             try {
                 //Disconnects from FTP server.
                 if (ftpClient.isConnected()) {
@@ -187,7 +188,7 @@ public class FTP {
                 Logger.getLogger(FTP.class.getName()).log(Level.SEVERE, "FTP disconnect failure: ", ex);
             }
         }
-
+        
         Logger.getLogger(FTP.class.getName()).info("Glove - FTP Extractor finalized.");
     }
 }
