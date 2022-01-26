@@ -43,6 +43,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -140,6 +141,7 @@ public class WorkbookDecoder implements Decoder {
             int scale) {
 
         Iterator<Row> rowIterator = sheet.iterator();
+        FormulaEvaluator evaluator = sheet.getWorkbook().getCreationHelper().createFormulaEvaluator();
 
         while (rowIterator.hasNext()) {
             List<Object> record = new ArrayList<>();
@@ -149,7 +151,7 @@ public class WorkbookDecoder implements Decoder {
                 for (int column = 0; column < row.getLastCellNum(); column++) {
                     Cell cell = row.getCell(column, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
 
-                    switch (cell.getCellType()) {
+                    switch (evaluator.evaluateInCell(cell).getCellType()) {
                         case BOOLEAN:
                             record.add(cell.getBooleanCellValue());
                             break;
