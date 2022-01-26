@@ -54,7 +54,6 @@ public class GooglePagespeedInsights {
 
     private static final Logger LOG = Logger.getLogger(GooglePagespeedInsights.class.getName());
     private static final String GOOGLE_PSI_ENDPOINT = "https://www.googleapis.com/pagespeedonline/v5/runPagespeed";
-    private static final int MAX_RETRY = 3;
 
     /**
      * Google Pagespeed Insights API File transfer
