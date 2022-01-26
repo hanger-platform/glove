@@ -1,7 +1,7 @@
 
 
 # Google Pagespeed Insights extractor
-### Extrator de dados de interações da ferramenta Google PageSpeed Insights.
+### Extrator de dados da ferramenta Google PageSpeed Insights.
 
 ## How it works
 
