@@ -249,7 +249,7 @@ public class GoogleDriveApi {
                                 System.out.printf("This file can be downloaded: %s (%s)\n",
                                         item.getName(), item.getMimeType());
 
-                                try (final OutputStream outputStream = java.nio.file.Files.newOutputStream(file.toPath())) { //laço
+                                try (final OutputStream outputStream = java.nio.file.Files.newOutputStream(file.toPath())) { 
                                     this.service.files().get(item.getId())
                                             .executeMediaAndDownloadTo(outputStream);
                                 }

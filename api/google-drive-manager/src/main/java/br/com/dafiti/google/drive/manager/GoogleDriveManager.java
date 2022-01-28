@@ -134,7 +134,7 @@ public class GoogleDriveManager {
                 //Download file from Google Drive.
                 Path outputPath = api.download(cli.getParameter("id"));
 
-                Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.INFO, "File downloaded successfully to {0}", outputPath.toString());
+                Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.INFO, "File(s) downloaded successfully to {0}", outputPath.toString());
 
                 //Defines input delimiter.
                 mitt.getReaderSettings().setDelimiter(cli.getParameter("delimiter").charAt(0));
