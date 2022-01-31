@@ -223,45 +223,34 @@ public class GoogleDriveApi {
             File fileMetadata = this.service.files().get(fileId)
                     .setFields("mimeType,name")
                     .execute();
-            
+
             //Defines the temporary output path. 
             outputPath = java.nio.file.Files.createTempDirectory("google_drive_manager_");
-                    
+
             if (fileMetadata.getMimeType().equals("application/vnd.google-apps.folder")) {
-                
-                String parents = "parents='"+fileId+"'";
+
+                String parents = "parents='" + fileId + "'";
 
                 FileList response = this.service.files().list()
-                    .setQ(parents)
-                    .setSpaces("drive")
-                    .execute();
+                        .setQ(parents)
+                        .setSpaces("drive")
+                        .execute();
 
-                    for (File item : response.getFiles()) {
-                        item.getId();
+                for (File item : response.getFiles()) {
+                    item.getId();
 
-                        //Defines the temporary file name.
-                        java.io.File file = new java.io.File(outputPath.toString() + "/" + item.getName());
+                    //Defines the temporary file name.
+                    java.io.File file = new java.io.File(outputPath.toString() + "/" + item.getName());
 
-                        switch (item.getMimeType()) {
-                            case "text/csv":
-                            case "text/plain":
-                            case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-                                System.out.printf("This file can be downloaded: %s (%s)\n",
-                                        item.getName(), item.getMimeType());
+                    System.out.printf("Getting file: %s (%s)\n", item.getName(), item.getMimeType());
 
-                                try (final OutputStream outputStream = java.nio.file.Files.newOutputStream(file.toPath())) { 
-                                    this.service.files().get(item.getId())
-                                            .executeMediaAndDownloadTo(outputStream);
-                                }
-                                break;
-                            default:
-                                System.out.printf("File can't be downloaded: %s (%s)\n",
-                                        item.getName(), item.getMimeType());
-                                break;
-                        }
+                    try (final OutputStream outputStream = java.nio.file.Files.newOutputStream(file.toPath())) {
+                        this.service.files().get(item.getId())
+                                .executeMediaAndDownloadTo(outputStream);
                     }
+                }
             } else {
-                
+
                 //Defines the temporary file name.
                 java.io.File file = new java.io.File(outputPath.toString() + "/" + fileMetadata.getName());
 
@@ -270,9 +259,9 @@ public class GoogleDriveApi {
                     this.service.files().get(fileId)
                             .executeMediaAndDownloadTo(outputStream);
                 }
-                
+
             }
-            
+
         } catch (IOException ex) {
             System.err.println("Error on download: " + ex.getMessage());
             System.exit(1);
