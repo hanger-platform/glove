@@ -43,6 +43,7 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
+import com.google.api.services.drive.model.FileList;
 import com.google.api.services.drive.model.Permission;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -217,21 +218,48 @@ public class GoogleDriveApi {
         java.nio.file.Path outputPath = null;
 
         try {
-            //Gets the name of the google drive file with extension.            
+            //Gets the name of the google drive file with extension. 
+            //quebra aqui e cai na exception
             File fileMetadata = this.service.files().get(fileId)
-                    .setFields("name")
+                    .setFields("mimeType,name")
                     .execute();
 
             //Defines the temporary output path. 
             outputPath = java.nio.file.Files.createTempDirectory("google_drive_manager_");
 
-            //Defines the temporary file name.
-            java.io.File file = new java.io.File(outputPath.toString() + "/" + fileMetadata.getName());
+            if (fileMetadata.getMimeType().equals("application/vnd.google-apps.folder")) {
 
-            //Download file to local station.
-            try (final OutputStream outputStream = java.nio.file.Files.newOutputStream(file.toPath())) {
-                this.service.files().get(fileId)
-                        .executeMediaAndDownloadTo(outputStream);
+                String parents = "parents='" + fileId + "'";
+
+                FileList response = this.service.files().list()
+                        .setQ(parents)
+                        .setSpaces("drive")
+                        .execute();
+
+                for (File item : response.getFiles()) {
+                    item.getId();
+
+                    //Defines the temporary file name.
+                    java.io.File file = new java.io.File(outputPath.toString() + "/" + item.getName());
+
+                    System.out.printf("Getting file: %s (%s)\n", item.getName(), item.getMimeType());
+
+                    try (final OutputStream outputStream = java.nio.file.Files.newOutputStream(file.toPath())) {
+                        this.service.files().get(item.getId())
+                                .executeMediaAndDownloadTo(outputStream);
+                    }
+                }
+            } else {
+
+                //Defines the temporary file name.
+                java.io.File file = new java.io.File(outputPath.toString() + "/" + fileMetadata.getName());
+
+                //Download file to local station.
+                try (final OutputStream outputStream = java.nio.file.Files.newOutputStream(file.toPath())) {
+                    this.service.files().get(fileId)
+                            .executeMediaAndDownloadTo(outputStream);
+                }
+
             }
 
         } catch (IOException ex) {

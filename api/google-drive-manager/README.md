@@ -94,6 +94,20 @@ java -jar /home/user_name/glove/extractor/lib/google-drive-manager.jar \
 * **Properties** parameter is used for XLS files, when you want to specify some file detail. Available properties can be found on [mitt doc](https://github.com/dafiti-group/glove/tree/master/api/mitt).
 * **Field** parameter is used to specify the fields of the output csv file.
 
+You can also download more than one file by informing the folder id where the files are. However, to have the expected result all the files inside the folder must have the same structure.
+
+```bash
+java -jar /home/user_name/glove/extractor/lib/google-drive-manager.jar \
+  --credentials=/home/user_name/credentials/google_drive.json \
+  --id="<folder id where the files are.>" \
+  --action="IMPORT" \
+  --output="/tmp/anything/file_name.csv" \
+  --field="field1+field2+field3+fieldN" \
+  --partition="::fixed(2019)" \
+  --key="::md5([[field1,field2]])" \
+  --properties="{\"skip\":\"1\",\"sheet\":\"sheet_name\"}"
+```
+
 ##### UPLOAD
 This action will upload one local file to Google Drive, if folder parameter is empty, upload to My drive directory.
 
