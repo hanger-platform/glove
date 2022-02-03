@@ -219,7 +219,6 @@ public class GoogleDriveApi {
 
         try {
             //Gets the name of the google drive file with extension. 
-            //quebra aqui e cai na exception
             File fileMetadata = this.service.files().get(fileId)
                     .setFields("mimeType,name")
                     .execute();
