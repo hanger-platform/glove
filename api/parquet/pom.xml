@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>br.com.dafiti</groupId>
+    <artifactId>parquet</artifactId>
+    <version>1.0</version>
+    <packaging>jar</packaging>
+    
+    <dependencies>
+        <!--MITT-->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mitt</artifactId>
+            <version>1.2.4</version>
+        </dependency>
+        
+        <!--Orc-->
+        
+        <dependency>
+            <groupId>org.apache.orc</groupId>
+            <artifactId>orc-mapreduce</artifactId>
+            <version>1.5.6</version>
+        </dependency>   
+               
+        <!--JSON-->
+        
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20211205</version>
+        </dependency>
+        
+        <!--Parquet-->
+
+        <dependency>
+            <groupId>org.apache.parquet</groupId>
+            <artifactId>parquet-avro</artifactId>
+            <version>1.12.2</version>
+        </dependency>
+        
+        <!--AWS S3-->
+        
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-s3</artifactId>
+            <version>1.12.17</version>
+        </dependency>
+    </dependencies>
+    
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
+</project>
