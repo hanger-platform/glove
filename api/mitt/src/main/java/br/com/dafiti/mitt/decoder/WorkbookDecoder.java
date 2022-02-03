@@ -43,6 +43,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -140,6 +141,7 @@ public class WorkbookDecoder implements Decoder {
             int scale) {
 
         Iterator<Row> rowIterator = sheet.iterator();
+        FormulaEvaluator evaluator = sheet.getWorkbook().getCreationHelper().createFormulaEvaluator();
 
         while (rowIterator.hasNext()) {
             List<Object> record = new ArrayList<>();
@@ -147,14 +149,16 @@ public class WorkbookDecoder implements Decoder {
 
             if (row.getRowNum() > (skip - 1)) {
                 for (int column = 0; column < row.getLastCellNum(); column++) {
+                    //Get a workbook cell. 
                     Cell cell = row.getCell(column, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
 
-                    switch (cell.getCellType()) {
+                    //If the cell has a formula (Cell Type#FORMULA), it will be evaluated and the cell content replaced by the formula result.
+                    switch (evaluator.evaluateInCell(cell).getCellType()) {
                         case BOOLEAN:
                             record.add(cell.getBooleanCellValue());
                             break;
                         case NUMERIC:
-                            // Identify if cell is a date.
+                            //Identifies if cell is a date.
                             if (DateUtil.isCellDateFormatted(cell)) {
                                 DateFormat df = new SimpleDateFormat(dateFormat);
                                 Date date = cell.getDateCellValue();
@@ -163,7 +167,7 @@ public class WorkbookDecoder implements Decoder {
                             } else {
                                 BigDecimal value = new BigDecimal(cell.getNumericCellValue());
 
-                                // Identify if number has decimal scale.
+                                //Identifies if number has decimal scale.
                                 if (value.scale() > 0) {
                                     record.add(value.setScale(scale, RoundingMode.HALF_EVEN).toPlainString());
                                 } else {
