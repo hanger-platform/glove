@@ -24,6 +24,8 @@
 package br.com.dafiti.parquet.converter;
 
 import br.com.dafiti.parquet.datalake.S3;
+import br.com.dafiti.parquet.util.InputFile;
+import br.com.dafiti.parquet.util.OutputFile;
 import br.com.dafiti.parquet.util.Statistics;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
@@ -46,10 +48,6 @@ import org.apache.avro.generic.GenericRecordBuilder;
 import org.apache.avro.Conversions;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.math.NumberUtils;
-import org.apache.hadoop.fs.Path;
-import org.apache.log4j.Logger;
 import org.apache.parquet.avro.AvroParquetReader;
 import org.apache.parquet.avro.AvroParquetWriter;
 import org.apache.parquet.hadoop.ParquetReader;
@@ -57,6 +55,10 @@ import org.apache.parquet.hadoop.ParquetWriter;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 /**
  * This class read a csv file and write the records into a parquet file.
@@ -64,6 +66,8 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
  * @author Valdiney V GOMES
  */
 public class CSVToParquet implements Runnable {
+
+    private static final Logger LOG = Logger.getLogger(CSVToParquet.class.getName());
 
     private final HashMap<String, Type> typeMap;
     private final HashMap<String, String> logicalTypeMap;
@@ -260,7 +264,7 @@ public class CSVToParquet implements Runnable {
     @Override
     public void run() {
         //Log the process init.
-        Logger.getLogger(this.getClass()).info("Converting CSV to Parquet: " + inputFile.getAbsolutePath());
+        LOG.info("Converting CSV to Parquet: " + inputFile.getAbsolutePath());
 
         //Identifies the file name pattern. 
         String path = FilenameUtils.getFullPath(inputFile.getAbsolutePath());
@@ -287,8 +291,11 @@ public class CSVToParquet implements Runnable {
             GenericData genericData = new GenericData();
             genericData.addLogicalTypeConversion(new Conversions.DecimalConversion());
 
+            //Defines an output stream.
+            OutputFile outputFile = new OutputFile(transientFile);
+
             //Convert to parquet.
-            try (ParquetWriter<GenericRecord> parquetWriter = AvroParquetWriter.<GenericRecord>builder(new Path(transientFile.getAbsolutePath()))
+            try (ParquetWriter<GenericRecord> parquetWriter = AvroParquetWriter.<GenericRecord>builder(outputFile)
                     .withSchema(schema)
                     .withDataModel(genericData)
                     .withCompressionCodec(this.compression)
@@ -320,8 +327,11 @@ public class CSVToParquet implements Runnable {
                         //Identifies parquet fields.
                         List<Field> fields = schema.getFields();
 
+                        //Defines an input file.
+                        InputFile originalInputFile = new InputFile(originalFile);
+
                         //Define the reader.
-                        ParquetReader<GenericRecord> parquetReader = AvroParquetReader.<GenericRecord>builder(new Path(originalFile.getAbsolutePath()))
+                        ParquetReader<GenericRecord> parquetReader = AvroParquetReader.<GenericRecord>builder(originalInputFile)
                                 .withDataModel(genericData)
                                 .disableCompatibility()
                                 .build();
@@ -394,7 +404,7 @@ public class CSVToParquet implements Runnable {
                 }
             }
         } catch (Exception ex) {
-            Logger.getLogger(this.getClass()).error("Error [" + ex + "] generating parquet file " + parquetFile.getName());
+            LOG.log(Level.SEVERE, "Error [" + ex + "] generating parquet file " + parquetFile.getName(), ex);
             System.exit(1);
         }
     }
