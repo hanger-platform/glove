@@ -23,11 +23,10 @@
  */
 package br.com.dafiti.parquet;
 
-import br.com.dafiti.parquet.converter.CSVToParquet;
 import br.com.dafiti.mitt.Mitt;
 import br.com.dafiti.mitt.cli.CommandLineInterface;
 import br.com.dafiti.mitt.exception.DuplicateEntityException;
-import br.com.dafiti.parquet.schema.Parser;
+import br.com.dafiti.parquet.util.Parser;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -102,7 +101,7 @@ public class Parquet {
                 for (File file : files) {
                     if (file.isDirectory() || "csv".equals(FilenameUtils.getExtension(file.getName()))) {
                         executor.execute(
-                                new CSVToParquet(
+                                new Converter(
                                         file,
                                         cli.getParameter("compression"),
                                         cli.getParameter("delimiter").charAt(0),

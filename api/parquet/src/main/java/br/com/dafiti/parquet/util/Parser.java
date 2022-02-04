@@ -21,13 +21,12 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
  */
-package br.com.dafiti.parquet.schema;
+package br.com.dafiti.parquet.util;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.avro.Schema;
 import org.json.JSONArray;
@@ -106,8 +105,6 @@ public class Parser {
                                 type.put("size", size);
                                 type.put("precision", type.getInt("precision"));
                                 type.put("scale", type.getInt("scale"));
-
-                                LOG.log(Level.INFO, "Schema was auto adjusted: {0} size fixed to {1}", new Object[]{type.getString("name"), size});
                             }
                         }
                     }
@@ -123,8 +120,6 @@ public class Parser {
                         type.put("size", size);
                         type.put("precision", type.getInt("precision"));
                         type.put("scale", type.getInt("scale"));
-
-                        LOG.log(Level.INFO, "Schema was auto adjusted: {0} size fixed to {1}", new Object[]{type.getString("name"), size});
                     }
                 }
             }

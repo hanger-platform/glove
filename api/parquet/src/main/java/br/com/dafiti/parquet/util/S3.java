@@ -21,7 +21,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
  */
-package br.com.dafiti.parquet.datalake;
+package br.com.dafiti.parquet.util;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;

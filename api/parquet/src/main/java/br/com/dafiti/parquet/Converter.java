@@ -21,9 +21,9 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
  */
-package br.com.dafiti.parquet.converter;
+package br.com.dafiti.parquet;
 
-import br.com.dafiti.parquet.datalake.S3;
+import br.com.dafiti.parquet.util.S3;
 import br.com.dafiti.parquet.util.InputFile;
 import br.com.dafiti.parquet.util.OutputFile;
 import br.com.dafiti.parquet.util.Statistics;
@@ -31,6 +31,7 @@ import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -65,9 +66,9 @@ import org.apache.commons.lang3.math.NumberUtils;
  *
  * @author Valdiney V GOMES
  */
-public class CSVToParquet implements Runnable {
+public class Converter implements Runnable {
 
-    private static final Logger LOG = Logger.getLogger(CSVToParquet.class.getName());
+    private static final Logger LOG = Logger.getLogger(Converter.class.getName());
 
     private final HashMap<String, Type> typeMap;
     private final HashMap<String, String> logicalTypeMap;
@@ -105,7 +106,7 @@ public class CSVToParquet implements Runnable {
      * @param mode Identify partition mode.
      * @param debug Identify if should show detailed log message.
      */
-    public CSVToParquet(
+    public Converter(
             File inputFile,
             String compression,
             Character delimiter,
@@ -121,9 +122,9 @@ public class CSVToParquet implements Runnable {
             String mode,
             boolean debug) {
 
-        this.typeMap = new HashMap();
-        this.logicalTypeMap = new HashMap();
-        this.decimalScaleMap = new HashMap();
+        this.typeMap = new HashMap<>();
+        this.logicalTypeMap = new HashMap<>();
+        this.decimalScaleMap = new HashMap<>();
         this.inputFile = inputFile;
         this.schema = schema;
         this.delimiter = delimiter;
@@ -264,7 +265,7 @@ public class CSVToParquet implements Runnable {
     @Override
     public void run() {
         //Log the process init.
-        LOG.info("Converting CSV to Parquet: " + inputFile.getAbsolutePath());
+        LOG.log(Level.INFO, "Converting CSV to Parquet: {0}", inputFile.getAbsolutePath());
 
         //Identifies the file name pattern. 
         String path = FilenameUtils.getFullPath(inputFile.getAbsolutePath());
@@ -527,8 +528,8 @@ public class CSVToParquet implements Runnable {
                                             Calendar calendar = Calendar.getInstance();
                                             calendar.setTime(date);
 
-                                            Long timeInMillis = calendar.getTimeInMillis();
-                                            Long timeZoneOffset = (long) calendar.getTimeZone().getOffset(calendar.getTimeInMillis());
+                                            long timeInMillis = calendar.getTimeInMillis();
+                                            long timeZoneOffset = calendar.getTimeZone().getOffset(calendar.getTimeInMillis());
 
                                             builder.set(field, timeInMillis + timeZoneOffset / (1000 * 60 * 60 * 24));
                                         }
@@ -545,8 +546,8 @@ public class CSVToParquet implements Runnable {
                                             Calendar calendar = Calendar.getInstance();
                                             calendar.setTime(date);
 
-                                            Long timeInMillis = calendar.getTimeInMillis();
-                                            Long timeZoneOffset = (long) calendar.getTimeZone().getOffset(calendar.getTimeInMillis());
+                                            long timeInMillis = calendar.getTimeInMillis();
+                                            long timeZoneOffset = calendar.getTimeZone().getOffset(calendar.getTimeInMillis());
 
                                             builder.set(field, timeInMillis + timeZoneOffset);
                                         }
@@ -568,7 +569,7 @@ public class CSVToParquet implements Runnable {
                                             //The scale is fixed, and is specified using an attribute.
                                             int scale = this.getDecimalScale(field);
 
-                                            builder.set(field, new BigDecimal(value).setScale(scale, BigDecimal.ROUND_UP));
+                                            builder.set(field, new BigDecimal(value).setScale(scale, RoundingMode.UP));
                                         }
 
                                         break;
