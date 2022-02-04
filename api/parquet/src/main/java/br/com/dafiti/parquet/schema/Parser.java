@@ -27,11 +27,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.avro.Schema;
-import org.apache.orc.TypeDescription;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -133,92 +131,6 @@ public class Parser {
         }
 
         return new Schema.Parser().parse(jsonSchema.toString());
-    }
-
-    /**
-     * Get schema from orc file.
-     *
-     * @return Orc struct.
-     * @throws java.io.IOException
-     */
-    public TypeDescription getOrcSchema() throws IOException {
-        StringBuilder schema = new StringBuilder();
-        ArrayList<String> fieldList = new ArrayList();
-        JSONObject jsonSchema;
-        BufferedReader buffer;
-        String line;
-
-        //Read the schema file.
-        buffer = new BufferedReader(new FileReader(schemaFile));
-
-        //Insert schema header.
-        schema.append("{");
-        schema.append("\"type\": \"record\",");
-        schema.append("\"name\": \"model\",");
-        schema.append("\"fields\":");
-
-        //Insert schema fields.
-        while ((line = buffer.readLine()) != null) {
-            schema.append(line);
-        }
-
-        //Insert schema footer.
-        schema.append("}");
-
-        //Convert the schema to json.
-        jsonSchema = new JSONObject(schema.toString());
-
-        //Get field list.
-        JSONArray fields = jsonSchema.getJSONArray("fields");
-
-        //Convert Avro schema to ORC schema.
-        for (int i = 0; i < fields.length(); i++) {
-            JSONObject field = fields.getJSONObject(i);
-
-            if (field.get("type") instanceof JSONArray) {
-                JSONArray union = field.getJSONArray("type");
-
-                for (int j = 0; j < union.length(); j++) {
-                    if (!union.get(j).equals("null")) {
-                        if (union.get(j) instanceof JSONObject) {
-                            JSONObject type = union.getJSONObject(j);
-
-                            if (type.get("type").equals("fixed")) {
-                                if (type.has("logicalType") && type.get("logicalType").equals("decimal")) {
-                                    fieldList.add(field.getString("name") + ":" + type.getString("logicalType") + "(" + type.getInt("precision") + "," + type.getInt("scale") + ")");
-                                }
-                            }
-                        } else {
-                            String dataType = union.getString(j);
-
-                            if ("long".equals(dataType)) {
-                                dataType = "bigint";
-                            }
-
-                            fieldList.add(field.getString("name") + ":" + dataType);
-                        }
-                    }
-                }
-            } else if (field.get("type") instanceof JSONObject) {
-                JSONObject type = field.getJSONObject("type");
-
-                if (type.get("type").equals("fixed")) {
-                    if (type.has("logicalType") && type.get("logicalType").equals("decimal")) {
-                        fieldList.add(field.getString("name") + ":" + type.getString("logicalType") + "(" + type.getInt("precision") + "," + type.getInt("scale") + ")");
-                    }
-                } else {
-                    String dataType = type.getString("type");
-
-                    if ("long".equals(dataType)) {
-                        dataType = "bigint";
-                    }
-
-                    fieldList.add(field.getString("name") + ":" + dataType);
-                }
-            }
-        }
-
-        return TypeDescription.fromString("struct<" + String.join(",", fieldList) + ">");
     }
 
     /**
