@@ -170,7 +170,6 @@ partition_load(){
 			--filename=* \
 			--delimiter=${DELIMITER} \
 			--schema=${METADATA_JSON_FILE} \
-			--target=${OUTPUT_FORMAT} \
 			--compression=${OUTPUT_COMPRESSION} \
 			--thread=${THREAD} \
 			--duplicated=${ALLOW_DUPLICATED} \
@@ -179,7 +178,7 @@ partition_load(){
 			--bucket=${STORAGE_QUEUE_PATH} \
 			--mode=${PARTITION_MODE} \
 			--escape=${QUOTE_ESCAPE} \
-			--replace \
+			--replace='true' \
 			--debug=${DEBUG}"
 	fi
 
@@ -188,7 +187,6 @@ partition_load(){
 		--filename=* \
 		--delimiter=${DELIMITER} \
 		--schema=${METADATA_JSON_FILE} \
-		--target=${OUTPUT_FORMAT} \
 		--compression=${OUTPUT_COMPRESSION} \
 		--thread=${THREAD} \
 		--duplicated=${ALLOW_DUPLICATED} \
@@ -197,7 +195,7 @@ partition_load(){
 		--bucket=${STORAGE_QUEUE_PATH} \
 		--mode=${PARTITION_MODE} \
 		--escape=${QUOTE_ESCAPE} \
-		--replace \
+		--replace='true' \
 		--debug=${DEBUG}
     error_check
 
@@ -263,7 +261,6 @@ delta_load(){
 			--filename=${DATA_FILE}.csv \
 			--delimiter=${DELIMITER} \
 			--schema=${METADATA_JSON_FILE} \
-			--target=${OUTPUT_FORMAT} \
 			--compression=${OUTPUT_COMPRESSION} \
 			--thread=${THREAD} \
 			--duplicated=${ALLOW_DUPLICATED} \
@@ -271,7 +268,7 @@ delta_load(){
 			--merge=${PARTITION_MERGE} \
 			--bucket=${STORAGE_QUEUE_PATH} \
 			--escape=${QUOTE_ESCAPE} \
-			--replace \
+			--replace='true' \
 			--debug=${DEBUG}"
 	fi
 
@@ -280,7 +277,6 @@ delta_load(){
 		--filename=${DATA_FILE}.csv \
 		--delimiter=${DELIMITER} \
 		--schema=${METADATA_JSON_FILE} \
-		--target=${OUTPUT_FORMAT} \
 		--compression=${OUTPUT_COMPRESSION} \
 		--thread=${THREAD} \
 		--duplicated=${ALLOW_DUPLICATED} \
@@ -288,7 +284,7 @@ delta_load(){
 		--merge=${PARTITION_MERGE} \
 		--bucket=${STORAGE_QUEUE_PATH} \
 		--escape=${QUOTE_ESCAPE} \
-		--replace \
+		--replace='true' \
 		--debug=${DEBUG}
     error_check
 
@@ -342,22 +338,21 @@ full_load(){
 			echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/${OUTPUT_FORMAT}.jar \
 				--folder=${RAWFILE_QUEUE_PATH} \
 				--filename=*.csv \
-				--header \
+				--header='true' \
 				--delimiter=${DELIMITER} \
 				--schema=${METADATA_JSON_FILE} \
-				--target=${OUTPUT_FORMAT} \
 				--compression=${OUTPUT_COMPRESSION} \
 				--thread=${THREAD} \
 				--duplicated=${ALLOW_DUPLICATED} \
 				--escape=${QUOTE_ESCAPE} \
-				--replace \
+				--replace='true' \
 				--debug=${DEBUG}"
 		fi
 
     	java -jar ${GLOVE_HOME}/extractor/lib/${OUTPUT_FORMAT}.jar \
 			--folder=${RAWFILE_QUEUE_PATH} \
 			--filename=*.csv \
-			--header \
+			--header='true' \
 			--delimiter=${DELIMITER} \
 			--schema=${METADATA_JSON_FILE} \
 			--target=${OUTPUT_FORMAT} \
@@ -365,7 +360,7 @@ full_load(){
 			--thread=${THREAD} \
 			--duplicated=${ALLOW_DUPLICATED} \
 			--escape=${QUOTE_ESCAPE} \
-			--replace \
+			--replace='true' \
 			--debug=${DEBUG}
     	error_check
 
@@ -389,7 +384,7 @@ full_load(){
 				--compression=${OUTPUT_COMPRESSION} \
 				--thread=${THREAD} \
 				--duplicated=${ALLOW_DUPLICATED} \
-				--replace \
+				--replace='true' \
 				--debug=${DEBUG}"
 		fi
 
@@ -403,7 +398,7 @@ full_load(){
 			--thread=${THREAD} \
 			--duplicated=${ALLOW_DUPLICATED} \
 			--escape=${QUOTE_ESCAPE} \
-			--replace \
+			--replace='true' \
 			--debug=${DEBUG}
 		error_check
 
