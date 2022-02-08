@@ -165,7 +165,7 @@ partition_load(){
     # Converte os arquivos das partições para formato colunar.
     echo "Generating ${OUTPUT_FORMAT} files!"
 	if [ ${DEBUG} = 1 ] ; then
-	 	echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
+	 	echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/${OUTPUT_FORMAT}.jar \
 			--folder=${RAWFILE_QUEUE_PATH} \
 			--filename=* \
 			--delimiter=${DELIMITER} \
@@ -183,7 +183,7 @@ partition_load(){
 			--debug=${DEBUG}"
 	fi
 
-    java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
+    java -jar ${GLOVE_HOME}/extractor/lib/${OUTPUT_FORMAT}.jar \
 		--folder=${RAWFILE_QUEUE_PATH} \
 		--filename=* \
 		--delimiter=${DELIMITER} \
@@ -258,7 +258,7 @@ delta_load(){
     # Converte o arquivo final para o formato colunar.
     echo "Generating ${OUTPUT_FORMAT} files!"
 	if [ ${DEBUG} = 1 ] ; then
-		echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
+		echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/${OUTPUT_FORMAT}.jar \
 			--folder=${RAWFILE_QUEUE_PATH} \
 			--filename=${DATA_FILE}.csv \
 			--delimiter=${DELIMITER} \
@@ -275,7 +275,7 @@ delta_load(){
 			--debug=${DEBUG}"
 	fi
 
-    java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
+    java -jar ${GLOVE_HOME}/extractor/lib/${OUTPUT_FORMAT}.jar \
 		--folder=${RAWFILE_QUEUE_PATH} \
 		--filename=${DATA_FILE}.csv \
 		--delimiter=${DELIMITER} \
@@ -339,7 +339,7 @@ full_load(){
 		# Converte o arquivo de dados para formato colunar.
     	echo "Generating ${OUTPUT_FORMAT} files!"
 		if [ ${DEBUG} = 1 ] ; then
-			echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
+			echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/${OUTPUT_FORMAT}.jar \
 				--folder=${RAWFILE_QUEUE_PATH} \
 				--filename=*.csv \
 				--header \
@@ -354,7 +354,7 @@ full_load(){
 				--debug=${DEBUG}"
 		fi
 
-    	java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
+    	java -jar ${GLOVE_HOME}/extractor/lib/${OUTPUT_FORMAT}.jar \
 			--folder=${RAWFILE_QUEUE_PATH} \
 			--filename=*.csv \
 			--header \
@@ -380,7 +380,7 @@ full_load(){
 		# Converte o arquivo de dados para formato colunar.
 		echo "Generating ${OUTPUT_FORMAT} files!"
 		if [ ${DEBUG} = 1 ] ; then
-			echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
+			echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/${OUTPUT_FORMAT}.jar \
 				--folder=${RAWFILE_QUEUE_PATH} \
 				--filename=*.csv \
 				--delimiter=${DELIMITER} \
@@ -393,7 +393,7 @@ full_load(){
 				--debug=${DEBUG}"
 		fi
 
-		java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
+		java -jar ${GLOVE_HOME}/extractor/lib/${OUTPUT_FORMAT}.jar \
 			--folder=${RAWFILE_QUEUE_PATH} \
 			--filename=*.csv \
 			--delimiter=${DELIMITER} \
