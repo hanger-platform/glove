@@ -33,7 +33,7 @@ java -jar parquet.jar  \
 	--schema=<Avro schema file to be used on conversion> \
 	--filename=<(Optional) Filename, with wildcard if necessary, to be converted> \
 	--header=<(Optional) Identifies if the csv file has a header> \
-	--replace=<(Optional) File delimiter; ';' as default> \
+	--replace=<(Optional) Identifies if csv files will be replaced to parquet files> \
 	--thread=<(Optional) Limit of threads; default is 1> \
 	--compression=<(Optional) Identifies the compression to be applied; default is gzip> \
 	--delimiter=<(Optional) Delimiter of csv files; default is ;> \
@@ -79,7 +79,7 @@ Estrutura da pasta antes da execução:
 		- user
 			-csv_files
 				- csv_0001.csv
-				- csv_0001.csv
+				- csv_0002.csv
 ```
 
 Estrutura da pasta depois da execução:
@@ -90,7 +90,7 @@ Estrutura da pasta depois da execução:
 			-csv_files
 				- csv_0001.csv
 				- csv_0001.snappy.parquet
-				- csv_0001.csv
+				- csv_0002.csv
 				- csv_0002.snappy.parquet
 ```
 
