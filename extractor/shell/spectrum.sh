@@ -355,7 +355,6 @@ full_load(){
 			--header='true' \
 			--delimiter=${DELIMITER} \
 			--schema=${METADATA_JSON_FILE} \
-			--target=${OUTPUT_FORMAT} \
 			--compression=${OUTPUT_COMPRESSION} \
 			--thread=${THREAD} \
 			--duplicated=${ALLOW_DUPLICATED} \
@@ -380,7 +379,6 @@ full_load(){
 				--filename=*.csv \
 				--delimiter=${DELIMITER} \
 				--schema=${METADATA_JSON_FILE} \
-				--target=${OUTPUT_FORMAT} \
 				--compression=${OUTPUT_COMPRESSION} \
 				--thread=${THREAD} \
 				--duplicated=${ALLOW_DUPLICATED} \
@@ -393,7 +391,6 @@ full_load(){
 			--filename=*.csv \
 			--delimiter=${DELIMITER} \
 			--schema=${METADATA_JSON_FILE} \
-			--target=${OUTPUT_FORMAT} \
 			--compression=${OUTPUT_COMPRESSION} \
 			--thread=${THREAD} \
 			--duplicated=${ALLOW_DUPLICATED} \
