@@ -60,9 +60,45 @@ java -jar parquet.jar  \
 	--thread=4 \
 ```
 
-Neste exemplo, todos os arquivo que tiverem a extensão _.csv_ serão convertidos para _parquet_.
+Neste exemplo, todos os arquivo que tiverem a extensão _.csv_ serão convertidos para _parquet_ baseado no parâmetro schema (avro schema).
 
+O arquivo **avro_json.json** deve ter a seguinte estrutura:
 
+```json
+[
+	{"name": "campo_string","type":["null", "string"], "default": null},
+	{"name": "campo_long","type":["null", "long"] , "default": null}
+]
+```
+
+Os arquivos _parquet_ serão gerados na mesma pasta dos arquivos _csv_ e com o mesmo nome:
+
+Estrutura da pasta antes da execução:
+```bash
+	- home	
+		- user
+			-csv_files
+				- csv_0001.csv
+				- csv_0001.csv
+```
+
+Estrutura da pasta depois da execução:
+```bash
+
+	- home	
+		- user
+			-csv_files
+				- csv_0001.csv
+				- csv_0001.snappy.parquet
+				- csv_0001.csv
+				- csv_0002.snappy.parquet
+```
+
+Caso desejar excluir os arquivos csvs após a transformações em parquet, basta utilizar o parâmetro _replace_:
+
+```bash
+--replace='true'
+```
 
 #### Exemplo 2
 ##### Conversão de csv para parquet com merge de um arquivo do S3 com um arquivo local.
