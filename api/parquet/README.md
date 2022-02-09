@@ -94,7 +94,7 @@ Estrutura da pasta depois da execução:
 				- csv_0002.snappy.parquet
 ```
 
-Caso desejar excluir os arquivos csvs após a transformações em parquet, basta utilizar o parâmetro _replace_:
+Caso desejar excluir os arquivos _csvs_ após a transformações em parquet, basta utilizar o parâmetro _replace_:
 
 ```bash
 --replace='true'
@@ -102,6 +102,31 @@ Caso desejar excluir os arquivos csvs após a transformações em parquet, basta
 
 #### Exemplo 2
 ##### Conversão de csv para parquet com merge de um arquivo do S3 com um arquivo local.
+
+```bash
+java -jar parquet.jar  \
+	--folder="/home/user/csv_files/" \
+	--filename=* \
+	--delimiter=; \
+	--schema=/home/user/metadata/avro_json.json \
+	--compression=gzip \
+	--thread=4 \
+	--duplicated=0 \
+	--fieldkey=1 \
+	--merge=1 \
+	--bucket=s3://bucket/parquet_files/ \
+	--mode=virtual
+```
+
+Neste exemplo após a conversão dos arquivos _csvs_ em _parquet_, o processo irá fazer o _download_ do arquivos no bucket informado e irá mesclar os arquivos _parquets_ locais com os arquivos baixados. O _log_ da aplicação vai mostrar a atualização após a finalização do processo.
+
+Exemplo de log:
+```bash
+INFORMAÇÕES: Converting CSV to Parquet: /home/user/csv_files
+[202202.gzip.parquet] records: 120777, Delta: 2383, ( Updated: 2063, Inserted: 320, Duplicated:0 ) Final: 121097
+```
+
+No caso acima, o arquivo _parquet_ local foi mesclado com o arquivo _parquet_ baixado do S3, no exemplo acima, 2063 registros foram atualizados, 320 foram inseridos e não foi encontrado nenhum registro duplicado.
 
 ## Contributing, Bugs, Questions
 Contributions are more than welcome! If you want to propose new changes, fix bugs or improve something feel free to fork the repository and send us a Pull Request. You can also open new `Issues` for reporting bugs and general problems.
