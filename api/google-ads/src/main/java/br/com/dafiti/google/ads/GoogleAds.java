@@ -33,8 +33,13 @@ import com.google.ads.googleads.v9.services.GoogleAdsRow;
 import com.google.ads.googleads.v9.services.GoogleAdsServiceClient;
 import com.google.ads.googleads.v9.services.SearchGoogleAdsStreamRequest;
 import com.google.ads.googleads.v9.services.SearchGoogleAdsStreamResponse;
+import com.google.api.gax.rpc.ResponseObserver;
 import com.google.api.gax.rpc.ServerStream;
+import com.google.api.gax.rpc.StreamController;
 import com.google.api.pathtemplate.ValidationException;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -43,8 +48,18 @@ import java.util.logging.Logger;
 import com.google.protobuf.util.JsonFormat;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicLong;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import io.grpc.LoadBalancerRegistry;
+import io.grpc.internal.PickFirstLoadBalancerProvider;
 
 /**
  *
@@ -53,12 +68,12 @@ import java.util.List;
  */
 public class GoogleAds {
 
-    public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+    public static void main(String[] args) {
         //Defines a MITT instance. 
         Mitt mitt = new Mitt();
 
         try {
-            Logger.getLogger(GoogleAds.class.getName()).log(Level.INFO, "GLOVE - Google Ads (v6) Extractor started");
+            Logger.getLogger(GoogleAds.class.getName()).log(Level.INFO, "GLOVE - Google Ads Extractor started");
 
             //Defines parameters.
             mitt.getConfiguration()
@@ -86,8 +101,8 @@ public class GoogleAds {
                     .addCustomField("etl_load_date", new Now())
                     .addField(cli.getParameterAsList("field", "\\,"));
 
-            //Get original fields.
-            List<String> fields = mitt.getConfiguration().getOriginalFieldName();
+            //Fixes could not find policy 'pick_first' error.
+            LoadBalancerRegistry.getDefaultRegistry().register(new PickFirstLoadBalancerProvider());
 
             //Defines an authenticated client for Google ads api.
             GoogleAdsClient googleAdsClient = GoogleAdsClient
@@ -96,8 +111,7 @@ public class GoogleAds {
                     setLoginCustomerId(Long.parseLong(cli.getParameter("manager")))
                     .build();
 
-            try (GoogleAdsServiceClient googleAdsServiceClient
-                    = googleAdsClient.getLatestVersion().createGoogleAdsServiceClient()) {
+            try (GoogleAdsServiceClient googleAdsServiceClient = googleAdsClient.getLatestVersion().createGoogleAdsServiceClient()) {
                 ArrayList<String> accounts = new ArrayList();
 
                 //Retrieves all child accounts of the manager, don't bring manager account.                
@@ -131,69 +145,49 @@ public class GoogleAds {
 
                 Logger.getLogger(GoogleAds.class.getName()).log(Level.INFO, "Retrieving data from {0} accounts", accounts.size());
 
-                for (String account : accounts) {
+                //Builds the query to be executed.
+                StringBuilder query = new StringBuilder();
+                query.append("SELECT ").append(cli.getParameter("field")).append(" FROM ").append(cli.getParameter("type"));
 
-                    //Builds the query to be executed.
-                    StringBuilder query = new StringBuilder();
-                    query.append("SELECT ");
-                    query.append(cli.getParameter("field"));
-                    query.append(" FROM ");
-                    query.append(cli.getParameter("type"));
-
-                    //Identifies if query has a filter.
-                    if (!cli.getParameter("filter").isEmpty()) {
-                        query.append(" WHERE ");
-                        query.append(cli.getParameter("filter"));
-                    }
-
-                    // Constructs the SearchGoogleAdsStreamRequest.
-                    SearchGoogleAdsStreamRequest request
-                            = SearchGoogleAdsStreamRequest.newBuilder()
-                                    .setCustomerId(account)
-                                    .setQuery(query.toString())
-                                    .build();
-
-                    // API call returns a stream
-                    ServerStream<SearchGoogleAdsStreamResponse> stream
-                            = googleAdsServiceClient.searchStreamCallable().call(request);
-
-                    //Count of rows of an account.
-                    int count = 0;
-
-                    // Iterates through the results in the stream response.
-                    for (SearchGoogleAdsStreamResponse response : stream) {
-                        count = response.getResultsList().size();
-
-                        for (GoogleAdsRow googleAdsRow : response.getResultsList()) {
-                            ArrayList<Object> record = new ArrayList();
-
-                            //Convert row to json.
-                            String json = JsonFormat
-                                    .printer()
-                                    .preservingProtoFieldNames()
-                                    .print(googleAdsRow);
-
-                            if (cli.getParameterAsBoolean("debug")) {
-                                Logger.getLogger(GoogleAds.class.getName()).log(Level.INFO, "Row: {0}", json);
-                            }
-
-                            for (String field : fields) {
-                                // Get the json value.
-                                try {
-                                    Object value = JsonPath.read(json, "$." + field);
-                                    record.add(value);
-                                } catch (PathNotFoundException ex) {
-                                    if (cli.getParameterAsBoolean("debug")) {
-                                        Logger.getLogger(GoogleAds.class.getName()).log(Level.SEVERE, "Error getting field: " + field + ", setting null value.", ex);
-                                    }
-                                    record.add("");
-                                }
-                            }
-                            mitt.write(record);
-                        }
-                    }
-                    Logger.getLogger(GoogleAds.class.getName()).log(Level.INFO, "Retrievied data from account {0} ({1} rows)", new Object[]{account, count});
+                if (!cli.getParameter("filter").isEmpty()) {
+                    query.append(" WHERE ").append(cli.getParameter("filter"));
                 }
+
+                //Defines the output path. 
+                Path outputPath = Files.createTempDirectory("google_ads_" + UUID.randomUUID());
+
+                //Defines the listenable future collection.  
+                List<ListenableFuture<ReportSummary>> futures = new ArrayList<>();
+
+                for (String account : accounts) {
+                    //Defines the report observer. 
+                    ReportObserver responseObserver = new ReportObserver(
+                            account,
+                            outputPath,
+                            mitt.getConfiguration().getOriginalFieldName());
+
+                    //Executes the report asynchronously.
+                    googleAdsServiceClient
+                            .searchStreamCallable()
+                            .call(
+                                    SearchGoogleAdsStreamRequest.newBuilder()
+                                            .setCustomerId(account)
+                                            .setQuery(query.toString())
+                                            .build(),
+                                    responseObserver);
+
+                    //Stores a future to retrieve the results.
+                    futures.add(responseObserver.asFuture());
+                }
+
+                //Logs each report execution result. 
+                Futures.allAsList(futures).get().forEach(System.out::println);
+
+                //Writes to output.
+                mitt.write(outputPath.toFile());
+
+                //Removes temporary folder and its files. 
+                Files.delete(outputPath);
             }
         } catch (FileNotFoundException ex) {
             Logger.getLogger(GoogleAds.class.getName()).log(Level.SEVERE, "Google Ads failed to load GoogleAdsClient configuration from file", ex);
@@ -201,13 +195,137 @@ public class GoogleAds {
 
         } catch (ValidationException
                 | DuplicateEntityException
-                | IOException ex) {
+                | IOException
+                | InterruptedException
+                | ExecutionException ex) {
             Logger.getLogger(GoogleAds.class.getName()).log(Level.SEVERE, "Google Ads failed due to ", ex);
             System.exit(1);
 
         } finally {
             mitt.close();
             Logger.getLogger(GoogleAds.class.getName()).log(Level.INFO, "GLOVE - Google Ads Extractor finished");
+        }
+    }
+
+    /**
+     *
+     */
+    private static class ReportObserver implements ResponseObserver<SearchGoogleAdsStreamResponse> {
+
+        private final SettableFuture<ReportSummary> future = SettableFuture.create();
+        private final String account;
+        private final List<String> fields;
+        private final Path outputPath;
+        private final AtomicLong trips = new AtomicLong(0);
+        private final AtomicLong records = new AtomicLong(0);
+
+        ReportObserver(String account, Path outputPath, List<String> fields) {
+            this.account = account;
+            this.outputPath = outputPath;
+            this.fields = fields;
+        }
+
+        @Override
+        public void onStart(StreamController controller) {
+            Logger.getLogger(GoogleAds.class.getName()).log(Level.INFO, "Retrievied data from account {0}", new Object[]{this.account});
+        }
+
+        @Override
+        public void onResponse(SearchGoogleAdsStreamResponse response) {
+            try {
+                //Defines a temporary file to hold de reponse. 
+                Path responsePath = Paths.get(this.outputPath.toString() + File.separator + account + "_" + trips);
+
+                try (
+                        CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(responsePath),
+                                CSVFormat.Builder.create()
+                                        .setDelimiter(';')
+                                        .setQuote('"')
+                                        .setHeader(fields.toArray(new String[0])).build())) {
+
+                    for (GoogleAdsRow googleAdsRow : response.getResultsList()) {
+                        ArrayList<Object> record = new ArrayList();
+
+                        String json = JsonFormat
+                                .printer()
+                                .preservingProtoFieldNames()
+                                .print(googleAdsRow);
+
+                        for (String field : fields) {
+                            try {
+                                Object value = JsonPath.read(json, "$." + field);
+                                record.add(value);
+                            } catch (PathNotFoundException ex) {
+                                record.add("");
+                            }
+                        }
+
+                        csvPrinter.printRecord(record);
+                    }
+
+                    csvPrinter.flush();
+                }
+
+                //Identifies the number of trips. 
+                trips.incrementAndGet();
+
+                //Identifies the record count. 
+                records.addAndGet(response.getResultsCount());
+            } catch (IOException ex) {
+                notifyResultReady(new ReportSummary(account, records.get(), ex));
+            }
+        }
+
+        @Override
+        public void onError(Throwable t) {
+            notifyResultReady(new ReportSummary(account, records.get(), t));
+        }
+
+        @Override
+        public void onComplete() {
+            notifyResultReady(new ReportSummary(account, records.get()));
+        }
+
+        private void notifyResultReady(ReportSummary summary) {
+            future.set(summary);
+        }
+
+        ListenableFuture<ReportSummary> asFuture() {
+            return future;
+        }
+    }
+
+    /**
+     *
+     */
+    private static class ReportSummary {
+
+        private final String account;
+        private final long records;
+        private final Throwable throwable;
+
+        ReportSummary(String account, long records, Throwable throwable) {
+            this.account = account;
+            this.throwable = throwable;
+            this.records = records;
+        }
+
+        ReportSummary(String customerId, long records) {
+            this(customerId, records, null);
+        }
+
+        boolean isSuccess() {
+            return throwable == null;
+        }
+
+        @Override
+        public String toString() {
+            return "Customer ID: "
+                    + account
+                    + " Records: "
+                    + records
+                    + " IsSuccess? "
+                    + (isSuccess() ? "Yes!" : "No :-( Why? " + throwable.getMessage());
         }
     }
 }
