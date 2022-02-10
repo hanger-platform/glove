@@ -193,7 +193,9 @@ public class GoogleAds {
 
                 //Logs each report execution result. 
                 for (ReportSummary reportSummary : Futures.allAsList(futures).get()) {
-                    Logger.getLogger(GoogleAds.class.getName()).log(Level.INFO, reportSummary.toString());
+                    if (reportSummary.records > 0) {
+                        Logger.getLogger(GoogleAds.class.getName()).log(Level.INFO, reportSummary.toString());
+                    }
                 }
 
                 //Writes to output.
@@ -384,7 +386,7 @@ public class GoogleAds {
                     + account
                     + ", records: "
                     + records
-                    + ", status? "
+                    + ", status: "
                     + (isSuccess() ? "Success!" : "Failure: " + throwable.getMessage());
         }
     }
