@@ -95,16 +95,26 @@ public class GoogleAds {
             mitt.setOutputFile(cli.getParameter("output"));
 
             //Defines fields.
-            mitt.getConfiguration()
-                    .addCustomField("partition_field", new Concat((List) cli.getParameterAsList("partition", "\\+")))
-                    .addCustomField("custom_primary_key", new Concat((List) cli.getParameterAsList("key", "\\+")))
+            Configuration configuration = mitt.getConfiguration();
+
+            if (cli.hasParameter("partition")) {
+                configuration
+                        .addCustomField("partition_field", new Concat((List) cli.getParameterAsList("partition", "\\+")));
+            }
+
+            if (cli.hasParameter("key")) {
+                configuration
+                        .addCustomField("custom_primary_key", new Concat((List) cli.getParameterAsList("key", "\\+")));
+            }
+            configuration
                     .addCustomField("etl_load_date", new Now())
-                    .addField(cli.getParameterAsList("field", "\\,"));
+                    .addField(cli.getParameterAsList("field", "\\+"));
+
 
             //Fixes could not find policy 'pick_first' error.
             LoadBalancerRegistry.getDefaultRegistry().register(new PickFirstLoadBalancerProvider());
 
-            //Defines an authenticated client for Google ads api.
+            //Defines an authenticated client for Google Ads api.
             GoogleAdsClient googleAdsClient = GoogleAdsClient
                     .newBuilder()
                     .fromPropertiesFile(new File(cli.getParameter("credentials"))).
@@ -112,23 +122,23 @@ public class GoogleAds {
                     .build();
 
             try (GoogleAdsServiceClient googleAdsServiceClient = googleAdsClient.getLatestVersion().createGoogleAdsServiceClient()) {
-                ArrayList<String> accounts = new ArrayList();
+                ArrayList<String> accounts = new ArrayList<>();
 
                 //Retrieves all child accounts of the manager, don't bring manager account.                
                 String queryAccounts = "SELECT customer_client.manager, customer_client.id FROM customer_client WHERE customer_client.level <= 1 AND customer_client.manager = false";
 
-                // Constructs the SearchGoogleAdsStreamRequest.
+                //Constructs the SearchGoogleAdsStreamRequest.
                 SearchGoogleAdsStreamRequest searchGoogleAdsStreamRequest
                         = SearchGoogleAdsStreamRequest.newBuilder()
                                 .setCustomerId(cli.getParameter("customer"))
                                 .setQuery(queryAccounts)
                                 .build();
 
-                // API call returns a stream
+                //API call returns a stream
                 ServerStream<SearchGoogleAdsStreamResponse> searchGoogleAdsStreamResponse
                         = googleAdsServiceClient.searchStreamCallable().call(searchGoogleAdsStreamRequest);
 
-                // Iterates through the results in the stream response.
+                //Iterates through the results in the stream response.
                 for (SearchGoogleAdsStreamResponse response : searchGoogleAdsStreamResponse) {
                     for (GoogleAdsRow googleAdsRow : response.getResultsList()) {
 
@@ -181,7 +191,9 @@ public class GoogleAds {
                 }
 
                 //Logs each report execution result. 
-                Futures.allAsList(futures).get().forEach(System.out::println);
+                for (ReportSummary reportSummary : Futures.allAsList(futures).get()) {
+                    Logger.getLogger(GoogleAds.class.getName()).log(Level.INFO, reportSummary.toString());
+                }
 
                 //Writes to output.
                 mitt.write(outputPath.toFile());
@@ -244,7 +256,7 @@ public class GoogleAds {
                                         .setHeader(fields.toArray(new String[0])).build())) {
 
                     for (GoogleAdsRow googleAdsRow : response.getResultsList()) {
-                        ArrayList<Object> record = new ArrayList();
+                        ArrayList<Object> record = new ArrayList<>();
 
                         String json = JsonFormat
                                 .printer()
