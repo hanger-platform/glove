@@ -382,10 +382,10 @@ public class GoogleAds {
         public String toString() {
             return "Customer ID: "
                     + account
-                    + " Records: "
+                    + ", records: "
                     + records
-                    + " IsSuccess? "
-                    + (isSuccess() ? "Yes!" : "No :-( Why? " + throwable.getMessage());
+                    + ", status? "
+                    + (isSuccess() ? "Success!" : "Failure: " + throwable.getMessage());
         }
     }
 }
