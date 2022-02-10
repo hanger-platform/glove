@@ -25,7 +25,7 @@ Utilizando o [Maven](https://maven.apache.org/):
 ## Utilização
 
 #### Parâmetros
-##### Explicação dos parâmetros disponívels na ferramenta.
+##### Explicação dos parâmetros disponíveis na ferramenta.
 
 ```bash
 java -jar parquet.jar  \
@@ -34,7 +34,7 @@ java -jar parquet.jar  \
 	--filename=<(Optional) Filename, with wildcard if necessary, to be converted> \
 	--header=<(Optional) Identifies if the csv file has a header> \
 	--replace=<(Optional) Identifies if csv files will be replaced to parquet files> \
-	--thread=<(Optional) Limit of threads; default is 1> \
+	--thread=<(Optional) Limit of threads, be careful with it not to overload the workstation memory; default is 1> \
 	--compression=<(Optional) Identifies the compression to be applied; default is gzip> \
 	--delimiter=<(Optional) Delimiter of csv files; default is ;> \
 	--quote=<(Optional) Identifies the quote escape character; default is \""> \
