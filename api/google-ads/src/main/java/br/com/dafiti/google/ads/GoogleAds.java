@@ -26,6 +26,7 @@ package br.com.dafiti.google.ads;
 import br.com.dafiti.mitt.Mitt;
 import br.com.dafiti.mitt.cli.CommandLineInterface;
 import br.com.dafiti.mitt.exception.DuplicateEntityException;
+import br.com.dafiti.mitt.model.Configuration;
 import br.com.dafiti.mitt.transformation.embedded.Concat;
 import br.com.dafiti.mitt.transformation.embedded.Now;
 import com.google.ads.googleads.lib.GoogleAdsClient;
