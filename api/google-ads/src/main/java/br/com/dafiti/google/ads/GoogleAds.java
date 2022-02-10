@@ -49,6 +49,8 @@ import java.util.logging.Logger;
 import com.google.protobuf.util.JsonFormat;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
+import io.grpc.LoadBalancerRegistry;
+import io.grpc.internal.PickFirstLoadBalancerProvider;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -59,8 +61,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-import io.grpc.LoadBalancerRegistry;
-import io.grpc.internal.PickFirstLoadBalancerProvider;
 
 /**
  *
@@ -172,7 +172,7 @@ public class GoogleAds {
 
                 for (String account : accounts) {
                     //Defines the report observer. 
-                    ReportObserver responseObserver = new ReportObserver(
+                    ReportObserver reportObserver = new ReportObserver(
                             account,
                             outputPath,
                             mitt.getConfiguration().getOriginalFieldName());
@@ -185,10 +185,10 @@ public class GoogleAds {
                                             .setCustomerId(account)
                                             .setQuery(query.toString())
                                             .build(),
-                                    responseObserver);
+                                    reportObserver);
 
                     //Stores a future to retrieve the results.
-                    futures.add(responseObserver.asFuture());
+                    futures.add(reportObserver.asFuture());
                 }
 
                 //Logs each report execution result. 
@@ -221,7 +221,7 @@ public class GoogleAds {
     }
 
     /**
-     *
+     * 
      */
     private static class ReportObserver implements ResponseObserver<SearchGoogleAdsStreamResponse> {
 
@@ -232,17 +232,31 @@ public class GoogleAds {
         private final AtomicLong trips = new AtomicLong(0);
         private final AtomicLong records = new AtomicLong(0);
 
+        /**
+         * 
+         * @param account
+         * @param outputPath
+         * @param fields 
+         */
         ReportObserver(String account, Path outputPath, List<String> fields) {
             this.account = account;
             this.outputPath = outputPath;
             this.fields = fields;
         }
 
+        /**
+         * 
+         * @param controller 
+         */
         @Override
         public void onStart(StreamController controller) {
             Logger.getLogger(GoogleAds.class.getName()).log(Level.INFO, "Retrievied data from account {0}", new Object[]{this.account});
         }
 
+        /**
+         * 
+         * @param response 
+         */
         @Override
         public void onResponse(SearchGoogleAdsStreamResponse response) {
             try {
@@ -289,20 +303,35 @@ public class GoogleAds {
             }
         }
 
+        /**
+         * 
+         * @param t 
+         */
         @Override
         public void onError(Throwable t) {
             notifyResultReady(new ReportSummary(account, records.get(), t));
         }
 
+        /**
+         * 
+         */
         @Override
         public void onComplete() {
             notifyResultReady(new ReportSummary(account, records.get()));
         }
 
+        /**
+         * 
+         * @param summary 
+         */
         private void notifyResultReady(ReportSummary summary) {
             future.set(summary);
         }
 
+        /**
+         * 
+         * @return 
+         */
         ListenableFuture<ReportSummary> asFuture() {
             return future;
         }
@@ -317,20 +346,39 @@ public class GoogleAds {
         private final long records;
         private final Throwable throwable;
 
+        /**
+         * 
+         * @param account
+         * @param records
+         * @param throwable 
+         */
         ReportSummary(String account, long records, Throwable throwable) {
             this.account = account;
             this.throwable = throwable;
             this.records = records;
         }
 
+        /**
+         * 
+         * @param customerId
+         * @param records 
+         */
         ReportSummary(String customerId, long records) {
             this(customerId, records, null);
         }
 
+        /**
+         * 
+         * @return 
+         */
         boolean isSuccess() {
             return throwable == null;
         }
 
+        /**
+         * 
+         * @return 
+         */
         @Override
         public String toString() {
             return "Customer ID: "
