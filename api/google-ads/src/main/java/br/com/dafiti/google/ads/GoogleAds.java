@@ -109,17 +109,16 @@ public class GoogleAds {
             }
             configuration
                     .addCustomField("etl_load_date", new Now())
-                    .addField(cli.getParameterAsList("field", "\\+"));
+                    .addField(cli.getParameterAsList("field", "\\,"));
 
-
-            //Fixes could not find policy 'pick_first' error.
+            //Fixes "could not find policy 'pick_first'" error.
             LoadBalancerRegistry.getDefaultRegistry().register(new PickFirstLoadBalancerProvider());
 
             //Defines an authenticated client for Google Ads api.
             GoogleAdsClient googleAdsClient = GoogleAdsClient
                     .newBuilder()
-                    .fromPropertiesFile(new File(cli.getParameter("credentials"))).
-                    setLoginCustomerId(Long.parseLong(cli.getParameter("manager")))
+                    .fromPropertiesFile(new File(cli.getParameter("credentials")))
+                    .setLoginCustomerId(Long.parseLong(cli.getParameter("manager")))
                     .build();
 
             try (GoogleAdsServiceClient googleAdsServiceClient = googleAdsClient.getLatestVersion().createGoogleAdsServiceClient()) {
@@ -154,8 +153,6 @@ public class GoogleAds {
                     }
                 }
 
-                Logger.getLogger(GoogleAds.class.getName()).log(Level.INFO, "Retrieving data from {0} accounts", accounts.size());
-
                 //Builds the query to be executed.
                 StringBuilder query = new StringBuilder();
                 query.append("SELECT ").append(cli.getParameter("field")).append(" FROM ").append(cli.getParameter("type"));
@@ -166,6 +163,9 @@ public class GoogleAds {
 
                 //Defines the output path. 
                 Path outputPath = Files.createTempDirectory("google_ads_" + UUID.randomUUID());
+
+                //Logs the number of accounts and the temporary folder. 
+                Logger.getLogger(GoogleAds.class.getName()).log(Level.INFO, "Retrieving data from {0} accounts to {1}", new Object[]{accounts.size(), outputPath});
 
                 //Defines the listenable future collection.  
                 List<ListenableFuture<ReportSummary>> futures = new ArrayList<>();
@@ -221,7 +221,7 @@ public class GoogleAds {
     }
 
     /**
-     * 
+     *
      */
     private static class ReportObserver implements ResponseObserver<SearchGoogleAdsStreamResponse> {
 
@@ -233,10 +233,10 @@ public class GoogleAds {
         private final AtomicLong records = new AtomicLong(0);
 
         /**
-         * 
+         *
          * @param account
          * @param outputPath
-         * @param fields 
+         * @param fields
          */
         ReportObserver(String account, Path outputPath, List<String> fields) {
             this.account = account;
@@ -245,17 +245,17 @@ public class GoogleAds {
         }
 
         /**
-         * 
-         * @param controller 
+         *
+         * @param controller
          */
         @Override
         public void onStart(StreamController controller) {
-            Logger.getLogger(GoogleAds.class.getName()).log(Level.INFO, "Retrievied data from account {0}", new Object[]{this.account});
+            Logger.getLogger(GoogleAds.class.getName()).log(Level.INFO, "Retrieving data from account {0}", new Object[]{this.account});
         }
 
         /**
-         * 
-         * @param response 
+         *
+         * @param response
          */
         @Override
         public void onResponse(SearchGoogleAdsStreamResponse response) {
@@ -263,13 +263,12 @@ public class GoogleAds {
                 //Defines a temporary file to hold de reponse. 
                 Path responsePath = Paths.get(this.outputPath.toString() + File.separator + account + "_" + trips);
 
-                try (
-                        CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(responsePath),
-                                CSVFormat.Builder.create()
-                                        .setDelimiter(';')
-                                        .setQuote('"')
-                                        .setHeader(fields.toArray(new String[0])).build())) {
-
+                try (CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(responsePath),
+                        CSVFormat.Builder.create()
+                                .setDelimiter(';')
+                                .setQuote('"')
+                                .setEscape('"')
+                                .setHeader(fields.toArray(new String[0])).build())) {
                     for (GoogleAdsRow googleAdsRow : response.getResultsList()) {
                         ArrayList<Object> record = new ArrayList<>();
 
@@ -304,8 +303,8 @@ public class GoogleAds {
         }
 
         /**
-         * 
-         * @param t 
+         *
+         * @param t
          */
         @Override
         public void onError(Throwable t) {
@@ -313,7 +312,7 @@ public class GoogleAds {
         }
 
         /**
-         * 
+         *
          */
         @Override
         public void onComplete() {
@@ -321,16 +320,16 @@ public class GoogleAds {
         }
 
         /**
-         * 
-         * @param summary 
+         *
+         * @param summary
          */
         private void notifyResultReady(ReportSummary summary) {
             future.set(summary);
         }
 
         /**
-         * 
-         * @return 
+         *
+         * @return
          */
         ListenableFuture<ReportSummary> asFuture() {
             return future;
@@ -347,10 +346,10 @@ public class GoogleAds {
         private final Throwable throwable;
 
         /**
-         * 
+         *
          * @param account
          * @param records
-         * @param throwable 
+         * @param throwable
          */
         ReportSummary(String account, long records, Throwable throwable) {
             this.account = account;
@@ -359,25 +358,25 @@ public class GoogleAds {
         }
 
         /**
-         * 
+         *
          * @param customerId
-         * @param records 
+         * @param records
          */
         ReportSummary(String customerId, long records) {
             this(customerId, records, null);
         }
 
         /**
-         * 
-         * @return 
+         *
+         * @return
          */
         boolean isSuccess() {
             return throwable == null;
         }
 
         /**
-         * 
-         * @return 
+         *
+         * @return
          */
         @Override
         public String toString() {
