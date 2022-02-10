@@ -51,7 +51,14 @@
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-client</artifactId>
             <version>3.3.1</version>            
-        </dependency>      
+        </dependency>  
+        
+        <!--slf4j-->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-nop</artifactId>
+            <version>1.7.35</version>
+        </dependency>    
     </dependencies>
     
     <build>
