@@ -23,8 +23,8 @@
  */
 package br.com.dafiti.orc;
 
-import br.com.dafiti.datalake.S3;
-import br.com.dafiti.util.Statistics;
+import br.com.dafiti.orc.util.S3;
+import br.com.dafiti.orc.util.Statistics;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import java.io.File;
@@ -37,8 +37,6 @@ import java.util.HashSet;
 import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.math.NumberUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.ql.exec.vector.BytesColumnVector;
@@ -49,7 +47,6 @@ import org.apache.hadoop.hive.ql.exec.vector.TimestampColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
 import org.apache.hadoop.hive.serde2.io.DateWritable;
 import org.apache.hadoop.hive.serde2.io.HiveDecimalWritable;
-import org.apache.log4j.Logger;
 import org.apache.orc.CompressionKind;
 import org.apache.orc.OrcFile;
 import org.apache.orc.OrcFile.EncodingStrategy;
@@ -61,6 +58,10 @@ import org.apache.orc.Writer;
 import org.apache.orc.mapred.OrcTimestamp;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 /**
  * This class read a csv file and write the records into a orc file
@@ -68,7 +69,9 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
  * @author Guilherme OLIVEIRA
  * @author Valdiney V GOMES
  */
-public class CSVToORC implements Runnable {
+public class Converter implements Runnable {
+
+    private static final Logger LOG = Logger.getLogger(Converter.class.getName());
 
     private final File inputFile;
     private final TypeDescription schema;
@@ -103,7 +106,7 @@ public class CSVToORC implements Runnable {
      * @param mode Identify partition mode.
      * @param debug Identify if should show detailed log message.
      */
-    public CSVToORC(
+    public Converter(
             File inputFile,
             String compression,
             Character delimiter,
@@ -161,7 +164,7 @@ public class CSVToORC implements Runnable {
     @Override
     public void run() {
         //Log the process init.
-        Logger.getLogger(this.getClass()).info("Converting CSV to Parquet: " + inputFile.getAbsolutePath());
+        LOG.log(Level.INFO, "Converting CSV to ORC: {0}", inputFile.getAbsolutePath());
 
         //Identifies the file name pattern. 
         String path = FilenameUtils.getFullPath(inputFile.getAbsolutePath());
@@ -331,7 +334,7 @@ public class CSVToORC implements Runnable {
                 }
             }
         } catch (Exception ex) {
-            Logger.getLogger(this.getClass()).error("Error [" + ex + "] generating orc file " + orcFile.getName());
+            LOG.log(Level.SEVERE, "Error [" + ex + "] generating orc file " + orcFile.getName(), ex);
             System.exit(1);
         }
     }

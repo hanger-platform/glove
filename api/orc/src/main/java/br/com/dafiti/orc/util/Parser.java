@@ -21,15 +21,13 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
  */
-package br.com.dafiti.schema;
+package br.com.dafiti.orc.util;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import org.apache.avro.Schema;
-import org.apache.log4j.Logger;
 import org.apache.orc.TypeDescription;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -50,87 +48,6 @@ public class Parser {
      */
     public Parser(File schemaFile) {
         this.schemaFile = schemaFile;
-    }
-
-    /**
-     * Get schema from parquet file.
-     *
-     * @return Avro schema.
-     * @throws java.io.IOException
-     */
-    public Schema getAvroSchema() throws IOException {
-        StringBuilder schema = new StringBuilder();
-        JSONObject jsonSchema;
-        BufferedReader buffer;
-        String line;
-
-        //Read the schema file.
-        buffer = new BufferedReader(new FileReader(schemaFile));
-
-        //Insert schema header.
-        schema.append("{");
-        schema.append("\"type\": \"record\",");
-        schema.append("\"name\": \"model\",");
-        schema.append("\"fields\":");
-
-        //Insert schema fields.
-        while ((line = buffer.readLine()) != null) {
-            schema.append(line);
-        }
-
-        //Insert schema footer.
-        schema.append("}");
-
-        //Convert the schema to json.
-        jsonSchema = new JSONObject(schema.toString());
-
-        //Get field list.
-        JSONArray fields = jsonSchema.getJSONArray("fields");
-
-        //Adjusts field attributes if necessary.
-        for (int i = 0; i < fields.length(); i++) {
-            JSONObject field = fields.getJSONObject(i);
-
-            if (field.get("type") instanceof JSONArray) {
-                JSONArray union = field.getJSONArray("type");
-
-                for (int j = 0; j < union.length(); j++) {
-                    if (union.get(j) instanceof JSONObject) {
-                        JSONObject type = union.getJSONObject(j);
-
-                        if (type.get("type").equals("fixed")) {
-                            if (type.has("logicalType") && type.get("logicalType").equals("decimal")) {
-                                int precision = type.getInt("precision");
-                                int size = computeMinBytesForPrecision(precision);
-
-                                type.put("size", size);
-                                type.put("precision", type.getInt("precision"));
-                                type.put("scale", type.getInt("scale"));
-
-                                Logger.getLogger(this.getClass()).info("Schema was auto adjusted: " + type.getString("name") + " size fixed to " + size);
-                            }
-                        }
-                    }
-                }
-            } else if (field.get("type") instanceof JSONObject) {
-                JSONObject type = field.getJSONObject("type");
-
-                if (type.get("type").equals("fixed")) {
-                    if (type.has("logicalType") && type.get("logicalType").equals("decimal")) {
-                        int precision = type.getInt("precision");
-                        int size = computeMinBytesForPrecision(precision);
-
-                        type.put("size", size);
-                        type.put("precision", type.getInt("precision"));
-                        type.put("scale", type.getInt("scale"));
-
-                        Logger.getLogger(this.getClass()).info("Schema was auto adjusted: " + type.getString("name") + " size fixed to " + size);
-                    }
-                }
-            }
-        }
-
-        return new Schema.Parser().parse(jsonSchema.toString());
     }
 
     /**
@@ -217,24 +134,5 @@ public class Parser {
         }
 
         return TypeDescription.fromString("struct<" + String.join(",", fieldList) + ">");
-    }
-
-    /**
-     * Returns the minimum number of bytes needed to store a decimal with a
-     * given precision.
-     *
-     * Extracted from: https://goo.gl/JD8Q4E
-     *
-     * @param precision field precision.
-     * @return bytes field size.
-     */
-    private int computeMinBytesForPrecision(int precision) {
-        int bytes = 1;
-
-        while (Math.pow(2, 8 * bytes - 1) < Math.pow(10, precision)) {
-            bytes += 1;
-        }
-
-        return bytes;
     }
 }

@@ -1,4 +1,4 @@
-package br.com.dafiti.parquet.util;
+package br.com.dafiti.orc.util;
 
 /**
  *
