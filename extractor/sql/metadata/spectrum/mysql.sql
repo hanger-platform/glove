@@ -99,6 +99,7 @@ SELECT * FROM (
 			WHEN data_type IN ('tinyint','smallint','mediumint', 'int', 'bigint') THEN CONCAT('CAST(`',column_name,'` AS SIGNED) AS `',REPLACE(column_name,' ','_'),'`')
             WHEN data_type IN ('text', 'longtext', 'mediumtext', 'tinytext', 'varchar') THEN CONCAT('`', column_name, '` AS `',REPLACE(column_name,' ','_'),'`' )
             WHEN data_type IN ('blob','mediumblob','longblob') THEN CONCAT('CONVERT(`', column_name, '` USING utf8) AS `',REPLACE(column_name,' ','_'),'`' )
+ 			WHEN data_type = 'time'  THEN CONCAT('CAST(`', column_name, '` AS CHAR) AS `',REPLACE(column_name,' ','_'),'`' )
             ELSE CONCAT('`',column_name,'`')
         END AS fields,
         CASE
@@ -107,7 +108,8 @@ SELECT * FROM (
 			WHEN data_type IN ('tinyint','smallint','mediumint', 'int', 'bigint') THEN CONCAT('CAST(`',column_name,'` AS SIGNED)')
             WHEN data_type IN ('text', 'longtext', 'mediumtext', 'tinytext', 'varchar') THEN CONCAT('`', column_name, '`' )
             WHEN data_type IN ('blob','mediumblob','longblob') THEN CONCAT('CONVERT(`',column_name,'` USING utf8)')
-            ELSE CONCAT('`',column_name,'`')
+ 			WHEN data_type = 'time' THEN CONCAT('CAST(`',column_name,'` AS CHAR)')            
+			ELSE CONCAT('`',column_name,'`')
         END AS casting,
 		CASE data_type
 			WHEN 'bit'          THEN 'int'
