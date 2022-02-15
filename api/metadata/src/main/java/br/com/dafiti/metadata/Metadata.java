@@ -104,9 +104,12 @@ public class Metadata {
                                     cli.getParameter("metadata"),
                                     cli.getParameter("output"),
                                     cli.getParameter("dialect"),
-                                    cli.getParameterAsInteger("dialect"),
+                                    cli.getParameterAsInteger("sample"),
                                     reserverWordsFile));
                 }
+
+                //Exit the thread executor.
+                executor.shutdown();
             }
 
         } catch (DuplicateEntityException
