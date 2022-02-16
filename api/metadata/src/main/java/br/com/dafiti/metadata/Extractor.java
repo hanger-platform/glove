@@ -40,30 +40,29 @@ import org.json.JSONObject;
 import org.json.JSONException;
 
 /**
- * This class read a csv file, infer and write the parquet schema.
+ * Read a csv file, infer and write the parquet schema.
  *
  * @author Valdiney V GOMES
  */
 public class Extractor implements Runnable {
 
     private static final Logger LOG = Logger.getLogger(Metadata.class.getName());
+    private static final int MAX_SAMPLE = 1000000;
 
-    public static final int MAX_SAMPLE = 1000000;
-
-    private final File file;
-    private final File reserverWordsFile;
+    private File file;
+    private File reserverWordsFile;
     private List<String> fieldList;
-    private final ArrayList<String[]> fieldContent;
-    private final ArrayList<String> fieldSchema;
-    private final ArrayList<String> fieldDataType;
-    private final ArrayList<String> fieldMetadata;
+    private ArrayList<String[]> fieldContent;
+    private ArrayList<String> fieldSchema;
+    private ArrayList<String> fieldDataType;
+    private ArrayList<String> fieldMetadata;
     private JSONArray jsonMetadata;
-    private final Character delimiter;
-    private final Character quote;
-    private final Character escape;
+    private Character delimiter;
+    private Character quote;
+    private Character escape;
     private String outputPath;
-    private final String dialect;
-    private final boolean hasHeader;
+    private String dialect;
+    private boolean hasHeader;
     private int sample;
     private String rowOnTheFly;
 
@@ -71,6 +70,7 @@ public class Extractor implements Runnable {
      * Constructor.
      *
      * @param csvFile CSV file.
+     * @param reserverWordsFile Identify the reserved words file list.
      * @param delimiter File delimiter.
      * @param quote File quote.
      * @param escape File escape.
@@ -80,10 +80,10 @@ public class Extractor implements Runnable {
      * @param dialect Identify the metadata dialect.
      * @param sample Sample de dados a ser analizado para definição de data
      * types.
-     * @param reserverWordsFile Identify the reserved words file list.
      */
     public Extractor(
             File csvFile,
+            File reserverWordsFile,
             Character delimiter,
             Character quote,
             Character escape,
@@ -91,8 +91,7 @@ public class Extractor implements Runnable {
             String metadata,
             String outputFolder,
             String dialect,
-            int sample,
-            File reserverWordsFile) {
+            int sample) {
 
         this.fieldList = new ArrayList();
         this.fieldContent = new ArrayList();
@@ -139,25 +138,11 @@ public class Extractor implements Runnable {
         try {
             String[] row;
 
-            //Define a settings.
-            CsvParserSettings settings = new CsvParserSettings();
-            settings.setNullValue("");
-            settings.setMaxCharsPerColumn(-1);
-
-            //Define format settings
-            settings.getFormat().setDelimiter(delimiter);
-            settings.getFormat().setQuote(quote);
-            settings.getFormat().setQuoteEscape(escape);
-
-            //Define a csv parser.
-            CsvParser csvParser = new CsvParser(settings);
-
-            //Init a parser.
+            CsvParser csvParser = new CsvParser(this.getCSVSettings());
             csvParser.beginParsing(file);
 
-            //Process each csv line.
             while ((row = csvParser.parseNext()) != null) {
-                //Identify if the file have a header
+                //Identify if file has a header
                 if (hasHeader && fieldList.isEmpty()) {
                     fieldList.addAll(Arrays.asList(row));
                 } else {
@@ -470,51 +455,24 @@ public class Extractor implements Runnable {
             }
 
             if (fieldList.size() > 0) {
-                //Write field list.  
-                String tableColumn = String.join("\n", fieldList);
-                FileWriter tableColumnFile = new FileWriter(this.outputPath.concat(file.getName().replace(".csv", "")).concat("_columns.csv"));
-
-                try (BufferedWriter tableColumnsBuffer = new BufferedWriter(tableColumnFile)) {
-                    tableColumnsBuffer.write(tableColumn);
-                    tableColumnsBuffer.flush();
-                    tableColumnFile.close();
-                }
+                //Write field list.                  
+                writeFile("_columns.csv", String.join("\n", fieldList));
 
                 //Write field list with datatype. 
                 if (fieldDataType.size() > 0) {
-                    String tableField = String.join(",", fieldDataType);
-                    FileWriter tableFieldFile = new FileWriter(this.outputPath.concat(file.getName().replace(".csv", "")).concat("_fields.csv"));
-
-                    try (BufferedWriter tableFieldBuffer = new BufferedWriter(tableFieldFile)) {
-                        tableFieldBuffer.write(tableField);
-                        tableFieldBuffer.flush();
-                        tableFieldFile.close();
-                    }
+                    writeFile("_fields.csv", String.join(",", fieldDataType));
                 }
 
                 //Write table parquet schema.
                 if (fieldSchema.size() > 0) {
-                    String schemaField = "[".concat(String.join(",\n", fieldSchema)).concat("]");
-                    FileWriter schemaFile = new FileWriter(this.outputPath.concat(file.getName().replace(".csv", "")).concat(".json"));
-
-                    try (BufferedWriter schemaBuffer = new BufferedWriter(schemaFile)) {
-                        schemaBuffer.write(schemaField);
-                        schemaBuffer.flush();
-                        schemaFile.close();
-                    }
+                    writeFile(".json", "[".concat(String.join(",\n", fieldSchema)).concat("]"));
                 }
 
                 //Write table metadata.
                 if (fieldMetadata.size() > 0) {
-                    String tableMetadata = "[".concat(String.join(",\n", fieldMetadata)).concat("]");
-                    FileWriter tableMetadataFile = new FileWriter(this.outputPath.concat(file.getName().replace(".csv", "")).concat("_metadata.csv"));
-
-                    try (BufferedWriter metadataBuffer = new BufferedWriter(tableMetadataFile)) {
-                        metadataBuffer.write(tableMetadata);
-                        metadataBuffer.flush();
-                        tableMetadataFile.close();
-                    }
+                    writeFile("_metadata.csv", "[".concat(String.join(",\n", this.fieldMetadata)).concat("]"));
                 }
+
             } else {
                 LOG.info("CSV file is empty");
             }
@@ -524,4 +482,39 @@ public class Extractor implements Runnable {
             System.exit(1);
         }
     }
+
+    /**
+     *
+     * @return CsvParserSettings
+     */
+    private CsvParserSettings getCSVSettings() {
+        CsvParserSettings settings = new CsvParserSettings();
+        settings.setNullValue("");
+        settings.setMaxCharsPerColumn(-1);
+        settings.getFormat().setDelimiter(delimiter);
+        settings.getFormat().setQuote(quote);
+        settings.getFormat().setQuoteEscape(escape);
+
+        return settings;
+    }
+
+    /**
+     * Write an output file.
+     *
+     * @param suffix String file name suffix
+     * @param content String file content
+     * @throws IOException
+     */
+    private void writeFile(String suffix, String content) throws IOException {
+        FileWriter writer = new FileWriter(this.outputPath
+                .concat(this.file.getName().replace(".csv", ""))
+                .concat(suffix));
+
+        try (BufferedWriter bf = new BufferedWriter(writer)) {
+            bf.write(content);
+            bf.flush();
+            writer.close();
+        }
+    }
+
 }

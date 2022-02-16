@@ -97,6 +97,7 @@ public class Metadata {
                     executor.execute(
                             new Extractor(
                                     file,
+                                    reserverWordsFile,
                                     cli.getParameter("delimiter").charAt(0),
                                     cli.getParameter("quote").charAt(0),
                                     cli.getParameter("escape").charAt(0),
@@ -104,8 +105,7 @@ public class Metadata {
                                     cli.getParameter("metadata"),
                                     cli.getParameter("output"),
                                     cli.getParameter("dialect"),
-                                    cli.getParameterAsInteger("sample"),
-                                    reserverWordsFile));
+                                    cli.getParameterAsInteger("sample")));
                 }
 
                 //Exit the thread executor.
