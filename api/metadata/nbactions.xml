@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.metadata.Metadata --folder=/home/helio.leal/Documentos/lixo/converter/teste_metadata_jar/com_is_recreate/sample/ --output=/home/helio.leal/Documentos/lixo/converter/teste_metadata_jar/com_is_recreate/output/ --metadata="" --field="" --sample=100000 --delimiter=";" --filename=spc_staging_dev_sales_order_simplified.csv --dialect=spectrum --reservedWords=/home/helio.leal/Documentos/projetos_publicos/glove/extractor/reserved_words/spectrum.txt</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.metadata.Metadata --folder=/home/helio.leal/Documentos/lixo/converter/teste_metadata_jar/com_is_recreate/sample/ --output=/home/helio.leal/Documentos/lixo/converter/teste_metadata_jar/com_is_recreate/output/ --metadata="" --field="" --sample=100000 --delimiter=";" --filename=spc_staging_dev_sales_order_simplified.csv --dialect=athena --reservedWords=/home/helio.leal/Documentos/projetos_publicos/glove/extractor/reserved_words/spectrum.txt</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.metadata.Metadata --folder=/home/helio.leal/Documentos/lixo/converter/teste_metadata_jar/com_is_recreate/sample/ --output=/home/helio.leal/Documentos/lixo/converter/teste_metadata_jar/com_is_recreate/output/ --metadata="" --field="" --sample=100000 --delimiter=";" --filename=spc_staging_dev_sales_order_simplified.csv --dialect=spectrum --reservedWords=/home/helio.leal/Documentos/projetos_publicos/glove/extractor/reserved_words/spectrum.txt</exec.args>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.metadata.Metadata --folder=/home/helio.leal/Documentos/lixo/converter/teste_metadata_jar/com_is_recreate/sample/ --output=/home/helio.leal/Documentos/lixo/converter/teste_metadata_jar/com_is_recreate/output/ --metadata="" --field="" --sample=100000 --delimiter=";" --filename=spc_staging_dev_sales_order_simplified.csv --dialect=athena --reservedWords=/home/helio.leal/Documentos/projetos_publicos/glove/extractor/reserved_words/spectrum.txt</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.metadata.Metadata --folder=/home/helio.leal/Documentos/lixo/converter/teste_metadata_jar/com_is_recreate/sample/ --output=/home/helio.leal/Documentos/lixo/converter/teste_metadata_jar/com_is_recreate/output/ --metadata="" --field="" --sample=100000 --delimiter=";" --filename=spc_staging_dev_sales_order_simplified.csv --dialect=spectrum --reservedWords=/home/helio.leal/Documentos/projetos_publicos/glove/extractor/reserved_words/spectrum.txt</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.metadata.Metadata --folder=/home/helio.leal/Documentos/lixo/converter/teste_metadata_jar/com_is_recreate/sample/ --output=/home/helio.leal/Documentos/lixo/converter/teste_metadata_jar/com_is_recreate/output/ --metadata="" --field="" --sample=100000 --delimiter=";" --filename=spc_staging_dev_sales_order_simplified.csv --dialect=athena --reservedWords=/home/helio.leal/Documentos/projetos_publicos/glove/extractor/reserved_words/spectrum.txt</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>

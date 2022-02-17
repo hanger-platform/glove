@@ -43,6 +43,7 @@ import org.json.JSONException;
  * Read a csv file, infer and write the parquet schema.
  *
  * @author Valdiney V GOMES
+ * @author Helio Leal
  */
 public class Extractor implements Runnable {
 
@@ -51,20 +52,18 @@ public class Extractor implements Runnable {
 
     private File file;
     private File reserverWordsFile;
-    private List<String> fieldList;
     private ArrayList<String[]> fieldContent;
-    private ArrayList<String> fieldSchema;
-    private ArrayList<String> fieldDataType;
-    private ArrayList<String> fieldMetadata;
     private JSONArray jsonMetadata;
     private Character delimiter;
     private Character quote;
     private Character escape;
     private String outputPath;
     private String dialect;
+    private String rowOnTheFly;
     private boolean hasHeader;
     private int sample;
-    private String rowOnTheFly;
+
+    private Field field;
 
     /**
      * Constructor.
@@ -93,11 +92,7 @@ public class Extractor implements Runnable {
             String dialect,
             int sample) {
 
-        this.fieldList = new ArrayList();
         this.fieldContent = new ArrayList();
-        this.fieldSchema = new ArrayList();
-        this.fieldDataType = new ArrayList();
-        this.fieldMetadata = new ArrayList();
         this.jsonMetadata = new JSONArray();
         this.file = csvFile;
         this.delimiter = delimiter;
@@ -109,9 +104,13 @@ public class Extractor implements Runnable {
         this.reserverWordsFile = reserverWordsFile;
         this.rowOnTheFly = "";
 
+        this.field = new Field();
+
         //Limit the data sample.
         if (sample > MAX_SAMPLE) {
             this.sample = MAX_SAMPLE;
+        } else {
+            this.sample = sample;
         }
 
         //Identify the output path.
@@ -121,7 +120,7 @@ public class Extractor implements Runnable {
 
         //Get the header fields passed by parameter. 
         if (!this.hasHeader) {
-            this.fieldList = Arrays.asList(csvField.replace(" ", "").split(Pattern.quote(",")));
+            this.field.setList(Arrays.asList(csvField.replace(" ", "").split(Pattern.quote(","))));
         }
 
         //Get the fields type passed by parameter. 
@@ -136,45 +135,12 @@ public class Extractor implements Runnable {
     @Override
     public void run() {
         try {
-            String[] row;
-
-            CsvParser csvParser = new CsvParser(this.getCSVSettings());
-            csvParser.beginParsing(file);
-
-            while ((row = csvParser.parseNext()) != null) {
-                //Identify if file has a header
-                if (hasHeader && fieldList.isEmpty()) {
-                    fieldList.addAll(Arrays.asList(row));
-                } else {
-                    //Get a limited, but not too limited, data sample from the file. 
-                    fieldContent.add(row);
-
-                    if (fieldContent.size() == sample) {
-                        break;
-                    }
-                }
-            }
-
-            //Stop the parser.
-            csvParser.stopParsing();
-
-            //Identify the reserved words. 
-            List<String> reservedWords = new ArrayList();
-
-            if (reserverWordsFile != null) {
-                try (Scanner scanner = new Scanner(reserverWordsFile)) {
-                    while (scanner.hasNext()) {
-                        reservedWords.add(scanner.next());
-                    }
-
-                    System.out.println(reservedWords.size() + " reserved words loaded from " + reserverWordsFile.getAbsolutePath());
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                }
-            }
+            this.fillDataSample();
+            List<String> reservedWords = this.getReservedWords();
+            Dialect clazz = (Dialect) Class.forName("br.com.dafiti.metadata." + dialect).newInstance();
 
             //Process each column. 
-            for (int column = 0; column < fieldList.size(); column++) {
+            for (int column = 0; column < this.field.getList().size(); column++) {
                 String type = "";
                 int length = 0;
                 int stringField = 0;
@@ -184,7 +150,7 @@ public class Extractor implements Runnable {
                 boolean hasMetadata = false;
 
                 //Get the field name.
-                String field = fieldList
+                String name = this.field.getList()
                         .get(column)
                         .replaceAll("\\s", "")
                         .replaceAll("\\W", "_")
@@ -194,7 +160,7 @@ public class Extractor implements Runnable {
                 //Get field properties from metadata. 
                 for (int i = 0; i < jsonMetadata.length(); i++) {
                     JSONObject metadata = jsonMetadata.getJSONObject(i);
-                    hasMetadata = metadata.getString("field").equalsIgnoreCase(field);
+                    hasMetadata = metadata.getString("field").equalsIgnoreCase(name);
 
                     if (hasMetadata) {
                         type = metadata.has("type") ? metadata.getString("type") : "";
@@ -205,9 +171,9 @@ public class Extractor implements Runnable {
                 }
 
                 //Concat postfix _rw to field name that is a reserved word. 
-                if (reservedWords.contains(field.toLowerCase())) {
-                    System.out.println("Reserved word found at " + field + " and replaced by " + field + "_rw");
-                    field = field.concat("_rw");
+                if (reservedWords.contains(name.toLowerCase())) {
+                    System.out.println("Reserved word found at " + name + " and replaced by " + name + "_rw");
+                    name = name.concat("_rw");
                 }
 
                 //Identify if have a metadata. 
@@ -243,244 +209,110 @@ public class Extractor implements Runnable {
 
                     //Identify the field type and size based on the number of ocurrences of each data type.
                     if ((nullField > 0 && stringField == 0 && integerField == 0 && doubleField == 0)) {
-                        fieldMetadata.add("{\"field\":\"" + field + "\",\"type\":\"string\",\"length\":255}");
-
-                        switch (dialect) {
-                            case "spectrum":
-                            case "athena":
-                                fieldSchema.add("{\"name\":\"" + field + "\",\"type\":[\"null\",\"string\"],\"default\":null}");
-                                fieldDataType.add(field + " " + "varchar(255)");
-                                break;
-                            case "redshift":
-                                fieldDataType.add(field + " " + "varchar(255) ENCODE ZSTD");
-                                break;
-                            case "bigquery":
-                                fieldSchema.add("{\"name\":\"" + field + "\",\"type\":\"STRING\"}");
-                                break;
-                        }
+                        clazz.generateNull(this.field, name);
 
                     } else if (stringField > 0) {
-                        int justifiedLength = (length * 2) > 65000 ? 65000 : (length * 2);
-
-                        fieldMetadata.add("{\"field\":\"" + field + "\",\"type\":\"string\",\"length\":" + justifiedLength + "}");
-
-                        switch (dialect) {
-                            case "spectrum":
-                            case "athena":
-                                fieldSchema.add("{\"name\":\"" + field + "\",\"type\":[\"null\",\"string\"],\"default\":null}");
-                                fieldDataType.add(field + " " + "varchar(" + justifiedLength + ")");
-                                break;
-                            case "redshift":
-                                fieldDataType.add(field + " " + "varchar(" + justifiedLength + ") ENCODE ZSTD");
-                                break;
-                            case "bigquery":
-                                fieldSchema.add("{\"name\":\"" + field + "\",\"type\":\"STRING\"}");
-                                break;
-                        }
+                        clazz.generateString(this.field, name, (length * 2) > 65000 ? 65000 : (length * 2));
 
                     } else if (integerField > 0 && stringField == 0 && doubleField == 0) {
-                        fieldMetadata.add("{\"field\":\"" + field + "\",\"type\":\"integer\"}");
-
-                        switch (dialect) {
-                            case "spectrum":
-                            case "athena":
-                                fieldSchema.add("{\"name\":\"" + field + "\",\"type\":[\"null\",\"long\"],\"default\":null}");
-                                fieldDataType.add(field + " " + "bigint");
-                                break;
-                            case "redshift":
-                                fieldDataType.add(field + " " + "bigint ENCODE AZ64");
-                                break;
-                            case "bigquery":
-                                fieldSchema.add("{\"name\":\"" + field + "\",\"type\":\"INTEGER\"}");
-                                break;
-                        }
+                        clazz.generateInteger(this.field, name);
 
                     } else if (doubleField > 0 && stringField == 0) {
-                        fieldMetadata.add("{\"field\":\"" + field + "\",\"type\":\"number\"}");
+                        clazz.generateNumber(this.field, name);
 
-                        switch (dialect) {
-                            case "spectrum":
-                                fieldSchema.add("{\"name\":\"" + field + "\",\"type\":[\"null\",\"double\"],\"default\":null}");
-                                fieldDataType.add(field + " " + "double precision");
-                                break;
-                            case "athena":
-                                fieldSchema.add("{\"name\":\"" + field + "\",\"type\":[\"null\",\"double\"],\"default\":null}");
-                                fieldDataType.add(field + " " + "double");
-                                break;
-                            case "redshift":
-                                fieldDataType.add(field + " " + "double precision ENCODE ZSTD");
-                                break;
-                            case "bigquery":
-                                fieldSchema.add("{\"name\":\"" + field + "\",\"type\":\"FLOAT\"}");
-                                break;
-                        }
                     }
                 } else {
                     switch (type) {
                         case "string":
-                            int justifiedLength = length > 65000 ? 65000 : length;
-
-                            fieldMetadata.add("{\"field\":\"" + field + "\",\"type\":\"string\",\"length\":" + justifiedLength + "}");
-
-                            switch (dialect) {
-                                case "spectrum":
-                                case "athena":
-                                    fieldSchema.add("{\"name\":\"" + field + "\",\"type\":[\"null\",\"string\"],\"default\":null}");
-                                    fieldDataType.add(field + " " + "varchar(" + justifiedLength + ")");
-                                    break;
-                                case "redshift":
-                                    fieldDataType.add(field + " " + "varchar(" + justifiedLength + ")  ENCODE ZSTD");
-                                    break;
-                                case "bigquery":
-                                    fieldSchema.add("{\"name\":\"" + field + "\",\"type\":\"STRING\"}");
-                                    break;
-                            }
+                            clazz.generateString(this.field, name, length > 65000 ? 65000 : length);
 
                             break;
                         case "integer":
                         case "long":
-                            fieldMetadata.add("{\"field\":\"" + field + "\",\"type\":\"integer\"}");
-
-                            switch (dialect) {
-                                case "spectrum":
-                                case "athena":
-                                    fieldSchema.add("{\"name\":\"" + field + "\",\"type\":[\"null\",\"long\"],\"default\":null}");
-                                    fieldDataType.add(field + " " + "bigint");
-                                    break;
-                                case "redshift":
-                                    fieldDataType.add(field + " " + "bigint ENCODE AZ64");
-                                    break;
-                                case "bigquery":
-                                    fieldSchema.add("{\"name\":\"" + field + "\",\"type\":\"INTEGER\"}");
-                                    break;
-                            }
+                            clazz.generateInteger(this.field, name);
 
                             break;
                         case "number":
                         case "bignumber":
-                            fieldMetadata.add("{\"field\":\"" + field + "\",\"type\":\"number\"}");
-
-                            switch (dialect) {
-                                case "spectrum":
-                                    fieldSchema.add("{\"name\":\"" + field + "\",\"type\":[\"null\",\"double\"],\"default\":null}");
-                                    fieldDataType.add(field + " " + "double precision");
-                                    break;
-                                case "athena":
-                                    fieldSchema.add("{\"name\":\"" + field + "\",\"type\":[\"null\",\"double\"],\"default\":null}");
-                                    fieldDataType.add(field + " " + "double");
-                                    break;
-                                case "redshift":
-                                    fieldDataType.add(field + " " + "double precision ENCODE ZSTD");
-                                    break;
-                                case "bigquery":
-                                    fieldSchema.add("{\"name\":\"" + field + "\",\"type\":\"FLOAT\"}");
-                                    break;
-                            }
+                            clazz.generateBigNumber(this.field, name);
 
                             break;
                         case "timestamp":
-                            fieldMetadata.add("{\"field\":\"" + field + "\",\"type\":\"string\",\"length\":19}");
-
-                            switch (dialect) {
-                                case "spectrum":
-                                case "athena":
-                                    fieldSchema.add("{\"name\":\"" + field + "\",\"type\":[\"null\",\"string\"],\"default\":null}");
-                                    fieldDataType.add(field + " " + "varchar(19)");
-                                    break;
-                                case "redshift":
-                                    fieldDataType.add(field + " " + "varchar(19) ENCODE ZSTD");
-                                    break;
-                                case "bigquery":
-                                    fieldSchema.add("{\"name\":\"" + field + "\",\"type\":\"TIMESTAMP\"}");
-                                    break;
-                            }
+                            clazz.generateTimestamp(this.field, name);
 
                             break;
                         case "date":
-                            fieldMetadata.add("{\"field\":\"" + field + "\",\"type\":\"string\",\"length\":19}");
-
-                            switch (dialect) {
-                                case "spectrum":
-                                case "athena":
-                                    fieldSchema.add("{\"name\":\"" + field + "\",\"type\":[\"null\",\"string\"],\"default\":null}");
-                                    fieldDataType.add(field + " " + "varchar(19)");
-                                    break;
-                                case "redshift":
-                                    fieldDataType.add(field + " " + "varchar(19) ENCODE ZSTD");
-                                    break;
-                                case "bigquery":
-                                    fieldSchema.add("{\"name\":\"" + field + "\",\"type\":\"DATE\"}");
-                                    break;
-                            }
+                            clazz.generateDate(this.field, name);
 
                             break;
                         case "boolean":
-                            fieldMetadata.add("{\"field\":\"" + field + "\",\"type\":\"boolean\"}");
-
-                            switch (dialect) {
-                                case "spectrum":
-                                case "athena":
-                                    fieldSchema.add("{\"name\":\"" + field + "\",\"type\":[\"null\",\"boolean\"],\"default\":null}");
-                                    fieldDataType.add(field + " " + "boolean");
-                                    break;
-                                case "redshift":
-                                    fieldDataType.add(field + " " + "boolean ENCODE ZSTD");
-                                    break;
-                                case "bigquery":
-                                    fieldSchema.add("{\"name\":\"" + field + "\",\"type\":\"BOOLEAN\"}");
-                                    break;
-                            }
+                            clazz.generateBoolean(this.field, name);
 
                             break;
                         default:
-                            fieldMetadata.add("{\"field\":\"" + field + "\",\"type\":\"string\",\"length\":255}");
-
-                            switch (dialect) {
-                                case "spectrum":
-                                case "athena":
-                                    fieldSchema.add("{\"name\":\"" + field + "\",\"type\":[\"null\",\"string\"],\"default\":null}");
-                                    fieldDataType.add(field + " " + "varchar(255)");
-                                    break;
-                                case "redshift":
-                                    fieldDataType.add(field + " " + "varchar(255) ENCODE ZSTD");
-                                    break;
-                                case "bigquery":
-                                    fieldSchema.add("{\"name\":\"" + field + "\",\"type\":\"STRING\"}");
-                                    break;
-                            }
+                            clazz.generateNull(this.field, name);
 
                             break;
                     }
                 }
             }
 
-            if (fieldList.size() > 0) {
+            if (this.field.getList().size() > 0) {
                 //Write field list.                  
-                writeFile("_columns.csv", String.join("\n", fieldList));
+                writeFile("_columns.csv", String.join("\n", this.field.getList()));
 
                 //Write field list with datatype. 
-                if (fieldDataType.size() > 0) {
-                    writeFile("_fields.csv", String.join(",", fieldDataType));
+                if (this.field.getDataType().size() > 0) {
+                    writeFile("_fields.csv", String.join(",", this.field.getDataType()));
                 }
 
                 //Write table parquet schema.
-                if (fieldSchema.size() > 0) {
-                    writeFile(".json", "[".concat(String.join(",\n", fieldSchema)).concat("]"));
+                if (this.field.getSchema().size() > 0) {
+                    writeFile(".json", "[".concat(String.join(",\n", this.field.getSchema())).concat("]"));
                 }
 
                 //Write table metadata.
-                if (fieldMetadata.size() > 0) {
-                    writeFile("_metadata.csv", "[".concat(String.join(",\n", this.fieldMetadata)).concat("]"));
+                if (this.field.getMetadata().size() > 0) {
+                    writeFile("_metadata.csv", "[".concat(String.join(",\n", this.field.getMetadata())).concat("]"));
                 }
 
             } else {
                 LOG.info("CSV file is empty");
             }
         } catch (IOException
-                | JSONException ex) {
+                | JSONException
+                | ClassNotFoundException
+                | InstantiationException
+                | IllegalAccessException ex) {
             System.out.println(ex + " on row: " + rowOnTheFly);
             System.exit(1);
         }
+    }
+
+    /**
+     *
+     */
+    private void fillDataSample() {
+        CsvParser csvParser = new CsvParser(this.getCSVSettings());
+        csvParser.beginParsing(file);
+
+        String[] row;
+
+        while ((row = csvParser.parseNext()) != null) {
+            //Identify if file has a header
+            if (hasHeader && this.field.getList().isEmpty()) {
+                this.field.getList().addAll(Arrays.asList(row));
+            } else {
+                //Get a limited data sample from the file.
+                fieldContent.add(row);
+
+                if (fieldContent.size() == sample) {
+                    break;
+                }
+            }
+        }
+
+        csvParser.stopParsing();
     }
 
     /**
@@ -496,6 +328,28 @@ public class Extractor implements Runnable {
         settings.getFormat().setQuoteEscape(escape);
 
         return settings;
+    }
+
+    /**
+     * Get Reserved words which cannot be used directly.
+     *
+     * @return List<String>
+     */
+    private List<String> getReservedWords() {
+        List<String> reservedWords = new ArrayList();
+
+        if (reserverWordsFile != null) {
+            try (Scanner scanner = new Scanner(reserverWordsFile)) {
+                while (scanner.hasNext()) {
+                    reservedWords.add(scanner.next());
+                }
+
+                System.out.println(reservedWords.size() + " reserved words loaded from " + reserverWordsFile.getAbsolutePath());
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+        return reservedWords;
     }
 
     /**
@@ -517,4 +371,311 @@ public class Extractor implements Runnable {
         }
     }
 
+}
+
+/**
+ *
+ * @author Helio Leal
+ */
+class Field {
+
+    private List<String> list;    // antigo fieldList
+    private ArrayList<String> schema; // fieldSchema;
+    private ArrayList<String> dataType; // fieldDataType;
+    private ArrayList<String> metadata; // fieldMetadata;
+
+    public Field() {
+        this.list = new ArrayList();
+        this.schema = new ArrayList();
+        this.dataType = new ArrayList();
+        this.metadata = new ArrayList();
+    }
+
+    public void setList(List<String> list) {
+        this.list = list;
+    }
+
+    public List<String> getList() {
+        return list;
+    }
+
+    public ArrayList<String> getSchema() {
+        return schema;
+    }
+
+    public void setSchema(ArrayList<String> schema) {
+        this.schema = schema;
+    }
+
+    public ArrayList<String> getDataType() {
+        return dataType;
+    }
+
+    public void setDataType(ArrayList<String> dataType) {
+        this.dataType = dataType;
+    }
+
+    public ArrayList<String> getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(ArrayList<String> metadata) {
+        this.metadata = metadata;
+    }
+}
+
+/**
+ *
+ * @author helio.leal
+ */
+interface Dialect {
+
+    public void generateNull(Field field, String name);
+
+    public void generateString(Field field, String name, int length);
+
+    public void generateInteger(Field field, String name);
+
+    public void generateNumber(Field field, String name);
+
+    public void generateBigNumber(Field field, String name);
+
+    public void generateTimestamp(Field field, String name);
+
+    public void generateDate(Field field, String name);
+
+    public void generateBoolean(Field field, String name);
+
+}
+
+/**
+ *
+ * @author Helio Leal
+ */
+class spectrum implements Dialect {
+
+    @Override
+    public void generateNull(Field field, String name) {
+        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":255}");
+        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"string\"],\"default\":null}");
+        field.getDataType().add(name + " " + "varchar(255)");
+    }
+
+    @Override
+    public void generateString(Field field, String name, int length) {
+        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":" + length + "}");
+        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"string\"],\"default\":null}");
+        field.getDataType().add(name + " " + "varchar(" + length + ")");
+    }
+
+    @Override
+    public void generateInteger(Field field, String name) {
+        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"integer\"}");
+        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"long\"],\"default\":null}");
+        field.getDataType().add(name + " " + "bigint");
+    }
+
+    @Override
+    public void generateNumber(Field field, String name) {
+        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"number\"}");
+        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"double\"],\"default\":null}");
+        field.getDataType().add(name + " " + "double precision");
+    }
+
+    @Override
+    public void generateBigNumber(Field field, String name) {
+        this.generateNumber(field, name);
+    }
+
+    @Override
+    public void generateTimestamp(Field field, String name) {
+        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":19}");
+        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"string\"],\"default\":null}");
+        field.getDataType().add(name + " " + "varchar(19)");
+    }
+
+    @Override
+    public void generateDate(Field field, String name) {
+        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":19}");
+        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"string\"],\"default\":null}");
+        field.getDataType().add(name + " " + "varchar(19)");
+    }
+
+    @Override
+    public void generateBoolean(Field field, String name) {
+        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"boolean\"}");
+        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"boolean\"],\"default\":null}");
+        field.getDataType().add(name + " " + "boolean");
+    }
+}
+
+/**
+ *
+ * @author Helio Leal
+ */
+class athena implements Dialect {
+
+    @Override
+    public void generateNull(Field field, String name) {
+        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":255}");
+        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"string\"],\"default\":null}");
+        field.getDataType().add(name + " " + "varchar(255)");
+    }
+
+    @Override
+    public void generateString(Field field, String name, int length) {
+        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":" + length + "}");
+        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"string\"],\"default\":null}");
+        field.getDataType().add(name + " " + "varchar(" + length + ")");
+    }
+
+    @Override
+    public void generateInteger(Field field, String name) {
+        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"integer\"}");
+        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"long\"],\"default\":null}");
+        field.getDataType().add(name + " " + "bigint");
+    }
+
+    @Override
+    public void generateNumber(Field field, String name) {
+        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"number\"}");
+        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"double\"],\"default\":null}");
+        field.getDataType().add(name + " " + "double precision");
+    }
+
+    @Override
+    public void generateBigNumber(Field field, String name) {
+        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"number\"}");
+        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"double\"],\"default\":null}");
+        field.getDataType().add(name + " " + "double");
+    }
+
+    @Override
+    public void generateTimestamp(Field field, String name) {
+        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":19}");
+        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"string\"],\"default\":null}");
+        field.getDataType().add(name + " " + "varchar(19)");
+    }
+
+    @Override
+    public void generateDate(Field field, String name) {
+        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":19}");
+        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"string\"],\"default\":null}");
+        field.getDataType().add(name + " " + "varchar(19)");
+    }
+
+    @Override
+    public void generateBoolean(Field field, String name) {
+        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"boolean\"}");
+        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"boolean\"],\"default\":null}");
+        field.getDataType().add(name + " " + "boolean");
+    }
+}
+
+/**
+ *
+ * @author Helio Leal
+ */
+class redshift implements Dialect {
+
+    @Override
+    public void generateNull(Field field, String name) {
+        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":255}");
+        field.getDataType().add(name + " " + "varchar(255) ENCODE ZSTD");
+    }
+
+    @Override
+    public void generateString(Field field, String name, int length) {
+        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":" + length + "}");
+        field.getDataType().add(name + " " + "varchar(" + length + ") ENCODE ZSTD");
+    }
+
+    @Override
+    public void generateInteger(Field field, String name) {
+        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"integer\"}");
+        field.getDataType().add(name + " " + "bigint ENCODE AZ64");
+    }
+
+    @Override
+    public void generateNumber(Field field, String name) {
+        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"number\"}");
+        field.getDataType().add(name + " " + "double precision ENCODE ZSTD");
+    }
+
+    @Override
+    public void generateBigNumber(Field field, String name) {
+        this.generateNumber(field, name);
+    }
+
+    @Override
+    public void generateTimestamp(Field field, String name) {
+        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":19}");
+        field.getDataType().add(name + " " + "varchar(19) ENCODE ZSTD");
+    }
+
+    @Override
+    public void generateDate(Field field, String name) {
+        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":19}");
+        field.getDataType().add(name + " " + "varchar(19) ENCODE ZSTD");
+    }
+
+    @Override
+    public void generateBoolean(Field field, String name) {
+        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"boolean\"}");
+        field.getDataType().add(name + " " + "boolean ENCODE ZSTD");
+    }
+}
+
+/**
+ *
+ * @author helio.leal
+ */
+class bigquery implements Dialect {
+
+    @Override
+    public void generateNull(Field field, String name) {
+        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":255}");
+        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":\"STRING\"}");
+    }
+
+    @Override
+    public void generateString(Field field, String name, int length) {
+        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":" + length + "}");
+        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":\"STRING\"}");
+    }
+
+    @Override
+    public void generateInteger(Field field, String name) {
+        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"integer\"}");
+        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":\"INTEGER\"}");
+    }
+
+    @Override
+    public void generateNumber(Field field, String name) {
+        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"number\"}");
+        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":\"FLOAT\"}");
+    }
+
+    @Override
+    public void generateBigNumber(Field field, String name) {
+        this.generateNumber(field, name);
+    }
+
+    @Override
+    public void generateTimestamp(Field field, String name) {
+        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":19}");
+        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":\"TIMESTAMP\"}");
+    }
+
+    @Override
+    public void generateDate(Field field, String name) {
+        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":19}");
+        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":\"DATE\"}");
+    }
+
+    @Override
+    public void generateBoolean(Field field, String name) {
+        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"boolean\"}");
+        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":\"BOOLEAN\"}");
+    }
 }
