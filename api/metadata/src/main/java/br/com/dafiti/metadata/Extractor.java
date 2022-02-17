@@ -113,7 +113,6 @@ public class Extractor implements Runnable {
             this.sample = sample;
         }
 
-        //Identify the output path.
         if (outputFolder.isEmpty()) {
             this.outputPath = csvFile.getParent().concat("/");
         }
@@ -135,162 +134,182 @@ public class Extractor implements Runnable {
     @Override
     public void run() {
         try {
-            this.fillDataSample();
-            List<String> reservedWords = this.getReservedWords();
-
             //Define which dialect to use, to generate output metadata.
             Metadata clazz = (Metadata) Class.forName("br.com.dafiti.metadata.schema." + StringUtils.capitalize(dialect)).newInstance();
 
-            //Process each column. 
-            for (int column = 0; column < this.field.getList().size(); column++) {
-                String type = "";
-                int length = 0;
-                int stringField = 0;
-                int integerField = 0;
-                int doubleField = 0;
-                int nullField = 0;
-                boolean hasMetadata = false;
+            this.fillDataSample();
 
-                //Get the field name.
-                String name = this.field.getList()
-                        .get(column)
-                        .replaceAll("\\s", "")
-                        .replaceAll("\\W", "_")
-                        .replaceAll("^_", "")
-                        .toLowerCase();
+            this.inferMetadata(clazz);
 
-                //Get field properties from metadata. 
-                for (int i = 0; i < jsonMetadata.length(); i++) {
-                    JSONObject metadata = jsonMetadata.getJSONObject(i);
-                    hasMetadata = metadata.getString("field").equalsIgnoreCase(name);
+            this.writeFiles();
 
-                    if (hasMetadata) {
-                        type = metadata.has("type") ? metadata.getString("type") : "";
-                        length = metadata.has("length") ? metadata.getInt("length") : 0;
-
-                        break;
-                    }
-                }
-
-                //Concat postfix _rw to field name that is a reserved word. 
-                if (reservedWords.contains(name.toLowerCase())) {
-                    System.out.println("Reserved word found at " + name + " and replaced by " + name + "_rw");
-                    name = name.concat("_rw");
-                }
-
-                //Identify if have a metadata. 
-                if (!hasMetadata) {
-                    //Process each record of each column.
-                    for (int content = 0; content < fieldContent.size(); content++) {
-                        rowOnTheFly = String.join(" | ", fieldContent.get(content));
-
-                        //Get the field value. 
-                        String value = fieldContent.get(content)[column] == null ? "" : fieldContent.get(content)[column];
-
-                        //Calculate the number of occurrences of each data type.
-                        if (value.matches("^[-+]?[0-9]*") && !(value.isEmpty() || value.equals("-") || value.equals("+") || (!value.equals("0") && value.matches("^0[0-9]*"))) && value.length() <= 19) {
-                            //Match integer.
-                            integerField = integerField + 1;
-                            length = value.length() > length ? value.length() : length;
-
-                        } else if (value.matches("^[-+]?[0-9]*\\.[0-9]+([eE][-+]?[0-9]+)?") && !(value.isEmpty() || value.equals("-") || value.equals("+") || (!value.equals("0") && value.matches("^0[0-9]*")))) {
-                            //Match double. 
-                            doubleField = doubleField + 1;
-                            length = value.length() > length ? value.length() : length;
-
-                        } else if (value.isEmpty()) {
-                            //Match null.
-                            nullField = nullField + 1;
-
-                        } else {
-                            //Match string. 
-                            stringField = stringField + 1;
-                            length = value.getBytes().length > length ? value.getBytes().length : length;
-                        }
-                    }
-
-                    //Identify the field type and size based on the number of ocurrences of each data type.
-                    if ((nullField > 0 && stringField == 0 && integerField == 0 && doubleField == 0)) {
-                        clazz.generateNull(this.field, name);
-
-                    } else if (stringField > 0) {
-                        clazz.generateString(this.field, name, (length * 2) > 65000 ? 65000 : (length * 2));
-
-                    } else if (integerField > 0 && stringField == 0 && doubleField == 0) {
-                        clazz.generateInteger(this.field, name);
-
-                    } else if (doubleField > 0 && stringField == 0) {
-                        clazz.generateNumber(this.field, name);
-
-                    }
-                } else {
-                    switch (type) {
-                        case "string":
-                            clazz.generateString(this.field, name, length > 65000 ? 65000 : length);
-
-                            break;
-                        case "integer":
-                        case "long":
-                            clazz.generateInteger(this.field, name);
-
-                            break;
-                        case "number":
-                        case "bignumber":
-                            clazz.generateBigNumber(this.field, name);
-
-                            break;
-                        case "timestamp":
-                            clazz.generateTimestamp(this.field, name);
-
-                            break;
-                        case "date":
-                            clazz.generateDate(this.field, name);
-
-                            break;
-                        case "boolean":
-                            clazz.generateBoolean(this.field, name);
-
-                            break;
-                        default:
-                            clazz.generateNull(this.field, name);
-
-                            break;
-                    }
-                }
-            }
-
-            if (this.field.getList().size() > 0) {
-                //Write field list.                  
-                writeFile("_columns.csv", String.join("\n", this.field.getList()));
-
-                //Write field list with datatype. 
-                if (this.field.getDataType().size() > 0) {
-                    writeFile("_fields.csv", String.join(",", this.field.getDataType()));
-                }
-
-                //Write table parquet schema.
-                if (this.field.getSchema().size() > 0) {
-                    writeFile(".json", "[".concat(String.join(",\n", this.field.getSchema())).concat("]"));
-                }
-
-                //Write table metadata.
-                if (this.field.getMetadata().size() > 0) {
-                    writeFile("_metadata.csv", "[".concat(String.join(",\n", this.field.getMetadata())).concat("]"));
-                }
-
-            } else {
-                LOG.info("CSV file is empty");
-            }
-        } catch (IOException
-                | JSONException
-                | ClassNotFoundException
-                | InstantiationException
-                | IllegalAccessException ex) {
-            System.out.println(ex + " on row: " + rowOnTheFly);
+        } catch (IOException | ClassNotFoundException | IllegalAccessException | InstantiationException | JSONException ex) {
+            LOG.log(Level.SEVERE, "GLOVE - Metadata Inference fail [row: " + rowOnTheFly + "]", ex);
             System.exit(1);
         }
     }
 
+    /**
+     * Infer metadata based on data sample values.
+     *
+     * @param clazz Metadata gereric class based on dialect.
+     * @throws JSONException
+     */
+    private void inferMetadata(Metadata clazz) throws JSONException {
+        List<String> reservedWords = this.getReservedWords();
+
+        //Process each column.
+        for (int column = 0; column < this.field.getList().size(); column++) {
+            String type = "";
+            int length = 0;
+            boolean hasMetadata = false;
+
+            //Get the field name.
+            String name = this.field.getList()
+                    .get(column)
+                    .replaceAll("\\s", "")
+                    .replaceAll("\\W", "_")
+                    .replaceAll("^_", "")
+                    .toLowerCase();
+
+            //Get field properties from metadata parameter.
+            for (int i = 0; i < jsonMetadata.length(); i++) {
+                JSONObject metadata = jsonMetadata.getJSONObject(i);
+                hasMetadata = metadata.getString("field").equalsIgnoreCase(name);
+
+                if (hasMetadata) {
+                    type = metadata.has("type") ? metadata.getString("type") : "";
+                    length = metadata.has("length") ? metadata.getInt("length") : 0;
+
+                    break;
+                }
+            }
+
+            //Concat postfix _rw to field name that is a reserved word.
+            if (reservedWords.contains(name.toLowerCase())) {
+                System.out.println("Reserved word found at " + name + " and replaced by " + name + "_rw");
+                name = name.concat("_rw");
+            }
+
+            if (!hasMetadata) {
+                int stringCount = 0;
+                int integerCount = 0;
+                int doubleCount = 0;
+                int nullCount = 0;
+
+                //Process each record of each column.
+                for (int content = 0; content < fieldContent.size(); content++) {
+                    rowOnTheFly = String.join(" | ", fieldContent.get(content));
+
+                    //Get the field value.
+                    String value = fieldContent.get(content)[column] == null ? "" : fieldContent.get(content)[column];
+
+                    //Calculate the number of occurrences of each data type.
+                    if (value.matches("^[-+]?[0-9]*") && !(value.isEmpty() || value.equals("-") || value.equals("+") || (!value.equals("0") && value.matches("^0[0-9]*"))) && value.length() <= 19) {
+                        //Match integer.
+                        integerCount = integerCount + 1;
+                        length = value.length() > length ? value.length() : length;
+
+                    } else if (value.matches("^[-+]?[0-9]*\\.[0-9]+([eE][-+]?[0-9]+)?") && !(value.isEmpty() || value.equals("-") || value.equals("+") || (!value.equals("0") && value.matches("^0[0-9]*")))) {
+                        //Match double.
+                        doubleCount = doubleCount + 1;
+                        length = value.length() > length ? value.length() : length;
+
+                    } else if (value.isEmpty()) {
+                        //Match null.
+                        nullCount = nullCount + 1;
+
+                    } else {
+                        //Match string.
+                        stringCount = stringCount + 1;
+                        length = value.getBytes().length > length ? value.getBytes().length : length;
+                    }
+                }
+
+                //Identify the field type and size based on the number of ocurrences of each data type.
+                if ((nullCount > 0 && stringCount == 0 && integerCount == 0 && doubleCount == 0)) {
+                    clazz.generateNull(this.field, name);
+
+                } else if (stringCount > 0) {
+                    clazz.generateString(this.field, name, (length * 2) > 65000 ? 65000 : (length * 2));
+
+                } else if (integerCount > 0 && stringCount == 0 && doubleCount == 0) {
+                    clazz.generateInteger(this.field, name);
+
+                } else if (doubleCount > 0 && stringCount == 0) {
+                    clazz.generateNumber(this.field, name);
+
+                }
+            } else {
+                switch (type) {
+                    case "string":
+                        clazz.generateString(this.field, name, length > 65000 ? 65000 : length);
+
+                        break;
+                    case "integer":
+                    case "long":
+                        clazz.generateInteger(this.field, name);
+
+                        break;
+                    case "number":
+                    case "bignumber":
+                        clazz.generateBigNumber(this.field, name);
+
+                        break;
+                    case "timestamp":
+                        clazz.generateTimestamp(this.field, name);
+
+                        break;
+                    case "date":
+                        clazz.generateDate(this.field, name);
+
+                        break;
+                    case "boolean":
+                        clazz.generateBoolean(this.field, name);
+
+                        break;
+                    default:
+                        clazz.generateNull(this.field, name);
+
+                        break;
+                }
+            }
+        }
+    }
+
+    /**
+     * Write output files.
+     *
+     * @throws IOException
+     */
+    private void writeFiles() throws IOException {
+        if (this.field.getList().size() > 0) {
+            //Write field list.
+            writeFile("_columns.csv", String.join("\n", this.field.getList()));
+
+            //Write field list with datatype.
+            if (this.field.getDataType().size() > 0) {
+                writeFile("_fields.csv", String.join(",", this.field.getDataType()));
+            }
+
+            //Write table parquet schema.
+            if (this.field.getSchema().size() > 0) {
+                writeFile(".json", "[".concat(String.join(",\n", this.field.getSchema())).concat("]"));
+            }
+
+            //Write table metadata.
+            if (this.field.getMetadata().size() > 0) {
+                writeFile("_metadata.csv", "[".concat(String.join(",\n", this.field.getMetadata())).concat("]"));
+            }
+
+        } else {
+            LOG.info("CSV file is empty");
+        }
+    }
+
+    /**
+     * Defines a limited data sample.
+     */
     private void fillDataSample() {
         CsvParser csvParser = new CsvParser(this.getCSVSettings());
         csvParser.beginParsing(file);
