@@ -27,7 +27,7 @@ import br.com.dafiti.metadata.model.Field;
 
 /**
  *
- * @author helio.leal
+ * @author Helio Leal
  */
 public interface Metadata {
 

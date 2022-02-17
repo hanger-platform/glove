@@ -200,27 +200,21 @@ public class Extractor implements Runnable {
                 //Process each record of each column.
                 for (int content = 0; content < fieldContent.size(); content++) {
                     rowOnTheFly = String.join(" | ", fieldContent.get(content));
-
-                    //Get the field value.
                     String value = fieldContent.get(content)[column] == null ? "" : fieldContent.get(content)[column];
 
                     //Calculate the number of occurrences of each data type.
                     if (value.matches("^[-+]?[0-9]*") && !(value.isEmpty() || value.equals("-") || value.equals("+") || (!value.equals("0") && value.matches("^0[0-9]*"))) && value.length() <= 19) {
-                        //Match integer.
                         integerCount = integerCount + 1;
                         length = value.length() > length ? value.length() : length;
 
                     } else if (value.matches("^[-+]?[0-9]*\\.[0-9]+([eE][-+]?[0-9]+)?") && !(value.isEmpty() || value.equals("-") || value.equals("+") || (!value.equals("0") && value.matches("^0[0-9]*")))) {
-                        //Match double.
                         doubleCount = doubleCount + 1;
                         length = value.length() > length ? value.length() : length;
 
                     } else if (value.isEmpty()) {
-                        //Match null.
                         nullCount = nullCount + 1;
 
                     } else {
-                        //Match string.
                         stringCount = stringCount + 1;
                         length = value.getBytes().length > length ? value.getBytes().length : length;
                     }
