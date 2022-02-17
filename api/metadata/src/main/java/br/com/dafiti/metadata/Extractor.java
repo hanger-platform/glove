@@ -134,7 +134,7 @@ public class Extractor implements Runnable {
     @Override
     public void run() {
         try {
-            //Define which dialect to use, to generate output metadata.
+            //Define which dialect to use to generate output metadata.
             Metadata clazz = (Metadata) Class.forName("br.com.dafiti.metadata.schema." + StringUtils.capitalize(dialect)).newInstance();
 
             this.fillDataSample();
