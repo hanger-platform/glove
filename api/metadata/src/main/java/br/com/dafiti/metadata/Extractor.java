@@ -23,6 +23,8 @@
  */
 package br.com.dafiti.metadata;
 
+import br.com.dafiti.metadata.model.Field;
+import br.com.dafiti.metadata.schema.Metadata;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import java.io.BufferedWriter;
@@ -33,8 +35,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
@@ -47,7 +51,7 @@ import org.json.JSONException;
  */
 public class Extractor implements Runnable {
 
-    private static final Logger LOG = Logger.getLogger(Metadata.class.getName());
+    private static final Logger LOG = Logger.getLogger(Main.class.getName());
     private static final int MAX_SAMPLE = 1000000;
 
     private File file;
@@ -62,11 +66,9 @@ public class Extractor implements Runnable {
     private String rowOnTheFly;
     private boolean hasHeader;
     private int sample;
-
     private Field field;
 
     /**
-     * Constructor.
      *
      * @param csvFile CSV file.
      * @param reserverWordsFile Identify the reserved words file list.
@@ -75,10 +77,9 @@ public class Extractor implements Runnable {
      * @param escape File escape.
      * @param csvField Header fields.
      * @param metadata Table metadata.
-     * @param outputFolder Metadata output folder.
+     * @param outputFolder Main output folder.
      * @param dialect Identify the metadata dialect.
-     * @param sample Sample de dados a ser analizado para definição de data
-     * types.
+     * @param sample Sample de dados analizado para definição de datatypes.
      */
     public Extractor(
             File csvFile,
@@ -92,8 +93,6 @@ public class Extractor implements Runnable {
             String dialect,
             int sample) {
 
-        this.fieldContent = new ArrayList();
-        this.jsonMetadata = new JSONArray();
         this.file = csvFile;
         this.delimiter = delimiter;
         this.quote = quote;
@@ -103,7 +102,8 @@ public class Extractor implements Runnable {
         this.hasHeader = csvField.isEmpty();
         this.reserverWordsFile = reserverWordsFile;
         this.rowOnTheFly = "";
-
+        this.fieldContent = new ArrayList();
+        this.jsonMetadata = new JSONArray();
         this.field = new Field();
 
         //Limit the data sample.
@@ -137,7 +137,9 @@ public class Extractor implements Runnable {
         try {
             this.fillDataSample();
             List<String> reservedWords = this.getReservedWords();
-            Dialect clazz = (Dialect) Class.forName("br.com.dafiti.metadata." + dialect).newInstance();
+
+            //Define which dialect to use, to generate output metadata.
+            Metadata clazz = (Metadata) Class.forName("br.com.dafiti.metadata.schema." + StringUtils.capitalize(dialect)).newInstance();
 
             //Process each column. 
             for (int column = 0; column < this.field.getList().size(); column++) {
@@ -289,9 +291,6 @@ public class Extractor implements Runnable {
         }
     }
 
-    /**
-     *
-     */
     private void fillDataSample() {
         CsvParser csvParser = new CsvParser(this.getCSVSettings());
         csvParser.beginParsing(file);
@@ -315,10 +314,6 @@ public class Extractor implements Runnable {
         csvParser.stopParsing();
     }
 
-    /**
-     *
-     * @return CsvParserSettings
-     */
     private CsvParserSettings getCSVSettings() {
         CsvParserSettings settings = new CsvParserSettings();
         settings.setNullValue("");
@@ -331,7 +326,7 @@ public class Extractor implements Runnable {
     }
 
     /**
-     * Get Reserved words which cannot be used directly.
+     * Get Reserved words which cannot be used directly on database.
      *
      * @return List<String>
      */
@@ -344,9 +339,10 @@ public class Extractor implements Runnable {
                     reservedWords.add(scanner.next());
                 }
 
-                System.out.println(reservedWords.size() + " reserved words loaded from " + reserverWordsFile.getAbsolutePath());
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
+                LOG.log(Level.INFO, "{0} reserved words loaded from {1}", new Object[]{reservedWords.size(), reserverWordsFile.getAbsolutePath()});
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Error getting reserved words: ", ex);
+
             }
         }
         return reservedWords;
@@ -371,311 +367,4 @@ public class Extractor implements Runnable {
         }
     }
 
-}
-
-/**
- *
- * @author Helio Leal
- */
-class Field {
-
-    private List<String> list;    // antigo fieldList
-    private ArrayList<String> schema; // fieldSchema;
-    private ArrayList<String> dataType; // fieldDataType;
-    private ArrayList<String> metadata; // fieldMetadata;
-
-    public Field() {
-        this.list = new ArrayList();
-        this.schema = new ArrayList();
-        this.dataType = new ArrayList();
-        this.metadata = new ArrayList();
-    }
-
-    public void setList(List<String> list) {
-        this.list = list;
-    }
-
-    public List<String> getList() {
-        return list;
-    }
-
-    public ArrayList<String> getSchema() {
-        return schema;
-    }
-
-    public void setSchema(ArrayList<String> schema) {
-        this.schema = schema;
-    }
-
-    public ArrayList<String> getDataType() {
-        return dataType;
-    }
-
-    public void setDataType(ArrayList<String> dataType) {
-        this.dataType = dataType;
-    }
-
-    public ArrayList<String> getMetadata() {
-        return metadata;
-    }
-
-    public void setMetadata(ArrayList<String> metadata) {
-        this.metadata = metadata;
-    }
-}
-
-/**
- *
- * @author helio.leal
- */
-interface Dialect {
-
-    public void generateNull(Field field, String name);
-
-    public void generateString(Field field, String name, int length);
-
-    public void generateInteger(Field field, String name);
-
-    public void generateNumber(Field field, String name);
-
-    public void generateBigNumber(Field field, String name);
-
-    public void generateTimestamp(Field field, String name);
-
-    public void generateDate(Field field, String name);
-
-    public void generateBoolean(Field field, String name);
-
-}
-
-/**
- *
- * @author Helio Leal
- */
-class spectrum implements Dialect {
-
-    @Override
-    public void generateNull(Field field, String name) {
-        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":255}");
-        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"string\"],\"default\":null}");
-        field.getDataType().add(name + " " + "varchar(255)");
-    }
-
-    @Override
-    public void generateString(Field field, String name, int length) {
-        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":" + length + "}");
-        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"string\"],\"default\":null}");
-        field.getDataType().add(name + " " + "varchar(" + length + ")");
-    }
-
-    @Override
-    public void generateInteger(Field field, String name) {
-        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"integer\"}");
-        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"long\"],\"default\":null}");
-        field.getDataType().add(name + " " + "bigint");
-    }
-
-    @Override
-    public void generateNumber(Field field, String name) {
-        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"number\"}");
-        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"double\"],\"default\":null}");
-        field.getDataType().add(name + " " + "double precision");
-    }
-
-    @Override
-    public void generateBigNumber(Field field, String name) {
-        this.generateNumber(field, name);
-    }
-
-    @Override
-    public void generateTimestamp(Field field, String name) {
-        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":19}");
-        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"string\"],\"default\":null}");
-        field.getDataType().add(name + " " + "varchar(19)");
-    }
-
-    @Override
-    public void generateDate(Field field, String name) {
-        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":19}");
-        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"string\"],\"default\":null}");
-        field.getDataType().add(name + " " + "varchar(19)");
-    }
-
-    @Override
-    public void generateBoolean(Field field, String name) {
-        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"boolean\"}");
-        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"boolean\"],\"default\":null}");
-        field.getDataType().add(name + " " + "boolean");
-    }
-}
-
-/**
- *
- * @author Helio Leal
- */
-class athena implements Dialect {
-
-    @Override
-    public void generateNull(Field field, String name) {
-        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":255}");
-        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"string\"],\"default\":null}");
-        field.getDataType().add(name + " " + "varchar(255)");
-    }
-
-    @Override
-    public void generateString(Field field, String name, int length) {
-        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":" + length + "}");
-        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"string\"],\"default\":null}");
-        field.getDataType().add(name + " " + "varchar(" + length + ")");
-    }
-
-    @Override
-    public void generateInteger(Field field, String name) {
-        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"integer\"}");
-        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"long\"],\"default\":null}");
-        field.getDataType().add(name + " " + "bigint");
-    }
-
-    @Override
-    public void generateNumber(Field field, String name) {
-        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"number\"}");
-        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"double\"],\"default\":null}");
-        field.getDataType().add(name + " " + "double precision");
-    }
-
-    @Override
-    public void generateBigNumber(Field field, String name) {
-        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"number\"}");
-        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"double\"],\"default\":null}");
-        field.getDataType().add(name + " " + "double");
-    }
-
-    @Override
-    public void generateTimestamp(Field field, String name) {
-        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":19}");
-        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"string\"],\"default\":null}");
-        field.getDataType().add(name + " " + "varchar(19)");
-    }
-
-    @Override
-    public void generateDate(Field field, String name) {
-        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":19}");
-        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"string\"],\"default\":null}");
-        field.getDataType().add(name + " " + "varchar(19)");
-    }
-
-    @Override
-    public void generateBoolean(Field field, String name) {
-        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"boolean\"}");
-        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":[\"null\",\"boolean\"],\"default\":null}");
-        field.getDataType().add(name + " " + "boolean");
-    }
-}
-
-/**
- *
- * @author Helio Leal
- */
-class redshift implements Dialect {
-
-    @Override
-    public void generateNull(Field field, String name) {
-        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":255}");
-        field.getDataType().add(name + " " + "varchar(255) ENCODE ZSTD");
-    }
-
-    @Override
-    public void generateString(Field field, String name, int length) {
-        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":" + length + "}");
-        field.getDataType().add(name + " " + "varchar(" + length + ") ENCODE ZSTD");
-    }
-
-    @Override
-    public void generateInteger(Field field, String name) {
-        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"integer\"}");
-        field.getDataType().add(name + " " + "bigint ENCODE AZ64");
-    }
-
-    @Override
-    public void generateNumber(Field field, String name) {
-        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"number\"}");
-        field.getDataType().add(name + " " + "double precision ENCODE ZSTD");
-    }
-
-    @Override
-    public void generateBigNumber(Field field, String name) {
-        this.generateNumber(field, name);
-    }
-
-    @Override
-    public void generateTimestamp(Field field, String name) {
-        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":19}");
-        field.getDataType().add(name + " " + "varchar(19) ENCODE ZSTD");
-    }
-
-    @Override
-    public void generateDate(Field field, String name) {
-        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":19}");
-        field.getDataType().add(name + " " + "varchar(19) ENCODE ZSTD");
-    }
-
-    @Override
-    public void generateBoolean(Field field, String name) {
-        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"boolean\"}");
-        field.getDataType().add(name + " " + "boolean ENCODE ZSTD");
-    }
-}
-
-/**
- *
- * @author helio.leal
- */
-class bigquery implements Dialect {
-
-    @Override
-    public void generateNull(Field field, String name) {
-        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":255}");
-        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":\"STRING\"}");
-    }
-
-    @Override
-    public void generateString(Field field, String name, int length) {
-        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":" + length + "}");
-        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":\"STRING\"}");
-    }
-
-    @Override
-    public void generateInteger(Field field, String name) {
-        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"integer\"}");
-        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":\"INTEGER\"}");
-    }
-
-    @Override
-    public void generateNumber(Field field, String name) {
-        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"number\"}");
-        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":\"FLOAT\"}");
-    }
-
-    @Override
-    public void generateBigNumber(Field field, String name) {
-        this.generateNumber(field, name);
-    }
-
-    @Override
-    public void generateTimestamp(Field field, String name) {
-        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":19}");
-        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":\"TIMESTAMP\"}");
-    }
-
-    @Override
-    public void generateDate(Field field, String name) {
-        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"string\",\"length\":19}");
-        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":\"DATE\"}");
-    }
-
-    @Override
-    public void generateBoolean(Field field, String name) {
-        field.getMetadata().add("{\"field\":\"" + name + "\",\"type\":\"boolean\"}");
-        field.getSchema().add("{\"name\":\"" + name + "\",\"type\":\"BOOLEAN\"}");
-    }
 }

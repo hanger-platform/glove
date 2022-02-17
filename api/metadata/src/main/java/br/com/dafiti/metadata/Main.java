@@ -38,9 +38,9 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
  *
  * @author Helio Leal
  */
-public class Metadata {
+public class Main {
 
-    private static final Logger LOG = Logger.getLogger(Metadata.class.getName());
+    private static final Logger LOG = Logger.getLogger(Main.class.getName());
 
     public static void main(String[] args) {
         LOG.info("GLOVE - Metadata Inference started");
