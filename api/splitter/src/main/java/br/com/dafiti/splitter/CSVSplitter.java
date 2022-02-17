@@ -35,6 +35,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.logging.Level;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.log4j.Logger;
@@ -44,9 +45,9 @@ import org.apache.log4j.Logger;
  *
  * @author Valdiney V GOMES
  */
-public class Converter implements Runnable {
-    
-    private static final java.util.logging.Logger LOG = java.util.logging.Logger.getLogger(Converter.class.getName());
+public class CSVSplitter implements Runnable {
+
+    private static final java.util.logging.Logger LOG = java.util.logging.Logger.getLogger(CSVSplitter.class.getName());
 
     private final File csvFile;
     private final int partitionColumn;
@@ -73,7 +74,7 @@ public class Converter implements Runnable {
      * @param splitStrategy Identify if should use the fastest strategy to
      * partitioning.
      */
-    public Converter(
+    public CSVSplitter(
             File csvFile,
             int fieldPartition,
             Character delimiter,
@@ -97,11 +98,11 @@ public class Converter implements Runnable {
     }
 
     /**
-     * Convert a csv file to a csv file.
+     * Convert a csv file to a csv file(s).
      */
     @Override
     public void run() {
-        Logger.getLogger(this.getClass()).info("Converting CSV to CSV");
+        LOG.info("Splitting CSV");
 
         try {
             if (splitStrategy.equalsIgnoreCase("FAST")) {
@@ -115,7 +116,7 @@ public class Converter implements Runnable {
                 csvFile.delete();
             }
         } catch (IOException ex) {
-            Logger.getLogger(this.getClass()).error("Error [" + ex + "] converting CSV to CSV");
+            LOG.log(Level.SEVERE, "Error [" + ex + "] splitting CSV", ex);
             System.exit(1);
         }
     }

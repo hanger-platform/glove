@@ -44,7 +44,7 @@ public class Splitter {
     private static final Logger LOG = Logger.getLogger(Splitter.class.getName());
 
     public static void main(String[] args) {
-        LOG.info("GLOVE - Splitter converter started");
+        LOG.info("GLOVE - CSV splitter started");
 
         //Define the mitt.
         Mitt mitt = new Mitt();
@@ -54,8 +54,8 @@ public class Splitter {
             mitt.getConfiguration()
                     .addParameter("f", "folder", "Folder where the files to be split are located", "", true, false)
                     .addParameter("fn", "filename", "(Optional) Filename, with wildcard if necessary, to be converted")
-                    .addParameter("h", "header", "(Optional) Identifies the csv file has a header", true)
-                    .addParameter("r", "replace", "(Optional) Identifies whether csv files will be replaced by partitioned files", true)
+                    .addParameter("h", "header", "(Optional) Identifies the csv file has a header", "true")
+                    .addParameter("r", "replace", "(Optional) Identifies whether csv files will be replaced by partitioned files", "true")
                     .addParameter("t", "thread", "(Optional) Limit of thread, default is 1", "1")
                     .addParameter("d", "delimiter", "(Optional) Delimiter of csv files, default is ;", ";")
                     .addParameter("q", "quote", "(Optional) Identifies the quote character, default is \"", "\"")
@@ -63,7 +63,7 @@ public class Splitter {
                     .addParameter("D", "debug", "(Optional) Show full log messages, default is 0", "0")
                     .addParameter("p", "partition", "(Optional) Partition column", "0")
                     .addParameter("ss", "splitStrategy", "(Optional) Identifies the split strategy", "SECURE")
-                    .addParameter("re", "readable", "(Optional) Identifies if partition name should be readable at runtime", false);
+                    .addParameter("re", "readable", "(Optional) Identifies if partition name should be readable at runtime", "false");
 
             //Reads the command line interface. 
             CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -93,15 +93,15 @@ public class Splitter {
 
                     if (extension.equalsIgnoreCase("csv")) {
                         executor.execute(
-                                new Converter(
+                                new CSVSplitter(
                                         file,
                                         cli.getParameterAsInteger("partition"),
                                         cli.getParameter("delimiter").charAt(0),
                                         cli.getParameter("quote").charAt(0),
                                         cli.getParameter("escape").charAt(0),
-                                        cli.hasParameter("header"),
-                                        cli.hasParameter("replace"),
-                                        cli.hasParameter("readable"),
+                                        cli.getParameterAsBoolean("header"),
+                                        cli.getParameterAsBoolean("replace"),
+                                        cli.getParameterAsBoolean("readable"),
                                         cli.getParameter("splitStrategy")));
                     } else {
                         LOG.log(Level.SEVERE, "Unsupported file ".concat(extension));
@@ -114,13 +114,13 @@ public class Splitter {
 
         } catch (DuplicateEntityException
                 | IllegalArgumentException ex) {
-            LOG.log(Level.SEVERE, "GLOVE - Splitter fail: ", ex);
+            LOG.log(Level.SEVERE, "GLOVE - CSV splitter fail: ", ex);
             System.exit(1);
 
         } finally {
             mitt.close();
-            
-            LOG.info("GLOVE - Splitter converter finished");
+
+            LOG.info("GLOVE - CSV splitter finished");
         }
     }
 }
