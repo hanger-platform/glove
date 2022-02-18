@@ -41,7 +41,7 @@ import org.apache.commons.io.LineIterator;
 import org.apache.log4j.Logger;
 
 /**
- * This class read a plain csv and write into a plain csv file.
+ * This class reads CSV file and writes to CSV file(s) per partition.
  *
  * @author Valdiney V GOMES
  */
