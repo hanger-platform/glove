@@ -119,8 +119,6 @@ public class Splitter {
 
         } finally {
             mitt.close();
-
-            LOG.info("GLOVE - CSV splitter finished");
         }
     }
 }

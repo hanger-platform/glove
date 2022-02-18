@@ -62,17 +62,15 @@ public class CSVSplitter implements Runnable {
     /**
      * Constructor.
      *
-     * @param csvFile Orc File
-     * @param fieldPartition Partition field
-     * @param delimiter File delimiter
+     * @param csvFile Csv File.
+     * @param fieldPartition Partition field.
+     * @param delimiter File delimiter.
      * @param quote File quote.
      * @param quoteEscape File escape.
      * @param header Identify if the file has header.
      * @param replace Identify if should replace the orignal file.
-     * @param readable Identifies if partition name should be readable at
-     * runtime.
-     * @param splitStrategy Identify if should use the fastest strategy to
-     * partitioning.
+     * @param readable Identifies if partition name should be readable at runtime.
+     * @param splitStrategy Identify if should use the fastest strategy to partitioning.
      */
     public CSVSplitter(
             File csvFile,
@@ -98,12 +96,10 @@ public class CSVSplitter implements Runnable {
     }
 
     /**
-     * Convert a csv file to a csv file(s).
+     * CSV file splitter into file(s) by partition.
      */
     @Override
     public void run() {
-        LOG.info("Splitting CSV");
-
         try {
             if (splitStrategy.equalsIgnoreCase("FAST")) {
                 this.fastSplit();
@@ -122,7 +118,7 @@ public class CSVSplitter implements Runnable {
     }
 
     /**
-     * Fast, but insecure split mode.
+     * Fast split mode for trusted files.
      *
      * @throws IOException
      */
@@ -131,9 +127,10 @@ public class CSVSplitter implements Runnable {
         String fileHeader = "";
         int lineNumber = 0;
         HashMap<String, BufferedWriter> partitions = new HashMap<>();
-        LineIterator lineIterator = FileUtils.lineIterator(csvFile, "UTF-8");
 
-        try {
+        LOG.info("Splitting CSV in fast mode");
+
+        try (LineIterator lineIterator = FileUtils.lineIterator(csvFile, "UTF-8")) {
             while (lineIterator.hasNext()) {
                 String line = lineIterator.nextLine();
 
@@ -187,8 +184,6 @@ public class CSVSplitter implements Runnable {
 
                 lineNumber++;
             }
-        } finally {
-            LineIterator.closeQuietly(lineIterator);
         }
 
         //Flush and close the output stream.
@@ -204,7 +199,7 @@ public class CSVSplitter implements Runnable {
     }
 
     /**
-     * Slow, but really reliable split strategy.
+     * Secure split mode for untrusted but slower files.
      *
      * @throws IOException
      */
@@ -212,6 +207,8 @@ public class CSVSplitter implements Runnable {
         int lineNumber = 0;
         String[] fileHeader = null;
         HashMap<String, CsvWriter> partitions = new HashMap<>();
+
+        LOG.info("Splitting CSV in secure mode");
 
         //Writer. 
         CsvWriterSettings writerSettings = new CsvWriterSettings();
