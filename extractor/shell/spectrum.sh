@@ -99,59 +99,47 @@ partition_load(){
 
     if [ ${MODULE} == "query" ] || [ ${MODULE} == "file" ]; then
 		if [ ${DEBUG} = 1 ] ; then
-			echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
+			echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/splitter.jar \
 				--folder=${RAWFILE_QUEUE_PATH} \
 				--filename=*.csv \
 				--delimiter=${DELIMITER} \
-				--target=csv \
 				--splitStrategy=${SPLIT_STRATEGY} \
-				--partition=0 \
 				--thread=${THREAD} \
 				--escape=${QUOTE_ESCAPE} \
-				--header \
-				--replace \
-				--debug=${DEBUG}"
+				--header='true' \
+				--replace='true'"
 		fi
 
-        java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
+        java -jar ${GLOVE_HOME}/extractor/lib/splitter.jar \
 			--folder=${RAWFILE_QUEUE_PATH} \
 			--filename=*.csv \
 			--delimiter=${DELIMITER} \
-			--target=csv \
 			--splitStrategy=${SPLIT_STRATEGY} \
-			--partition=0 \
 			--thread=${THREAD} \
 			--escape=${QUOTE_ESCAPE} \
-			--header \
-			--replace \
-			--debug=${DEBUG}
+			--header='true' \
+			--replace='true'
 		error_check
     else
 		if [ ${DEBUG} = 1 ] ; then
-			echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
+			echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/splitter.jar \
 				--folder=${RAWFILE_QUEUE_PATH} \
 				--filename=*.csv \
 				--delimiter=${DELIMITER} \
-				--target=csv \
 				--splitStrategy=${SPLIT_STRATEGY} \
-				--partition=0 \
 				--thread=${THREAD} \
 				--escape=${QUOTE_ESCAPE} \
-				--replace \
-				--debug=${DEBUG}"
+				--replace='true'"
 		fi
 
-        java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
+        java -jar ${GLOVE_HOME}/extractor/lib/splitter.jar \
 			--folder=${RAWFILE_QUEUE_PATH} \
 			--filename=*.csv \
 			--delimiter=${DELIMITER} \
-			--target=csv \
 			--splitStrategy=${SPLIT_STRATEGY} \
-			--partition=0 \
 			--thread=${THREAD} \
 			--escape=${QUOTE_ESCAPE} \
-			--replace \
-			--debug=${DEBUG}
+			--replace='true'
 		error_check
     fi
 
@@ -674,19 +662,16 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 
 					# Particiona o arquivo em single thread (thread=1) para preservar os dados e nome das partições.  
 					# TODO - A geração de um único arquivo de saída deve ser suportada pelo conversor de dados nativamente sem a necessidade do merge anterior. 
-					java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
+					java -jar ${GLOVE_HOME}/extractor/lib/splitter.jar \
 						--folder=${RAWFILE_QUEUE_PATH} \
 						--filename=merged.csv \
 						--delimiter=${DELIMITER} \
-						--target=csv \
 						--splitStrategy=${SPLIT_STRATEGY} \
-						--partition=0 \
 						--thread=1 \
 						--escape=${QUOTE_ESCAPE} \
-						--header \
-						--readable \
-						--replace \
-						--debug=${DEBUG}
+						--header='true' \
+						--readable='true' \
+						--replace='true'
 					error_check
 				fi
 
