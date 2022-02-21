@@ -53,17 +53,17 @@ public class Splitter {
             //Defines parameters.
             mitt.getConfiguration()
                     .addParameter("f", "folder", "Folder where the files to be split are located", "", true, false)
-                    .addParameter("fn", "filename", "(Optional) Filename, with wildcard if necessary, to be converted")
-                    .addParameter("h", "header", "(Optional) Identifies the csv file has a header", "true")
-                    .addParameter("r", "replace", "(Optional) Identifies whether csv files will be replaced by partitioned files", "true")
+                    .addParameter("fn", "filename", "(Optional) Filename, with wildcard if necessary, to be converted, default is '*.csv'", "*.csv")
+                    .addParameter("h", "header", "(Optional) Identifies the csv file has a header, default is true", "true")
+                    .addParameter("r", "replace", "(Optional) Identifies whether csv files will be replaced by partitioned files, default is true", "true")
                     .addParameter("t", "thread", "(Optional) Limit of thread, default is 1", "1")
                     .addParameter("d", "delimiter", "(Optional) Delimiter of csv files, default is ;", ";")
                     .addParameter("q", "quote", "(Optional) Identifies the quote character, default is \"", "\"")
                     .addParameter("e", "escape", "(Optional) Identifies the quote escape character, default is \"", "\"")
                     .addParameter("D", "debug", "(Optional) Show full log messages, default is 0", "0")
-                    .addParameter("p", "partition", "(Optional) Partition column", "0")
-                    .addParameter("ss", "splitStrategy", "(Optional) Identifies the split strategy", "SECURE")
-                    .addParameter("re", "readable", "(Optional) Identifies if partition name should be readable at runtime", "false");
+                    .addParameter("p", "partition", "(Optional) Partition column, default is 0", "0")
+                    .addParameter("ss", "splitStrategy", "(Optional) Identifies the split strategy, default is SECURE", "SECURE")
+                    .addParameter("re", "readable", "(Optional) Identifies if partition name should be readable at runtime, default is false", "false");
 
             //Reads the command line interface. 
             CommandLineInterface cli = mitt.getCommandLineInterface(args);
