@@ -28,10 +28,10 @@ package br.com.dafiti.metadata.schema;
  * @author Helio Leal
  */
 public class FactoryMetadatable {
-    
+
     public static Metadatable getMetadatable(String dialect) {
         Metadatable metadatable = null;
-        
+
         switch (dialect) {
             case "spectrum":
                 metadatable = new Spectrum();

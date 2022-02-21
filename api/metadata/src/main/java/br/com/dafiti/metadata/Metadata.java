@@ -81,7 +81,6 @@ public class Metadata {
             String folderName = cli.getParameter("folder").replace("file:", "");
             File[] files = new File(folderName).listFiles(fileFilter);
 
-            //Identifies if there are files to process.
             if (files != null) {
                 //Define the number of threads.
                 ExecutorService executor = Executors.newFixedThreadPool(cli.getParameterAsInteger("thread"));
@@ -108,7 +107,6 @@ public class Metadata {
                                     cli.getParameterAsInteger("sample")));
                 }
 
-                //Exit the thread executor.
                 executor.shutdown();
             }
 
