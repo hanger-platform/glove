@@ -38,7 +38,6 @@ import java.util.UUID;
 import java.util.logging.Level;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
-import org.apache.log4j.Logger;
 
 /**
  * This class reads CSV file and writes to CSV file(s) per partition.
@@ -69,8 +68,10 @@ public class CSVSplitter implements Runnable {
      * @param quoteEscape File escape.
      * @param header Identify if the file has header.
      * @param replace Identify if should replace the orignal file.
-     * @param readable Identifies if partition name should be readable at runtime.
-     * @param splitStrategy Identify if should use the fastest strategy to partitioning.
+     * @param readable Identifies if partition name should be readable at
+     * runtime.
+     * @param splitStrategy Identify if should use the fastest strategy to
+     * partitioning.
      */
     public CSVSplitter(
             File csvFile,
@@ -192,7 +193,7 @@ public class CSVSplitter implements Runnable {
                 v.flush();
                 v.close();
             } catch (IOException ex) {
-                Logger.getLogger(this.getClass()).error("Error [" + ex + "] closing writer");
+                LOG.log(Level.SEVERE, "Error [{0}] closing writer", ex);
                 System.exit(1);
             }
         });

@@ -60,7 +60,6 @@ public class Splitter {
                     .addParameter("d", "delimiter", "(Optional) Delimiter of csv files, default is ;", ";")
                     .addParameter("q", "quote", "(Optional) Identifies the quote character, default is \"", "\"")
                     .addParameter("e", "escape", "(Optional) Identifies the quote escape character, default is \"", "\"")
-                    .addParameter("D", "debug", "(Optional) Show full log messages, default is 0", "0")
                     .addParameter("p", "partition", "(Optional) Partition column, default is 0", "0")
                     .addParameter("ss", "splitStrategy", "(Optional) Identifies the split strategy, default is SECURE", "SECURE")
                     .addParameter("re", "readable", "(Optional) Identifies if partition name should be readable at runtime, default is false", "false");

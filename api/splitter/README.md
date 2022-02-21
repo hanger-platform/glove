@@ -37,7 +37,6 @@ java -jar splitter.jar  \
 	--delimiter=<(Optional) Delimiter of csv files; default is ;> \
 	--quote=<(Optional) Identifies the quote character; default is \"> \
 	--escape=<(Optional) Identifies the quote escape character; default is \"> \
-	--debug=<(Optional) Show full log messages; default is 0> \
 	--partition=<(Optional) Partition column; default is 0> \
 	--splitStrategy=<(Optional) Identifies if split strategy is FAST or SECURE; default is SECURE> \
 	--readable=<(Optional) Identifies if partition name should be readable at runtime; default is false>
