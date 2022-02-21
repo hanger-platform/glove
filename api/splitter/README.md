@@ -43,8 +43,8 @@ java -jar splitter.jar  \
 
 ```             
 
-#### EXEMPLOS
-##### Arquivo de entrada
+#### Exemplos
+##### Arquivo de entrada:
 
     /home/user/Documents/customer/customer.csv
 
@@ -62,7 +62,7 @@ java -jar splitter.jar  \
 	--folder=/home/user/Documents/customer/
 ```
 
-Transformação:
+##### Arquivos de saída:
 
     /home/user/Documents/customer/20220101/57956570-2a91-4053-9024-25601ef132b7.csv
 
@@ -71,17 +71,16 @@ Transformação:
 20220101;200;200;Ted;Thompson
 20220101;405;405;Rose;Williams
 ```
-----
+
     /home/user/Documents/customer/20220102/26d76e78-daf8-4f68-8638-dd2b6273168a.csv
 
 ```bash
 20220102;303;303;Paul;Reed
 20220102;502;502;Bertha;Blood
-....
 ```
 
 #### Exemplo 2
-Habilitando o readable:
+##### Habilitando o readable:
 
 ```bash
 java -jar splitter.jar  \
@@ -89,7 +88,7 @@ java -jar splitter.jar  \
 	--readable=true
 ```
 
-Transformação:
+##### Arquivos de saída:
 
     /home/user/Documents/customer/20220101.csv
 
@@ -98,7 +97,7 @@ Transformação:
 20220101;200;200;Ted;Thompson
 20220101;405;405;Rose;Williams
 ```
----
+
     /home/user/Documents/customer/20220102.csv
 
 ```bash
@@ -108,11 +107,11 @@ Transformação:
 
 ## Informações adicionais
 
-**Parâmetro splitStrategy** - Identifica a estratégia utilizada para o particionamento dos dados sendo: 
- - FAST - os dados sendo processados são confiáveis e não contém caracteres especiais ou quebra de linhas. Modo rápido. 
- - SECURE - os dados não são confiáveis e devem ser tratados. Modo um pouco mais lento.
+**Parâmetro splitStrategy:** Identifica a estratégia utilizada para o particionamento dos dados sendo: 
+ - FAST - os dados sendo processados são confiáveis e não contém caracteres especiais ou quebra de linhas. Modo rápido;
+ - SECURE - os dados não são confiáveis e devem ser tratados. Modo um pouco mais lento;
 
-**Observação** - A ferramenta só aceita arquivo no formato csv.
+**Observação:** A ferramenta só aceita arquivo de entrada no formato **csv**.
 
 ## Contributing, Bugs, Questions
 Contributions are more than welcome! If you want to propose new changes, fix bugs or improve something feel free to fork the repository and send us a Pull Request. You can also open new `Issues` for reporting bugs and general problems.
