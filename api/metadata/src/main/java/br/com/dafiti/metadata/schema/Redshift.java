@@ -23,13 +23,13 @@
  */
 package br.com.dafiti.metadata.schema;
 
-import br.com.dafiti.metadata.model.Field;
+import br.com.dafiti.metadata.Field;
 
 /**
  *
  * @author Helio Leal
  */
-public class Redshift implements Metadata {
+public class Redshift implements Metadatable {
 
     @Override
     public void generateNull(Field field, String name) {

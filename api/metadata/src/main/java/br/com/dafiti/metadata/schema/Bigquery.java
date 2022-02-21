@@ -23,13 +23,13 @@
  */
 package br.com.dafiti.metadata.schema;
 
-import br.com.dafiti.metadata.model.Field;
+import br.com.dafiti.metadata.Field;
 
 /**
  *
  * @author Helio Leal
  */
-public class Bigquery implements Metadata {
+public class Bigquery implements Metadatable {
 
     @Override
     public void generateNull(Field field, String name) {

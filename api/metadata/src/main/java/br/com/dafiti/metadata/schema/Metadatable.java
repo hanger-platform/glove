@@ -23,13 +23,13 @@
  */
 package br.com.dafiti.metadata.schema;
 
-import br.com.dafiti.metadata.model.Field;
+import br.com.dafiti.metadata.Field;
 
 /**
  *
  * @author Helio Leal
  */
-public interface Metadata {
+public interface Metadatable {
 
     public void generateNull(Field field, String name);
 

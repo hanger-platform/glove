@@ -23,8 +23,6 @@
  */
 package br.com.dafiti.metadata;
 
-import br.com.dafiti.metadata.model.Field;
-import br.com.dafiti.metadata.schema.Metadata;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import java.io.BufferedWriter;
@@ -42,6 +40,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
+import br.com.dafiti.metadata.schema.Metadatable;
 
 /**
  * Read a csv file, infer and write the parquet schema.
@@ -51,7 +50,7 @@ import org.json.JSONException;
  */
 public class Extractor implements Runnable {
 
-    private static final Logger LOG = Logger.getLogger(Main.class.getName());
+    private static final Logger LOG = Logger.getLogger(Metadata.class.getName());
     private static final int MAX_SAMPLE = 1000000;
 
     private File file;
@@ -70,20 +69,20 @@ public class Extractor implements Runnable {
 
     /**
      *
-     * @param csvFile CSV file.
-     * @param reserverWordsFile Identify the reserved words file list.
+     * @param file CSV file.
+     * @param reservedWords Identify the reserved words file list.
      * @param delimiter File delimiter.
      * @param quote File quote.
      * @param escape File escape.
      * @param csvField Header fields.
      * @param metadata Table metadata.
-     * @param outputFolder Main output folder.
+     * @param outputFolder Metadata output folder.
      * @param dialect Identify the metadata dialect.
      * @param sample Sample de dados analizado para definição de datatypes.
      */
     public Extractor(
-            File csvFile,
-            File reserverWordsFile,
+            File file,
+            File reservedWords,
             Character delimiter,
             Character quote,
             Character escape,
@@ -93,14 +92,14 @@ public class Extractor implements Runnable {
             String dialect,
             int sample) {
 
-        this.file = csvFile;
+        this.file = file;
         this.delimiter = delimiter;
         this.quote = quote;
         this.escape = escape;
         this.outputPath = outputFolder;
         this.dialect = dialect;
         this.hasHeader = csvField.isEmpty();
-        this.reserverWordsFile = reserverWordsFile;
+        this.reserverWordsFile = reservedWords;
         this.rowOnTheFly = "";
         this.fieldContent = new ArrayList();
         this.jsonMetadata = new JSONArray();
@@ -114,7 +113,7 @@ public class Extractor implements Runnable {
         }
 
         if (outputFolder.isEmpty()) {
-            this.outputPath = csvFile.getParent().concat("/");
+            this.outputPath = file.getParent().concat("/");
         }
 
         //Get the header fields passed by parameter. 
@@ -135,7 +134,7 @@ public class Extractor implements Runnable {
     public void run() {
         try {
             //Define which dialect to use to generate output metadata.
-            Metadata clazz = (Metadata) Class.forName("br.com.dafiti.metadata.schema." + StringUtils.capitalize(dialect)).newInstance();
+            Metadatable clazz = (Metadatable) Class.forName("br.com.dafiti.metadata.schema." + StringUtils.capitalize(dialect)).newInstance();
 
             this.fillDataSample();
 
@@ -152,10 +151,10 @@ public class Extractor implements Runnable {
     /**
      * Infer metadata based on data sample values.
      *
-     * @param clazz Metadata gereric class based on dialect.
+     * @param clazz Metadatable gereric class based on dialect.
      * @throws JSONException
      */
-    private void inferMetadata(Metadata clazz) throws JSONException {
+    public void inferMetadata(Metadatable clazz) throws JSONException {
         List<String> reservedWords = this.getReservedWords();
 
         //Process each column.
@@ -276,7 +275,7 @@ public class Extractor implements Runnable {
      *
      * @throws IOException
      */
-    private void writeFiles() throws IOException {
+    public void writeFiles() throws IOException {
         if (this.field.getList().size() > 0) {
             //Write field list.
             writeFile("_columns.csv", String.join("\n", this.field.getList()));
@@ -304,7 +303,7 @@ public class Extractor implements Runnable {
     /**
      * Defines a limited data sample.
      */
-    private void fillDataSample() {
+    public void fillDataSample() {
         CsvParser csvParser = new CsvParser(this.getCSVSettings());
         csvParser.beginParsing(file);
 
@@ -378,6 +377,14 @@ public class Extractor implements Runnable {
             bf.flush();
             writer.close();
         }
+    }
+
+    public ArrayList<String[]> getFieldContent() {
+        return fieldContent;
+    }
+
+    public Field getField() {
+        return field;
     }
 
 }

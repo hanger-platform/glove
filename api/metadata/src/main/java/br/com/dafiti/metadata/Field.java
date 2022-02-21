@@ -21,7 +21,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
  */
-package br.com.dafiti.metadata.model;
+package br.com.dafiti.metadata;
 
 import java.util.ArrayList;
 import java.util.List;
