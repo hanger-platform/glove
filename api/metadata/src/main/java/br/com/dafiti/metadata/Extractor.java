@@ -23,6 +23,7 @@
  */
 package br.com.dafiti.metadata;
 
+import br.com.dafiti.metadata.schema.FactoryMetadatable;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import java.io.BufferedWriter;
@@ -36,7 +37,6 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
@@ -134,15 +134,15 @@ public class Extractor implements Runnable {
     public void run() {
         try {
             //Define which dialect to use to generate output metadata.
-            Metadatable clazz = (Metadatable) Class.forName("br.com.dafiti.metadata.schema." + StringUtils.capitalize(dialect)).newInstance();
+            Metadatable metadatable = FactoryMetadatable.getMetadatable(dialect);            
 
             this.fillDataSample();
 
-            this.inferMetadata(clazz);
+            this.inferMetadata(metadatable);
 
             this.writeFiles();
 
-        } catch (IOException | ClassNotFoundException | IllegalAccessException | InstantiationException | JSONException ex) {
+        } catch (IOException | JSONException ex) {
             LOG.log(Level.SEVERE, "GLOVE - Metadata Inference fail [row: " + rowOnTheFly + "]", ex);
             System.exit(1);
         }
@@ -151,10 +151,10 @@ public class Extractor implements Runnable {
     /**
      * Infer metadata based on data sample values.
      *
-     * @param clazz Metadatable gereric class based on dialect.
+     * @param metadatable Metadatable gereric class based on dialect.
      * @throws JSONException
      */
-    public void inferMetadata(Metadatable clazz) throws JSONException {
+    public void inferMetadata(Metadatable metadatable) throws JSONException {
         List<String> reservedWords = this.getReservedWords();
 
         //Process each column.
@@ -221,48 +221,48 @@ public class Extractor implements Runnable {
 
                 //Identify the field type and size based on the number of ocurrences of each data type.
                 if ((nullCount > 0 && stringCount == 0 && integerCount == 0 && doubleCount == 0)) {
-                    clazz.generateNull(this.field, name);
+                    metadatable.generateNull(this.field, name);
 
                 } else if (stringCount > 0) {
-                    clazz.generateString(this.field, name, (length * 2) > 65000 ? 65000 : (length * 2));
+                    metadatable.generateString(this.field, name, (length * 2) > 65000 ? 65000 : (length * 2));
 
                 } else if (integerCount > 0 && stringCount == 0 && doubleCount == 0) {
-                    clazz.generateInteger(this.field, name);
+                    metadatable.generateInteger(this.field, name);
 
                 } else if (doubleCount > 0 && stringCount == 0) {
-                    clazz.generateNumber(this.field, name);
+                    metadatable.generateNumber(this.field, name);
 
                 }
             } else {
                 switch (type) {
                     case "string":
-                        clazz.generateString(this.field, name, length > 65000 ? 65000 : length);
+                        metadatable.generateString(this.field, name, length > 65000 ? 65000 : length);
 
                         break;
                     case "integer":
                     case "long":
-                        clazz.generateInteger(this.field, name);
+                        metadatable.generateInteger(this.field, name);
 
                         break;
                     case "number":
                     case "bignumber":
-                        clazz.generateBigNumber(this.field, name);
+                        metadatable.generateBigNumber(this.field, name);
 
                         break;
                     case "timestamp":
-                        clazz.generateTimestamp(this.field, name);
+                        metadatable.generateTimestamp(this.field, name);
 
                         break;
                     case "date":
-                        clazz.generateDate(this.field, name);
+                        metadatable.generateDate(this.field, name);
 
                         break;
                     case "boolean":
-                        clazz.generateBoolean(this.field, name);
+                        metadatable.generateBoolean(this.field, name);
 
                         break;
                     default:
-                        clazz.generateNull(this.field, name);
+                        metadatable.generateNull(this.field, name);
 
                         break;
                 }
