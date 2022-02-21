@@ -31,8 +31,8 @@ Utilizando o [Maven](https://maven.apache.org/):
 java -jar splitter.jar  \
 	--folder=<Folder where the files to be split are located> \
 	--filename=<(Optional) Filename, with wildcard if necessary, to be converted; default is "*.csv"> \
-	--header=<(Optional) Identifies the csv file has a header; default is true> \
-	--replace=<(Optional) Identifies whether csv files will be replaced by partitioned files; default is true> \
+	--header=<(Optional) Identifies the csv file has a header; default is false> \
+	--replace=<(Optional) Identifies whether csv files will be replaced by partitioned files; default is false> \
 	--thread=<(Optional) Limit of thread; default is 1> \
 	--delimiter=<(Optional) Delimiter of csv files; default is ;> \
 	--quote=<(Optional) Identifies the quote character; default is \"> \
@@ -59,7 +59,8 @@ partition_field;custom_primary_key;id;first_name;last_name
 #### Exemplo 1
 ```bash
 java -jar splitter.jar  \
-	--folder=/home/user/Documents/customer/
+	--folder=/home/user/Documents/customer/ \
+	--header=true
 ```
 
 ##### Arquivos de saída:
@@ -85,7 +86,9 @@ java -jar splitter.jar  \
 ```bash
 java -jar splitter.jar  \
 	--folder=/home/user/Documents/customer/ \
+	--header=true \
 	--readable=true
+
 ```
 
 ##### Arquivos de saída:
