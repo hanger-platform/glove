@@ -1,6 +1,6 @@
 
 # Splitter [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-### Splitter é uma ferramenta auxiliar do GLOVE na criação de arquivos csv particionados.
+### Splitter é uma ferramenta que auxilia na criação de arquivos csv particionados.
 
 ## How it works
 
@@ -29,7 +29,7 @@ Utilizando o [Maven](https://maven.apache.org/):
 
 ```bash
 java -jar splitter.jar  \
-	--folder=<Folder where the files to be split are located> \
+	--folder=<Folder where the files to be splitted are located> \
 	--filename=<(Optional) Filename, with wildcard if necessary, to be converted; default is "*.csv"> \
 	--header=<(Optional) Identifies the csv file has a header; default is false> \
 	--replace=<(Optional) Identifies whether csv files will be replaced by partitioned files; default is false> \
@@ -111,8 +111,8 @@ java -jar splitter.jar  \
 ## Informações adicionais
 
 **Parâmetro splitStrategy:** Identifica a estratégia utilizada para o particionamento dos dados sendo: 
- - FAST - os dados sendo processados são confiáveis e não contém caracteres especiais ou quebra de linhas. Modo rápido;
- - SECURE - os dados não são confiáveis e devem ser tratados. Modo um pouco mais lento;
+ - FAST - os dados de entrada que serão processados são confiáveis e, não contém caracteres especiais ou quebra de linhas. Modo rápido;
+ - SECURE - os dados de entrada não são confiáveis e devem passar por um tratamento. Modo um pouco mais lento;
 
 **Observação:** A ferramenta só aceita arquivo de entrada no formato **csv**.
 

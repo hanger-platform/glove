@@ -52,7 +52,7 @@ public class Splitter {
         try {
             //Defines parameters.
             mitt.getConfiguration()
-                    .addParameter("f", "folder", "Folder where the files to be split are located", "", true, false)
+                    .addParameter("f", "folder", "Folder where the files to be splitted are located", "", true, false)
                     .addParameter("fn", "filename", "(Optional) Filename, with wildcard if necessary, to be converted, default is '*.csv'", "*.csv")
                     .addParameter("h", "header", "(Optional) Identifies the csv file has a header, default is false", "false")
                     .addParameter("r", "replace", "(Optional) Identifies whether csv files will be replaced by partitioned files, default is false", "false")
