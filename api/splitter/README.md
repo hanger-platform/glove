@@ -84,7 +84,7 @@ java -jar splitter.jar  \
 
 ```bash
 java -jar splitter.jar  \
-	--folder=/home/user/Documents/customer/
+	--folder=/home/user/Documents/customer/ \
 	--readable=true
 ```
 
