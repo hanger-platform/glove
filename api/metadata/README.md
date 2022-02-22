@@ -3,7 +3,7 @@
 
 ## How it works
 
-A ferramenta **Metadata** atua na geração de arquivos de metadados que serão utilizados pelo processo de ingestão do GLOVE, a geração desses metadados se dá através da inferência dos campos baseado em um _sample_ de dados. Essa ferramenta é utilizada pelos módulos [Named Query](https://github.com/dafiti-group/glove#named-query-module) e [File](https://github.com/dafiti-group/glove#named-query-module). 
+A ferramenta **Metadata** atua na geração de arquivos de metadados que serão utilizados pelo processo de ingestão do GLOVE, a geração desses metadados se dá através da inferência dos campos baseado em um _sample_ de dados. Essa ferramenta é utilizada pelos módulos [Named Query](https://github.com/dafiti-group/glove#named-query-module) e [File](https://github.com/dafiti-group/glove#file-module). 
 
 No total, a saída do programa gera quatro arquivos:
 - **<schema>_<tabela>_columns.csv**: Lista com todos os campos, um campo por linha.
