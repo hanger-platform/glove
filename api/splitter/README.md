@@ -32,7 +32,7 @@ java -jar splitter.jar  \
 	--folder=<Folder where the files to be splitted are located> \
 	--filename=<(Optional) Filename, with wildcard if necessary, to be converted; default is "*.csv"> \
 	--header=<(Optional) Identifies the csv file has a header; default is false> \
-	--replace=<(Optional) Identifies whether csv files will be replaced by partitioned files; default is false> \
+	--replace=<(Optional) Identifies if csv files will be replaced by partitioned files; default is false> \
 	--thread=<(Optional) Limit of thread; default is 1> \
 	--delimiter=<(Optional) Delimiter of csv files; default is ;> \
 	--quote=<(Optional) Identifies the quote character; default is \"> \
@@ -81,7 +81,7 @@ java -jar splitter.jar  \
 ```
 
 #### Exemplo 2
-##### Habilitando o readable:
+O parâmetro readable habilitado (true), serve para gerar arquivo com nome legível, como no exemplo abaixo.
 
 ```bash
 java -jar splitter.jar  \
