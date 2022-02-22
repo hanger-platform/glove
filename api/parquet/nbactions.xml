@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.parquet.Parquet --folder=/home/helio.leal/Documentos/lixo/converter/parquet_meta_decimal/rawfile --filename=* --delimiter=; --schema=/home/helio.leal/Documentos/lixo/converter/parquet_meta_decimal/metadata/spc_staging_sales_orders.json --compression=gzip --thread=4 --duplicated=0 --fieldkey=1 --merge=1 --bucket=s3://bi-dafiti-group-dev/b83a05_spc_staging/3eba25_sales_orders/rawfile/queue/ --mode=virtual</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.parquet.Parquet --folder=/home/helio.leal/Documentos/lixo/converter/parquet_meta_decimal/rawfile --filename=* --delimiter=; --schema=/home/helio.leal/Documentos/lixo/converter/parquet_meta_decimal/metadata/spc_staging_sales_orders.json --compression=gzip --thread=4 --duplicated=0 --fieldkey=1 --merge=1 --bucket=s3://bi-dafiti-group-dev/b83a05_spc_staging/3eba25_sales_orders/rawfile/queue/ --mode=virtual --replace='false'</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.parquet.Parquet --folder=/home/helio.leal/Documentos/lixo/converter/parquet_meta_decimal/rawfile --filename=* --delimiter=; --schema=/home/helio.leal/Documentos/lixo/converter/parquet_meta_decimal/metadata/spc_staging_sales_orders.json --compression=gzip --thread=4 --duplicated=0 --fieldkey=1 --merge=1 --bucket=s3://bi-dafiti-group-dev/b83a05_spc_staging/3eba25_sales_orders/rawfile/queue/ --mode=virtual</exec.args>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.parquet.Parquet --folder=/home/helio.leal/Documentos/lixo/converter/parquet_meta_decimal/rawfile --filename=* --delimiter=; --schema=/home/helio.leal/Documentos/lixo/converter/parquet_meta_decimal/metadata/spc_staging_sales_orders.json --compression=gzip --thread=4 --duplicated=0 --fieldkey=1 --merge=1 --bucket=s3://bi-dafiti-group-dev/b83a05_spc_staging/3eba25_sales_orders/rawfile/queue/ --mode=virtual --replace='false'</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.parquet.Parquet --folder=/home/helio.leal/Documentos/lixo/converter/parquet_meta_decimal/rawfile --filename=* --delimiter=; --schema=/home/helio.leal/Documentos/lixo/converter/parquet_meta_decimal/metadata/spc_staging_sales_orders.json --compression=gzip --thread=4 --duplicated=0 --fieldkey=1 --merge=1 --bucket=s3://bi-dafiti-group-dev/b83a05_spc_staging/3eba25_sales_orders/rawfile/queue/ --mode=virtual</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.parquet.Parquet --folder=/home/helio.leal/Documentos/lixo/converter/parquet_meta_decimal/rawfile --filename=* --delimiter=; --schema=/home/helio.leal/Documentos/lixo/converter/parquet_meta_decimal/metadata/spc_staging_sales_orders.json --compression=gzip --thread=4 --duplicated=0 --fieldkey=1 --merge=1 --bucket=s3://bi-dafiti-group-dev/b83a05_spc_staging/3eba25_sales_orders/rawfile/queue/ --mode=virtual --replace='false'</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>

@@ -58,8 +58,8 @@ public class Parquet {
                     .addParameter("fo", "folder", "Folder where the files to be converted to parquet are", "", true, false)
                     .addParameter("s", "schema", "Avro schema to be used on conversion", "", true, false)
                     .addParameter("f", "filename", "(Optional) Filename, with wildcard if necessary, to be converted")
-                    .addParameter("h", "header", "(Optional) Identifies the csv file has a header")
-                    .addParameter("r", "replace", "(Optional) Identifies if csv files will be replaced to parquet files")
+                    .addParameter("h", "header", "(Optional) Identifies the csv file has a header, default is false", "false")
+                    .addParameter("r", "replace", "(Optional) Identifies if csv files will be replaced to parquet files, default is false", "false")
                     .addParameter("t", "thread", "(Optional) Limit of thread, default is 1", "1")
                     .addParameter("c", "compression", "(Optional) Identifies the compression to be applied, default is gzip", "gzip")
                     .addParameter("d", "delimiter", "(Optional) Delimiter of csv files, default is ;", ";")
@@ -108,8 +108,8 @@ public class Parquet {
                                         cli.getParameter("quote").charAt(0),
                                         cli.getParameter("escape").charAt(0),
                                         schema,
-                                        cli.hasParameter("header"),
-                                        cli.hasParameter("replace"),
+                                        cli.getParameterAsBoolean("header"),
+                                        cli.getParameterAsBoolean("replace"),
                                         cli.getParameterAsInteger("fieldkey"),
                                         cli.getParameterAsInteger("duplicated") == 1,
                                         cli.getParameterAsInteger("merge") == 1,
