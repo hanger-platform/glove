@@ -3,13 +3,13 @@
 
 ## How it works
 
-A ferramenta **Metadata** atua na geração de arquivos de metadados que serão utilizados pelo processo de ingestão do GLOVE, a geração desses metadados se dá através da inferência dos campos baseado em um _sample_ de dados. Essa ferramenta é utilizada pelos módulos [Named Query](https://github.com/dafiti-group/glove#named-query-module) e [File](https://github.com/dafiti-group/glove#named-query-module). 
+A ferramenta **Metadata** atua na geração de arquivos de metadados que serão utilizados pelo processo de ingestão do GLOVE, a geração desses metadados se dá através da inferência dos campos baseado em um _sample_ de dados. Essa ferramenta é utilizada pelos módulos [Named Query](https://github.com/dafiti-group/glove#named-query-module) e [File](https://github.com/dafiti-group/glove#file-module). 
 
 No total, a saída do programa gera quatro arquivos:
-- **<schema>_<tabela>_columns.csv**: Lista com todos os campos, um campo por linha.
-- **<schema>_<tabela>_fields.csv**: Lista de todos os campos com o tipo de dados.
-- **<schema>_<tabela>.json**: Possui formato json com os campos e os seus respectivos tipos, formato para ser usado nos conversores orc e parquet.
-- **<schema>_<tabela>_metadata.csv**: Possui formato json com os campos e os seus respectivos tipos.
+- **schema_tabela_columns.csv**: Lista com todos os campos, um campo por linha.
+- **schema_tabela_fields.csv**: Lista de todos os campos com o tipo de dados.
+- **schema_tabela.json**: Formato json com os campos e os seus respectivos tipos, formato para ser usado nos conversores orc e parquet.
+- **schema_tabela_metadata.csv**: Formato json com os campos e os seus respectivos tipos.
 
 ## Instalação
 
