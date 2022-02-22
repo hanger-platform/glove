@@ -94,53 +94,10 @@ partition_load(){
 	echo "Running partition load!"
 	cd ${RAWFILE_QUEUE_PATH}
 
-	#Particiona o arquivo contendo os dados.
-	echo "Partitioning data file delimited by ${DELIMITER}!"
-
     if [ ${MODULE} == "query" ] || [ ${MODULE} == "file" ]; then
-		if [ ${DEBUG} = 1 ] ; then
-			echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/splitter.jar \
-				--folder=${RAWFILE_QUEUE_PATH} \
-				--filename=*.csv \
-				--delimiter=${DELIMITER} \
-				--splitStrategy=${SPLIT_STRATEGY} \
-				--thread=${THREAD} \
-				--escape=${QUOTE_ESCAPE} \
-				--header='true' \
-				--replace='true'"
-		fi
-
-        java -jar ${GLOVE_HOME}/extractor/lib/splitter.jar \
-			--folder=${RAWFILE_QUEUE_PATH} \
-			--filename=*.csv \
-			--delimiter=${DELIMITER} \
-			--splitStrategy=${SPLIT_STRATEGY} \
-			--thread=${THREAD} \
-			--escape=${QUOTE_ESCAPE} \
-			--header='true' \
-			--replace='true'
-		error_check
+		split_file "*.csv" ${THREAD} ${HEADER} "false"
     else
-		if [ ${DEBUG} = 1 ] ; then
-			echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/splitter.jar \
-				--folder=${RAWFILE_QUEUE_PATH} \
-				--filename=*.csv \
-				--delimiter=${DELIMITER} \
-				--splitStrategy=${SPLIT_STRATEGY} \
-				--thread=${THREAD} \
-				--escape=${QUOTE_ESCAPE} \
-				--replace='true'"
-		fi
-
-        java -jar ${GLOVE_HOME}/extractor/lib/splitter.jar \
-			--folder=${RAWFILE_QUEUE_PATH} \
-			--filename=*.csv \
-			--delimiter=${DELIMITER} \
-			--splitStrategy=${SPLIT_STRATEGY} \
-			--thread=${THREAD} \
-			--escape=${QUOTE_ESCAPE} \
-			--replace='true'
-		error_check
+		split_file "*.csv" ${THREAD} "false" "false"
     fi
 
 	# Identifica se será realizado merge.
@@ -151,41 +108,7 @@ partition_load(){
 	fi
 
     # Converte os arquivos das partições para formato colunar.
-    echo "Generating ${OUTPUT_FORMAT} files!"
-	if [ ${DEBUG} = 1 ] ; then
-	 	echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/${OUTPUT_FORMAT}.jar \
-			--folder=${RAWFILE_QUEUE_PATH} \
-			--filename=* \
-			--delimiter=${DELIMITER} \
-			--schema=${METADATA_JSON_FILE} \
-			--compression=${OUTPUT_COMPRESSION} \
-			--thread=${THREAD} \
-			--duplicated=${ALLOW_DUPLICATED} \
-			--fieldkey=1 \
-			--merge=${PARTITION_MERGE} \
-			--bucket=${STORAGE_QUEUE_PATH} \
-			--mode=${PARTITION_MODE} \
-			--escape=${QUOTE_ESCAPE} \
-			--replace='true' \
-			--debug=${DEBUG}"
-	fi
-
-    java -jar ${GLOVE_HOME}/extractor/lib/${OUTPUT_FORMAT}.jar \
-		--folder=${RAWFILE_QUEUE_PATH} \
-		--filename=* \
-		--delimiter=${DELIMITER} \
-		--schema=${METADATA_JSON_FILE} \
-		--compression=${OUTPUT_COMPRESSION} \
-		--thread=${THREAD} \
-		--duplicated=${ALLOW_DUPLICATED} \
-		--fieldkey=1 \
-		--merge=${PARTITION_MERGE} \
-		--bucket=${STORAGE_QUEUE_PATH} \
-		--mode=${PARTITION_MODE} \
-		--escape=${QUOTE_ESCAPE} \
-		--replace='true' \
-		--debug=${DEBUG}
-    error_check
+	convert "*" "1" ${PARTITION_MERGE} ${STORAGE_QUEUE_PATH} ${PARTITION_MODE} "false"
 
     # Identifica se o particionamento é real ou virtual.
     if [ ${PARTITION_MODE} == "real" ]; then
@@ -242,40 +165,7 @@ delta_load(){
     fi
 
     # Converte o arquivo final para o formato colunar.
-    echo "Generating ${OUTPUT_FORMAT} files!"
-	if [ ${DEBUG} = 1 ] ; then
-		echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/${OUTPUT_FORMAT}.jar \
-			--folder=${RAWFILE_QUEUE_PATH} \
-			--filename=${DATA_FILE}.csv \
-			--delimiter=${DELIMITER} \
-			--schema=${METADATA_JSON_FILE} \
-			--compression=${OUTPUT_COMPRESSION} \
-			--thread=${THREAD} \
-			--duplicated=${ALLOW_DUPLICATED} \
-			--fieldkey=0 \
-			--merge=${PARTITION_MERGE} \
-			--bucket=${STORAGE_QUEUE_PATH} \
-			--escape=${QUOTE_ESCAPE} \
-			--replace='true' \
-			--debug=${DEBUG}"
-	fi
-
-    java -jar ${GLOVE_HOME}/extractor/lib/${OUTPUT_FORMAT}.jar \
-		--folder=${RAWFILE_QUEUE_PATH} \
-		--filename=${DATA_FILE}.csv \
-		--delimiter=${DELIMITER} \
-		--schema=${METADATA_JSON_FILE} \
-		--compression=${OUTPUT_COMPRESSION} \
-		--thread=${THREAD} \
-		--duplicated=${ALLOW_DUPLICATED} \
-		--fieldkey=0 \
-		--merge=${PARTITION_MERGE} \
-		--bucket=${STORAGE_QUEUE_PATH} \
-		--escape=${QUOTE_ESCAPE} \
-		--replace='true' \
-		--debug=${DEBUG}
-    error_check
-
+	convert "${DATA_FILE}.csv" "0" ${PARTITION_MERGE} ${STORAGE_QUEUE_PATH} "" "false"
 
     # Remove os arquivos antigos.
     aws s3 rm ${STORAGE_QUEUE_PATH} --recursive --exclude "*" --include "${DATA_FILE}.*" --only-show-errors
@@ -321,71 +211,18 @@ full_load(){
 
 	if [ ${MODULE} == "file" ]; then
 		# Converte o arquivo de dados para formato colunar.
-    	echo "Generating ${OUTPUT_FORMAT} files!"
-		if [ ${DEBUG} = 1 ] ; then
-			echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/${OUTPUT_FORMAT}.jar \
-				--folder=${RAWFILE_QUEUE_PATH} \
-				--filename=*.csv \
-				--header='true' \
-				--delimiter=${DELIMITER} \
-				--schema=${METADATA_JSON_FILE} \
-				--compression=${OUTPUT_COMPRESSION} \
-				--thread=${THREAD} \
-				--duplicated=${ALLOW_DUPLICATED} \
-				--escape=${QUOTE_ESCAPE} \
-				--replace='true' \
-				--debug=${DEBUG}"
-		fi
-
-    	java -jar ${GLOVE_HOME}/extractor/lib/${OUTPUT_FORMAT}.jar \
-			--folder=${RAWFILE_QUEUE_PATH} \
-			--filename=*.csv \
-			--header='true' \
-			--delimiter=${DELIMITER} \
-			--schema=${METADATA_JSON_FILE} \
-			--compression=${OUTPUT_COMPRESSION} \
-			--thread=${THREAD} \
-			--duplicated=${ALLOW_DUPLICATED} \
-			--escape=${QUOTE_ESCAPE} \
-			--replace='true' \
-			--debug=${DEBUG}
-    	error_check
+		convert "*.csv" "-1" "0" "" "" "true"
 
 		if [ ${FILE_OUTPUT_MODE} == "append" ]; then
 			echo "APPEND mode ON!"
 		else
-			# Remove os arquivos antigo do storage.
+			# Remove os arquivos antigos do storage.
 			echo "Removing files from ${STORAGE_QUEUE_PATH}"
 			aws s3 rm ${STORAGE_QUEUE_PATH} --recursive --only-show-errors
 		fi
 	else
 		# Converte o arquivo de dados para formato colunar.
-		echo "Generating ${OUTPUT_FORMAT} files!"
-		if [ ${DEBUG} = 1 ] ; then
-			echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/${OUTPUT_FORMAT}.jar \
-				--folder=${RAWFILE_QUEUE_PATH} \
-				--filename=*.csv \
-				--delimiter=${DELIMITER} \
-				--schema=${METADATA_JSON_FILE} \
-				--compression=${OUTPUT_COMPRESSION} \
-				--thread=${THREAD} \
-				--duplicated=${ALLOW_DUPLICATED} \
-				--replace='true' \
-				--debug=${DEBUG}"
-		fi
-
-		java -jar ${GLOVE_HOME}/extractor/lib/${OUTPUT_FORMAT}.jar \
-			--folder=${RAWFILE_QUEUE_PATH} \
-			--filename=*.csv \
-			--delimiter=${DELIMITER} \
-			--schema=${METADATA_JSON_FILE} \
-			--compression=${OUTPUT_COMPRESSION} \
-			--thread=${THREAD} \
-			--duplicated=${ALLOW_DUPLICATED} \
-			--escape=${QUOTE_ESCAPE} \
-			--replace='true' \
-			--debug=${DEBUG}
-		error_check
+		convert "*.csv" "-1" "0" "" "" "false"
 
 		# Remove os arquivos antigo do storage.
 		echo "Removing files from ${STORAGE_QUEUE_PATH}"
@@ -519,6 +356,90 @@ send_email()
 	echo "Sending e-mail with presign link to recipients: ${ALLOWED_EMAILS::-1}"					
 
 	echo $1 | mutt -s "${EXPORT_SHEETS_SUBJECT}" -b ${ALLOWED_EMAILS::-1}
+}
+
+# Efetua a conversão dos arquivos de dados para formato colunares (Orc ou parquet)
+convert()
+{
+	FILENAME=$1 # File name or Wildcard
+	FIELDKEY=$2 # Field key
+	IS_MERGE=$3 # Identify if it is a merge
+	BUCKET=$4 # Bucket with file to merge
+	MODE=$5 # Identify partition mode
+	HEADER=$6 # Identify if the file has header
+
+	echo "Generating ${OUTPUT_FORMAT} files!"
+	if [ ${DEBUG} = 1 ] ; then
+	 	echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/${OUTPUT_FORMAT}.jar \
+			--folder=${RAWFILE_QUEUE_PATH} \
+			--filename=${FILENAME} \
+			--delimiter=${DELIMITER} \
+			--schema=${METADATA_JSON_FILE} \
+			--compression=${OUTPUT_COMPRESSION} \
+			--thread=${THREAD} \
+			--duplicated=${ALLOW_DUPLICATED} \
+			--fieldkey=${FIELDKEY} \
+			--merge=${IS_MERGE} \
+			--bucket=${BUCKET} \
+			--mode=${MODE} \
+			--escape=${QUOTE_ESCAPE} \
+			--replace='true' \
+			--header=${HEADER} \
+			--debug=${DEBUG}"
+	fi
+
+	java -jar ${GLOVE_HOME}/extractor/lib/${OUTPUT_FORMAT}.jar \
+		--folder=${RAWFILE_QUEUE_PATH} \
+		--filename=${FILENAME} \
+		--delimiter=${DELIMITER} \
+		--schema=${METADATA_JSON_FILE} \
+		--compression=${OUTPUT_COMPRESSION} \
+		--thread=${THREAD} \
+		--duplicated=${ALLOW_DUPLICATED} \
+		--fieldkey=${FIELDKEY} \
+		--merge=${IS_MERGE} \
+		--bucket=${BUCKET} \
+		--mode=${MODE} \
+		--escape=${QUOTE_ESCAPE} \
+		--replace='true' \
+		--header=${HEADER} \
+		--debug=${DEBUG}
+	error_check
+}
+
+#Particiona o arquivo contendo os dados.
+split_file()
+{
+	FILENAME=$1 # File name or Wildcard
+	THREADS=$2 # Use how many threads.
+	HEADER=$3 # Identify if the file has header
+	READABLE=$4 # Identify if it is a merge
+
+	echo "Partitioning data file delimited by ${DELIMITER}!"
+	if [ ${DEBUG} = 1 ] ; then
+		echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/splitter.jar \
+			--folder=${RAWFILE_QUEUE_PATH} \
+			--filename=${FILENAME} \
+			--delimiter=${DELIMITER} \
+			--splitStrategy=${SPLIT_STRATEGY} \
+			--thread=${THREADS} \
+			--escape=${QUOTE_ESCAPE} \
+			--header=${HEADER} \
+			--replace='true'
+			--readable=${READABLE}"
+	fi
+
+	java -jar ${GLOVE_HOME}/extractor/lib/splitter.jar \
+		--folder=${RAWFILE_QUEUE_PATH} \
+		--filename=${FILENAME} \
+		--delimiter=${DELIMITER} \
+		--splitStrategy=${SPLIT_STRATEGY} \
+		--thread=${THREADS} \
+		--escape=${QUOTE_ESCAPE} \
+		--header=${HEADER} \
+		--replace='true' \
+		--readable=${READABLE}
+	error_check
 }
 
 # Identifica a ocorrência de erros e interrompe processo.
@@ -662,17 +583,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 
 					# Particiona o arquivo em single thread (thread=1) para preservar os dados e nome das partições.  
 					# TODO - A geração de um único arquivo de saída deve ser suportada pelo conversor de dados nativamente sem a necessidade do merge anterior. 
-					java -jar ${GLOVE_HOME}/extractor/lib/splitter.jar \
-						--folder=${RAWFILE_QUEUE_PATH} \
-						--filename=merged.csv \
-						--delimiter=${DELIMITER} \
-						--splitStrategy=${SPLIT_STRATEGY} \
-						--thread=1 \
-						--escape=${QUOTE_ESCAPE} \
-						--header='true' \
-						--readable='true' \
-						--replace='true'
-					error_check
+					split_file "merged.csv" "1" "true" "true"
 				fi
 
 				# Identifica cada bucket para o qual o export deve ser enviado.
