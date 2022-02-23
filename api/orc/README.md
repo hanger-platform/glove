@@ -32,8 +32,8 @@ java -jar orc.jar  \
 	--folder=<Folder where the files to be converted to orc are> \
 	--schema=<Avro schema file to be used on conversion> \
 	--filename=<(Optional) Filename, with wildcard if necessary, to be converted> \
-	--header=<(Optional) Identifies if the csv file has a header> \
-	--replace=<(Optional) Identifies if csv files will be replaced to orc files> \
+	--header=<(Optional) Identifies if the csv file has a header, default is false> \
+	--replace=<(Optional) Identifies if csv files will be replaced to orc files, default is false> \
 	--thread=<(Optional) Limit of threads, be careful with it not to overload the workstation memory; default is 1> \
 	--compression=<(Optional) Identifies the compression to be applied; default is gzip> \
 	--delimiter=<(Optional) Delimiter of csv files; default is ;> \
