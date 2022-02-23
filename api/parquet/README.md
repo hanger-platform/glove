@@ -44,7 +44,7 @@ java -jar parquet.jar  \
 	--merge=<(Optional) Identifies if should merge existing files; default is 0> \
 	--debug=<(Optional) Show full log messages; default is 0"> \
 	--bucket=<(Optional) Identifies the storage bucket> \
-	--mode=<(Optional) Identifies the partition mode>
+	--mode=<(Optional) Identifies the partition mode between real and virtual; default is virtual>
 ```             
 
 #### Exemplo 1
