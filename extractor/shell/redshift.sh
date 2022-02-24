@@ -297,7 +297,7 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 					echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/splitter.jar \
 					--folder=${RAWFILE_QUEUE_PATH} \
 					--filename=merged.csv \
-					--delimiter=${DELIMITER} \					
+					--delimiter=${DELIMITER} \
 					--splitStrategy=${SPLIT_STRATEGY} \
 					--thread=1 \
 					--escape=${QUOTE_ESCAPE} \
