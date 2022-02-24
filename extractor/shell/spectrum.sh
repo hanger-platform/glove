@@ -95,7 +95,7 @@ partition_load(){
 	cd ${RAWFILE_QUEUE_PATH}
 
     if [ ${MODULE} == "query" ] || [ ${MODULE} == "file" ]; then
-		split_file "*.csv" ${THREAD} ${HEADER} "false"
+		split_file "*.csv" ${THREAD} "true" "false"
     else
 		split_file "*.csv" ${THREAD} "false" "false"
     fi
