@@ -938,7 +938,7 @@ if [ ${HAS_RECORD} -gt 1 ]; then
 		--escape='${QUOTE_ESCAPE}' \
 		--filename=${SCHEMA_NAME}_${TABLE}.csv  \
 		--dialect=${DIALECT} \
-		--reservedWords=${RESERVED_WORDS_FILE}		
+		--reservedWords=${RESERVED_WORDS_FILE}
 	error_check
 
 	echo "INFERRED METADATA"
