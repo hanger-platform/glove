@@ -163,9 +163,6 @@ public class Converter implements Runnable {
      */
     @Override
     public void run() {
-        //Log the process init.
-        LOG.log(Level.INFO, "Converting CSV to ORC: {0}", inputFile.getAbsolutePath());
-
         //Identifies the file name pattern. 
         String path = FilenameUtils.getFullPath(inputFile.getAbsolutePath());
         String name = FilenameUtils.getBaseName(inputFile.getName());
