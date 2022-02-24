@@ -918,9 +918,9 @@ if [ ${HAS_RECORD} -gt 1 ]; then
 	 	echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/metadata.jar \
 		--folder=${RAWFILE_QUEUE_SAMPLE_PATH} \
 		--output=${METADATA_QUEUE_PATH} \
-		--metadata="${METADATA}" \
+		--metadata='${METADATA}' \
 		--sample=${SAMPLE} \
-		--field="" \
+		--field='' \
 		--delimiter="${DELIMITER}" \
 		--escape='${QUOTE_ESCAPE}' \
 		--filename=${SCHEMA_NAME}_${TABLE}.csv  \
