@@ -177,7 +177,7 @@ public class Extractor implements Runnable {
                 hasMetadata = metadata.getString("field").equalsIgnoreCase(name);
 
                 if (hasMetadata) {
-                    type = metadata.has("type") ? metadata.getString("type") : "";
+                    type = metadata.has("type") ? metadata.getString("type").toLowerCase() : "";
                     length = metadata.has("length") ? metadata.getInt("length") : 0;
 
                     break;
