@@ -42,10 +42,9 @@ import java.util.List;
 import java.util.Properties;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
+import org.slf4j.LoggerFactory;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 
 /**
  *
@@ -53,7 +52,7 @@ import org.apache.log4j.PatternLayout;
  */
 public class Sapjco3 {
 
-    private static final Logger LOG = Logger.getLogger(Sapjco3.class.getName());
+    private static final Logger LOG = (Logger) LoggerFactory.getLogger(Sapjco3.class);
 
     /**
      * SAPJCO3 data transfer
@@ -61,15 +60,6 @@ public class Sapjco3 {
      * @param args cli parameteres provided by command line.
      */
     public static void main(String[] args) {
-        //configure the appender
-        ConsoleAppender console = new ConsoleAppender();
-        String PATTERN = "%d{yyyy-MM-dd HH:mm:ss} %-5p %m%n";
-        console.setLayout(new PatternLayout(PATTERN));
-        console.setThreshold(Level.DEBUG);
-        console.activateOptions();
-        //add appender to any Logger (here is root)
-        Logger.getRootLogger().addAppender(console);
-
         LOG.info("GLOVE - SAPJCO3 extractor started");
 
         //Define the mitt.
@@ -99,8 +89,6 @@ public class Sapjco3 {
             //Defines the log level.
             if (cli.getParameterAsBoolean("debug")) {
                 LOG.setLevel(Level.DEBUG);
-            } else {
-                LOG.setLevel(Level.INFO);
             }
 
             //Defines output file.
@@ -152,7 +140,7 @@ public class Sapjco3 {
             int rowSkips = cli.getParameterAsInteger("row_skips");
             int numRows = ZRFCGetTableCount(destination, cli);
 
-            LOG.log(Level.INFO, "Table " + cli.getParameter("table") + " has " + numRows + " records [WHERE CONDITION: " + cli.getParameter("where") + "].");
+            LOG.info("Table " + cli.getParameter("table") + " has " + numRows + " records [WHERE CONDITION: " + cli.getParameter("where") + "].");
 
             //Retrieves data based on row count.
             do {
@@ -213,7 +201,7 @@ public class Sapjco3 {
 
                     final JCoTable rows = function.getTableParameterList().getTable("DATA");
 
-                    LOG.log(Level.INFO, "This request returned " + rows.getNumRows() + " rows [ROWCOUNT: " + rowCount + ", ROWSKIPS: " + rowSkips + "].");
+                    LOG.info("This request returned " + rows.getNumRows() + " rows [ROWCOUNT: " + rowCount + ", ROWSKIPS: " + rowSkips + "].");
 
                     LOG.debug("Before mitt write.");
 
@@ -243,7 +231,7 @@ public class Sapjco3 {
             } while (rowCount > 0 && rowSkips < numRows);
 
         } catch (Exception ex) {
-            LOG.log(Level.ERROR, "GLOVE - SAPJCO3 extractor fail: ", ex);
+            LOG.error("GLOVE - SAPJCO3 extractor fail: ", ex);
             System.exit(1);
         } finally {
             mitt.close();
