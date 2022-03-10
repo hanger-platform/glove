@@ -10,18 +10,27 @@
         <dependency>
             <groupId>com.google.api-ads</groupId>
             <artifactId>google-ads</artifactId>
-            <version>16.0.1</version>
+            <version>16.0.3</version>
         </dependency>
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java-util</artifactId>
             <version>3.19.1</version>
-            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.9.0</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>mitt</artifactId>
-            <version>1.2.2</version>
+            <version>1.2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-core</artifactId>
+            <version>1.44.0</version>
         </dependency>
     </dependencies>
     

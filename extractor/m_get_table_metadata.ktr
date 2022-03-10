@@ -732,6 +732,11 @@
     </hop>
     <hop>
       <from>Has delta casting?</from>
+      <to>Has delta type?</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Has delta type?</from>
       <to>DELTA_FIELD_CASTING</to>
       <enabled>Y</enabled>
     </hop>
@@ -1051,7 +1056,7 @@
       <value>
         <name>field_type</name>
         <rename>field_type</rename>
-        <default>'UNDEFINED'</default>
+        <default/>
         <type>String</type>
       </value>
     </lookup>
@@ -1350,6 +1355,46 @@
     <GUI>
       <xloc>1232</xloc>
       <yloc>528</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Has delta casting?</name>
+    <type>IfNull</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <replaceAllByValue/>
+    <replaceAllMask/>
+    <selectFields>Y</selectFields>
+    <selectValuesType>N</selectValuesType>
+    <setEmptyStringAll>N</setEmptyStringAll>
+    <valuetypes>
+      </valuetypes>
+    <fields>
+      <field>
+        <name>casting</name>
+        <value>'0'</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>352</xloc>
+      <yloc>880</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -2194,7 +2239,7 @@
     </GUI>
   </step>
   <step>
-    <name>Has delta casting?</name>
+    <name>Has delta type?</name>
     <type>IfNull</type>
     <description/>
     <distribute>Y</distribute>
@@ -2213,8 +2258,8 @@
       </valuetypes>
     <fields>
       <field>
-        <name>casting</name>
-        <value>'0'</value>
+        <name>field_type</name>
+        <value>'UNDEFINED'</value>
         <mask/>
         <set_empty_string>N</set_empty_string>
       </field>
@@ -2229,7 +2274,7 @@
     </remotesteps>
     <GUI>
       <xloc>352</xloc>
-      <yloc>880</yloc>
+      <yloc>1008</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
