@@ -914,16 +914,15 @@ if [ ${HAS_RECORD} -gt 1 ]; then
 	echo "Dialect: " $DIALECT
 
 	echo "Extracting metadata"
-	java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
+	java -jar ${GLOVE_HOME}/extractor/lib/metadata.jar \
 		--folder=${RAWFILE_QUEUE_SAMPLE_PATH} \
 		--output=${METADATA_QUEUE_PATH} \
 		--metadata="${METADATA}" \
 		--sample=${SAMPLE} \
-		--header \
+		--field="" \
 		--delimiter="${DELIMITER}" \
 		--escape='${QUOTE_ESCAPE}' \
 		--filename=${SCHEMA_NAME}_${TABLE}.csv  \
-		--target=metadata \
 		--dialect=${DIALECT} \
 		--reservedWords=${RESERVED_WORDS_FILE}
 	error_check

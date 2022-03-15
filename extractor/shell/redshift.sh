@@ -293,18 +293,30 @@ if [ ${QUEUE_FILE_COUNT} -gt 0 ]; then
 				echo "Partitioning data file delimited by ${DELIMITER}!"
 				cat ${RAWFILE_QUEUE_FILE} >> ${RAWFILE_QUEUE_PATH}merged.csv
 				
-				java -jar ${GLOVE_HOME}/extractor/lib/converter.jar \
+				if [ ${DEBUG} = 1 ] ; then
+					echo "DEBUG:java -jar ${GLOVE_HOME}/extractor/lib/splitter.jar \
 					--folder=${RAWFILE_QUEUE_PATH} \
 					--filename=merged.csv \
 					--delimiter=${DELIMITER} \
-					--target=csv \
 					--splitStrategy=${SPLIT_STRATEGY} \
-					--partition=0 \
 					--thread=1 \
 					--escape=${QUOTE_ESCAPE} \
-					--header \
-					--readable \
-					--replace \
+					--header='true' \
+					--readable='true' \
+					--replace='true' \
+					--debug=${DEBUG}"
+				fi
+
+				java -jar ${GLOVE_HOME}/extractor/lib/splitter.jar \
+					--folder=${RAWFILE_QUEUE_PATH} \
+					--filename=merged.csv \
+					--delimiter=${DELIMITER} \					
+					--splitStrategy=${SPLIT_STRATEGY} \
+					--thread=1 \
+					--escape=${QUOTE_ESCAPE} \
+					--header='true' \
+					--readable='true' \
+					--replace='true' \
 					--debug=${DEBUG}
 				error_check
 			fi
