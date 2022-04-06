@@ -89,7 +89,7 @@ public class Quicksight {
                     cli.getParameter("account"),
                     cli.getParameter("namespace"));
 
-            LOG.log(Level.SEVERE, "Retrieving {0} from Quicksight.", new Object[]{cli.getParameter("resource")});
+            LOG.log(Level.INFO, "Retrieving {0} from Quicksight.", new Object[]{cli.getParameter("resource")});
 
             describable.setFields(configuration);
             describable.extract(mitt);
