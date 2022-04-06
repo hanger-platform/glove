@@ -63,7 +63,7 @@ public class FactoryDescribable {
                 describable = new User(region, awsAccountId, namespace);
                 break;
             default:
-                throw new UnsupportedOperationException("Not supported yet.");
+                throw new UnsupportedOperationException("Type " + resource + " not supported yet.");
         }
 
         return describable;

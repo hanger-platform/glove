@@ -5,7 +5,7 @@
   <artifactId>quicksight</artifactId>
   <version>1.0</version>
   <build>
-    <finalName>Quicksight</finalName>
+    <finalName>quicksight</finalName>
     <plugins>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
