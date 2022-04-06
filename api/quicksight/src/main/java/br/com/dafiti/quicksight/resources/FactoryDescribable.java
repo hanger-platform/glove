@@ -38,11 +38,29 @@ public class FactoryDescribable {
         Describable describable = null;
 
         switch (resource) {
-            case "user":
-                describable = new User(region, awsAccountId, namespace);
+            case "dashboard":
+                describable = new Dashboard(region, awsAccountId, namespace);
+                break;
+            case "dashboard_permissions":
+                describable = new DashboardPermissions(region, awsAccountId, namespace);
+                break;
+            case "dataset":
+                describable = new DataSet(region, awsAccountId, namespace);
+                break;
+            case "dataset_permissions":
+                describable = new DataSetPermissions(region, awsAccountId, namespace);
+                break;
+            case "datasource":
+                describable = new DataSource(region, awsAccountId, namespace);
                 break;
             case "group":
                 describable = new Group(region, awsAccountId, namespace);
+                break;
+            case "group_membership":
+                describable = new GroupMembership(region, awsAccountId, namespace);
+                break;
+            case "user":
+                describable = new User(region, awsAccountId, namespace);
                 break;
             default:
                 throw new UnsupportedOperationException("Not supported yet.");
