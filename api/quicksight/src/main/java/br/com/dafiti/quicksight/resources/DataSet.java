@@ -74,6 +74,7 @@ public class DataSet extends QuicksightClient implements Describable {
         configuration.addField("arn");
         configuration.addField("created_time");
         configuration.addField("dataset_id");
+        configuration.addField("import_mode");
         configuration.addField("last_updated_time");
         configuration.addField("name");
     }
