@@ -63,9 +63,6 @@ public class DataSet extends QuicksightClient implements Describable {
                 record.add(dataset.getImportMode());
                 record.add(dataset.getLastUpdatedTime());
                 record.add(dataset.getName());
-                record.add(dataset.getRowLevelPermissionDataSet().getArn());
-                record.add(dataset.getRowLevelPermissionDataSet().getNamespace());
-                record.add(dataset.getRowLevelPermissionDataSet().getPermissionPolicy());
 
                 mitt.write(record);
             });
@@ -79,8 +76,5 @@ public class DataSet extends QuicksightClient implements Describable {
         configuration.addField("dataset_id");
         configuration.addField("last_updated_time");
         configuration.addField("name");
-        configuration.addField("row_level_permissions_dataset_arn");
-        configuration.addField("row_level_permissions_dataset_namespace");
-        configuration.addField("row_level_permissions_dataset_permission_policy");
     }
 }
