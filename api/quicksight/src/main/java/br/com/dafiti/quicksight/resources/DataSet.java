@@ -27,6 +27,9 @@ import br.com.dafiti.mitt.Mitt;
 import br.com.dafiti.mitt.exception.DuplicateEntityException;
 import br.com.dafiti.mitt.model.Configuration;
 import br.com.dafiti.quicksight.config.QuicksightClient;
+import com.amazonaws.services.quicksight.model.DescribeDataSetRequest;
+import com.amazonaws.services.quicksight.model.DescribeDataSetResult;
+import com.amazonaws.services.quicksight.model.InvalidParameterValueException;
 import com.amazonaws.services.quicksight.model.ListDataSetsRequest;
 import com.amazonaws.services.quicksight.model.ListDataSetsResult;
 import java.util.ArrayList;
@@ -64,6 +67,22 @@ public class DataSet extends QuicksightClient implements Describable {
                 record.add(dataset.getLastUpdatedTime());
                 record.add(dataset.getName());
 
+                Long consumedSpiceCapacityInBytes = 0L;
+                try {
+                    DescribeDataSetResult describeDataSetResult
+                            = client.describeDataSet(
+                                    new DescribeDataSetRequest()
+                                            .withAwsAccountId(this.awsAccountId)
+                                            .withDataSetId(dataset.getDataSetId()));
+
+                    consumedSpiceCapacityInBytes = describeDataSetResult
+                            .getDataSet()
+                            .getConsumedSpiceCapacityInBytes();
+                } catch (InvalidParameterValueException ex) {
+                } finally {
+                    record.add(consumedSpiceCapacityInBytes);
+                }
+
                 mitt.write(record);
             });
         } while (nextToken != null);
@@ -77,5 +96,6 @@ public class DataSet extends QuicksightClient implements Describable {
         configuration.addField("import_mode");
         configuration.addField("last_updated_time");
         configuration.addField("name");
+        configuration.addField("consumed_spice_capacity_in_bytes");
     }
 }
