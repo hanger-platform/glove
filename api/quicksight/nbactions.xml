@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.quicksight.QuickSight --output="/tmp/quicksight/user/user.csv" --resource="user" --region="us-east-1" --account="296025910508" --namespace="default"</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.quicksight.Quicksight --output="/tmp/quicksight/dataset/dataset.csv" --resource="dataset" --region="us-east-1" --account="296025910508" --namespace="default"</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.quicksight.QuickSight --output="/tmp/quicksight/user/user.csv" --resource="user" --region="us-east-1" --account="296025910508" --namespace="default"</exec.args>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.quicksight.Quicksight --output="/tmp/quicksight/dataset/dataset.csv" --resource="dataset" --region="us-east-1" --account="296025910508" --namespace="default"</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath br.com.dafiti.quicksight.QuickSight --output="/tmp/quicksight/user/user.csv" --resource="user" --region="us-east-1" --account="296025910508" --namespace="default"</exec.args>
+                <exec.args>-classpath %classpath br.com.dafiti.quicksight.Quicksight --output="/tmp/quicksight/dataset/dataset.csv" --resource="dataset" --region="us-east-1" --account="296025910508" --namespace="default"</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>

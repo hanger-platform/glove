@@ -26,6 +26,7 @@ package br.com.dafiti.quicksight.resources;
 import br.com.dafiti.mitt.Mitt;
 import br.com.dafiti.mitt.exception.DuplicateEntityException;
 import br.com.dafiti.mitt.model.Configuration;
+import br.com.dafiti.mitt.transformation.embedded.DateFormat;
 import br.com.dafiti.quicksight.config.QuicksightClient;
 import com.amazonaws.services.quicksight.model.ListDataSourcesRequest;
 import com.amazonaws.services.quicksight.model.ListDataSourcesResult;
@@ -77,11 +78,11 @@ public class DataSource extends QuicksightClient implements Describable {
     @Override
     public void setFields(Configuration configuration) throws DuplicateEntityException {
         configuration.addField("arn");
-        configuration.addField("created_time");
+        configuration.addField("created_time", new DateFormat("last_updated_time", "EEE MMM d h:mm:ss G yyyy", "yyyy-MM-dd hh:mm:ss"));
         configuration.addField("datasource_id");
         configuration.addField("datasource_parameters");
         configuration.addField("error_info");
-        configuration.addField("last_updated_time");
+        configuration.addField("last_updated_time", new DateFormat("last_updated_time", "EEE MMM d h:mm:ss G yyyy", "yyyy-MM-dd hh:mm:ss"));
         configuration.addField("name");
         configuration.addField("ssl_properties");
         configuration.addField("status");
