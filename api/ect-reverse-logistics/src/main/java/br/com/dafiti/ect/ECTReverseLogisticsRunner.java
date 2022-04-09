@@ -23,12 +23,12 @@
  */
 package br.com.dafiti.ect;
 
-import br.com.correios.logisticareversa.service.ColetasSolicitadas;
-import br.com.correios.logisticareversa.service.HistoricoColeta;
-import br.com.correios.logisticareversa.service.LogisticaReversaService;
-import br.com.correios.logisticareversa.service.LogisticaReversaWS;
-import br.com.correios.logisticareversa.service.ObjetoPostal;
-import br.com.correios.logisticareversa.service.RetornoAcompanhamento;
+import br.com.correios.logisticareversa.ColetasSolicitadas;
+import br.com.correios.logisticareversa.HistoricoColeta;
+import br.com.correios.logisticareversa.LogisticaReversaService;
+import br.com.correios.logisticareversa.LogisticaReversaWS;
+import br.com.correios.logisticareversa.ObjetoPostal;
+import br.com.correios.logisticareversa.RetornoAcompanhamento;
 import br.com.dafiti.mitt.Mitt;
 import br.com.dafiti.mitt.exception.DuplicateEntityException;
 import br.com.dafiti.mitt.transformation.embedded.Concat;

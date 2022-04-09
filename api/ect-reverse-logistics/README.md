@@ -17,6 +17,14 @@ O **ECT Reverse Logistics Extractor** permite a extração de dados sobre logís
 
 Utilizando o [Maven](https://maven.apache.org/):
 
+- Crie o arquivo $HOME_DIRECTORY/.metro/auth com o seguinte conteúdo:
+
+```bash
+https://<user>:<password>@cws.correios.com.br/logisticaReversaWS/logisticaReversaService/logisticaReversaWS?wsdl
+```
+
+Caso o nome do usário ou a senha possua algum caracter especial, eles deve ser URL encoded.
+
 - Acesse o diretório no qual os fontes do **ect-reverse-logistics** se localizam.
 - Digite o comando _**mvn package**_.
 - O arquivo **ect-reverse-logistics.jar** será gerado no subdiretório **_target_**.
@@ -25,7 +33,7 @@ Utilizando o [Maven](https://maven.apache.org/):
 
 * Crie um arquivo com as seguintes informações sobre seu acesso ao serviço de logística reversa da ECT, este será o seu **credentials file**:
 
-```
+```json
 {
 	"user":"<username>",
 	"password":"<password>",
