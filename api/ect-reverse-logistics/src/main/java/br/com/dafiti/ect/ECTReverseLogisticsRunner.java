@@ -58,8 +58,8 @@ public class ECTReverseLogisticsRunner implements Runnable {
     private final List partition;
     private final List<String> authorizations;
 
-    private final int API_DEFAULT_LIMIT = 30;
-    private final int API_DEFAULT_RETRY = 3;
+    private final int API_DEFAULT_LIMIT = 10;
+    private final int API_DEFAULT_RETRY = 5;
 
     /**
      *
@@ -269,7 +269,7 @@ public class ECTReverseLogisticsRunner implements Runnable {
             try {
                 if (retry < API_DEFAULT_RETRY) {
                     Logger.getLogger(ECTReverseLogisticsRunner.class.getName()).log(Level.INFO, "Reverse logistics retry {0} for authorizations: {1}, caused by {2}", new Object[]{retry, String.join(",", authorizations), ex});
-                    TimeUnit.MINUTES.sleep(1);
+                    TimeUnit.SECONDS.sleep(10 * retry);
                     retry = retry + 1;
                     this.loteProcessor(mitt, authorizations, retry);
                 } else {
