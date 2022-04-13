@@ -82,7 +82,7 @@ public class ECTReverseLogistics {
             List<String> authorizations = new ArrayList();
 
             if (cli.getParameter("authorization").startsWith("file:")) {
-                try (FileReader file = new FileReader(cli.getParameter("authorization").replace("file:", ""))) {
+                try ( FileReader file = new FileReader(cli.getParameter("authorization").replace("file:", ""))) {
                     String record;
                     BufferedReader buffer = new BufferedReader(file);
 
