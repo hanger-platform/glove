@@ -96,8 +96,8 @@ SELECT * FROM (
         CASE
             WHEN data_type IN ('datetime','timestamp') THEN CONCAT('COALESCE(DATE_FORMAT(IF( WEEKDAY(',column_name,') IS NULL', ',' , '''1900-01-01 00:00:00''', ',', column_name, '),', '''%Y-%m-%d %T', ' ${TIMEZONE_OFFSET}', '''), ', '''1900-01-01 00:00:00''', ') AS `',column_name,'`')
             WHEN data_type = 'date' THEN CONCAT('COALESCE(DATE_FORMAT(IF( WEEKDAY(',column_name,') IS NULL', ',' , '''1900-01-01''', ',', column_name, '),', '''%Y-%m-%d', '''), ', '''1900-01-01''', ') AS `',REPLACE(column_name,' ','_'),'`')
-			WHEN data_type IN ('tinyint','smallint','mediumint', 'int', 'bigint') THEN CONCAT('CAST(`',column_name,'` AS SIGNED) AS `',REPLACE(column_name,' ','_'),'`')
-            WHEN data_type IN ('text', 'longtext', 'mediumtext', 'tinytext', 'varchar') THEN CONCAT('`', column_name, '` AS `',REPLACE(column_name,' ','_'),'`' )
+			WHEN data_type IN ('bit','tinyint','smallint','mediumint','int','bigint') THEN CONCAT('CAST(`',column_name,'` AS SIGNED) AS `',REPLACE(column_name,' ','_'),'`')
+            WHEN data_type IN ('text','longtext', 'mediumtext','tinytext','varchar') THEN CONCAT('`', column_name, '` AS `',REPLACE(column_name,' ','_'),'`' )
             WHEN data_type IN ('blob','mediumblob','longblob') THEN CONCAT('CONVERT(`', column_name, '` USING utf8) AS `',REPLACE(column_name,' ','_'),'`' )
  			WHEN data_type = 'time'  THEN CONCAT('CAST(`', column_name, '` AS CHAR) AS `',REPLACE(column_name,' ','_'),'`' )
             ELSE CONCAT('`',column_name,'`')
@@ -105,8 +105,8 @@ SELECT * FROM (
         CASE
             WHEN data_type IN ('datetime','timestamp') THEN CONCAT('COALESCE(DATE_FORMAT(IF( WEEKDAY(',column_name,') IS NULL', ',' , '''1900-01-01 00:00:00''', ',', column_name, '),', '''%Y-%m-%d %T', ' ${TIMEZONE_OFFSET}', '''), ', '''1900-01-01 00:00:00''', ')')
             WHEN data_type = 'date' THEN CONCAT('COALESCE(DATE_FORMAT(IF( WEEKDAY(',column_name,') IS NULL', ',' , '''1900-01-01''', ',', column_name, '),', '''%Y-%m-%d', '''), ', '''1900-01-01''', ')' )
-			WHEN data_type IN ('tinyint','smallint','mediumint', 'int', 'bigint') THEN CONCAT('CAST(`',column_name,'` AS SIGNED)')
-            WHEN data_type IN ('text', 'longtext', 'mediumtext', 'tinytext', 'varchar') THEN CONCAT('`', column_name, '`' )
+			WHEN data_type IN ('bit','tinyint','smallint','mediumint','int','bigint') THEN CONCAT('CAST(`',column_name,'` AS SIGNED)')
+            WHEN data_type IN ('text','longtext','mediumtext','tinytext','varchar') THEN CONCAT('`', column_name, '`' )
             WHEN data_type IN ('blob','mediumblob','longblob') THEN CONCAT('CONVERT(`',column_name,'` USING utf8)')
  			WHEN data_type = 'time' THEN CONCAT('CAST(`',column_name,'` AS CHAR)')            
 			ELSE CONCAT('`',column_name,'`')
