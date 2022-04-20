@@ -47,7 +47,7 @@ public class Parquet {
     private static final Logger LOG = Logger.getLogger(Parquet.class.getName());
 
     public static void main(String[] args) {
-        LOG.info("GLOVE - Parquet 1.12.0 converter started");
+        LOG.info("GLOVE - Parquet 1.12.2 converter started");
 
         //Define the mitt.
         Mitt mitt = new Mitt();
@@ -127,7 +127,7 @@ public class Parquet {
         } catch (DuplicateEntityException
                 | IOException
                 | IllegalArgumentException ex) {
-            LOG.log(Level.SEVERE, "GLOVE - Parquet 1.12.0 converter fail: ", ex);
+            LOG.log(Level.SEVERE, "GLOVE - Parquet 1.12.2 converter fail: ", ex);
             System.exit(1);
 
         } finally {

@@ -27,7 +27,7 @@
         <dependency>
             <groupId>org.apache.parquet</groupId>
             <artifactId>parquet-avro</artifactId>
-            <version>1.12.0</version>
+            <version>1.12.2</version>
         </dependency>
         
         <!--AWS S3-->

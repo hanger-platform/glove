@@ -24,8 +24,6 @@
 package br.com.dafiti.parquet;
 
 import br.com.dafiti.parquet.util.S3;
-import br.com.dafiti.parquet.util.InputFile;
-import br.com.dafiti.parquet.util.OutputFile;
 import br.com.dafiti.parquet.util.Statistics;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
@@ -60,6 +58,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.hadoop.fs.Path;
 
 /**
  * This class read a csv file and write the records into a parquet file.
@@ -289,11 +288,8 @@ public class Converter implements Runnable {
             GenericData genericData = new GenericData();
             genericData.addLogicalTypeConversion(new Conversions.DecimalConversion());
 
-            //Defines an output stream.
-            OutputFile outputFile = new OutputFile(transientFile);
-
             //Convert to parquet.
-            try (ParquetWriter<GenericRecord> parquetWriter = AvroParquetWriter.<GenericRecord>builder(outputFile)
+            try (ParquetWriter<GenericRecord> parquetWriter = AvroParquetWriter.<GenericRecord>builder(new Path(transientFile.getAbsolutePath()))
                     .withSchema(schema)
                     .withDataModel(genericData)
                     .withCompressionCodec(this.compression)
@@ -325,11 +321,8 @@ public class Converter implements Runnable {
                         //Identifies parquet fields.
                         List<Field> fields = schema.getFields();
 
-                        //Defines an input file.
-                        InputFile originalInputFile = new InputFile(originalFile);
-
                         //Define the reader.
-                        ParquetReader<GenericRecord> parquetReader = AvroParquetReader.<GenericRecord>builder(originalInputFile)
+                        ParquetReader<GenericRecord> parquetReader = AvroParquetReader.<GenericRecord>builder(new Path(originalFile.getAbsolutePath()))
                                 .withDataModel(genericData)
                                 .disableCompatibility()
                                 .build();
