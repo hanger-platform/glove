@@ -29,6 +29,8 @@ import br.com.dafiti.mitt.exception.DuplicateEntityException;
 import com.amazonaws.services.quicksight.AmazonQuickSight;
 import com.amazonaws.services.quicksight.AmazonQuickSightClientBuilder;
 import com.amazonaws.services.quicksight.model.CreateIngestionRequest;
+import com.amazonaws.services.quicksight.model.DescribeDataSetRequest;
+import com.amazonaws.services.quicksight.model.DescribeDataSetResult;
 import com.amazonaws.services.quicksight.model.DescribeIngestionRequest;
 import com.amazonaws.services.quicksight.model.DescribeIngestionResult;
 import java.util.logging.Level;
@@ -45,12 +47,12 @@ public class QuicksightIngestion {
     public static void main(String[] args) {
         LOG.info("Quicksight Ingestion started");
 
-        // Define the mitt.
+        //Defines the mitt.
         Mitt mitt = new Mitt();
 
         try {
 
-            // Defines parameters.
+            //Defines parameters.
             mitt.getConfiguration()
                     .addParameter("a", "account", "The Amazon Web Services account ID", "", true, false)
                     .addParameter("d", "dataset", "The ID of the dataset used in the ingestion", "", true, false)
@@ -64,7 +66,7 @@ public class QuicksightIngestion {
                     .standard()
                     .build();
 
-            //Define a unique id based on unix epoch.
+            //Defines a unique id based on unix epoch.
             String ingestionId = String.valueOf(System.currentTimeMillis() / 1000);
 
             //Starts a new ingestion.
@@ -75,6 +77,13 @@ public class QuicksightIngestion {
                             .withIngestionType(cli.getParameter("type"))
                             .withIngestionId(ingestionId)
             );
+
+            //Describes dataset properties.
+            DescribeDataSetResult describeDataSetResult = client.describeDataSet(
+                    new DescribeDataSetRequest()
+                            .withAwsAccountId(cli.getParameter("account"))
+                            .withDataSetId(cli.getParameter("dataset")));
+            LOG.log(Level.INFO, "Refresh started for dataset: {0}", new Object[]{describeDataSetResult.getDataSet().getName()});
 
             //Control ingestion status.
             boolean running = true;
