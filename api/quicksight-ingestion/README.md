@@ -45,7 +45,7 @@ In this example, we run a dataset with incremental refresh.
 ```bash
 java -jar quicksight.jar \
 	--account='276421814571' \
-	--dataset='2c0e37a6-3f7e-4f41-a840-9b0de466b116' \
+	--dataset='2c8j37a6-3f5e-4c41-a850-9b3se466b116' \
 	--type='INCREMENTAL_REFRESH'
 ```
 
