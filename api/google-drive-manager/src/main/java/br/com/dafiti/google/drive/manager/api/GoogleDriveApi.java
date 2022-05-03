@@ -231,7 +231,7 @@ public class GoogleDriveApi {
                 String parents = "parents='" + fileId + "'";
 
                 FileList response = this.service.files().list()
-                        .setQ(parents)
+                        .setQ(parents + "and trashed = false")
                         .setSpaces("drive")
                         .execute();
 
