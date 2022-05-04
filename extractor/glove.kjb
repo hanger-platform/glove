@@ -28,7 +28,7 @@
     </parameter>
     <parameter>
       <name>BIG_QUERY_REGION</name>
-      <default_value>us</default_value>
+      <default_value>US</default_value>
       <description>Identifica a região na qual a consulta vai ser realizadas.</description>
     </parameter>
     <parameter>
