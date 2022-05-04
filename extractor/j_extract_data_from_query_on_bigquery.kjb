@@ -307,7 +307,6 @@
 mkdir -p ${RAWFILE_QUEUE_STAGING_PATH}
 mkdir -p ${RAWFILE_QUEUE_PATH}
 
-#Replaces - by _ to be used as part of transient dataset name. 
 REGION=${BIG_QUERY_REGION//-/_}
 
 error_check(){
@@ -318,7 +317,7 @@ error_check(){
         	if [ ${DEBUG} = 0 ] ; then
             		rm -rf ${RAWFILE_QUEUE_PATH}
 			bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${STAGING_SCHEMA}_${REGION}.${SCHEMA_NAME}_${TABLE}
-			gsutil -m rm gs://${GOOGLE_CLOUD_BUCKET}/${SCHEMA_NAME}/${TABLE}/*
+			gsutil -m rm gs://${GOOGLE_CLOUD_BUCKET}_${REGION}/${SCHEMA_NAME}/${TABLE}/*
        	 fi
 
 		exit 1
@@ -331,12 +330,12 @@ bq --location=${BIG_QUERY_REGION} rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t 
 bq --location=${BIG_QUERY_REGION} query --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --allow_large_results --destination_table=${STAGING_SCHEMA}_${REGION}.${SCHEMA_NAME}_${TABLE} "${INPUT_DATA_STATEMENT_ESCAPED}"
 error_check
 
-echo "Extracting data to gs://${GOOGLE_CLOUD_BUCKET}/${SCHEMA_NAME}/${TABLE}/${UUID}/!"
-bq --location=${BIG_QUERY_REGION} extract --compression=GZIP --project_id=${BIG_QUERY_PROJECT_ID} -F ';' ${STAGING_SCHEMA}_${REGION}.${SCHEMA_NAME}_${TABLE} gs://${GOOGLE_CLOUD_BUCKET}/${SCHEMA_NAME}/${TABLE}/${UUID}/${SCHEMA_NAME}_${TABLE}*.gz
+echo "Extracting data to gs://${GOOGLE_CLOUD_BUCKET}_${REGION}/${SCHEMA_NAME}/${TABLE}/${UUID}/!"
+bq --location=${BIG_QUERY_REGION} extract --compression=GZIP --project_id=${BIG_QUERY_PROJECT_ID} -F ';' ${STAGING_SCHEMA}_${REGION}.${SCHEMA_NAME}_${TABLE} gs://${GOOGLE_CLOUD_BUCKET}_${REGION}/${SCHEMA_NAME}/${TABLE}/${UUID}/${SCHEMA_NAME}_${TABLE}*.gz
 error_check
 
 echo "Copying data to ${RAWFILE_QUEUE_STAGING_PATH}!"
-gsutil -m mv gs://${GOOGLE_CLOUD_BUCKET}/${SCHEMA_NAME}/${TABLE}/${UUID}/${SCHEMA_NAME}_${TABLE}*.gz ${RAWFILE_QUEUE_STAGING_PATH}
+gsutil -m mv gs://${GOOGLE_CLOUD_BUCKET}_${REGION}/${SCHEMA_NAME}/${TABLE}/${UUID}/${SCHEMA_NAME}_${TABLE}*.gz ${RAWFILE_QUEUE_STAGING_PATH}
 error_check
 
 echo "Unzipping data!"
