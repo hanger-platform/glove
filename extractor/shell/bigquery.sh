@@ -78,7 +78,7 @@ full_load()
 	error_check	
 	
 	echo "Updating from ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}"
-	bq query --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false  << EOF
+	bq query --project_id=${BIG_QUERY_PROJECT_ID} --location=${BIG_QUERY_REGION} --use_legacy_sql=false  << EOF
 	BEGIN TRANSACTION;
 		DELETE FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} t WHERE TRUE;
 		
@@ -111,7 +111,7 @@ delta_load()
 	error_check
 	
 	echo "Updating from ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE}"
-	bq query --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false  << EOF
+	bq query --project_id=${BIG_QUERY_PROJECT_ID} --location=${BIG_QUERY_REGION} --use_legacy_sql=false  << EOF
 	BEGIN TRANSACTION;
 		DELETE FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.${TABLE} t
 		WHERE custom_primary_key IN (SELECT DISTINCT custom_primary_key FROM ${CUSTOM_SCHEMA}${SCHEMA_NAME}.tmp_${TABLE});
