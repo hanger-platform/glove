@@ -325,7 +325,7 @@ error_check(){
 echo "Running query on Big Query!"
 bq mk --project_id=${BIG_QUERY_PROJECT_ID}  ${STAGING_SCHEMA}
 bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${STAGING_SCHEMA}.${SCHEMA_NAME}_${TABLE}
-bq query --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --allow_large_results --destination_table=${STAGING_SCHEMA}.${SCHEMA_NAME}_${TABLE} "${INPUT_DATA_STATEMENT_ESCAPED}"
+bq --location=${BIG_QUERY_REGION} query --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --allow_large_results --destination_table=${STAGING_SCHEMA}.${SCHEMA_NAME}_${TABLE} "${INPUT_DATA_STATEMENT_ESCAPED}"
 error_check
 
 echo "Extracting data to gs://${GOOGLE_CLOUD_BUCKET}/${SCHEMA_NAME}/${TABLE}/${UUID}/!"
@@ -360,7 +360,7 @@ do
 			error_check
 		else
 			echo "Removing data file header!"
-			sed '1d' ${i} >> ${RAWFILE_QUEUE_FILE}	
+			sed '1d' ${i} >&gt; ${RAWFILE_QUEUE_FILE}	
 			error_check	
 		fi
 	fi
