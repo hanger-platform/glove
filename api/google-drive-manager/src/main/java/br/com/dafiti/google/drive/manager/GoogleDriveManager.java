@@ -68,7 +68,8 @@ public class GoogleDriveManager {
                 .addParameter("h", "input", "(Optional) Input file; Required for UPLOAD", "")
                 .addParameter("n", "notification", "(Optional) Send notification email; COPY only; FALSE is default", "false")
                 .addParameter("m", "mimetype", "(Optional) download file format; EXPORT only; application/vnd.openxmlformats-officedocument.spreadsheetml.sheet is default", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-                .addParameter("d", "delimiter", "(Optional) File delimiter; ';' as default", ";");
+                .addParameter("d", "delimiter", "(Optional) File delimiter; ';' as default", ";")
+                .addParameter("e", "encode", "(Optional) Encode file.", "auto");
 
         //Command Line.
         CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -138,7 +139,7 @@ public class GoogleDriveManager {
 
                 //Defines input delimiter.
                 mitt.getReaderSettings().setDelimiter(cli.getParameter("delimiter").charAt(0));
-
+                mitt.getReaderSettings().setEncode(cli.getParameter("encode"));
                 //Defines the file properties.
                 if (cli.getParameter("properties") != null) {
                     mitt.getReaderSettings().setProperties(cli.getParameter("properties"));
@@ -149,7 +150,7 @@ public class GoogleDriveManager {
                 Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.INFO, "File successfully written to {0}", cli.getParameter("output"));
 
                 //Remove temporary path. 
-                Files.delete(outputPath); 
+                Files.delete(outputPath);
 
                 break;
             case "UPLOAD":
