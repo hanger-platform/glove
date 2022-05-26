@@ -27,6 +27,11 @@
       <description>Identifica o projeto  do Big Query que será utilizado.</description>
     </parameter>
     <parameter>
+      <name>BIG_QUERY_REGION</name>
+      <default_value>US</default_value>
+      <description>Identifica a região na qual a consulta vai ser realizadas.</description>
+    </parameter>
+    <parameter>
       <name>CLUSTER_COLUMNS</name>
       <default_value />
       <description>Identifica quais colunas serão usadas para clusterizar uma tabela no BigQuery.</description>
@@ -780,7 +785,7 @@ fi</script>
   / ____/   / /   / __ \| |  / /   / ____/
  / / __    / /   / / / /| | / /   / __/   
 / /_/ /   / /___/ /_/ / | |/ /   / /___   
-\____/   /_____/\____/  |___/   /_____/     Version 0.36.0
+\____/   /_____/\____/  |___/   /_____/     Version 0.37.0
 
                                     
 #-----------------------------------------------------------

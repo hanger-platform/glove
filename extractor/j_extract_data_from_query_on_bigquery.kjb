@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job>
   <name>j_extract_data_from_query_on_bigquery</name>
-  <description/>
-  <extended_description/>
-  <job_version/>
+  <description />
+  <extended_description />
+  <job_version />
   <directory>/</directory>
   <created_user>-</created_user>
   <created_date>2018/02/02 16:06:12.433</created_date>
@@ -14,12 +14,12 @@
   <slaveservers>
     </slaveservers>
   <job-log-table>
-    <connection/>
-    <schema/>
-    <table/>
-    <size_limit_lines/>
-    <interval/>
-    <timeout_days/>
+    <connection />
+    <schema />
+    <table />
+    <size_limit_lines />
+    <interval />
+    <timeout_days />
     <field>
       <id>ID_JOB</id>
       <enabled>Y</enabled>
@@ -127,10 +127,10 @@
     </field>
   </job-log-table>
   <jobentry-log-table>
-    <connection/>
-    <schema/>
-    <table/>
-    <timeout_days/>
+    <connection />
+    <schema />
+    <table />
+    <timeout_days />
     <field>
       <id>ID_BATCH</id>
       <enabled>Y</enabled>
@@ -218,10 +218,10 @@
     </field>
   </jobentry-log-table>
   <channel-log-table>
-    <connection/>
-    <schema/>
-    <table/>
-    <timeout_days/>
+    <connection />
+    <schema />
+    <table />
+    <timeout_days />
     <field>
       <id>ID_BATCH</id>
       <enabled>Y</enabled>
@@ -284,21 +284,21 @@
     </field>
   </channel-log-table>
   <pass_batchid>N</pass_batchid>
-  <shared_objects_file/>
+  <shared_objects_file />
   <entries>
     <entry>
       <name>Extract data</name>
-      <description/>
+      <description />
       <type>SHELL</type>
-      <attributes/>
-      <filename/>
-      <work_directory/>
+      <attributes />
+      <filename />
+      <work_directory />
       <arg_from_previous>N</arg_from_previous>
       <exec_per_row>N</exec_per_row>
       <set_logfile>N</set_logfile>
-      <logfile/>
+      <logfile />
       <set_append_logfile>N</set_append_logfile>
-      <logext/>
+      <logext />
       <add_date>N</add_date>
       <add_time>N</add_time>
       <insertScript>Y</insertScript>
@@ -307,6 +307,9 @@
 mkdir -p ${RAWFILE_QUEUE_STAGING_PATH}
 mkdir -p ${RAWFILE_QUEUE_PATH}
 
+REGION=${BIG_QUERY_REGION//-/_}
+REGION="$(echo "$REGION" | tr '[:upper:]' '[:lower:]')"
+
 error_check(){
 	if [ $? -gt 0 ]; then
        	 echo "An error has occurred :_("
@@ -314,8 +317,8 @@ error_check(){
         	# Remove os arquivos temporários.
         	if [ ${DEBUG} = 0 ] ; then
             		rm -rf ${RAWFILE_QUEUE_PATH}
-			bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${STAGING_SCHEMA}.${SCHEMA_NAME}_${TABLE}
-			gsutil -m rm gs://${GOOGLE_CLOUD_BUCKET}/${SCHEMA_NAME}/${TABLE}/*
+			bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${STAGING_SCHEMA}_${REGION}.${SCHEMA_NAME}_${TABLE}
+			gsutil -m rm gs://${GOOGLE_CLOUD_BUCKET}_${REGION}/${SCHEMA_NAME}/${TABLE}/*
        	 fi
 
 		exit 1
@@ -323,17 +326,17 @@ error_check(){
 }
 
 echo "Running query on Big Query!"
-bq mk --project_id=${BIG_QUERY_PROJECT_ID}  ${STAGING_SCHEMA}
-bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${STAGING_SCHEMA}.${SCHEMA_NAME}_${TABLE}
-bq query --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --allow_large_results --destination_table=${STAGING_SCHEMA}.${SCHEMA_NAME}_${TABLE} "${INPUT_DATA_STATEMENT_ESCAPED}"
+bq --location=${BIG_QUERY_REGION} mk --project_id=${BIG_QUERY_PROJECT_ID}  ${STAGING_SCHEMA}_${REGION}
+bq --location=${BIG_QUERY_REGION} rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${STAGING_SCHEMA}_${REGION}.${SCHEMA_NAME}_${TABLE}
+bq --location=${BIG_QUERY_REGION} query --project_id=${BIG_QUERY_PROJECT_ID} --use_legacy_sql=false --allow_large_results --destination_table=${STAGING_SCHEMA}_${REGION}.${SCHEMA_NAME}_${TABLE} "${INPUT_DATA_STATEMENT_ESCAPED}"
 error_check
 
-echo "Extracting data to gs://${GOOGLE_CLOUD_BUCKET}/${SCHEMA_NAME}/${TABLE}/${UUID}/!"
-bq extract --compression=GZIP --project_id=${BIG_QUERY_PROJECT_ID} -F ';' ${STAGING_SCHEMA}.${SCHEMA_NAME}_${TABLE} gs://${GOOGLE_CLOUD_BUCKET}/${SCHEMA_NAME}/${TABLE}/${UUID}/${SCHEMA_NAME}_${TABLE}*.gz
+echo "Extracting data to gs://${GOOGLE_CLOUD_BUCKET}_${REGION}/${SCHEMA_NAME}/${TABLE}/${UUID}/!"
+bq --location=${BIG_QUERY_REGION} extract --compression=GZIP --project_id=${BIG_QUERY_PROJECT_ID} -F ';' ${STAGING_SCHEMA}_${REGION}.${SCHEMA_NAME}_${TABLE} gs://${GOOGLE_CLOUD_BUCKET}_${REGION}/${SCHEMA_NAME}/${TABLE}/${UUID}/${SCHEMA_NAME}_${TABLE}*.gz
 error_check
 
 echo "Copying data to ${RAWFILE_QUEUE_STAGING_PATH}!"
-gsutil -m mv gs://${GOOGLE_CLOUD_BUCKET}/${SCHEMA_NAME}/${TABLE}/${UUID}/${SCHEMA_NAME}_${TABLE}*.gz ${RAWFILE_QUEUE_STAGING_PATH}
+gsutil -m mv gs://${GOOGLE_CLOUD_BUCKET}_${REGION}/${SCHEMA_NAME}/${TABLE}/${UUID}/${SCHEMA_NAME}_${TABLE}*.gz ${RAWFILE_QUEUE_STAGING_PATH}
 error_check
 
 echo "Unzipping data!"
@@ -370,22 +373,22 @@ done
 
 echo "Removing staging data!"
 rm -rf ${RAWFILE_QUEUE_STAGING_PATH}
-bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${STAGING_SCHEMA}.${SCHEMA_NAME}_${TABLE}</script>
+bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${STAGING_SCHEMA}_${REGION}.${SCHEMA_NAME}_${TABLE}</script>
       <loglevel>Basic</loglevel>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>480</xloc>
       <yloc>64</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Set delimiter to ;</name>
-      <description/>
+      <description />
       <type>SET_VARIABLES</type>
-      <attributes/>
+      <attributes />
       <replacevars>Y</replacevars>
-      <filename/>
+      <filename />
       <file_variable_type>JVM</file_variable_type>
       <fields>
         <field>
@@ -399,13 +402,13 @@ bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${STAGING_SCHEMA}.${SCHEMA_NAME
       <nr>0</nr>
       <xloc>192</xloc>
       <yloc>64</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>START</name>
-      <description/>
+      <description />
       <type>SPECIAL</type>
-      <attributes/>
+      <attributes />
       <start>Y</start>
       <dummy>N</dummy>
       <repeat>N</repeat>
@@ -421,55 +424,55 @@ bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${STAGING_SCHEMA}.${SCHEMA_NAME
       <nr>0</nr>
       <xloc>64</xloc>
       <yloc>64</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Success</name>
-      <description/>
+      <description />
       <type>SUCCESS</type>
-      <attributes/>
+      <attributes />
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>624</xloc>
       <yloc>64</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Fail extracting data from Big Query</name>
-      <description/>
+      <description />
       <type>ABORT</type>
-      <attributes/>
-      <message/>
+      <attributes />
+      <message />
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>480</xloc>
       <yloc>176</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
     <entry>
       <name>Scape shell variable</name>
-      <description/>
+      <description />
       <type>TRANS</type>
-      <attributes/>
+      <attributes />
       <specification_method>filename</specification_method>
-      <trans_object_id/>
+      <trans_object_id />
       <filename>${Internal.Entry.Current.Directory}/m_scape_shell_variable.ktr</filename>
-      <transname/>
+      <transname />
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
       <exec_per_row>N</exec_per_row>
       <clear_rows>N</clear_rows>
       <clear_files>N</clear_files>
       <set_logfile>N</set_logfile>
-      <logfile/>
-      <logext/>
+      <logfile />
+      <logext />
       <add_date>N</add_date>
       <add_time>N</add_time>
       <loglevel>Basic</loglevel>
       <cluster>N</cluster>
-      <slave_server_name/>
+      <slave_server_name />
       <set_append_logfile>N</set_append_logfile>
       <wait_until_finished>Y</wait_until_finished>
       <follow_abort_remote>N</follow_abort_remote>
@@ -484,7 +487,7 @@ bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${STAGING_SCHEMA}.${SCHEMA_NAME
       <nr>0</nr>
       <xloc>336</xloc>
       <yloc>64</yloc>
-      <attributes_kjc/>
+      <attributes_kjc />
     </entry>
   </entries>
   <hops>
@@ -536,5 +539,5 @@ bq rm --project_id=${BIG_QUERY_PROJECT_ID} -f -t ${STAGING_SCHEMA}.${SCHEMA_NAME
   </hops>
   <notepads>
   </notepads>
-  <attributes/>
+  <attributes />
 </job>
