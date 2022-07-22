@@ -12,7 +12,7 @@
             <properties>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.executable>java</exec.executable>
-                <exec.appArgs>--credentials=/home/valdiney.gomes/credentials/reversa.json --authorization=2023496288+2023496177+2023496256+2023496295+2023506760+2023506777+2023506784+2023506800+2023506824+2023506888+2023506903+2023506950+2023506967+2023506974+2023516274+2023516935+2023516994+2023517008+2023517022+2023517119+2023517197+2023517205+2023517220+2023517237+2023516923+2023517101+2023517244+2023517251+2023526753+2023526765 --output=/tmp/ect/</exec.appArgs>
+                <exec.appArgs>--credentials=/home/valdiney.gomes/credentials/reversa.json --authorization=2148630169+2148630183+2148630195+2148630235+2148630287+2148630327+2148630120+2148634958+2148634972+2148635018 --output=/tmp/ect/</exec.appArgs>
                 <exec.vmArgs></exec.vmArgs>
                 <exec.mainClass>br.com.dafiti.ect.ECTReverseLogistics</exec.mainClass>
             </properties>
@@ -30,7 +30,7 @@
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
-                <exec.appArgs>--credentials=/home/valdiney.gomes/credentials/reversa.json --authorization=2023496288+2023496177+2023496256+2023496295+2023506760+2023506777+2023506784+2023506800+2023506824+2023506888+2023506903+2023506950+2023506967+2023506974+2023516274+2023516935+2023516994+2023517008+2023517022+2023517119+2023517197+2023517205+2023517220+2023517237+2023516923+2023517101+2023517244+2023517251+2023526753+2023526765 --output=/tmp/ect/</exec.appArgs>
+                <exec.appArgs>--credentials=/home/valdiney.gomes/credentials/reversa.json --authorization=2148630169+2148630183+2148630195+2148630235+2148630287+2148630327+2148630120+2148634958+2148634972+2148635018 --output=/tmp/ect/</exec.appArgs>
                 <exec.vmArgs>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
                 <exec.mainClass>br.com.dafiti.ect.ECTReverseLogistics</exec.mainClass>
             </properties>
@@ -47,7 +47,7 @@
             <properties>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.executable>java</exec.executable>
-                <exec.appArgs>--credentials=/home/valdiney.gomes/credentials/reversa.json --authorization=2023496288+2023496177+2023496256+2023496295+2023506760+2023506777+2023506784+2023506800+2023506824+2023506888+2023506903+2023506950+2023506967+2023506974+2023516274+2023516935+2023516994+2023517008+2023517022+2023517119+2023517197+2023517205+2023517220+2023517237+2023516923+2023517101+2023517244+2023517251+2023526753+2023526765 --output=/tmp/ect/</exec.appArgs>
+                <exec.appArgs>--credentials=/home/valdiney.gomes/credentials/reversa.json --authorization=2148630169+2148630183+2148630195+2148630235+2148630287+2148630327+2148630120+2148634958+2148634972+2148635018 --output=/tmp/ect/</exec.appArgs>
                 <exec.vmArgs></exec.vmArgs>
                 <exec.mainClass>br.com.dafiti.ect.ECTReverseLogistics</exec.mainClass>
             </properties>

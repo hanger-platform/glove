@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>run</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-classpath %classpath br.com.dafiti.trustvox.Trustvox --credentials="/home/helio.leal/credentials/trustvox.json"  --output="/tmp/trustvox/trustvox.csv" --field="id+rate+text+recommends+created_at+product.id+product.name+product.price+client.email+order.delivery_date+order.order_id" --endpoint="stores/113911/opinions" --object='items' --parameters={"by_max_created_at":"2022-05-24","by_min_created_at":"2022-05-24"}</exec.args>
+                <exec.executable>java</exec.executable>
+            </properties>
+        </action>
+        <action>
+            <actionName>debug</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath br.com.dafiti.trustvox.Trustvox --credentials="/home/helio.leal/credentials/trustvox.json"  --output="/tmp/trustvox/trustvox.csv" --field="id+rate+text+recommends+created_at+product.id+product.name+product.price+client.email+order.delivery_date+order.order_id" --endpoint="stores/113911/opinions" --object='items' --parameters={"by_max_created_at":"2022-05-24","by_min_created_at":"2022-05-24"}</exec.args>
+                <exec.executable>java</exec.executable>
+                <jpda.listen>true</jpda.listen>
+            </properties>
+        </action>
+        <action>
+            <actionName>profile</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-classpath %classpath br.com.dafiti.trustvox.Trustvox --credentials="/home/helio.leal/credentials/trustvox.json"  --output="/tmp/trustvox/trustvox.csv" --field="id+rate+text+recommends+created_at+product.id+product.name+product.price+client.email+order.delivery_date+order.order_id" --endpoint="stores/113911/opinions" --object='items' --parameters={"by_max_created_at":"2022-05-24","by_min_created_at":"2022-05-24"}</exec.args>
+                <exec.executable>java</exec.executable>
+            </properties>
+        </action>
+    </actions>

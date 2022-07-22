@@ -69,7 +69,9 @@ public class GoogleDriveManager {
                 .addParameter("n", "notification", "(Optional) Send notification email; COPY only; FALSE is default", "false")
                 .addParameter("m", "mimetype", "(Optional) download file format; EXPORT only; application/vnd.openxmlformats-officedocument.spreadsheetml.sheet is default", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
                 .addParameter("d", "delimiter", "(Optional) File delimiter; ';' as default", ";")
-                .addParameter("e", "encode", "(Optional) Encode file.", "auto");
+                .addParameter("e", "encode", "(Optional) Encode file.", "auto")
+                .addParameter("nc", "name_contains", "(Optional) Name contains prefix text.", "")
+                .addParameter("mo", "last_modified", "(Optional) Date of the last modification of the file.", "");
 
         //Command Line.
         CommandLineInterface cli = mitt.getCommandLineInterface(args);
@@ -131,9 +133,9 @@ public class GoogleDriveManager {
                         .addCustomField("custom_primary_key", new Concat((List) cli.getParameterAsList("key", "\\+")))
                         .addCustomField("etl_load_date", new Now())
                         .addField(cli.getParameterAsList("field", "\\+"));
-
+                
                 //Download file from Google Drive.
-                Path outputPath = api.download(cli.getParameter("id"));
+                Path outputPath = api.download(cli.getParameter("id"), cli.getParameter("last_modified"), cli.getParameter("name_contains"));
 
                 Logger.getLogger(GoogleDriveManager.class.getName()).log(Level.INFO, "File(s) downloaded successfully to {0}", outputPath.toString());
 

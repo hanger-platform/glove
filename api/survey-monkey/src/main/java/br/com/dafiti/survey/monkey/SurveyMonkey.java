@@ -144,7 +144,7 @@ public class SurveyMonkey {
                         .build();
 
                 //Connect to the API. 
-                try (CloseableHttpClient client = HttpClients.createDefault()) {
+                try ( CloseableHttpClient client = HttpClients.createDefault()) {
                     HttpGet httpGet = new HttpGet(SURVEYMONKEY_ENDPOINT + cli.getParameter("endpoint"));
 
                     //Sets header.
@@ -177,54 +177,64 @@ public class SurveyMonkey {
 
                     //Gets a reponse entity. 
                     json = EntityUtils.toString(response.getEntity(), "UTF-8");
-                }
 
-                if (json != null && !json.isEmpty()) {
+                    if (json != null && !json.isEmpty()) {
+                        int statusCode = response.getStatusLine().getStatusCode();
 
-                    //Display page statistics.
-                    if (paginate) {
-                        int perPage = JsonPath.read(json, "$.per_page");
-                        int currentPage = JsonPath.read(json, "$.page");
-                        int total = JsonPath.read(json, "$.total");
+                        //Identifies the response status code.
+                        switch (statusCode) {
+                            case 200 /*OK*/:
 
-                        LOG.log(Level.INFO, "Total: {0} | Current page: {1} ({2} per page)", new Object[]{total, currentPage, perPage});
+                                //Display page statistics.
+                                if (paginate) {
+                                    int perPage = JsonPath.read(json, "$.per_page");
+                                    int currentPage = JsonPath.read(json, "$.page");
+                                    int total = JsonPath.read(json, "$.total");
 
-                        //Identifies if it is last page.
-                        try {
-                            JsonPath.read(json, "$.links.next");
-                        } catch (PathNotFoundException ex) {
-                            process = false;
-                        }
-                    }
+                                    LOG.log(Level.INFO, "Total: {0} | Current page: {1} ({2} per page)", new Object[]{total, currentPage, perPage});
 
-                    //Defines jFlat to flatten json.
-                    JFlat jFlat = new JFlat(json);
-
-                    //get the 2D representation of JSON document.
-                    List<Object[]> values = jFlat.json2Sheet().headerSeparator(".").getJsonAsSheet();
-
-                    //Starts at 1 to ignore header.
-                    for (int line = 1; line < values.size(); line++) {
-                        List record = new ArrayList();
-
-                        //Fetchs original fields.
-                        for (String field : originalFields) {
-
-                            //Fetchs all field to get only originals.
-                            for (int column = 0; column < values.get(0).length; column++) {
-                                if (field.toLowerCase().equals(values.get(0)[column].toString().toLowerCase())) {
-                                    if (values.get(line)[column] != null) {
-                                        record.add(((JsonPrimitive) values.get(line)[column]).getAsString());
-                                    } else {
-                                        record.add("");
+                                    //Identifies if it is last page.
+                                    try {
+                                        JsonPath.read(json, "$.links.next");
+                                    } catch (PathNotFoundException ex) {
+                                        process = false;
                                     }
                                 }
-                            }
-                        }
 
-                        mitt.write(record);
+                                //Defines jFlat to flatten json.
+                                JFlat jFlat = new JFlat(json);
+
+                                //get the 2D representation of JSON document.
+                                List<Object[]> values = jFlat.json2Sheet().headerSeparator(".").getJsonAsSheet();
+
+                                //Starts at 1 to ignore header.
+                                for (int line = 1; line < values.size(); line++) {
+                                    List record = new ArrayList();
+
+                                    //Fetchs original fields.
+                                    for (String field : originalFields) {
+                                        String value = "";
+
+                                        //Fetchs all field to get only originals.
+                                        for (int column = 0; column < values.get(0).length; column++) {
+                                            if (field.toLowerCase().equals(values.get(0)[column].toString().toLowerCase())) {
+                                                if (values.get(line)[column] != null) {
+                                                    value = ((JsonPrimitive) values.get(line)[column]).getAsString();
+                                                }
+                                                break;
+                                            }
+                                        }
+                                        record.add(value);
+                                    }
+
+                                    mitt.write(record);
+                                }
+                                break;
+                            default:
+                                throw new Exception("HTTP Exception: " + json);
+                        }
                     }
-                }
+                } 
             } while (paginate && process);
 
         } catch (Exception ex) {

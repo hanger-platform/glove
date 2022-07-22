@@ -60,7 +60,9 @@ java -jar google-drive-manager.jar \
   	--notification=<(Optional) Send notification email; COPY only; FALSE is default> \
 	--mimetype=<(Optional) download file format; EXPORT only; application/vnd.openxmlformats-officedocument.spreadsheetml.sheet is default> \
 	--delimiter=<(Optional) File delimiter; ';' as default> \
-	--encode=<(optional) encode file; 'auto' as default>
+	--encode=<(optional) encode file; 'auto' as default> \
+  --name_contains=<(Optional) Name contains prefix text.> \
+  --last_modified=<(Optional) Date of the last modification of the file.> \
 ```
 
 ##### COPY
@@ -108,6 +110,38 @@ java -jar /home/user_name/glove/extractor/lib/google-drive-manager.jar \
   --key="::md5([[field1,field2]])" \
   --properties="{\"skip\":\"1\",\"sheet\":\"sheet_name\"}"
 ```
+
+The *name_contains* and *last_modified* parameters allows us to filter the files by the last modified date and by its name prefix.
+
+Let's consider a folder that has some files named as:
+
+- File name: **engineering_A** last modified: **2021-12-10**
+- File name: **engineering_B** last modified: **2022-01-31**
+- File name: **engineering_C** last modified: **2022-01-31**
+- File name: **marketing_A** last modified: **2022-01-31**
+
+Now let's suppose that we need to download all the files that contains the prefix ***engineering_*** and have the last modified date greater than or equal to ***2022-01-31***: 
+
+```bash
+java -jar /home/user_name/glove/extractor/lib/google-drive-manager.jar \
+  --credentials=/home/user_name/credentials/google_drive.json \
+  --id="<folder id where the files are.>" \
+  --action="IMPORT" \
+  --output="/tmp/anything/file_name.csv" \
+  --field="field1+field2+field3+fieldN" \
+  --partition="::fixed(2019)" \
+  --key="::md5([[field1,field2]])" \
+  --properties="{\"skip\":\"1\",\"sheet\":\"sheet_name\"}" \
+  --name_contains="engineering_" \
+  --last_modified="2022-01-31" \
+```
+
+The extratcor would consider and download just the files:
+
+- File name: **engineering_B** last modified: **2022-01-31**
+- File name: **engineering_C** last modified: **2022-01-31**
+
+**Note:** last_modified paramter accepts RFC 3339 format and default timezone is UTC, such as 2012-06-04T12:00:00-08:00.
 
 ##### UPLOAD
 This action will upload one local file to Google Drive, if folder parameter is empty, upload to My drive directory.

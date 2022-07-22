@@ -157,9 +157,11 @@ public class GoogleAds {
                 StringBuilder query = new StringBuilder();
                 query.append("SELECT ").append(cli.getParameter("field")).append(" FROM ").append(cli.getParameter("type"));
 
-                if (!cli.getParameter("filter").isEmpty()) {
+                if ((cli.getParameter("filter") != null) && (!cli.getParameter("filter").isEmpty())) {
                     query.append(" WHERE ").append(cli.getParameter("filter"));
                 }
+
+                Logger.getLogger(GoogleAds.class.getName()).log(Level.INFO, "Query built: {0}", query);
 
                 //Defines the output path. 
                 Path outputPath = Files.createTempDirectory("google_ads_" + UUID.randomUUID());

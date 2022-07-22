@@ -1,0 +1,245 @@
+*                  text                            eol=lf
+#       Basic                      .gitattributes   for   sql   files
+*.sql              text                            eol=lf   linguist-detectable=true
+*.sql              text                            eol=lf   linguist-language=sql
+*.h                text                            eol=lf   linguist-detectable=true   diff=cpp
+*.h                text                            eol=lf   linguist-language=C        diff=cpp
+*.gitattributes    text                            eol=lf
+.gitignore         text                            eol=lf
+*.gitattributes                                                 linguist-language=gitattributes
+.gitattributes     text                            eol=lf        export-ignore
+.gitignore         text                            eol=lf        export-ignore
+.gitkeep           text                            eol=lf        export-ignore
+*.pyc              binary                                        export-ignore
+*.pyd              binary                                        export-ignore
+*.pyo              binary                                        export-ignore
+.env               text                            eol=lf
+.gitattributes     text                            eol=lf
+.gitconfig         text                            eol=lf
+*.*ignore          text                            eol=lf
+*.*rc              text                            eol=lf
+*.3gp              binary
+*.3gpp             binary
+*.7z               binary
+*.a                binary
+*.adoc             text                            eol=lf
+*.ai               binary
+*.app filter=lfs diff=lfs merge=lfs -text
+*.as               binary
+*.asf              binary
+*.asx              binary
+*.avi              binary
+*.bal              text                            eol=lf
+*.balx             binary
+*.bash             text                            eol=lf
+*.bat              text                            eol=crlf
+*.bibtex           text                            eol=lf        diff=bibtex
+*.bmp              binary
+*.c                text                            eol=lf        diff=cpp
+*.c++              text                            eol=lf        diff=cpp
+*.cc               text                            eol=lf        diff=cpp
+*.class            binary
+*.cmd              text                            eol=crlf
+*.cnf              text                            eol=lf
+*.coffee           text                            eol=lf
+*.conf             text                            eol=lf
+*.config           text                            eol=lf
+*.cpp              text                            eol=lf        diff=cpp
+*.csproj           text                            eol=lf
+*.css              text                            eol=lf        diff=css
+*.csv              text                            eol=lf
+*.cxx              text                            eol=lf        diff=cpp
+*.db               binary
+*.dbproj           text                            eol=lf
+*.df               text                            eol=lf
+*.dll              binary
+*.dot              text                            eol=lf
+*.dylib            binary
+*.ear              binary
+*.ejs              text                            eol=lf
+*.eot              binary
+*.eps              binary
+*.erb              text                            eol=lf
+*.exe              binary
+*.filters          text                            eol=lf
+*.fish             text                            eol=lf
+*.fla              binary
+*.flv              binary
+*.fsproj           text                            eol=lf
+*.gch              binary
+*.gif              binary
+*.gifv             binary
+*.gradle           text                            eol=lf        diff=java
+*.gradle.kts       text                            eol=lf        diff=kotlin
+*.groovy           text                            eol=lf        diff=java
+*.gz               binary
+*.h++              text                            eol=lf        diff=cpp
+*.haml             text                            eol=lf
+*.handlebars       text                            eol=lf
+*.hbs              text                            eol=lf
+*.hbt              text                            eol=lf
+*.hh               text                            eol=lf        diff=cpp
+*.hpp              text                            eol=lf        diff=cpp
+*.htm              text                            eol=lf        diff=html
+*.html             text                            eol=lf        diff=html
+*.ico              binary
+*.inc              text                            eol=lf
+*.ini              text                            eol=lf
+*.ipynb            text                            eol=lf
+*.jade             text                            eol=lf
+*.jar filter=lfs diff=lfs merge=lfs -text
+*.java             text                            eol=lf        diff=java
+*.jks              binary
+*.jng              binary
+*.jp2              binary
+*.jpeg             binary
+*.jpg              binary
+*.jpx              binary
+*.js               text                            eol=lf
+*.json             text                            eol=lf
+*.jsp              text                            eol=lf
+*.jspf             text                            eol=lf
+*.jspx             text                            eol=lf
+*.jsx              text                            eol=lf
+*.jxr              binary
+*.kar              binary
+*.kt               text                            eol=lf        diff=kotlin
+*.la               binary
+*.lai              binary
+*.latte            text                            eol=lf
+*.less             text                            eol=lf
+*.lib              binary
+*.lo               binary
+*.lock             text                            eol=lf        -diff
+*.ls               text                            eol=lf
+*.lsproj           text                            eol=lf
+*.m4a              binary
+*.m4v              binary
+*.map              text                            eol=lf        -diff
+*.markdown         text                            eol=lf        diff=markdown
+*.md               text                            eol=lf        diff=markdown
+*.mdown            text                            eol=lf        diff=markdown
+*.mdtext           text                            eol=lf        diff=markdown
+*.mdtxt            text                            eol=lf        diff=markdown
+*.mdwn             text                            eol=lf        diff=markdown
+*.mdx              text                            eol=lf        diff=markdown
+*.mid              binary
+*.midi             binary
+*.mkd              text                            eol=lf        diff=markdown
+*.mkdn             text                            eol=lf        diff=markdown
+*.mng              binary
+*.modelproj        text                            eol=lf
+*.mov              binary
+*.mp3              binary
+*.mp4              binary
+*.mpeg             binary
+*.mpg              binary
+*.mustache         text                            eol=lf
+*.njk              text                            eol=lf
+*.o                binary
+*.obj              binary
+*.od               text                            eol=lf
+*.ogg              binary
+*.ogv              binary
+*.onlydata         text                            eol=lf
+*.otf              binary
+*.out              binary
+*.p                binary
+*.pch              binary
+*.pdf              binary
+*.php              text                            eol=lf        diff=php
+*.phtml            text                            eol=lf
+*.pickle           binary
+*.pkl              binary
+*.pl               text                            eol=lf
+*.png              binary
+*.properties       text                            eol=lf
+*.props            text                            eol=lf
+*.ps1              text                            eol=crlf
+*.psb              binary
+*.psd              binary
+*.pxd              text                            eol=lf        diff=python
+*.py               text                            eol=lf        diff=python
+*.py3              text                            eol=lf        diff=python
+*.pyc              binary                          export-ignore
+*.pyd              binary                          export-ignore
+*.pyi              text                            eol=lf        diff=python
+*.pyo              binary                          export-ignore
+*.pyw              text                            eol=lf        diff=python
+*.pyx              text                            eol=lf        diff=python
+*.pyz              text                            eol=lf        diff=python
+*.ra               binary
+*.rar              binary
+*.rb               text                            eol=lf        diff=ruby
+*.sass             text                            eol=lf
+*.scala            text                            eol=lf        diff=java
+*.scm              text                            eol=lf
+*.scss             text                            eol=lf        diff=css
+*.sh               text                            eol=lf
+*.sln              text                            eol=lf
+*.slo              binary
+*.so               binary
+*.sqlproj          text                            eol=lf
+*.styl             text                            eol=lf
+*.svelte           text                            eol=lf
+*.svg              text                            eol=lf
+*.svgz             binary
+*.swc              binary
+*.swf              binary
+*.tab              text                            eol=lf
+*.tag              text                            eol=lf
+*.tagx             text                            eol=lf
+*.tar              binary
+*.tex              text                            eol=lf        diff=tex
+*.textile          text                            eol=lf
+*.tgz              binary
+*.tif              binary
+*.tiff             binary
+*.tld              text                            eol=lf
+*.tmpl             text                            eol=lf
+*.toml             text                            eol=lf
+*.tpl              text                            eol=lf
+*.ts               text                            eol=lf
+*.tsv              text                            eol=lf
+*.tsx              text                            eol=lf
+*.ttf              binary
+*.twig             text                            eol=lf
+*.txt              text                            eol=lf
+*.vbproj           text                            eol=lf
+*.vcproj           text                            eol=lf
+*.vcxitems         text                            eol=lf
+*.vcxproj          text                            eol=lf
+*.vim              text                            eol=lf
+*.vue              text                            eol=lf
+*.war              binary
+*.wbmp             binary
+*.webm             binary
+*.webp             binary
+*.wixproj          text                            eol=lf
+*.woff             binary
+*.woff2            binary
+*.wwaproj          text                            eol=lf
+*.xhtml            text                            eol=lf        diff=html
+*.xml              text                            eol=lf
+*.xproj            text                            eol=lf
+*.yaml             text                            eol=lf
+*.yml              text                            eol=lf
+*.zip              binary
+*.zsh              text                            eol=lf
+.editorconfig      text                            eol=lf
+.gvimrc            text                            eol=lf
+.htaccess          text                            eol=lf
+.husky/*           text                            eol=lf
+.prettierrc        text                            eol=lf
+.vimrc             text                            eol=lf
+dockerfile         text                            eol=lf
+install            text                            eol=lf
+license            text                            eol=lf
+makefile           text                            eol=lf
+news               text                            eol=lf
+package.json       text                            eol=lf
+package-lock.json  text                            eol=lf
+pnpm-lock.yaml     text                            eol=lf
+readme             text                            eol=lf
+todo               text                            eol=lf
+yarn.lock          text                            eol=lf

@@ -110,6 +110,10 @@ partition_load(){
     # Converte os arquivos das partições para formato colunar.
 	convert "*" "1" ${PARTITION_MERGE} ${STORAGE_QUEUE_PATH} ${PARTITION_MODE} "false"
 
+	# Remove os arquivos utilizados no merge.
+	rm -f *.original.${OUTPUT_FORMAT}
+	rm -f *.transient.${OUTPUT_FORMAT}
+
     # Identifica se o particionamento é real ou virtual.
     if [ ${PARTITION_MODE} == "real" ]; then
         # Cria o diretório para cada partição respeitando o padrão de particionamento do HIVE.
@@ -122,9 +126,6 @@ partition_load(){
             error_check
         done
     fi
-
-    # Remove os arquivos utilizados no merge.
-    rm -f *.original.${OUTPUT_FORMAT}
 
 	# Envia os arquivo para o storage.
 	echo "Uploading ${OUTPUT_FORMAT} files!"

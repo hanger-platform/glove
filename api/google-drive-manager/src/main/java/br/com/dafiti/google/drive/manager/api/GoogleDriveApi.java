@@ -212,9 +212,11 @@ public class GoogleDriveApi {
      * Downloads google Drive file by its ID.
      *
      * @param fileId Google Drive file
+     * @param nameContains
+     * @param lastModified
      * @return Path of downloaded file
      */
-    public java.nio.file.Path download(String fileId) {
+    public java.nio.file.Path download(String fileId, String lastModified, String nameContains) {
         java.nio.file.Path outputPath = null;
 
         try {
@@ -228,12 +230,36 @@ public class GoogleDriveApi {
 
             if (fileMetadata.getMimeType().equals("application/vnd.google-apps.folder")) {
 
+                lastModified = lastModified == null ? "" :lastModified;
+                nameContains = nameContains == null ? "" :nameContains;
+                
                 String parents = "parents='" + fileId + "'";
+                String modifiedTime = "modifiedTime>='" + lastModified + "'";
+                String name = "name contains '" + nameContains + "'";
+                
+                FileList response = null;
 
-                FileList response = this.service.files().list()
-                        .setQ(parents + "and trashed = false")
-                        .setSpaces("drive")
-                        .execute();
+                if (!lastModified.isEmpty() && !nameContains.isEmpty()) {
+                     response = this.service.files().list()
+                            .setQ(parents + "and trashed = false" + "and" + modifiedTime + "and" + name)
+                            .setSpaces("drive")
+                            .execute();
+                } else if (lastModified.isEmpty() && !nameContains.isEmpty()) {
+                     response = this.service.files().list()
+                            .setQ(parents + "and trashed = false and" + name)
+                            .setSpaces("drive")
+                            .execute();
+                } else if (!lastModified.isEmpty() && nameContains.isEmpty()) {
+                     response = this.service.files().list()
+                            .setQ(parents + "and trashed = false and" + modifiedTime)
+                            .setSpaces("drive")
+                            .execute();
+                } else {
+                     response = this.service.files().list()
+                            .setQ(parents + "and trashed = false")
+                            .setSpaces("drive")
+                            .execute();
+                }
 
                 for (File item : response.getFiles()) {
                     item.getId();

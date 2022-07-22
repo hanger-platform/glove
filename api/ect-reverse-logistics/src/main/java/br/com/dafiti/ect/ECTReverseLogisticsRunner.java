@@ -24,6 +24,7 @@
 package br.com.dafiti.ect;
 
 import br.com.correios.logisticareversa.ColetasSolicitadas;
+import br.com.correios.logisticareversa.ComponenteException;
 import br.com.correios.logisticareversa.HistoricoColeta;
 import br.com.correios.logisticareversa.LogisticaReversaService;
 import br.com.correios.logisticareversa.LogisticaReversaWS;
@@ -35,6 +36,7 @@ import br.com.dafiti.mitt.transformation.embedded.Concat;
 import br.com.dafiti.mitt.transformation.embedded.DateFormat;
 import br.com.dafiti.mitt.transformation.embedded.Now;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -59,7 +61,7 @@ public class ECTReverseLogisticsRunner implements Runnable {
     private final List<String> authorizations;
 
     private final int API_DEFAULT_LIMIT = 10;
-    private final int API_DEFAULT_RETRY = 5;
+    private final int API_DEFAULT_RETRY = 3;
 
     /**
      *
@@ -269,11 +271,15 @@ public class ECTReverseLogisticsRunner implements Runnable {
             try {
                 if (retry < API_DEFAULT_RETRY) {
                     Logger.getLogger(ECTReverseLogisticsRunner.class.getName()).log(Level.INFO, "Reverse logistics retry {0} for authorizations: {1}, caused by {2}", new Object[]{retry, String.join(",", authorizations), ex});
-                    TimeUnit.SECONDS.sleep(5 * retry);
+                    TimeUnit.SECONDS.sleep(1 * retry);
                     retry = retry + 1;
-                    this.loteProcessor(mitt, authorizations, retry);
+
+                    //Try to recovery each authorization code. 
+                    for (String authorization : authorizations) {
+                        this.loteProcessor(mitt, new ArrayList<>(Arrays.asList(authorization)), retry);
+                    }
                 } else {
-                    Logger.getLogger(ECTReverseLogisticsRunner.class.getName()).log(Level.INFO, "Reverse logistics retrying limit exceeded. Authorizations: {0}", new Object[]{retry, String.join(",", authorizations)});
+                    Logger.getLogger(ECTReverseLogisticsRunner.class.getName()).log(Level.INFO, "Reverse logistics retrying limit ({0}) exceeded. Authorizations: {1}", new Object[]{retry, String.join(",", authorizations)});
                 }
             } catch (InterruptedException e) {
                 Logger.getLogger(ECTReverseLogisticsRunner.class.getName()).log(Level.SEVERE, "Reverse logistics runner retry error: ", e);
